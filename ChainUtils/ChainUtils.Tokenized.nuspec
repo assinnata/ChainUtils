@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<package >
+	<metadata>
+		<id>ChainUtils</id>
+		<version>$version$</version>
+		<title>ChainUtils</title>
+		<authors>Nicolas Dorier</authors>
+		<owners>$author$</owners>
+		<iconUrl>https://aois.blob.core.windows.net/public/Bitcoin.png</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>.NET Bitcoin Framework</description>
+		<summary>
+			The most complete and portable Bitcoin Framework in .NET
+			Getting started (http://www.codeproject.com/Articles/768412/ChainUtils-The-most-complete-Bitcoin-port-Part-Crypt)
+			Full script evaluation and parsing
+			Key generation
+			Deterministic wallet : BIP 32
+			Payment protocol
+			RPC Client
+			Encrypted wallet : BIP 38 (http://www.codeproject.com/Articles/775226/ChainUtils-Cryptography-Part)
+			Stealth Addresses (http://www.codeproject.com/Articles/775226/ChainUtils-Cryptography-Part)
+			Standard script generation and parsing
+			Object model faithful to the C++ API but with C# goodness
+			Simpler API (here is how to generate a key and get the address : new Key().PubKey.Address.ToString())
+			Bloom filter, partial merkle tree
+			Serialization of Blocks, Transactions, Script
+			Signing/verification with private keys, support compact signature for prooving ownership
+			NodeServer implementation
+
+			And more check at https://github.com/NicolasDorier/ChainUtils/blob/master/README.md
+		</summary>
+		<projectUrl>https://github.com/NicolasDorier/ChainUtils</projectUrl>
+		<copyright>Copyright 2014</copyright>
+		<tags>bitcoin</tags>
+		<dependencies>
+			<group targetFramework="net45">
+				<dependency id="protobuf-net" version="2.0.0.668" />
+				<dependency id="System.Data.SQLite.Core" version="1.0.94.0" />
+				<dependency id="Newtonsoft.Json" version="6.0.1" />
+			</group>
+
+			<group>
+			</group>
+		</dependencies>
+	</metadata>
+
+	<files>
+
+		<file src="bin\Release\ChainUtils.*" target="lib\net45" />
+		<file src="bin\Release\Mono.Nat.*" target="lib\net45" />
+		
+		<file src="..\ChainUtils.Portable\bin\Profile111\Release\*.*" target="lib\portable-net45+win+wpa81+Xamarin.iOS10+MonoAndroid10+MonoTouch10" />
+		<file src="..\ChainUtils.Portable\bin\Profile259\Release\*.*" target="lib\portable-net45+win+wpa81+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10" />
+		<file src="..\ChainUtils.Portable\bin\MonoAndroid\Release\*.*" target="lib\MonoAndroid" />
+
+	</files>
+</package>

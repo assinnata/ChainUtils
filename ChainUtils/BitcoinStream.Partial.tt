@@ -1,0 +1,152 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Sockets;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ChainUtils
+{
+	public partial class BitcoinStream
+	{
+		<# foreach(String signature in new string[]
+		{
+			"<T>(ref T[] data) where T : IBitcoinSerializable",
+			"(ref ulong[] data)",
+			"(ref ushort[] data)",
+			"(ref uint[] data)",
+			"(ref byte[] data)",
+			"(ref long[] data)",
+			"(ref short[] data)",
+			"(ref int[] data)",
+		}){ #>
+
+		private void ReadWriteArray<#= signature #>
+		{
+			if(data == null && Serializing)
+				throw new ArgumentNullException("Impossible to serialize a null array");
+			var length = new VarInt(data == null ? 0 : (ulong)data.Length);
+			ReadWrite(ref length);
+
+			if(length.ToLong() > (uint)MaxArraySize)
+				throw new ArgumentOutOfRangeException("Array size not big");
+			if(!Serializing)
+				data = new <#= signature.Split(' ','[')[1] #>[length.ToLong()];
+			for(int i = 0 ; i < data.Length ; i++)
+			{
+				<#= signature.Split(' ','[')[1] #> obj = data[i];
+				ReadWrite(ref obj);
+				data[i] = obj;
+			}
+		}
+
+		<# } #>
+
+
+		<# foreach(String type in new string[]
+		{
+			"ulong",
+			"ushort",
+			"uint",
+			"byte",
+			"long",
+			"short",
+			"int"
+		}){ #>
+
+		private void ReadWriteList(ref List<<#= type #>> data)
+		{
+			var dataArray = data == null ? null : data.ToArray();
+			if(Serializing && dataArray == null)
+			{
+				dataArray = new <#= type #>[0];
+			}
+			ReadWriteArray(ref dataArray);
+			if(!Serializing)
+			{
+				if(data == null)
+					data = new List<<#= type #>>();
+				else
+					data.Clear();
+				data.AddRange(dataArray);
+			}
+		}
+
+		<# } #>
+
+		<# foreach(String signature in new string[]
+		{
+			"(ref ulong[] data)",
+			"(ref ushort[] data)",
+			"(ref uint[] data)",
+			"(ref long[] data)",
+			"(ref short[] data)",
+			"(ref int[] data)",
+		}){ #>
+
+		public void ReadWrite<#= signature #>
+		{
+			ReadWriteArray(ref data);
+		}
+
+		<# } #>
+
+
+			<# foreach(String type in new string[]
+		{
+			"ulong",
+			"ushort",
+			"uint",
+		}){ #>
+
+		public void ReadWrite(ref <#= type #> data)
+		{
+			ulong l = (ulong)data;
+			ReadWriteNumber(ref l, sizeof(<#= type #>));
+			if(!Serializing)
+				data = (<#= type #>)l;
+		}
+
+		public <#= type #> ReadWrite(<#= type #> data)
+		{
+			ReadWrite(ref data);
+			return data;
+		}
+
+		<# } #>
+
+
+			<# foreach(String type in new string[]
+		{
+			"long",
+			"short",
+			"int",
+		}){ #>
+
+		public void ReadWrite(ref <#= type #> data)
+		{
+			long l = (long)data;
+			ReadWriteNumber(ref l, sizeof(<#= type #>));
+			if(!Serializing)
+				data = (<#= type #>)l;
+		}
+
+		public <#= type #> ReadWrite(<#= type #> data)
+		{
+			ReadWrite(ref data);
+			return data;
+		}
+
+		<# } #>
+	}
+}
