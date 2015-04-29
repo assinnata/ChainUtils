@@ -1,5 +1,6 @@
 ﻿namespace ChainUtils
 {
+    //LOL
 	public abstract class BitcoinExtKeyBase : Base58Data, IDestination
 	{
 	    protected BitcoinExtKeyBase(IBitcoinSerializable key, Network network)
