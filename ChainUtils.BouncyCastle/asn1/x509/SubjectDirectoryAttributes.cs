@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities;
 using ChainUtils.BouncyCastle.Utilities.Collections;
 
@@ -70,10 +69,10 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		private SubjectDirectoryAttributes(
 			Asn1Sequence seq)
 		{
-            this.attributes = Platform.CreateArrayList();
-            foreach (object o in seq)
+            attributes = Platform.CreateArrayList();
+            foreach (var o in seq)
 			{
-				Asn1Sequence s = Asn1Sequence.GetInstance(o);
+				var s = Asn1Sequence.GetInstance(o);
 				attributes.Add(AttributeX509.GetInstance(s));
 			}
 		}
@@ -123,8 +122,8 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-            AttributeX509[] v = new AttributeX509[attributes.Count];
-            for (int i = 0; i < attributes.Count; ++i)
+            var v = new AttributeX509[attributes.Count];
+            for (var i = 0; i < attributes.Count; ++i)
             {
                 v[i] = (AttributeX509)attributes[i];
             }

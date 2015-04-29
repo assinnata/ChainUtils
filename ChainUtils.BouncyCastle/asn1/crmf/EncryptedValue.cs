@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Crmf
@@ -16,10 +15,10 @@ namespace ChainUtils.BouncyCastle.Asn1.Crmf
 
         private EncryptedValue(Asn1Sequence seq)
         {
-            int index = 0;
+            var index = 0;
             while (seq[index] is Asn1TaggedObject)
             {
-                Asn1TaggedObject tObj = (Asn1TaggedObject)seq[index];
+                var tObj = (Asn1TaggedObject)seq[index];
 
                 switch (tObj.TagNo)
                 {
@@ -130,7 +129,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Crmf
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
             AddOptional(v, 0, intendedAlg);
             AddOptional(v, 1, symmAlg);

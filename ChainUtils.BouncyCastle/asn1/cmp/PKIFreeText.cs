@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cmp
 {
@@ -33,7 +32,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 		public PkiFreeText(
 			Asn1Sequence seq)
 		{
-			foreach (object o in seq)
+			foreach (var o in seq)
 			{
 				if (!(o is DerUtf8String))
 				{
@@ -41,7 +40,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 				}
 			}
 
-			this.strings = seq;
+			strings = seq;
 		}
 
 		public PkiFreeText(

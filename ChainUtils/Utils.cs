@@ -1,22 +1,16 @@
-﻿using ChainUtils.DataEncoders;
-using ChainUtils.BouncyCastle.Crypto.Digests;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Numerics;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Security;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using ChainUtils.BouncyCastle.Math;
+using ChainUtils.DataEncoders;
 using ChainUtils.Protocol;
-using System.Runtime.ExceptionServices;
 #if !PORTABLE
-using System.Security.Cryptography;
 using System.Net.Sockets;
 #endif
 
@@ -24,7 +18,7 @@ namespace ChainUtils
 {
 	public static class Extensions
 	{
-		public static Block GetBlock(this IBlockRepository repository, uint256 blockId)
+		public static Block GetBlock(this IBlockRepository repository, Uint256 blockId)
 		{
 			try
 			{
@@ -47,9 +41,9 @@ namespace ChainUtils
 			if(base58 == null)
 				throw new ArgumentNullException("base58");
 			var inner = base58.ToBytes();
-			if(base58.Type != Base58Type.COLORED_ADDRESS)
+			if(base58.Type != Base58Type.ColoredAddress)
 			{
-				byte[] version = network.GetVersionBytes(base58.Type);
+				var version = network.GetVersionBytes(base58.Type);
 				var newBase58 = Encoders.Base58Check.EncodeData(version.Concat(inner).ToArray());
 				return Network.CreateFromBase58Data<T>(newBase58, network);
 			}
@@ -62,7 +56,7 @@ namespace ChainUtils
 		}
 		public static byte[] ReadBytes(this Stream stream, int count)
 		{
-			byte[] result = new byte[count];
+			var result = new byte[count];
 			stream.Read(result, 0, count);
 			return result;
 		}
@@ -71,9 +65,9 @@ namespace ChainUtils
 			if(list.Count == count)
 				return new T[0];
 
-			List<T> removed = new List<T>();
+			var removed = new List<T>();
 
-			for(int i = list.Count - 1 ; i + 1 > count ; i--)
+			for(var i = list.Count - 1 ; i + 1 > count ; i--)
 			{
 				removed.Add(list[i]);
 				list.RemoveAt(i);
@@ -92,7 +86,7 @@ namespace ChainUtils
 		public static IEnumerable<List<T>> Partition<T>(this IEnumerable<T> source, Func<int> max)
 		{
 			var partitionSize = max();
-			List<T> toReturn = new List<T>(partitionSize);
+			var toReturn = new List<T>(partitionSize);
 			foreach(var item in source)
 			{
 				toReturn.Add(item);
@@ -111,16 +105,16 @@ namespace ChainUtils
 #if !PORTABLE
 		public static int ReadEx(this Stream stream, byte[] buffer, int offset, int count, CancellationToken cancellation = default(CancellationToken))
 		{
-			int readen = 0;
+			var readen = 0;
 			while(readen < count)
 			{
-				int thisRead = 0;
+				var thisRead = 0;
 				if(stream is NetworkStream) //Big performance problem with begin read for other stream than NetworkStream
 				{
 					var ar = stream.BeginRead(buffer, offset + readen, count - readen, null, null);
 					if(!ar.CompletedSynchronously)
 					{
-						WaitHandle.WaitAny(new WaitHandle[] { ar.AsyncWaitHandle, cancellation.WaitHandle }, -1);
+						WaitHandle.WaitAny(new[] { ar.AsyncWaitHandle, cancellation.WaitHandle }, -1);
 					}
 					cancellation.ThrowIfCancellationRequested();
 					thisRead = stream.EndRead(ar);
@@ -254,19 +248,19 @@ namespace ChainUtils
 		}
 
 
-		public static String BITCOIN_SIGNED_MESSAGE_HEADER = "Bitcoin Signed Message:\n";
-		public static byte[] BITCOIN_SIGNED_MESSAGE_HEADER_BYTES = Encoding.UTF8.GetBytes(BITCOIN_SIGNED_MESSAGE_HEADER);
+		public static String BitcoinSignedMessageHeader = "Bitcoin Signed Message:\n";
+		public static byte[] BitcoinSignedMessageHeaderBytes = Encoding.UTF8.GetBytes(BitcoinSignedMessageHeader);
 
 		//http://bitcoinj.googlecode.com/git-history/keychain/core/src/main/java/com/google/bitcoin/core/Utils.java
 		public static byte[] FormatMessageForSigning(string messageText)
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			var message = Encoding.UTF8.GetBytes(messageText);
 
-			ms.WriteByte((byte)BITCOIN_SIGNED_MESSAGE_HEADER_BYTES.Length);
-			Write(ms, BITCOIN_SIGNED_MESSAGE_HEADER_BYTES);
+			ms.WriteByte((byte)BitcoinSignedMessageHeaderBytes.Length);
+			Write(ms, BitcoinSignedMessageHeaderBytes);
 
-			VarInt size = new VarInt((ulong)message.Length);
+			var size = new VarInt((ulong)message.Length);
 			Write(ms, size.ToBytes());
 			Write(ms, message);
 			return ms.ToArray();
@@ -278,16 +272,16 @@ namespace ChainUtils
 			ms.Write(bytes, 0, bytes.Length);
 		}
 
-		internal static Array BigIntegerToBytes(ChainUtils.BouncyCastle.Math.BigInteger b, int numBytes)
+		internal static Array BigIntegerToBytes(BigInteger b, int numBytes)
 		{
 			if(b == null)
 			{
 				return null;
 			}
-			byte[] bytes = new byte[numBytes];
-			byte[] biBytes = b.ToByteArray();
-			int start = (biBytes.Length == numBytes + 1) ? 1 : 0;
-			int length = Math.Min(biBytes.Length, numBytes);
+			var bytes = new byte[numBytes];
+			var biBytes = b.ToByteArray();
+			var start = (biBytes.Length == numBytes + 1) ? 1 : 0;
+			var length = Math.Min(biBytes.Length, numBytes);
 			Array.Copy(biBytes, start, bytes, numBytes - length, length);
 			return bytes;
 
@@ -297,7 +291,7 @@ namespace ChainUtils
 
 #if !NOBIGINT
 		//https://en.bitcoin.it/wiki/Script
-		public static byte[] BigIntegerToBytes(BigInteger num)
+		public static byte[] BigIntegerToBytes(System.Numerics.BigInteger num)
 #else
 		internal static byte[] BigIntegerToBytes(BigInteger num)
 #endif
@@ -306,7 +300,7 @@ namespace ChainUtils
 				//Positive 0 is represented by a null-length vector
 				return new byte[0];
 
-			bool isPositive = true;
+			var isPositive = true;
 			if(num < 0)
 			{
 				isPositive = false;
@@ -319,7 +313,7 @@ namespace ChainUtils
 		}
 
 #if !NOBIGINT
-		public static BigInteger BytesToBigInteger(byte[] data)
+		public static System.Numerics.BigInteger BytesToBigInteger(byte[] data)
 #else
 		internal static BigInteger BytesToBigInteger(byte[] data)
 #endif
@@ -327,37 +321,37 @@ namespace ChainUtils
 			if(data == null)
 				throw new ArgumentNullException("data");
 			if(data.Length == 0)
-				return BigInteger.Zero;
+				return System.Numerics.BigInteger.Zero;
 			data = data.ToArray();
 			var positive = (data[data.Length - 1] & 0x80) == 0;
 			if(!positive)
 			{
 				data[data.Length - 1] &= unchecked((byte)~0x80);
-				return -new BigInteger(data);
+				return -new System.Numerics.BigInteger(data);
 			}
-			return new BigInteger(data);
+			return new System.Numerics.BigInteger(data);
 		}
 
-		static readonly TraceSource _TraceSource = new TraceSource("ChainUtils");
+		static readonly TraceSource TraceSource = new TraceSource("ChainUtils");
 
 		public static bool error(string msg, params object[] args)
 		{
-			_TraceSource.TraceEvent(TraceEventType.Error, 0, msg, args);
+			TraceSource.TraceEvent(TraceEventType.Error, 0, msg, args);
 			return false;
 		}
 		public static bool error(string msg)
 		{
-			_TraceSource.TraceEvent(TraceEventType.Error, 0, msg);
+			TraceSource.TraceEvent(TraceEventType.Error, 0, msg);
 			return false;
 		}
 
-		internal static void log(string msg)
+		internal static void Log(string msg)
 		{
-			_TraceSource.TraceEvent(TraceEventType.Information, 0, msg);
+			TraceSource.TraceEvent(TraceEventType.Information, 0, msg);
 		}
 
 
-		static DateTimeOffset unixRef = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+		static DateTimeOffset _unixRef = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
 		public static uint DateTimeToUnixTime(DateTimeOffset dt)
 		{
@@ -367,9 +361,9 @@ namespace ChainUtils
 		internal static ulong DateTimeToUnixTimeLong(DateTimeOffset dt)
 		{
 			dt = dt.ToUniversalTime();
-			if(dt < unixRef)
+			if(dt < _unixRef)
 				throw new ArgumentOutOfRangeException("The supplied datetime can't be expressed in unix timestamp");
-			var result = (dt - unixRef).TotalSeconds;
+			var result = (dt - _unixRef).TotalSeconds;
 			if(result > UInt32.MaxValue)
 				throw new ArgumentOutOfRangeException("The supplied datetime can't be expressed in unix timestamp");
 			return (ulong)result;
@@ -378,20 +372,20 @@ namespace ChainUtils
 		public static DateTimeOffset UnixTimeToDateTime(uint timestamp)
 		{
 			var span = TimeSpan.FromSeconds(timestamp);
-			return unixRef + span;
+			return _unixRef + span;
 		}
 		public static DateTimeOffset UnixTimeToDateTime(ulong timestamp)
 		{
 			var span = TimeSpan.FromSeconds(timestamp);
-			return unixRef + span;
+			return _unixRef + span;
 		}
 
 
 
 		public static string ExceptionToString(Exception exception)
 		{
-			Exception ex = exception;
-			StringBuilder stringBuilder = new StringBuilder(128);
+			var ex = exception;
+			var stringBuilder = new StringBuilder(128);
 			while(ex != null)
 			{
 				stringBuilder.Append(ex.GetType().Name);
@@ -409,8 +403,8 @@ namespace ChainUtils
 
 		public static void Shuffle<T>(T[] arr)
 		{
-			Random rand = new Random();
-			for(int i = 0 ; i < arr.Length ; i++)
+			var rand = new Random();
+			for(var i = 0 ; i < arr.Length ; i++)
 			{
 				var fromIndex = rand.Next(arr.Length);
 				var from = arr[fromIndex];
@@ -425,7 +419,7 @@ namespace ChainUtils
 
 
 #if !PORTABLE
-		internal static void SafeCloseSocket(System.Net.Sockets.Socket socket)
+		internal static void SafeCloseSocket(Socket socket)
 		{
 			try
 			{
@@ -444,9 +438,9 @@ namespace ChainUtils
 			}
 		}
 
-		public static System.Net.IPEndPoint EnsureIPv6(System.Net.IPEndPoint endpoint)
+		public static IPEndPoint EnsureIPv6(IPEndPoint endpoint)
 		{
-			if(endpoint.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+			if(endpoint.AddressFamily == AddressFamily.InterNetworkV6)
 				return endpoint;
 			return new IPEndPoint(endpoint.Address.MapToIPv6(), endpoint.Port);
 		}
@@ -455,7 +449,7 @@ namespace ChainUtils
 		{
 			if(littleEndian)
 			{
-				return new byte[]
+				return new[]
 				{
 					(byte)value,
 					(byte)(value >> 8),
@@ -465,7 +459,7 @@ namespace ChainUtils
 			}
 			else
 			{
-				return new byte[]
+				return new[]
 				{
 					(byte)(value >> 24),
 					(byte)(value >> 16),
@@ -520,8 +514,8 @@ namespace ChainUtils
 				{
 					return 0;
 				}
-				int hash = 17;
-				for(int i = 0 ; i < array.Length ; i++)
+				var hash = 17;
+				for(var i = 0 ; i < array.Length ; i++)
 				{
 					hash = hash * 31 + array[i];
 				}

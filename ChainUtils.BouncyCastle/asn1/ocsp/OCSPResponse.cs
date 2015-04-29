@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 {
     public class OcspResponse
@@ -77,7 +75,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(responseStatus);
+            var v = new Asn1EncodableVector(responseStatus);
 
 			if (responseBytes != null)
             {

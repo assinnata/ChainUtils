@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -297,18 +296,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             bool	encrypting,
             byte[]	key)
         {
-            int[] newKey = new int[32];
-            bool[] pc1m = new bool[56];
-			bool[] pcr = new bool[56];
+            var newKey = new int[32];
+            var pc1m = new bool[56];
+			var pcr = new bool[56];
 
-			for (int j = 0; j < 56; j++ )
+			for (var j = 0; j < 56; j++ )
             {
                 int l = pc1[j];
 
 				pc1m[j] = ((key[(uint) l >> 3] & bytebit[l & 07]) != 0);
             }
 
-            for (int i = 0; i < 16; i++)
+            for (var i = 0; i < 16; i++)
             {
                 int l, m, n;
 
@@ -324,7 +323,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                 n = m + 1;
                 newKey[m] = newKey[n] = 0;
 
-                for (int j = 0; j < 28; j++)
+                for (var j = 0; j < 28; j++)
                 {
                     l = j + totrot[i];
                     if ( l < 28 )
@@ -337,7 +336,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                     }
                 }
 
-                for (int j = 28; j < 56; j++)
+                for (var j = 28; j < 56; j++)
                 {
                     l = j + totrot[i];
                     if (l < 56 )
@@ -350,7 +349,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                     }
                 }
 
-                for (int j = 0; j < 24; j++)
+                for (var j = 0; j < 24; j++)
                 {
                     if (pcr[pc2[j]])
                     {
@@ -367,7 +366,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             //
             // store the processed key
             //
-            for (int i = 0; i != 32; i += 2)
+            for (var i = 0; i != 32; i += 2)
             {
                 int i1, i2;
 
@@ -398,8 +397,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]	outBytes,
             int		outOff)
         {
-			uint left = Pack.BE_To_UInt32(input, inOff);
-			uint right = Pack.BE_To_UInt32(input, inOff + 4);
+			var left = Pack.BE_To_UInt32(input, inOff);
+			var right = Pack.BE_To_UInt32(input, inOff + 4);
 			uint work;
 
             work = ((left >> 4) ^ right) & 0x0f0f0f0f;
@@ -420,7 +419,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             right ^= work;
             left = (left << 1) | (left >> 31);
 
-            for (int round = 0; round < 8; round++)
+            for (var round = 0; round < 8; round++)
             {
                 uint fval;
 

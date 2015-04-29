@@ -41,8 +41,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count != 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.sigPolicyQualifierId = (DerObjectIdentifier) seq[0].ToAsn1Object();
-			this.sigQualifier = seq[1].ToAsn1Object();
+			sigPolicyQualifierId = (DerObjectIdentifier) seq[0].ToAsn1Object();
+			sigQualifier = seq[1].ToAsn1Object();
 		}
 
 		public SigPolicyQualifierInfo(

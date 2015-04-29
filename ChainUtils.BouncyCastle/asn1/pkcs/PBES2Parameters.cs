@@ -12,7 +12,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
         {
             if (obj == null)
                 return null;
-            PbeS2Parameters existing = obj as PbeS2Parameters;
+            var existing = obj as PbeS2Parameters;
             if (existing != null)
                 return existing;
             return new PbeS2Parameters(Asn1Sequence.GetInstance(obj));
@@ -20,8 +20,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 
         public PbeS2Parameters(KeyDerivationFunc keyDevFunc, EncryptionScheme encScheme)
         {
-            this.func = keyDevFunc;
-            this.scheme = encScheme;
+            func = keyDevFunc;
+            scheme = encScheme;
         }
 
         public PbeS2Parameters(
@@ -30,7 +30,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             if (seq.Count != 2)
                 throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-            Asn1Sequence funcSeq = (Asn1Sequence)seq[0].ToAsn1Object();
+            var funcSeq = (Asn1Sequence)seq[0].ToAsn1Object();
 
             // TODO Not sure if this special case is really necessary/appropriate
             if (funcSeq[0].Equals(PkcsObjectIdentifiers.IdPbkdf2))

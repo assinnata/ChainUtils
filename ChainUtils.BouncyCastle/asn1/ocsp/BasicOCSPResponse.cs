@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
@@ -51,13 +49,13 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 		private BasicOcspResponse(
             Asn1Sequence seq)
         {
-            this.tbsResponseData = ResponseData.GetInstance(seq[0]);
-            this.signatureAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
-            this.signature = (DerBitString)seq[2];
+            tbsResponseData = ResponseData.GetInstance(seq[0]);
+            signatureAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
+            signature = (DerBitString)seq[2];
 
 			if (seq.Count > 3)
             {
-                this.certs = Asn1Sequence.GetInstance((Asn1TaggedObject)seq[3], true);
+                certs = Asn1Sequence.GetInstance((Asn1TaggedObject)seq[3], true);
             }
         }
 
@@ -117,7 +115,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
 				tbsResponseData, signatureAlgorithm, signature);
 
 			if (certs != null)

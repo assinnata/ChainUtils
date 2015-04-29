@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace ChainUtils.Protocol
 {
 
-	public interface MessageListener<in T>
+	public interface IMessageListener<in T>
 	{
 		void PushMessage(T message);
 	}
 
-	public class NullMessageListener<T> : MessageListener<T>
+	public class NullMessageListener<T> : IMessageListener<T>
 	{
 		#region MessageListener<T> Members
 
@@ -25,14 +22,14 @@ namespace ChainUtils.Protocol
 		#endregion
 	}
 
-	public class NewThreadMessageListener<T> : MessageListener<T>
+	public class NewThreadMessageListener<T> : IMessageListener<T>
 	{
-		readonly Action<T> _Process;
+		readonly Action<T> _process;
 		public NewThreadMessageListener(Action<T> process)
 		{
 			if(process == null)
 				throw new ArgumentNullException("process");
-			_Process = process;
+			_process = process;
 		}
 		#region MessageListener<T> Members
 
@@ -43,7 +40,7 @@ namespace ChainUtils.Protocol
 				{
 					try
 					{
-						_Process(message);
+						_process(message);
 					}
 					catch(Exception ex)
 					{
@@ -56,7 +53,7 @@ namespace ChainUtils.Protocol
 	}
 
 #if !PORTABLE
-	public class EventLoopMessageListener<T> : MessageListener<T>, IDisposable
+	public class EventLoopMessageListener<T> : IMessageListener<T>, IDisposable
 	{
 		public EventLoopMessageListener(Action<T> processMessage)
 		{
@@ -64,9 +61,9 @@ namespace ChainUtils.Protocol
 			{
 				try
 				{
-					while(!cancellationSource.IsCancellationRequested)
+					while(!_cancellationSource.IsCancellationRequested)
 					{
-						var message = _MessageQueue.Take(cancellationSource.Token);
+						var message = _messageQueue.Take(_cancellationSource.Token);
 						if(message != null)
 						{
 							try
@@ -85,12 +82,12 @@ namespace ChainUtils.Protocol
 				}
 			})).Start();
 		}
-		BlockingCollection<T> _MessageQueue = new BlockingCollection<T>(new ConcurrentQueue<T>());
+		BlockingCollection<T> _messageQueue = new BlockingCollection<T>(new ConcurrentQueue<T>());
 		public BlockingCollection<T> MessageQueue
 		{
 			get
 			{
-				return _MessageQueue;
+				return _messageQueue;
 			}
 		}
 
@@ -99,34 +96,34 @@ namespace ChainUtils.Protocol
 
 		public void PushMessage(T message)
 		{
-			_MessageQueue.Add(message);
+			_messageQueue.Add(message);
 		}
 
 		#endregion
 
 		#region IDisposable Members
 
-		CancellationTokenSource cancellationSource = new CancellationTokenSource();
+		CancellationTokenSource _cancellationSource = new CancellationTokenSource();
 		public void Dispose()
 		{
-			if(cancellationSource.IsCancellationRequested)
+			if(_cancellationSource.IsCancellationRequested)
 				return;
-			cancellationSource.Cancel();
+			_cancellationSource.Cancel();
 		}
 
 		#endregion
 
 	}
 
-	public class PollMessageListener<T> : MessageListener<T>
+	public class PollMessageListener<T> : IMessageListener<T>
 	{
 
-		BlockingCollection<T> _MessageQueue = new BlockingCollection<T>(new ConcurrentQueue<T>());
+		BlockingCollection<T> _messageQueue = new BlockingCollection<T>(new ConcurrentQueue<T>());
 		public BlockingCollection<T> MessageQueue
 		{
 			get
 			{
-				return _MessageQueue;
+				return _messageQueue;
 			}
 		}
 
@@ -139,7 +136,7 @@ namespace ChainUtils.Protocol
 
 		public virtual void PushMessage(T message)
 		{
-			_MessageQueue.Add(message);
+			_messageQueue.Add(message);
 		}
 
 		#endregion

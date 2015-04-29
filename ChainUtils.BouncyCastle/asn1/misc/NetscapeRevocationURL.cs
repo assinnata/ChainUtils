@@ -1,5 +1,3 @@
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Misc
 {
     public class NetscapeRevocationUrl
@@ -12,7 +10,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Misc
 
         public override string ToString()
         {
-            return "NetscapeRevocationUrl: " + this.GetString();
+            return "NetscapeRevocationUrl: " + GetString();
         }
     }
 }

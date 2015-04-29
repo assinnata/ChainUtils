@@ -54,10 +54,10 @@ namespace Mono.Nat.Upnp
 
         public override WebRequest Encode(out byte[] body)
         {
-            CultureInfo culture = CultureInfo.InvariantCulture;
+            var culture = CultureInfo.InvariantCulture;
 
-            StringBuilder builder = new StringBuilder(256);
-            XmlWriter writer = CreateWriter(builder);
+            var builder = new StringBuilder(256);
+            var writer = CreateWriter(builder);
 
             WriteFullElement(writer, "NewRemoteHost", string.Empty);
             WriteFullElement(writer, "NewExternalPort", this.mapping.PublicPort.ToString(culture));

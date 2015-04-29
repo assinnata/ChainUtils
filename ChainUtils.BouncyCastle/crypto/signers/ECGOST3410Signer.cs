@@ -1,6 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
@@ -31,27 +28,27 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             {
                 if (parameters is ParametersWithRandom)
                 {
-                    ParametersWithRandom rParam = (ParametersWithRandom)parameters;
+                    var rParam = (ParametersWithRandom)parameters;
 
-                    this.random = rParam.Random;
+                    random = rParam.Random;
                     parameters = rParam.Parameters;
                 }
                 else
                 {
-                    this.random = new SecureRandom();
+                    random = new SecureRandom();
                 }
 
                 if (!(parameters is ECPrivateKeyParameters))
                     throw new InvalidKeyException("EC private key required for signing");
 
-                this.key = (ECPrivateKeyParameters) parameters;
+                key = (ECPrivateKeyParameters) parameters;
             }
             else
             {
                 if (!(parameters is ECPublicKeyParameters))
                     throw new InvalidKeyException("EC public key required for verification");
 
-                this.key = (ECPublicKeyParameters)parameters;
+                key = (ECPublicKeyParameters)parameters;
             }
         }
 
@@ -65,21 +62,21 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
         public BigInteger[] GenerateSignature(
             byte[] message)
         {
-            byte[] mRev = new byte[message.Length]; // conversion is little-endian
-            for (int i = 0; i != mRev.Length; i++)
+            var mRev = new byte[message.Length]; // conversion is little-endian
+            for (var i = 0; i != mRev.Length; i++)
             {
                 mRev[i] = message[mRev.Length - 1 - i];
             }
 
-            BigInteger e = new BigInteger(1, mRev);
+            var e = new BigInteger(1, mRev);
 
-            ECDomainParameters ec = key.Parameters;
-            BigInteger n = ec.N;
-            BigInteger d = ((ECPrivateKeyParameters)key).D;
+            var ec = key.Parameters;
+            var n = ec.N;
+            var d = ((ECPrivateKeyParameters)key).D;
 
             BigInteger r, s = null;
 
-            ECMultiplier basePointMultiplier = CreateBasePointMultiplier();
+            var basePointMultiplier = CreateBasePointMultiplier();
 
             do // generate s
             {
@@ -92,7 +89,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                     }
                     while (k.SignValue == 0);
 
-                    ECPoint p = basePointMultiplier.Multiply(ec.G, k).Normalize();
+                    var p = basePointMultiplier.Multiply(ec.G, k).Normalize();
 
                     r = p.AffineXCoord.ToBigInteger().Mod(n);
                 }
@@ -115,14 +112,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             BigInteger	r,
             BigInteger	s)
         {
-            byte[] mRev = new byte[message.Length]; // conversion is little-endian
-            for (int i = 0; i != mRev.Length; i++)
+            var mRev = new byte[message.Length]; // conversion is little-endian
+            for (var i = 0; i != mRev.Length; i++)
             {
                 mRev[i] = message[mRev.Length - 1 - i];
             }
 
-            BigInteger e = new BigInteger(1, mRev);
-            BigInteger n = key.Parameters.N;
+            var e = new BigInteger(1, mRev);
+            var n = key.Parameters.N;
 
             // r in the range [1,n-1]
             if (r.CompareTo(BigInteger.One) < 0 || r.CompareTo(n) >= 0)
@@ -136,20 +133,20 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 return false;
             }
 
-            BigInteger v = e.ModInverse(n);
+            var v = e.ModInverse(n);
 
-            BigInteger z1 = s.Multiply(v).Mod(n);
-            BigInteger z2 = (n.Subtract(r)).Multiply(v).Mod(n);
+            var z1 = s.Multiply(v).Mod(n);
+            var z2 = (n.Subtract(r)).Multiply(v).Mod(n);
 
-            ECPoint G = key.Parameters.G; // P
-            ECPoint Q = ((ECPublicKeyParameters)key).Q;
+            var G = key.Parameters.G; // P
+            var Q = ((ECPublicKeyParameters)key).Q;
 
-            ECPoint point = ECAlgorithms.SumOfTwoMultiplies(G, z1, Q, z2).Normalize();
+            var point = ECAlgorithms.SumOfTwoMultiplies(G, z1, Q, z2).Normalize();
 
             if (point.IsInfinity)
                 return false;
 
-            BigInteger R = point.AffineXCoord.ToBigInteger().Mod(n);
+            var R = point.AffineXCoord.ToBigInteger().Mod(n);
 
             return R.Equals(r);
         }

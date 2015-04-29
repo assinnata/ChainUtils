@@ -1,11 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.IO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.RPC
 {
@@ -22,13 +17,13 @@ namespace ChainUtils.RPC
 		}
 		public Transaction Parse(string str)
 		{
-			JObject obj = JObject.Parse(str);
+			var obj = JObject.Parse(str);
 			return Parse(obj);
 		}
 
 		public Transaction Parse(JObject obj)
 		{
-			Transaction tx = new Transaction();
+			var tx = new Transaction();
 			BuildTransaction(obj, tx);
 			return tx;
 		}

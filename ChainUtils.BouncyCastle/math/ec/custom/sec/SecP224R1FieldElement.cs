@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
@@ -21,7 +20,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public SecP224R1FieldElement()
         {
-            this.x = Nat224.Create();
+            x = Nat224.Create();
         }
 
         protected internal SecP224R1FieldElement(uint[] x)
@@ -61,28 +60,28 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECFieldElement Add(ECFieldElement b)
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224R1Field.Add(x, ((SecP224R1FieldElement)b).x, z);
             return new SecP224R1FieldElement(z);
         }
 
         public override ECFieldElement AddOne()
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224R1Field.AddOne(x, z);
             return new SecP224R1FieldElement(z);
         }
 
         public override ECFieldElement Subtract(ECFieldElement b)
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224R1Field.Subtract(x, ((SecP224R1FieldElement)b).x, z);
             return new SecP224R1FieldElement(z);
         }
 
         public override ECFieldElement Multiply(ECFieldElement b)
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224R1Field.Multiply(x, ((SecP224R1FieldElement)b).x, z);
             return new SecP224R1FieldElement(z);
         }
@@ -90,7 +89,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public override ECFieldElement Divide(ECFieldElement b)
         {
             //return Multiply(b.Invert());
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             Mod.Invert(SecP224R1Field.P, ((SecP224R1FieldElement)b).x, z);
             SecP224R1Field.Multiply(z, x, z);
             return new SecP224R1FieldElement(z);
@@ -98,14 +97,14 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECFieldElement Negate()
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224R1Field.Negate(x, z);
             return new SecP224R1FieldElement(z);
         }
 
         public override ECFieldElement Square()
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224R1Field.Square(x, z);
             return new SecP224R1FieldElement(z);
         }
@@ -113,7 +112,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public override ECFieldElement Invert()
         {
             //return new SecP224R1FieldElement(ToBigInteger().ModInverse(Q));
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             Mod.Invert(SecP224R1Field.P, x, z);
             return new SecP224R1FieldElement(z);
         }
@@ -124,15 +123,15 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
          */
         public override ECFieldElement Sqrt()
         {
-            uint[] c = this.x;
+            var c = x;
             if (Nat224.IsZero(c) || Nat224.IsOne(c))
                 return this;
 
-            uint[] nc = Nat224.Create();
+            var nc = Nat224.Create();
             SecP224R1Field.Negate(c, nc);
 
-            uint[] r = Mod.Random(SecP224R1Field.P);
-            uint[] t = Nat224.Create();
+            var r = Mod.Random(SecP224R1Field.P);
+            var t = Nat224.Create();
 
             if (!IsSquare(c))
                 return null;
@@ -173,11 +172,11 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         private static bool IsSquare(uint[] x)
         {
-            uint[] t1 = Nat224.Create();
-            uint[] t2 = Nat224.Create();
+            var t1 = Nat224.Create();
+            var t2 = Nat224.Create();
             Nat224.Copy(x, t1);
 
-            for (int i = 0; i < 7; ++i)
+            for (var i = 0; i < 7; ++i)
             {
                 Nat224.Copy(t1, t2);
                 SecP224R1Field.SquareN(t1, 1 << i, t1);
@@ -206,15 +205,15 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         {
             Nat224.Copy(nc, f1);
 
-            uint[] d0 = Nat224.Create();
-            uint[] e0 = Nat224.Create();
+            var d0 = Nat224.Create();
+            var e0 = Nat224.Create();
 
-            for (int i = 0; i < 7; ++i)
+            for (var i = 0; i < 7; ++i)
             {
                 Nat224.Copy(d1, d0);
                 Nat224.Copy(e1, e0);
 
-                int j = 1 << i;
+                var j = 1 << i;
                 while (--j >= 0)
                 {
                     RS(d1, e1, f1, t);
@@ -231,23 +230,23 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             SecP224R1Field.Square(d, t);
             SecP224R1Field.Add(f, t, d);
             SecP224R1Field.Multiply(f, t, f);
-            uint c = Nat.ShiftUpBits(7, f, 2, 0);
+            var c = Nat.ShiftUpBits(7, f, 2, 0);
             SecP224R1Field.Reduce32(c, f);
         }
 
         private static bool TrySqrt(uint[] nc, uint[] r, uint[] t)
         {
-            uint[] d1 = Nat224.Create();
+            var d1 = Nat224.Create();
             Nat224.Copy(r, d1);
-            uint[] e1 = Nat224.Create();
+            var e1 = Nat224.Create();
             e1[0] = 1;
-            uint[] f1 = Nat224.Create();
+            var f1 = Nat224.Create();
             RP(nc, d1, e1, f1, t);
 
-            uint[] d0 = Nat224.Create();
-            uint[] e0 = Nat224.Create();
+            var d0 = Nat224.Create();
+            var e0 = Nat224.Create();
 
-            for (int k = 1; k < 96; ++k)
+            for (var k = 1; k < 96; ++k)
             {
                 Nat224.Copy(d1, d0);
                 Nat224.Copy(e1, e0);

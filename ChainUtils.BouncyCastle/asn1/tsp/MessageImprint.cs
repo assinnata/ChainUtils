@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Tsp
@@ -37,8 +36,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 			if (seq.Count != 2)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-			this.hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
-			this.hashedMessage = Asn1OctetString.GetInstance(seq[1]).GetOctets();
+			hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
+			hashedMessage = Asn1OctetString.GetInstance(seq[1]).GetOctets();
 		}
 
 		public MessageImprint(

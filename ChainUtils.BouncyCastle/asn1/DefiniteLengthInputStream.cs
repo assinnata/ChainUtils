@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -21,8 +20,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (length < 0)
 				throw new ArgumentException("negative lengths not allowed", "length");
 
-			this._originalLength = length;
-			this._remaining = length;
+			_originalLength = length;
+			_remaining = length;
 
 			if (length == 0)
 			{
@@ -40,7 +39,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (_remaining == 0)
 				return -1;
 
-			int b = _in.ReadByte();
+			var b = _in.ReadByte();
 
 			if (b < 0)
 				throw new EndOfStreamException("DEF length " + _originalLength + " object truncated by " + _remaining);
@@ -61,8 +60,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (_remaining == 0)
 				return 0;
 
-			int toRead = System.Math.Min(len, _remaining);
-			int numRead = _in.Read(buf, off, toRead);
+			var toRead = System.Math.Min(len, _remaining);
+			var numRead = _in.Read(buf, off, toRead);
 
 			if (numRead < 1)
 				throw new EndOfStreamException("DEF length " + _originalLength + " object truncated by " + _remaining);
@@ -90,7 +89,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (_remaining == 0)
 				return EmptyBytes;
 
-			byte[] bytes = new byte[_remaining];
+			var bytes = new byte[_remaining];
 			if ((_remaining -= Streams.ReadFully(_in, bytes)) != 0)
 				throw new EndOfStreamException("DEF length " + _originalLength + " object truncated by " + _remaining);
 			SetParentEofDetect(true);

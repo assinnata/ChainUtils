@@ -1,15 +1,12 @@
-﻿using ChainUtils.Crypto;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using ChainUtils.Crypto;
 using ChainUtils.DataEncoders;
 using ChainUtils.Protocol;
 using ChainUtils.RPC;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
@@ -35,74 +32,74 @@ namespace ChainUtils
 
 
 		// header
-		const int CURRENT_VERSION = 2;
+		const int CurrentVersion = 2;
 
-		uint256 hashPrevBlock;
+		Uint256 _hashPrevBlock;
 
-		public uint256 HashPrevBlock
+		public Uint256 HashPrevBlock
 		{
 			get
 			{
-				return hashPrevBlock;
+				return _hashPrevBlock;
 			}
 			set
 			{
-				hashPrevBlock = value;
+				_hashPrevBlock = value;
 			}
 		}
-		uint256 hashMerkleRoot;
+		Uint256 _hashMerkleRoot;
 
-		uint nTime;
-		uint nBits;
+		uint _nTime;
+		uint _nBits;
 
 		public Target Bits
 		{
 			get
 			{
-				return nBits;
+				return _nBits;
 			}
 			set
 			{
-				nBits = value;
+				_nBits = value;
 			}
 		}
 
-		int nVersion;
+		int _nVersion;
 
 		public int Version
 		{
 			get
 			{
-				return nVersion;
+				return _nVersion;
 			}
 			set
 			{
-				nVersion = value;
+				_nVersion = value;
 			}
 		}
 
-		uint nNonce;
+		uint _nNonce;
 
 		public uint Nonce
 		{
 			get
 			{
-				return nNonce;
+				return _nNonce;
 			}
 			set
 			{
-				nNonce = value;
+				_nNonce = value;
 			}
 		}
-		public uint256 HashMerkleRoot
+		public Uint256 HashMerkleRoot
 		{
 			get
 			{
-				return hashMerkleRoot;
+				return _hashMerkleRoot;
 			}
 			set
 			{
-				hashMerkleRoot = value;
+				_hashMerkleRoot = value;
 			}
 		}
 
@@ -114,41 +111,41 @@ namespace ChainUtils
 
 		internal void SetNull()
 		{
-			nVersion = CURRENT_VERSION;
-			hashPrevBlock = 0;
-			hashMerkleRoot = 0;
-			nTime = 0;
-			nBits = 0;
-			nNonce = 0;
+			_nVersion = CurrentVersion;
+			_hashPrevBlock = 0;
+			_hashMerkleRoot = 0;
+			_nTime = 0;
+			_nBits = 0;
+			_nNonce = 0;
 		}
 
 		public bool IsNull
 		{
 			get
 			{
-				return (nBits == 0);
+				return (_nBits == 0);
 			}
 		}
 		#region IBitcoinSerializable Members
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref nVersion);
-			stream.ReadWrite(ref hashPrevBlock);
-			stream.ReadWrite(ref hashMerkleRoot);
-			stream.ReadWrite(ref nTime);
-			stream.ReadWrite(ref nBits);
-			stream.ReadWrite(ref nNonce);
+			stream.ReadWrite(ref _nVersion);
+			stream.ReadWrite(ref _hashPrevBlock);
+			stream.ReadWrite(ref _hashMerkleRoot);
+			stream.ReadWrite(ref _nTime);
+			stream.ReadWrite(ref _nBits);
+			stream.ReadWrite(ref _nNonce);
 			if(stream.NetworkFormat)
 			{
-				VarInt txCount = new VarInt(0);
+				var txCount = new VarInt(0);
 				stream.ReadWrite(ref txCount);
 			}
 		}
 
 		#endregion
 
-		public uint256 GetHash()
+		public Uint256 GetHash()
 		{
 			return Hashes.Hash256(this.ToBytes());
 		}
@@ -157,11 +154,11 @@ namespace ChainUtils
 		{
 			get
 			{
-				return Utils.UnixTimeToDateTime(nTime);
+				return Utils.UnixTimeToDateTime(_nTime);
 			}
 			set
 			{
-				this.nTime = Utils.DateTimeToUnixTime(value);
+				_nTime = Utils.DateTimeToUnixTime(value);
 			}
 		}
 
@@ -182,20 +179,20 @@ namespace ChainUtils
 
 	public class Block : IBitcoinSerializable
 	{
-		public const uint MAX_BLOCK_SIZE = 1000000;
-		BlockHeader header = new BlockHeader();
+		public const uint MaxBlockSize = 1000000;
+		BlockHeader _header = new BlockHeader();
 		// network and disk
-		List<Transaction> vtx = new List<Transaction>();
+		List<Transaction> _vtx = new List<Transaction>();
 
 		public List<Transaction> Transactions
 		{
 			get
 			{
-				return vtx;
+				return _vtx;
 			}
 			set
 			{
-				vtx = value;
+				_vtx = value;
 			}
 		}
 
@@ -213,7 +210,7 @@ namespace ChainUtils
 		public Block(BlockHeader blockHeader)
 		{
 			SetNull();
-			header = blockHeader;
+			_header = blockHeader;
 		}
 		public Block(byte[] bytes)
 		{
@@ -225,31 +222,31 @@ namespace ChainUtils
 		{
 			using(stream.NetworkFormatScope(false))
 			{
-				stream.ReadWrite(ref header);
+				stream.ReadWrite(ref _header);
 			}
-			stream.ReadWrite(ref vtx);
+			stream.ReadWrite(ref _vtx);
 		}
 
 		public bool HeaderOnly
 		{
 			get
 			{
-				return vtx == null || vtx.Count == 0;
+				return _vtx == null || _vtx.Count == 0;
 			}
 		}
 
 
 		void SetNull()
 		{
-			header.SetNull();
-			vtx.Clear();
+			_header.SetNull();
+			_vtx.Clear();
 		}
 
 		public BlockHeader Header
 		{
 			get
 			{
-				return header;
+				return _header;
 			}
 		}
 
@@ -289,17 +286,17 @@ namespace ChainUtils
 		//static uint256 CheckMerkleBranch(uint256 hash, const std::vector<uint256>& vMerkleBranch, int nIndex);
 		//void print() const;
 
-		public uint256 GetHash()
+		public Uint256 GetHash()
 		{
 			//Block's hash is his header's hash
-			return Hashes.Hash256(header.ToBytes());
+			return Hashes.Hash256(_header.ToBytes());
 		}
 
 		public int Length
 		{
 			get
 			{
-				return header.ToBytes().Length;
+				return _header.ToBytes().Length;
 			}
 		}
 
@@ -307,7 +304,7 @@ namespace ChainUtils
 		{
 			var ms = new MemoryStream(array);
 			ms.Position += startIndex;
-			BitcoinStream bitStream = new BitcoinStream(ms, false);
+			var bitStream = new BitcoinStream(ms, false);
 			ReadWrite(bitStream);
 		}
 
@@ -319,7 +316,7 @@ namespace ChainUtils
 
 		public void UpdateMerkleRoot()
 		{
-			this.Header.HashMerkleRoot = GetMerkleRoot().Hash;
+			Header.HashMerkleRoot = GetMerkleRoot().Hash;
 		}
 
 		/// <summary>
@@ -347,9 +344,9 @@ namespace ChainUtils
 		}
 		public Block CreateNextBlockWithCoinbase(BitcoinAddress address, int height, DateTimeOffset now)
 		{
-			Block block = new Block();
+			var block = new Block();
 			block.Header.Nonce = RandomUtils.GetUInt32();
-			block.Header.HashPrevBlock = this.GetHash();
+			block.Header.HashPrevBlock = GetHash();
 			block.Header.BlockTime = now;
 			var tx = block.AddTransaction(new Transaction());
 			tx.AddInput(new TxIn()
@@ -369,9 +366,9 @@ namespace ChainUtils
 		}
 		public Block CreateNextBlockWithCoinbase(PubKey pubkey, Money value, DateTimeOffset now)
 		{
-			Block block = new Block();
+			var block = new Block();
 			block.Header.Nonce = RandomUtils.GetUInt32();
-			block.Header.HashPrevBlock = this.GetHash();
+			block.Header.HashPrevBlock = GetHash();
 			block.Header.BlockTime = now;
 			var tx = block.AddTransaction(new Transaction());
 			tx.AddInput(new TxIn()
@@ -391,13 +388,13 @@ namespace ChainUtils
 			var formatter = new BlockExplorerFormatter();
 			var block = JObject.Parse(json);
 			var txs = (JArray)block["tx"];
-			Block blk = new Block();
+			var blk = new Block();
 			blk.Header.Bits = new Target((uint)block["bits"]);
 			blk.Header.BlockTime = Utils.UnixTimeToDateTime((uint)block["time"]);
 			blk.Header.Nonce = (uint)block["nonce"];
 			blk.Header.Version = (int)block["ver"];
-			blk.Header.HashPrevBlock = new uint256((string)block["prev_block"]);
-			blk.Header.HashMerkleRoot = new uint256((string)block["mrkl_root"]);
+			blk.Header.HashPrevBlock = new Uint256((string)block["prev_block"]);
+			blk.Header.HashMerkleRoot = new Uint256((string)block["mrkl_root"]);
 			foreach(var tx in txs)
 			{
 				blk.AddTransaction(formatter.Parse((JObject)tx));
@@ -405,7 +402,7 @@ namespace ChainUtils
 			return blk;
 		}
 
-		public MerkleBlock Filter(params uint256[] txIds)
+		public MerkleBlock Filter(params Uint256[] txIds)
 		{
 			return new MerkleBlock(this, txIds);
 		}

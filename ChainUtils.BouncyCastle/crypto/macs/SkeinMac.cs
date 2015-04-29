@@ -1,8 +1,6 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Crypto.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Macs
 {
@@ -47,12 +45,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 		///                      bytes.</param>
 		public SkeinMac(int stateSizeBits, int digestSizeBits)
 		{
-			this.engine = new SkeinEngine(stateSizeBits, digestSizeBits);
+			engine = new SkeinEngine(stateSizeBits, digestSizeBits);
 		}
 
 		public SkeinMac(SkeinMac mac)
 		{
-			this.engine = new SkeinEngine(mac.engine);
+			engine = new SkeinEngine(mac.engine);
 		}
 
 		public string AlgorithmName

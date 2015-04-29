@@ -1,8 +1,5 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Crypto.Utilities;
-using ChainUtils.BouncyCastle.Utilities.Encoders;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
 {
@@ -74,7 +71,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		static ThreefishEngine()
 		{
-			for (int i = 0; i < MOD9.Length; i++)
+			for (var i = 0; i < MOD9.Length; i++)
 			{
 				MOD17[i] = i % 17;
 				MOD9[i] = i % 9;
@@ -122,15 +119,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		///                      <see cref="BLOCKSIZE_1024"/> .</param>
 		public ThreefishEngine(int blocksizeBits)
 		{
-			this.blocksizeBytes = (blocksizeBits / 8);
-			this.blocksizeWords = (this.blocksizeBytes / 8);
-			this.currentBlock = new ulong[blocksizeWords];
+			blocksizeBytes = (blocksizeBits / 8);
+			blocksizeWords = (blocksizeBytes / 8);
+			currentBlock = new ulong[blocksizeWords];
 
 			/*
 	         * Provide room for original key words, extended key word and repeat of key words for modulo
 	         * free lookup of key schedule words.
 	         */
-			this.kw = new ulong[2 * blocksizeWords + 1];
+			kw = new ulong[2 * blocksizeWords + 1];
 
 			switch (blocksizeBits)
 			{
@@ -162,7 +159,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			if (parameters is TweakableBlockCipherParameters)
 			{
-				TweakableBlockCipherParameters tParams = (TweakableBlockCipherParameters)parameters;
+				var tParams = (TweakableBlockCipherParameters)parameters;
 				keyBytes = tParams.Key.GetKey();
 				tweakBytes = tParams.Tweak;
 			}
@@ -182,13 +179,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			if (keyBytes != null)
 			{
-				if (keyBytes.Length != this.blocksizeBytes)
+				if (keyBytes.Length != blocksizeBytes)
 				{
 					throw new ArgumentException("Threefish key must be same size as block (" + blocksizeBytes
 					                            + " bytes)");
 				}
 				keyWords = new ulong[blocksizeWords];
-				for (int i = 0; i < keyWords.Length; i++)
+				for (var i = 0; i < keyWords.Length; i++)
 				{
 					keyWords[i] = BytesToWord(keyBytes, i * 8);
 				}
@@ -225,7 +222,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		private void SetKey(ulong[] key)
 		{
-			if (key.Length != this.blocksizeWords)
+			if (key.Length != blocksizeWords)
 			{
 				throw new ArgumentException("Threefish key must be same size as block (" + blocksizeWords
 				                            + " words)");
@@ -239,8 +236,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 	         * used, to avoid expensive mod computations during cipher operation.
 	         */
 
-			ulong knw = C_240;
-			for (int i = 0; i < blocksizeWords; i++)
+			var knw = C_240;
+			for (var i = 0; i < blocksizeWords; i++)
 			{
 				kw[i] = key[i];
 				knw = knw ^ kw[i];
@@ -297,14 +294,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				throw new DataLengthException("Input buffer too short");
 			}
 
-			for (int i = 0; i < blocksizeBytes; i += 8)
+			for (var i = 0; i < blocksizeBytes; i += 8)
 			{
 				currentBlock[i >> 3] = BytesToWord(inBytes, inOff + i);
 			}
-			ProcessBlock(this.currentBlock, this.currentBlock);
-			for (int i = 0; i < blocksizeBytes; i += 8)
+			ProcessBlock(currentBlock, currentBlock);
+			for (var i = 0; i < blocksizeBytes; i += 8)
 			{
-				WordToBytes(this.currentBlock[i >> 3], outBytes, outOff + i);
+				WordToBytes(currentBlock[i >> 3], outBytes, outOff + i);
 			}
 
 			return blocksizeBytes;
@@ -358,7 +355,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			}
 
 			ulong word = 0;
-			int index = off;
+			var index = off;
 
 			word = (bytes[index++] & 0xffUL);
 			word |= (bytes[index++] & 0xffUL) << 8;
@@ -382,7 +379,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				// Help the JIT avoid index checks
 				throw new ArgumentException();
 			}
-			int index = off;
+			var index = off;
 
 			bytes[index++] = (byte)word;
 			bytes[index++] = (byte)(word >> 8);
@@ -407,7 +404,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 	     */
 		private static ulong XorRotr(ulong x, int n, ulong xor)
 		{
-			ulong xored = x ^ xor;
+			var xored = x ^ xor;
 			return (xored >> n) | (xored << (64 - n));
 		}
 
@@ -457,10 +454,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			internal override void EncryptBlock(ulong[] block, ulong[] outWords)
 			{
-				ulong[] kw = this.kw;
-				ulong[] t = this.t;
-				int[] mod5 = MOD5;
-				int[] mod3 = MOD3;
+				var kw = this.kw;
+				var t = this.t;
+				var mod5 = MOD5;
+				var mod3 = MOD3;
 
 				/* Help the JIT avoid index bounds checks */
 				if (kw.Length != 9)
@@ -475,10 +472,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				/*
 	             * Read 4 words of plaintext data, not using arrays for cipher state
 	             */
-				ulong b0 = block[0];
-				ulong b1 = block[1];
-				ulong b2 = block[2];
-				ulong b3 = block[3];
+				var b0 = block[0];
+				var b1 = block[1];
+				var b2 = block[2];
+				var b3 = block[3];
 
 				/*
 	             * First subkey injection.
@@ -499,10 +496,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 	             * inlining constant rotation values (avoiding array index/lookup).
 	             */
 
-				for (int d = 1; d < (ROUNDS_256 / 4); d += 2)
+				for (var d = 1; d < (ROUNDS_256 / 4); d += 2)
 				{
-					int dm5 = mod5[d];
-					int dm3 = mod3[d];
+					var dm5 = mod5[d];
+					var dm3 = mod3[d];
 
 					/*
 	                 * 4 rounds of mix and permute.
@@ -565,10 +562,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			internal override void DecryptBlock(ulong[] block, ulong[] state)
 			{
-				ulong[] kw = this.kw;
-				ulong[] t = this.t;
-				int[] mod5 = MOD5;
-				int[] mod3 = MOD3;
+				var kw = this.kw;
+				var t = this.t;
+				var mod5 = MOD5;
+				var mod3 = MOD3;
 
 				/* Help the JIT avoid index bounds checks */
 				if (kw.Length != 9)
@@ -580,15 +577,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 					throw new ArgumentException();
 				}
 
-				ulong b0 = block[0];
-				ulong b1 = block[1];
-				ulong b2 = block[2];
-				ulong b3 = block[3];
+				var b0 = block[0];
+				var b1 = block[1];
+				var b2 = block[2];
+				var b3 = block[3];
 
-				for (int d = (ROUNDS_256 / 4) - 1; d >= 1; d -= 2)
+				for (var d = (ROUNDS_256 / 4) - 1; d >= 1; d -= 2)
 				{
-					int dm5 = mod5[d];
-					int dm3 = mod3[d];
+					var dm5 = mod5[d];
+					var dm3 = mod3[d];
 
 					/* Reverse key injection for second 4 rounds */
 					b0 -= kw[dm5 + 1];
@@ -688,10 +685,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			internal override void EncryptBlock(ulong[] block, ulong[] outWords)
 			{
-				ulong[] kw = this.kw;
-				ulong[] t = this.t;
-				int[] mod9 = MOD9;
-				int[] mod3 = MOD3;
+				var kw = this.kw;
+				var t = this.t;
+				var mod9 = MOD9;
+				var mod3 = MOD3;
 
 				/* Help the JIT avoid index bounds checks */
 				if (kw.Length != 17)
@@ -706,14 +703,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				/*
 	             * Read 8 words of plaintext data, not using arrays for cipher state
 	             */
-				ulong b0 = block[0];
-				ulong b1 = block[1];
-				ulong b2 = block[2];
-				ulong b3 = block[3];
-				ulong b4 = block[4];
-				ulong b5 = block[5];
-				ulong b6 = block[6];
-				ulong b7 = block[7];
+				var b0 = block[0];
+				var b1 = block[1];
+				var b2 = block[2];
+				var b3 = block[3];
+				var b4 = block[4];
+				var b5 = block[5];
+				var b6 = block[6];
+				var b7 = block[7];
 
 				/*
 	             * First subkey injection.
@@ -738,10 +735,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 	             * inlining constant rotation values (avoiding array index/lookup).
 	             */
 
-				for (int d = 1; d < (ROUNDS_512 / 4); d += 2)
+				for (var d = 1; d < (ROUNDS_512 / 4); d += 2)
 				{
-					int dm9 = mod9[d];
-					int dm3 = mod3[d];
+					var dm9 = mod9[d];
+					var dm3 = mod3[d];
 
 					/*
 	                 * 4 rounds of mix and permute.
@@ -832,10 +829,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			internal override void DecryptBlock(ulong[] block, ulong[] state)
 			{
-				ulong[] kw = this.kw;
-				ulong[] t = this.t;
-				int[] mod9 = MOD9;
-				int[] mod3 = MOD3;
+				var kw = this.kw;
+				var t = this.t;
+				var mod9 = MOD9;
+				var mod3 = MOD3;
 
 				/* Help the JIT avoid index bounds checks */
 				if (kw.Length != 17)
@@ -847,19 +844,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 					throw new ArgumentException();
 				}
 
-				ulong b0 = block[0];
-				ulong b1 = block[1];
-				ulong b2 = block[2];
-				ulong b3 = block[3];
-				ulong b4 = block[4];
-				ulong b5 = block[5];
-				ulong b6 = block[6];
-				ulong b7 = block[7];
+				var b0 = block[0];
+				var b1 = block[1];
+				var b2 = block[2];
+				var b3 = block[3];
+				var b4 = block[4];
+				var b5 = block[5];
+				var b6 = block[6];
+				var b7 = block[7];
 
-				for (int d = (ROUNDS_512 / 4) - 1; d >= 1; d -= 2)
+				for (var d = (ROUNDS_512 / 4) - 1; d >= 1; d -= 2)
 				{
-					int dm9 = mod9[d];
-					int dm3 = mod3[d];
+					var dm9 = mod9[d];
+					var dm3 = mod3[d];
 
 					/* Reverse key injection for second 4 rounds */
 					b0 -= kw[dm9 + 1];
@@ -1014,10 +1011,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			internal override void EncryptBlock(ulong[] block, ulong[] outWords)
 			{
-				ulong[] kw = this.kw;
-				ulong[] t = this.t;
-				int[] mod17 = MOD17;
-				int[] mod3 = MOD3;
+				var kw = this.kw;
+				var t = this.t;
+				var mod17 = MOD17;
+				var mod3 = MOD3;
 
 				/* Help the JIT avoid index bounds checks */
 				if (kw.Length != 33)
@@ -1032,22 +1029,22 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				/*
 	             * Read 16 words of plaintext data, not using arrays for cipher state
 	             */
-				ulong b0 = block[0];
-				ulong b1 = block[1];
-				ulong b2 = block[2];
-				ulong b3 = block[3];
-				ulong b4 = block[4];
-				ulong b5 = block[5];
-				ulong b6 = block[6];
-				ulong b7 = block[7];
-				ulong b8 = block[8];
-				ulong b9 = block[9];
-				ulong b10 = block[10];
-				ulong b11 = block[11];
-				ulong b12 = block[12];
-				ulong b13 = block[13];
-				ulong b14 = block[14];
-				ulong b15 = block[15];
+				var b0 = block[0];
+				var b1 = block[1];
+				var b2 = block[2];
+				var b3 = block[3];
+				var b4 = block[4];
+				var b5 = block[5];
+				var b6 = block[6];
+				var b7 = block[7];
+				var b8 = block[8];
+				var b9 = block[9];
+				var b10 = block[10];
+				var b11 = block[11];
+				var b12 = block[12];
+				var b13 = block[13];
+				var b14 = block[14];
+				var b15 = block[15];
 
 				/*
 	             * First subkey injection.
@@ -1080,10 +1077,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 	             * inlining constant rotation values (avoiding array index/lookup).
 	             */
 
-				for (int d = 1; d < (ROUNDS_1024 / 4); d += 2)
+				for (var d = 1; d < (ROUNDS_1024 / 4); d += 2)
 				{
-					int dm17 = mod17[d];
-					int dm3 = mod3[d];
+					var dm17 = mod17[d];
+					var dm3 = mod3[d];
 
 					/*
 	                 * 4 rounds of mix and permute.
@@ -1231,10 +1228,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			internal override void DecryptBlock(ulong[] block, ulong[] state)
 			{
-				ulong[] kw = this.kw;
-				ulong[] t = this.t;
-				int[] mod17 = MOD17;
-				int[] mod3 = MOD3;
+				var kw = this.kw;
+				var t = this.t;
+				var mod17 = MOD17;
+				var mod3 = MOD3;
 
 				/* Help the JIT avoid index bounds checks */
 				if (kw.Length != 33)
@@ -1246,27 +1243,27 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 					throw new ArgumentException();
 				}
 
-				ulong b0 = block[0];
-				ulong b1 = block[1];
-				ulong b2 = block[2];
-				ulong b3 = block[3];
-				ulong b4 = block[4];
-				ulong b5 = block[5];
-				ulong b6 = block[6];
-				ulong b7 = block[7];
-				ulong b8 = block[8];
-				ulong b9 = block[9];
-				ulong b10 = block[10];
-				ulong b11 = block[11];
-				ulong b12 = block[12];
-				ulong b13 = block[13];
-				ulong b14 = block[14];
-				ulong b15 = block[15];
+				var b0 = block[0];
+				var b1 = block[1];
+				var b2 = block[2];
+				var b3 = block[3];
+				var b4 = block[4];
+				var b5 = block[5];
+				var b6 = block[6];
+				var b7 = block[7];
+				var b8 = block[8];
+				var b9 = block[9];
+				var b10 = block[10];
+				var b11 = block[11];
+				var b12 = block[12];
+				var b13 = block[13];
+				var b14 = block[14];
+				var b15 = block[15];
 
-				for (int d = (ROUNDS_1024 / 4) - 1; d >= 1; d -= 2)
+				for (var d = (ROUNDS_1024 / 4) - 1; d >= 1; d -= 2)
 				{
-					int dm17 = mod17[d];
-					int dm3 = mod3[d];
+					var dm17 = mod17[d];
+					var dm3 = mod3[d];
 
 					/* Reverse key injection for second 4 rounds */
 					b0 -= kw[dm17 + 1];

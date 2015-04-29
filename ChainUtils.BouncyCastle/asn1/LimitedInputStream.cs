@@ -1,5 +1,4 @@
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -14,8 +13,8 @@ namespace ChainUtils.BouncyCastle.Asn1
             Stream	inStream,
 			int		limit)
         {
-            this._in = inStream;
-			this._limit = limit;
+            _in = inStream;
+			_limit = limit;
         }
 
 	    internal virtual int GetRemaining()

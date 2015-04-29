@@ -1,13 +1,6 @@
 ﻿
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using ChainUtils.Protocol;
 
 namespace ChainUtils
@@ -26,9 +19,9 @@ namespace ChainUtils
 				throw new ArgumentOutOfRangeException("Array size not big");
 			if(!Serializing)
 				data = new T[length.ToLong()];
-			for(int i = 0 ; i < data.Length ; i++)
+			for(var i = 0 ; i < data.Length ; i++)
 			{
-				T obj = data[i];
+				var obj = data[i];
 				ReadWrite(ref obj);
 				data[i] = obj;
 			}
@@ -46,9 +39,9 @@ namespace ChainUtils
 				throw new ArgumentOutOfRangeException("Array size not big");
 			if(!Serializing)
 				data = new ulong[length.ToLong()];
-			for(int i = 0 ; i < data.Length ; i++)
+			for(var i = 0 ; i < data.Length ; i++)
 			{
-				ulong obj = data[i];
+				var obj = data[i];
 				ReadWrite(ref obj);
 				data[i] = obj;
 			}
@@ -66,9 +59,9 @@ namespace ChainUtils
 				throw new ArgumentOutOfRangeException("Array size not big");
 			if(!Serializing)
 				data = new ushort[length.ToLong()];
-			for(int i = 0 ; i < data.Length ; i++)
+			for(var i = 0 ; i < data.Length ; i++)
 			{
-				ushort obj = data[i];
+				var obj = data[i];
 				ReadWrite(ref obj);
 				data[i] = obj;
 			}
@@ -86,9 +79,9 @@ namespace ChainUtils
 				throw new ArgumentOutOfRangeException("Array size not big");
 			if(!Serializing)
 				data = new uint[length.ToLong()];
-			for(int i = 0 ; i < data.Length ; i++)
+			for(var i = 0 ; i < data.Length ; i++)
 			{
-				uint obj = data[i];
+				var obj = data[i];
 				ReadWrite(ref obj);
 				data[i] = obj;
 			}
@@ -106,9 +99,9 @@ namespace ChainUtils
 				throw new ArgumentOutOfRangeException("Array size not big");
 			if(!Serializing)
 				data = new byte[length.ToLong()];
-			for(int i = 0 ; i < data.Length ; i++)
+			for(var i = 0 ; i < data.Length ; i++)
 			{
-				byte obj = data[i];
+				var obj = data[i];
 				ReadWrite(ref obj);
 				data[i] = obj;
 			}
@@ -126,9 +119,9 @@ namespace ChainUtils
 				throw new ArgumentOutOfRangeException("Array size not big");
 			if(!Serializing)
 				data = new long[length.ToLong()];
-			for(int i = 0 ; i < data.Length ; i++)
+			for(var i = 0 ; i < data.Length ; i++)
 			{
-				long obj = data[i];
+				var obj = data[i];
 				ReadWrite(ref obj);
 				data[i] = obj;
 			}
@@ -146,9 +139,9 @@ namespace ChainUtils
 				throw new ArgumentOutOfRangeException("Array size not big");
 			if(!Serializing)
 				data = new short[length.ToLong()];
-			for(int i = 0 ; i < data.Length ; i++)
+			for(var i = 0 ; i < data.Length ; i++)
 			{
-				short obj = data[i];
+				var obj = data[i];
 				ReadWrite(ref obj);
 				data[i] = obj;
 			}
@@ -166,9 +159,9 @@ namespace ChainUtils
 				throw new ArgumentOutOfRangeException("Array size not big");
 			if(!Serializing)
 				data = new int[length.ToLong()];
-			for(int i = 0 ; i < data.Length ; i++)
+			for(var i = 0 ; i < data.Length ; i++)
 			{
-				int obj = data[i];
+				var obj = data[i];
 				ReadWrite(ref obj);
 				data[i] = obj;
 			}
@@ -351,7 +344,7 @@ namespace ChainUtils
 			
 		public void ReadWrite(ref ulong data)
 		{
-			ulong l = (ulong)data;
+			var l = (ulong)data;
 			ReadWriteNumber(ref l, sizeof(ulong));
 			if(!Serializing)
 				data = (ulong)l;
@@ -366,7 +359,7 @@ namespace ChainUtils
 		
 		public void ReadWrite(ref ushort data)
 		{
-			ulong l = (ulong)data;
+			var l = (ulong)data;
 			ReadWriteNumber(ref l, sizeof(ushort));
 			if(!Serializing)
 				data = (ushort)l;
@@ -381,7 +374,7 @@ namespace ChainUtils
 		
 		public void ReadWrite(ref uint data)
 		{
-			ulong l = (ulong)data;
+			var l = (ulong)data;
 			ReadWriteNumber(ref l, sizeof(uint));
 			if(!Serializing)
 				data = (uint)l;
@@ -398,7 +391,7 @@ namespace ChainUtils
 			
 		public void ReadWrite(ref long data)
 		{
-			long l = (long)data;
+			var l = (long)data;
 			ReadWriteNumber(ref l, sizeof(long));
 			if(!Serializing)
 				data = (long)l;
@@ -413,7 +406,7 @@ namespace ChainUtils
 		
 		public void ReadWrite(ref short data)
 		{
-			long l = (long)data;
+			var l = (long)data;
 			ReadWriteNumber(ref l, sizeof(short));
 			if(!Serializing)
 				data = (short)l;
@@ -428,7 +421,7 @@ namespace ChainUtils
 		
 		public void ReadWrite(ref int data)
 		{
-			long l = (long)data;
+			var l = (long)data;
 			ReadWriteNumber(ref l, sizeof(int));
 			if(!Serializing)
 				data = (int)l;

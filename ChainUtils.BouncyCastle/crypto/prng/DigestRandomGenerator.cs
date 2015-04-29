@@ -1,7 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto.Digests;
-
 namespace ChainUtils.BouncyCastle.Crypto.Prng
 {
 	/**
@@ -27,11 +23,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Prng
 		{
 			this.digest = digest;
 
-			this.seed = new byte[digest.GetDigestSize()];
-			this.seedCounter = 1;
+			seed = new byte[digest.GetDigestSize()];
+			seedCounter = 1;
 
-			this.state = new byte[digest.GetDigestSize()];
-			this.stateCounter = 1;
+			state = new byte[digest.GetDigestSize()];
+			stateCounter = 1;
 		}
 
 		public void AddSeedMaterial(
@@ -69,12 +65,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Prng
 		{
 			lock (this)
 			{
-				int stateOff = 0;
+				var stateOff = 0;
 
 				GenerateState();
 
-				int end = start + len;
-				for (int i = start; i < end; ++i)
+				var end = start + len;
+				for (var i = start; i < end; ++i)
 				{
 					if (stateOff == state.Length)
 					{
@@ -108,8 +104,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Prng
 
 		private void DigestAddCounter(long seedVal)
 		{
-			ulong seed = (ulong)seedVal;
-			for (int i = 0; i != 8; i++)
+			var seed = (ulong)seedVal;
+			for (var i = 0; i != 8; i++)
 			{
 				digest.Update((byte)seed);
 				seed >>= 8;

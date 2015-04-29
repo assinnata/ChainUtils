@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Modes;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
@@ -57,12 +56,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			ICipherParameters	parameters)
         {
             this.forWrapping = forWrapping;
-            this.engine = new CbcBlockCipher(new DesEdeEngine());
+            engine = new CbcBlockCipher(new DesEdeEngine());
 
 			SecureRandom sr;
 			if (parameters is ParametersWithRandom)
 			{
-				ParametersWithRandom pr = (ParametersWithRandom) parameters;
+				var pr = (ParametersWithRandom) parameters;
 				parameters = pr.Parameters;
 				sr = pr.Random;
 			}
@@ -73,15 +72,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			if (parameters is KeyParameter)
             {
-                this.param = (KeyParameter) parameters;
+                param = (KeyParameter) parameters;
                 if (this.forWrapping)
 				{
                     // Hm, we have no IV but we want to wrap ?!?
                     // well, then we have to create our own IV.
-                    this.iv = new byte[8];
+                    iv = new byte[8];
 					sr.NextBytes(iv);
 
-					this.paramPlusIV = new ParametersWithIV(this.param, this.iv);
+					paramPlusIV = new ParametersWithIV(param, iv);
                 }
             }
             else if (parameters is ParametersWithIV)
@@ -89,11 +88,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				if (!forWrapping)
 					throw new ArgumentException("You should not supply an IV for unwrapping");
 
-				this.paramPlusIV = (ParametersWithIV) parameters;
-                this.iv = this.paramPlusIV.GetIV();
-                this.param = (KeyParameter) this.paramPlusIV.Parameters;
+				paramPlusIV = (ParametersWithIV) parameters;
+                iv = paramPlusIV.GetIV();
+                param = (KeyParameter) paramPlusIV.Parameters;
 
-				if (this.iv.Length != 8)
+				if (iv.Length != 8)
 					throw new ArgumentException("IV is not 8 octets", "parameters");
             }
         }
@@ -126,49 +125,49 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                 throw new InvalidOperationException("Not initialized for wrapping");
             }
 
-			byte[] keyToBeWrapped = new byte[length];
+			var keyToBeWrapped = new byte[length];
             Array.Copy(input, inOff, keyToBeWrapped, 0, length);
 
             // Compute the CMS Key Checksum, (section 5.6.1), call this CKS.
-            byte[] CKS = CalculateCmsKeyChecksum(keyToBeWrapped);
+            var CKS = CalculateCmsKeyChecksum(keyToBeWrapped);
 
             // Let WKCKS = WK || CKS where || is concatenation.
-            byte[] WKCKS = new byte[keyToBeWrapped.Length + CKS.Length];
+            var WKCKS = new byte[keyToBeWrapped.Length + CKS.Length];
             Array.Copy(keyToBeWrapped, 0, WKCKS, 0, keyToBeWrapped.Length);
             Array.Copy(CKS, 0, WKCKS, keyToBeWrapped.Length, CKS.Length);
 
             // Encrypt WKCKS in CBC mode using KEK as the key and IV as the
             // initialization vector. Call the results TEMP1.
 
-			int blockSize = engine.GetBlockSize();
+			var blockSize = engine.GetBlockSize();
 
 			if (WKCKS.Length % blockSize != 0)
                 throw new InvalidOperationException("Not multiple of block length");
 
 			engine.Init(true, paramPlusIV);
 
-            byte [] TEMP1 = new byte[WKCKS.Length];
+            var TEMP1 = new byte[WKCKS.Length];
 
-			for (int currentBytePos = 0; currentBytePos != WKCKS.Length; currentBytePos += blockSize)
+			for (var currentBytePos = 0; currentBytePos != WKCKS.Length; currentBytePos += blockSize)
 			{
                 engine.ProcessBlock(WKCKS, currentBytePos, TEMP1, currentBytePos);
             }
 
             // Let TEMP2 = IV || TEMP1.
-            byte[] TEMP2 = new byte[this.iv.Length + TEMP1.Length];
-            Array.Copy(this.iv, 0, TEMP2, 0, this.iv.Length);
-            Array.Copy(TEMP1, 0, TEMP2, this.iv.Length, TEMP1.Length);
+            var TEMP2 = new byte[iv.Length + TEMP1.Length];
+            Array.Copy(iv, 0, TEMP2, 0, iv.Length);
+            Array.Copy(TEMP1, 0, TEMP2, iv.Length, TEMP1.Length);
 
             // Reverse the order of the octets in TEMP2 and call the result TEMP3.
-            byte[] TEMP3 = reverse(TEMP2);
+            var TEMP3 = reverse(TEMP2);
 
 			// Encrypt TEMP3 in CBC mode using the KEK and an initialization vector
             // of 0x 4a dd a2 2c 79 e8 21 05. The resulting cipher text is the desired
             // result. It is 40 octets long if a 168 bit key is being wrapped.
-            ParametersWithIV param2 = new ParametersWithIV(this.param, IV2);
-            this.engine.Init(true, param2);
+            var param2 = new ParametersWithIV(param, IV2);
+            engine.Init(true, param2);
 
-            for (int currentBytePos = 0; currentBytePos != TEMP3.Length; currentBytePos += blockSize)
+            for (var currentBytePos = 0; currentBytePos != TEMP3.Length; currentBytePos += blockSize)
 			{
                 engine.ProcessBlock(TEMP3, currentBytePos, TEMP3, currentBytePos);
             }
@@ -199,7 +198,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                 throw new InvalidCipherTextException("Null pointer as ciphertext");
             }
 
-			int blockSize = engine.GetBlockSize();
+			var blockSize = engine.GetBlockSize();
 			
             if (length % blockSize != 0)
             {
@@ -223,41 +222,41 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
             // Decrypt the cipher text with TRIPLedeS in CBC mode using the KEK
             // and an initialization vector (IV) of 0x4adda22c79e82105. Call the output TEMP3.
-            ParametersWithIV param2 = new ParametersWithIV(this.param, IV2);
-            this.engine.Init(false, param2);
+            var param2 = new ParametersWithIV(param, IV2);
+            engine.Init(false, param2);
 
-            byte [] TEMP3 = new byte[length];
+            var TEMP3 = new byte[length];
 
-			for (int currentBytePos = 0; currentBytePos != TEMP3.Length; currentBytePos += blockSize)
+			for (var currentBytePos = 0; currentBytePos != TEMP3.Length; currentBytePos += blockSize)
 			{
 				engine.ProcessBlock(input, inOff + currentBytePos, TEMP3, currentBytePos);
             }
 
             // Reverse the order of the octets in TEMP3 and call the result TEMP2.
-            byte[] TEMP2 = reverse(TEMP3);
+            var TEMP2 = reverse(TEMP3);
 
 			// Decompose TEMP2 into IV, the first 8 octets, and TEMP1, the remaining octets.
-            this.iv = new byte[8];
-            byte[] TEMP1 = new byte[TEMP2.Length - 8];
-            Array.Copy(TEMP2, 0, this.iv, 0, 8);
+            iv = new byte[8];
+            var TEMP1 = new byte[TEMP2.Length - 8];
+            Array.Copy(TEMP2, 0, iv, 0, 8);
             Array.Copy(TEMP2, 8, TEMP1, 0, TEMP2.Length - 8);
 
             // Decrypt TEMP1 using TRIPLedeS in CBC mode using the KEK and the IV
             // found in the previous step. Call the result WKCKS.
-            this.paramPlusIV = new ParametersWithIV(this.param, this.iv);
-            this.engine.Init(false, this.paramPlusIV);
+            paramPlusIV = new ParametersWithIV(param, iv);
+            engine.Init(false, paramPlusIV);
 
-            byte[] WKCKS = new byte[TEMP1.Length];
+            var WKCKS = new byte[TEMP1.Length];
 
-            for (int currentBytePos = 0; currentBytePos != WKCKS.Length; currentBytePos += blockSize)
+            for (var currentBytePos = 0; currentBytePos != WKCKS.Length; currentBytePos += blockSize)
 			{
                 engine.ProcessBlock(TEMP1, currentBytePos, WKCKS, currentBytePos);
             }
 
             // Decompose WKCKS. CKS is the last 8 octets and WK, the wrapped key, are
             // those octets before the CKS.
-            byte[] result = new byte[WKCKS.Length - 8];
-            byte[] CKStoBeVerified = new byte[8];
+            var result = new byte[WKCKS.Length - 8];
+            var CKStoBeVerified = new byte[8];
             Array.Copy(WKCKS, 0, result, 0, WKCKS.Length - 8);
             Array.Copy(WKCKS, WKCKS.Length - 8, CKStoBeVerified, 0, 8);
 
@@ -291,7 +290,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			sha1.BlockUpdate(key, 0, key.Length);
             sha1.DoFinal(digest, 0);
 
-            byte[] result = new byte[8];
+            var result = new byte[8];
 			Array.Copy(digest, 0, result, 0, 8);
 			return result;
         }
@@ -311,8 +310,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		private static byte[] reverse(byte[] bs)
 		{
-			byte[] result = new byte[bs.Length];
-			for (int i = 0; i < bs.Length; i++) 
+			var result = new byte[bs.Length];
+			for (var i = 0; i < bs.Length; i++) 
 			{
 				result[i] = bs[bs.Length - (i + 1)];
 			}

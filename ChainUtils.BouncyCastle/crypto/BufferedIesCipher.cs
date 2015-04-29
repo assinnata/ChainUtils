@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Crypto.Engines;
-using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto
@@ -50,7 +48,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 			if (engine == null)
 				throw new InvalidOperationException("cipher not initialised");
 
-			int baseLen = inputLen + (int) buffer.Length;
+			var baseLen = inputLen + (int) buffer.Length;
 			return forEncryption
 				?	baseLen + 20
 				:	baseLen - 20;
@@ -89,7 +87,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 
 		public override byte[] DoFinal()
 		{
-			byte[] buf = buffer.ToArray();
+			var buf = buffer.ToArray();
 
 			Reset();
 

@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Digests;
 
@@ -55,13 +54,13 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 			if (keyID == null)
 				throw new ArgumentNullException("keyID");
 
-			this.keyIdentifier = keyID;
+			keyIdentifier = keyID;
         }
 
 		public SubjectKeyIdentifier(
             Asn1OctetString keyID)
         {
-            this.keyIdentifier = keyID.GetOctets();
+            keyIdentifier = keyID.GetOctets();
         }
 
 		/**
@@ -73,7 +72,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public SubjectKeyIdentifier(
 			SubjectPublicKeyInfo spki)
 		{
-			this.keyIdentifier = GetDigest(spki);
+			keyIdentifier = GetDigest(spki);
 		}
 
 		public byte[] GetKeyIdentifier()
@@ -115,8 +114,8 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public static SubjectKeyIdentifier CreateTruncatedSha1KeyIdentifier(
 			SubjectPublicKeyInfo keyInfo)
 		{
-			byte[] dig = GetDigest(keyInfo);
-			byte[] id = new byte[8];
+			var dig = GetDigest(keyInfo);
+			var id = new byte[8];
 
 			Array.Copy(dig, dig.Length - 8, id, 0, id.Length);
 
@@ -130,9 +129,9 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 			SubjectPublicKeyInfo spki)
 		{
             IDigest digest = new Sha1Digest();
-            byte[] resBuf = new byte[digest.GetDigestSize()];
+            var resBuf = new byte[digest.GetDigestSize()];
 
-			byte[] bytes = spki.PublicKeyData.GetBytes();
+			var bytes = spki.PublicKeyData.GetBytes();
             digest.BlockUpdate(bytes, 0, bytes.Length);
             digest.DoFinal(resBuf, 0);
             return resBuf;

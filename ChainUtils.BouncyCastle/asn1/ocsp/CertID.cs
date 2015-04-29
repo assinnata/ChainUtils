@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
@@ -54,10 +52,10 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 			if (seq.Count != 4)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-			this.hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
-            this.issuerNameHash = Asn1OctetString.GetInstance(seq[1]);
-            this.issuerKeyHash = Asn1OctetString.GetInstance(seq[2]);
-            this.serialNumber = DerInteger.GetInstance(seq[3]);
+			hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0]);
+            issuerNameHash = Asn1OctetString.GetInstance(seq[1]);
+            issuerKeyHash = Asn1OctetString.GetInstance(seq[2]);
+            serialNumber = DerInteger.GetInstance(seq[3]);
         }
 
 		public AlgorithmIdentifier HashAlgorithm

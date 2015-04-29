@@ -58,7 +58,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(certReqId, checkAfter);
+			var v = new Asn1EncodableVector(certReqId, checkAfter);
 			v.AddOptional(reason);
 			return new DerSequence(v);
 		}

@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -78,7 +77,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
                 ProcessBlock();
             }
 
-            for (int i = xOff; i < 14; ++i)
+            for (var i = xOff; i < 14; ++i)
             {
                 X[i] = 0;
             }
@@ -117,7 +116,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
             xOff = 0;
 
-            for (int i = 0; i != X.Length; i++)
+            for (var i = 0; i != X.Length; i++)
             {
                 X[i] = 0;
             }
@@ -202,10 +201,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         internal override void ProcessBlock()
         {
-            uint a = H1;
-            uint b = H2;
-            uint c = H3;
-            uint d = H4;
+            var a = H1;
+            var b = H2;
+            var c = H3;
+            var d = H4;
 
             //
             // Round 1 - F cycle, 16 times.
@@ -302,7 +301,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public override void Reset(IMemoable other)
 		{
-			MD5Digest d = (MD5Digest)other;
+			var d = (MD5Digest)other;
 
 			CopyIn(d);
 		}

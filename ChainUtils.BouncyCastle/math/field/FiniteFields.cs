@@ -13,7 +13,7 @@ namespace ChainUtils.BouncyCastle.Math.Field
             {
                 throw new ArgumentException("Irreducible polynomials in GF(2) must have constant term", "exponents");
             }
-            for (int i = 1; i < exponents.Length; ++i)
+            for (var i = 1; i < exponents.Length; ++i)
             {
                 if (exponents[i] <= exponents[i - 1])
                 {
@@ -31,7 +31,7 @@ namespace ChainUtils.BouncyCastle.Math.Field
 
         public static IFiniteField GetPrimeField(BigInteger characteristic)
         {
-            int bitLength = characteristic.BitLength;
+            var bitLength = characteristic.BitLength;
             if (characteristic.SignValue <= 0 || bitLength < 2)
             {
                 throw new ArgumentException("Must be >= 2", "characteristic");

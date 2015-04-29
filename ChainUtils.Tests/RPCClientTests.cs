@@ -113,9 +113,9 @@ namespace ChainUtils.Tests
 		public void CanGetPrivateKeysFromAccount()
 		{
 			var rpc = CreateRPCClient();
-			BitcoinAddress address = rpc.GetAccountAddress(TestAccount);
-			BitcoinSecret secret = rpc.DumpPrivKey(address);
-			BitcoinSecret secret2 = rpc.GetAccountSecret(TestAccount);
+			var address = rpc.GetAccountAddress(TestAccount);
+			var secret = rpc.DumpPrivKey(address);
+			var secret2 = rpc.GetAccountSecret(TestAccount);
 
 			Assert.Equal(secret.ToString(), secret2.ToString());
 			Assert.Equal(address.ToString(), secret.GetAddress().ToString());
@@ -135,7 +135,7 @@ namespace ChainUtils.Tests
 				var testData = ((JObject)test[2]).ToString();
 
 
-				Transaction raw = Transaction.Parse(testData, format, network);
+				var raw = Transaction.Parse(testData, format, network);
 
 
 				AssertJsonEquals(raw.ToString(format, network), testData);

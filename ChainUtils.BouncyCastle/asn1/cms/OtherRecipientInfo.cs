@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
     public class OtherRecipientInfo
@@ -50,7 +48,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         {
             if (obj == null)
                 return null;
-            OtherRecipientInfo existing = obj as OtherRecipientInfo;
+            var existing = obj as OtherRecipientInfo;
             if (existing != null)
                 return existing;
             return new OtherRecipientInfo(Asn1Sequence.GetInstance(obj));

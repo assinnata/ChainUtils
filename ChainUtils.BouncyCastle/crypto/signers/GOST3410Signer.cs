@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
@@ -28,27 +26,27 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 			{
 				if (parameters is ParametersWithRandom)
 				{
-					ParametersWithRandom rParam = (ParametersWithRandom)parameters;
+					var rParam = (ParametersWithRandom)parameters;
 
-					this.random = rParam.Random;
+					random = rParam.Random;
 					parameters = rParam.Parameters;
 				}
 				else
 				{
-					this.random = new SecureRandom();
+					random = new SecureRandom();
 				}
 
 				if (!(parameters is Gost3410PrivateKeyParameters))
 					throw new InvalidKeyException("GOST3410 private key required for signing");
 
-				this.key = (Gost3410PrivateKeyParameters) parameters;
+				key = (Gost3410PrivateKeyParameters) parameters;
 			}
 			else
 			{
 				if (!(parameters is Gost3410PublicKeyParameters))
 					throw new InvalidKeyException("GOST3410 public key required for signing");
 
-				this.key = (Gost3410PublicKeyParameters) parameters;
+				key = (Gost3410PublicKeyParameters) parameters;
 			}
 		}
 
@@ -62,14 +60,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 		public BigInteger[] GenerateSignature(
 			byte[] message)
 		{
-			byte[] mRev = new byte[message.Length]; // conversion is little-endian
-			for (int i = 0; i != mRev.Length; i++)
+			var mRev = new byte[message.Length]; // conversion is little-endian
+			for (var i = 0; i != mRev.Length; i++)
 			{
 				mRev[i] = message[mRev.Length - 1 - i];
 			}
 
-			BigInteger m = new BigInteger(1, mRev);
-			Gost3410Parameters parameters = key.Parameters;
+			var m = new BigInteger(1, mRev);
+			var parameters = key.Parameters;
 			BigInteger k;
 
 			do
@@ -78,9 +76,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 			}
 			while (k.CompareTo(parameters.Q) >= 0);
 
-			BigInteger r = parameters.A.ModPow(k, parameters.P).Mod(parameters.Q);
+			var r = parameters.A.ModPow(k, parameters.P).Mod(parameters.Q);
 
-			BigInteger s = k.Multiply(m).
+			var s = k.Multiply(m).
 				Add(((Gost3410PrivateKeyParameters)key).X.Multiply(r)).
 				Mod(parameters.Q);
 
@@ -97,14 +95,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 			BigInteger	r,
 			BigInteger	s)
 		{
-			byte[] mRev = new byte[message.Length]; // conversion is little-endian
-			for (int i = 0; i != mRev.Length; i++)
+			var mRev = new byte[message.Length]; // conversion is little-endian
+			for (var i = 0; i != mRev.Length; i++)
 			{
 				mRev[i] = message[mRev.Length - 1 - i];
 			}
 
-			BigInteger m = new BigInteger(1, mRev);
-			Gost3410Parameters parameters = key.Parameters;
+			var m = new BigInteger(1, mRev);
+			var parameters = key.Parameters;
 
 			if (r.SignValue < 0 || parameters.Q.CompareTo(r) <= 0)
 			{
@@ -116,15 +114,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 				return false;
 			}
 
-			BigInteger v = m.ModPow(parameters.Q.Subtract(BigInteger.Two), parameters.Q);
+			var v = m.ModPow(parameters.Q.Subtract(BigInteger.Two), parameters.Q);
 
-			BigInteger z1 = s.Multiply(v).Mod(parameters.Q);
-			BigInteger z2 = (parameters.Q.Subtract(r)).Multiply(v).Mod(parameters.Q);
+			var z1 = s.Multiply(v).Mod(parameters.Q);
+			var z2 = (parameters.Q.Subtract(r)).Multiply(v).Mod(parameters.Q);
 
 			z1 = parameters.A.ModPow(z1, parameters.P);
 			z2 = ((Gost3410PublicKeyParameters)key).Y.ModPow(z2, parameters.P);
 
-			BigInteger u = z1.Multiply(z2).Mod(parameters.P).Mod(parameters.Q);
+			var u = z1.Multiply(z2).Mod(parameters.P).Mod(parameters.Q);
 
 			return u.Equals(r);
 		}

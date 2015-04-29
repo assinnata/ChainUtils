@@ -32,7 +32,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Collections
 
 		public virtual void CopyTo(Array array, int index)
 		{
-			foreach (object k in keys)
+			foreach (var k in keys)
 			{
 				array.SetValue(hash[k], index++);
 			}
@@ -89,8 +89,8 @@ namespace ChainUtils.BouncyCastle.Utilities.Collections
 			// NB: Order has to be the same as for Keys property
 			get
 			{
-                IList values = Platform.CreateArrayList(keys.Count);
-				foreach (object k in keys)
+                var values = Platform.CreateArrayList(keys.Count);
+				foreach (var k in keys)
 				{
 					values.Add(hash[k]);
 				}
@@ -132,7 +132,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Collections
 		{
 			get
 			{
-				object k = CurrentKey;
+				var k = CurrentKey;
 				return new DictionaryEntry(k, parent.hash[k]);
 			}
 		}
@@ -154,7 +154,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Collections
 
 		public virtual void Reset()
 		{
-			this.pos = -1;
+			pos = -1;
 		}
 
 		public virtual object Value

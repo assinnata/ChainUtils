@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Math;
 
@@ -33,8 +32,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 			if (seq.Count != 2)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-			this.name = X509Name.GetInstance(seq[0]);
-            this.certSerialNumber = DerInteger.GetInstance(seq[1]);
+			name = X509Name.GetInstance(seq[0]);
+            certSerialNumber = DerInteger.GetInstance(seq[1]);
         }
 
 		public IssuerAndSerialNumber(

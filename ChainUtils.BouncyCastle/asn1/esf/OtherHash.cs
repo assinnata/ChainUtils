@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.Oiw;
 using ChainUtils.BouncyCastle.Asn1.X509;
 

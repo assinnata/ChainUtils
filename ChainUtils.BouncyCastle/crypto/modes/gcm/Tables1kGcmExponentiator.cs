@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
@@ -25,8 +24,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
 		public void ExponentiateX(long pow, byte[] output)
 		{
-			byte[] y = GcmUtilities.OneAsBytes();
-            int bit = 0;
+			var y = GcmUtilities.OneAsBytes();
+            var bit = 0;
             while (pow > 0)
             {
                 if ((pow & 1L) != 0)
@@ -43,10 +42,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         private void EnsureAvailable(int bit)
         {
-            int count = lookupPowX2.Count;
+            var count = lookupPowX2.Count;
             if (count <= bit)
             {
-                byte[] tmp = (byte[])lookupPowX2[count - 1];
+                var tmp = (byte[])lookupPowX2[count - 1];
                 do
                 {
                     tmp = Arrays.Clone(tmp);

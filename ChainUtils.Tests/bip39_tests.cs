@@ -151,10 +151,10 @@ namespace ChainUtils.Tests
 		//[Fact]
 		public void GenerateHardcodedBIP39Dictionary()
 		{
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			foreach(var lang in new[] { Language.ChineseSimplified, Language.ChineseTraditional, Language.English, Language.Japanese, Language.Spanish })
 			{
-				string name = Wordlist.GetLanguageFileName(lang);
+				var name = Wordlist.GetLanguageFileName(lang);
 				builder.AppendLine("dico.Add(\"" + name + "\",\"" + GetLanguage(lang) + "\");");
 			}
 			var dico = builder.ToString();
@@ -163,10 +163,10 @@ namespace ChainUtils.Tests
 		[Fact]
 		public void GenerateHardcodedNormalization()
 		{
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			builder.Append("\"");
-			HashSet<char> chars = new HashSet<char>();
-			List<CharRangeT> ranges = new List<CharRangeT>();
+			var chars = new HashSet<char>();
+			var ranges = new List<CharRangeT>();
 			ranges.Add(CharRange(0, 1000)); //Some latin language accent
 			ranges.Add(CharRange(0x3040, 0x309F)); //Hiragana
 			ranges.Add(CharRange(0x30A0, 0x30FF)); //Katakana
@@ -190,10 +190,10 @@ namespace ChainUtils.Tests
 
 			foreach(var letter in ranges.SelectMany(c => c).OrderBy(c => c))
 			{
-				string nonNormal = new String(new[] { letter });
+				var nonNormal = new String(new[] { letter });
 				try
 				{
-					string normal = nonNormal.Normalize(NormalizationForm.FormKD);
+					var normal = nonNormal.Normalize(NormalizationForm.FormKD);
 					if(nonNormal != normal && chars.Add(letter))
 					{
 						builder.Append(nonNormal + normal + "\\n");
@@ -255,7 +255,7 @@ namespace ChainUtils.Tests
 
 		private string GetLanguage(Language lang)
 		{
-			string name = Wordlist.GetLanguageFileName(lang);
+			var name = Wordlist.GetLanguageFileName(lang);
 			System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
 			var data = client.GetAsync("https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/" + name + ".txt").Result.Content.ReadAsStringAsync().Result;
 			return data.Replace("\n", "\\n");

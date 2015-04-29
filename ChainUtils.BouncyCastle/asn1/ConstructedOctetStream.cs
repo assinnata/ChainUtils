@@ -1,5 +1,4 @@
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -25,7 +24,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 				if (!_first)
 					return 0;
 
-				Asn1OctetStringParser s = (Asn1OctetStringParser)_parser.ReadObject();
+				var s = (Asn1OctetStringParser)_parser.ReadObject();
 
 				if (s == null)
 					return 0;
@@ -34,11 +33,11 @@ namespace ChainUtils.BouncyCastle.Asn1
 				_currentStream = s.GetOctetStream();
 			}
 
-			int totalRead = 0;
+			var totalRead = 0;
 
 			for (;;)
 			{
-				int numRead = _currentStream.Read(buffer, offset + totalRead, count - totalRead);
+				var numRead = _currentStream.Read(buffer, offset + totalRead, count - totalRead);
 
 				if (numRead > 0)
 				{
@@ -49,7 +48,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 				}
 				else
 				{
-					Asn1OctetStringParser aos = (Asn1OctetStringParser)_parser.ReadObject();
+					var aos = (Asn1OctetStringParser)_parser.ReadObject();
 
 					if (aos == null)
 					{
@@ -69,7 +68,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 				if (!_first)
 					return 0;
 
-				Asn1OctetStringParser s = (Asn1OctetStringParser)_parser.ReadObject();
+				var s = (Asn1OctetStringParser)_parser.ReadObject();
 
 				if (s == null)
 					return 0;
@@ -80,14 +79,14 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 			for (;;)
 			{
-				int b = _currentStream.ReadByte();
+				var b = _currentStream.ReadByte();
 
 				if (b >= 0)
 				{
 					return b;
 				}
 
-				Asn1OctetStringParser aos = (Asn1OctetStringParser)_parser.ReadObject();
+				var aos = (Asn1OctetStringParser)_parser.ReadObject();
 
 				if (aos == null)
 				{

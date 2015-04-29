@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -28,7 +26,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			ValidateValue(dQ, "dQ", "DQ value");
 			ValidateValue(qInv, "qInv", "InverseQ value");
 
-			this.e = publicExponent;
+			e = publicExponent;
             this.p = p;
             this.q = q;
             this.dP = dP;
@@ -72,15 +70,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (obj == this)
 				return true;
 
-			RsaPrivateCrtKeyParameters kp = obj as RsaPrivateCrtKeyParameters;
+			var kp = obj as RsaPrivateCrtKeyParameters;
 
 			if (kp == null)
 				return false;
 
 			return kp.DP.Equals(dP)
 				&& kp.DQ.Equals(dQ)
-				&& kp.Exponent.Equals(this.Exponent)
-				&& kp.Modulus.Equals(this.Modulus)
+				&& kp.Exponent.Equals(Exponent)
+				&& kp.Modulus.Equals(Modulus)
 				&& kp.P.Equals(p)
 				&& kp.Q.Equals(q)
 				&& kp.PublicExponent.Equals(e)

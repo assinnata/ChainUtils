@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1

@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
 	public class TimeStampedData
@@ -14,7 +12,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		public TimeStampedData(DerIA5String dataUri, MetaData metaData, Asn1OctetString content,
 			Evidence temporalEvidence)
 		{
-			this.version = new DerInteger(1);
+			version = new DerInteger(1);
 			this.dataUri = dataUri;
 			this.metaData = metaData;
 			this.content = content;
@@ -23,22 +21,22 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 		private TimeStampedData(Asn1Sequence seq)
 		{
-			this.version = DerInteger.GetInstance(seq[0]);
+			version = DerInteger.GetInstance(seq[0]);
 			
-			int index = 1;
+			var index = 1;
 			if (seq[index] is DerIA5String)
 			{
-				this.dataUri = DerIA5String.GetInstance(seq[index++]);
+				dataUri = DerIA5String.GetInstance(seq[index++]);
 			}
 			if (seq[index] is MetaData || seq[index] is Asn1Sequence)
 			{
-				this.metaData = MetaData.GetInstance(seq[index++]);
+				metaData = MetaData.GetInstance(seq[index++]);
 			}
 			if (seq[index] is Asn1OctetString)
 			{
-				this.content = Asn1OctetString.GetInstance(seq[index++]);
+				content = Asn1OctetString.GetInstance(seq[index++]);
 			}
-			this.temporalEvidence = Evidence.GetInstance(seq[index]);
+			temporalEvidence = Evidence.GetInstance(seq[index]);
 		}
 
 		public static TimeStampedData GetInstance(object obj)
@@ -86,7 +84,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(version);
+			var v = new Asn1EncodableVector(version);
 			v.AddOptional(dataUri, metaData, content);
 			v.Add(temporalEvidence);
 			return new BerSequence(v);

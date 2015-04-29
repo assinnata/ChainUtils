@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1
 {
 	public class BerApplicationSpecific

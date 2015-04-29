@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Generators;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
@@ -34,27 +32,27 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             {
                 if (parameters is ParametersWithRandom)
                 {
-                    ParametersWithRandom rParam = (ParametersWithRandom) parameters;
+                    var rParam = (ParametersWithRandom) parameters;
 
-                    this.random = rParam.Random;
+                    random = rParam.Random;
                     parameters = rParam.Parameters;
                 }
                 else
                 {
-                    this.random = new SecureRandom();
+                    random = new SecureRandom();
                 }
 
                 if (!(parameters is ECPrivateKeyParameters))
                     throw new InvalidKeyException("EC private key required for signing");
 
-                this.key = (ECPrivateKeyParameters) parameters;
+                key = (ECPrivateKeyParameters) parameters;
             }
             else
             {
                 if (!(parameters is ECPublicKeyParameters))
                     throw new InvalidKeyException("EC public key required for verification");
 
-                this.key = (ECPublicKeyParameters) parameters;
+                key = (ECPublicKeyParameters) parameters;
             }
         }
 
@@ -71,19 +69,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
         public BigInteger[] GenerateSignature(
             byte[] message)
         {
-            if (!this.forSigning)
+            if (!forSigning)
             {
                 // not properly initilaized... deal with it
                 throw new InvalidOperationException("not initialised for signing");
             }
 
-            BigInteger n = ((ECPrivateKeyParameters) this.key).Parameters.N;
-            int nBitLength = n.BitLength;
+            var n = ((ECPrivateKeyParameters) key).Parameters.N;
+            var nBitLength = n.BitLength;
 
-            BigInteger e = new BigInteger(1, message);
-            int eBitLength = e.BitLength;
+            var e = new BigInteger(1, message);
+            var eBitLength = e.BitLength;
 
-            ECPrivateKeyParameters  privKey = (ECPrivateKeyParameters)key;
+            var  privKey = (ECPrivateKeyParameters)key;
 
             if (eBitLength > nBitLength)
             {
@@ -98,23 +96,23 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             {
                 // generate another, but very temporary, key pair using
                 // the same EC parameters
-                ECKeyPairGenerator keyGen = new ECKeyPairGenerator();
+                var keyGen = new ECKeyPairGenerator();
 
-                keyGen.Init(new ECKeyGenerationParameters(privKey.Parameters, this.random));
+                keyGen.Init(new ECKeyGenerationParameters(privKey.Parameters, random));
 
                 tempPair = keyGen.GenerateKeyPair();
 
                 //    BigInteger Vx = tempPair.getPublic().getW().getAffineX();
-                ECPublicKeyParameters V = (ECPublicKeyParameters) tempPair.Public; // get temp's public key
-                BigInteger Vx = V.Q.AffineXCoord.ToBigInteger(); // get the point's x coordinate
+                var V = (ECPublicKeyParameters) tempPair.Public; // get temp's public key
+                var Vx = V.Q.AffineXCoord.ToBigInteger(); // get the point's x coordinate
 
                 r = Vx.Add(e).Mod(n);
             }
             while (r.SignValue == 0);
 
             // generate s
-            BigInteger x = privKey.D;                // private key value
-            BigInteger u = ((ECPrivateKeyParameters) tempPair.Private).D; // temp's private key value
+            var x = privKey.D;                // private key value
+            var u = ((ECPrivateKeyParameters) tempPair.Private).D; // temp's private key value
             s = u.Subtract(r.Multiply(x)).Mod(n);
 
             return new BigInteger[]{ r, s };
@@ -139,18 +137,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             BigInteger	r,
             BigInteger	s)
         {
-            if (this.forSigning)
+            if (forSigning)
             {
                 // not properly initilaized... deal with it
                 throw new InvalidOperationException("not initialised for verifying");
             }
 
-            ECPublicKeyParameters pubKey = (ECPublicKeyParameters)key;
-            BigInteger n = pubKey.Parameters.N;
-            int nBitLength = n.BitLength;
+            var pubKey = (ECPublicKeyParameters)key;
+            var n = pubKey.Parameters.N;
+            var nBitLength = n.BitLength;
 
-            BigInteger e = new BigInteger(1, message);
-            int eBitLength = e.BitLength;
+            var e = new BigInteger(1, message);
+            var eBitLength = e.BitLength;
 
             if (eBitLength > nBitLength)
             {
@@ -171,16 +169,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 
             // compute P = sG + rW
 
-            ECPoint G = pubKey.Parameters.G;
-            ECPoint W = pubKey.Q;
+            var G = pubKey.Parameters.G;
+            var W = pubKey.Q;
             // calculate P using Bouncy math
-            ECPoint P = ECAlgorithms.SumOfTwoMultiplies(G, s, W, r).Normalize();
+            var P = ECAlgorithms.SumOfTwoMultiplies(G, s, W, r).Normalize();
 
             if (P.IsInfinity)
                 return false;
 
-            BigInteger x = P.AffineXCoord.ToBigInteger();
-            BigInteger t = r.Subtract(x).Mod(n);
+            var x = P.AffineXCoord.ToBigInteger();
+            var t = r.Subtract(x).Mod(n);
 
             return t.Equals(e);
         }

@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 
 namespace ChainUtils.BouncyCastle.Crypto.Digests
@@ -35,7 +34,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public int DoFinal(byte[] outBytes, int outOff)
 		{
-			byte[] res = bOut.ToArray();
+			var res = bOut.ToArray();
 			res.CopyTo(outBytes, outOff);
 			Reset();
 			return res.Length;

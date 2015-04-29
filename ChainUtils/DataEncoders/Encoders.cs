@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.DataEncoders
 {
@@ -32,12 +29,12 @@ namespace ChainUtils.DataEncoders
 	}
 	public class Encoders
 	{
-		static readonly ASCIIEncoder _ASCII = new ASCIIEncoder();
+		static readonly AsciiEncoder Ascii = new AsciiEncoder();
 		public static DataEncoder ASCII
 		{
 			get
 			{
-				return _ASCII;
+				return Ascii;
 			}
 		}
 		static readonly HexEncoder _Hex = new HexEncoder();

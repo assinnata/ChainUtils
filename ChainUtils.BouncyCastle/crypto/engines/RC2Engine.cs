@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -60,19 +59,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             int         bits)
         {
             int     x;
-            int[]   xKey = new int[128];
+            var   xKey = new int[128];
 
-            for (int i = 0; i != key.Length; i++)
+            for (var i = 0; i != key.Length; i++)
             {
                 xKey[i] = key[i] & 0xff;
             }
 
             // Phase 1: Expand input key to 128 bytes
-            int len = key.Length;
+            var len = key.Length;
 
             if (len < 128)
             {
-                int     index = 0;
+                var     index = 0;
 
                 x = xKey[len - 1];
 
@@ -89,16 +88,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             x = piTable[xKey[128 - len] & (255 >> (7 & -bits))] & 0xff;
             xKey[128 - len] = x;
 
-            for (int i = 128 - len - 1; i >= 0; i--)
+            for (var i = 128 - len - 1; i >= 0; i--)
             {
                     x = piTable[x ^ xKey[i + len]] & 0xff;
                     xKey[i] = x;
             }
 
             // Phase 3 - copy to newKey in little-endian order
-            int[] newKey = new int[64];
+            var newKey = new int[64];
 
-            for (int i = 0; i != newKey.Length; i++)
+            for (var i = 0; i != newKey.Length; i++)
             {
                 newKey[i] = (xKey[2 * i] + (xKey[2 * i + 1] << 8));
             }
@@ -118,18 +117,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             bool				forEncryption,
             ICipherParameters	parameters)
         {
-            this.encrypting = forEncryption;
+            encrypting = forEncryption;
 
 			if (parameters is RC2Parameters)
             {
-                RC2Parameters param = (RC2Parameters) parameters;
+                var param = (RC2Parameters) parameters;
 
 				workingKey = GenerateWorkingKey(param.GetKey(), param.EffectiveKeyBits);
             }
             else if (parameters is KeyParameter)
             {
-				KeyParameter param = (KeyParameter) parameters;
-				byte[] key = param.GetKey();
+				var param = (KeyParameter) parameters;
+				var key = param.GetKey();
 
 				workingKey = GenerateWorkingKey(key, key.Length * 8);
             }
@@ -207,7 +206,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             x32 = ((input[inOff + 3] & 0xff) << 8) + (input[inOff + 2] & 0xff);
             x10 = ((input[inOff + 1] & 0xff) << 8) + (input[inOff + 0] & 0xff);
 
-            for (int i = 0; i <= 16; i += 4)
+            for (var i = 0; i <= 16; i += 4)
             {
                     x10 = RotateWordLeft(x10 + (x32 & ~x76) + (x54 & x76) + workingKey[i  ], 1);
                     x32 = RotateWordLeft(x32 + (x54 & ~x10) + (x76 & x10) + workingKey[i+1], 2);
@@ -220,7 +219,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             x54 += workingKey[x32 & 63];
             x76 += workingKey[x54 & 63];
 
-            for (int i = 20; i <= 40; i += 4)
+            for (var i = 20; i <= 40; i += 4)
             {
                     x10 = RotateWordLeft(x10 + (x32 & ~x76) + (x54 & x76) + workingKey[i  ], 1);
                     x32 = RotateWordLeft(x32 + (x54 & ~x10) + (x76 & x10) + workingKey[i+1], 2);
@@ -233,7 +232,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             x54 += workingKey[x32 & 63];
             x76 += workingKey[x54 & 63];
 
-            for (int i = 44; i < 64; i += 4)
+            for (var i = 44; i < 64; i += 4)
             {
                     x10 = RotateWordLeft(x10 + (x32 & ~x76) + (x54 & x76) + workingKey[i  ], 1);
                     x32 = RotateWordLeft(x32 + (x54 & ~x10) + (x76 & x10) + workingKey[i+1], 2);
@@ -264,7 +263,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             x32 = ((input[inOff + 3] & 0xff) << 8) + (input[inOff + 2] & 0xff);
             x10 = ((input[inOff + 1] & 0xff) << 8) + (input[inOff + 0] & 0xff);
 
-            for (int i = 60; i >= 44; i -= 4)
+            for (var i = 60; i >= 44; i -= 4)
             {
                 x76 = RotateWordLeft(x76, 11) - ((x10 & ~x54) + (x32 & x54) + workingKey[i+3]);
                 x54 = RotateWordLeft(x54, 13) - ((x76 & ~x32) + (x10 & x32) + workingKey[i+2]);
@@ -277,7 +276,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             x32 -= workingKey[x10 & 63];
             x10 -= workingKey[x76 & 63];
 
-            for (int i = 40; i >= 20; i -= 4)
+            for (var i = 40; i >= 20; i -= 4)
             {
                 x76 = RotateWordLeft(x76, 11) - ((x10 & ~x54) + (x32 & x54) + workingKey[i+3]);
                 x54 = RotateWordLeft(x54, 13) - ((x76 & ~x32) + (x10 & x32) + workingKey[i+2]);
@@ -290,7 +289,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             x32 -= workingKey[x10 & 63];
             x10 -= workingKey[x76 & 63];
 
-            for (int i = 16; i >= 0; i -= 4)
+            for (var i = 16; i >= 0; i -= 4)
             {
                 x76 = RotateWordLeft(x76, 11) - ((x10 & ~x54) + (x32 & x54) + workingKey[i+3]);
                 x54 = RotateWordLeft(x54, 13) - ((x76 & ~x32) + (x10 & x32) + workingKey[i+2]);

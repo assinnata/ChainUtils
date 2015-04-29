@@ -30,8 +30,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Crmf
 
         public virtual AttributeTypeAndValue[] ToAttributeTypeAndValueArray()
         {
-            AttributeTypeAndValue[] result = new AttributeTypeAndValue[content.Count];
-            for (int i = 0; i != result.Length; ++i)
+            var result = new AttributeTypeAndValue[content.Count];
+            for (var i = 0; i != result.Length; ++i)
             {
                 result[i] = AttributeTypeAndValue.GetInstance(content[i]);
             }

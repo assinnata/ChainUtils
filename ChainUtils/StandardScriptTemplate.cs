@@ -1,9 +1,7 @@
-﻿using ChainUtils.Crypto;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.Crypto;
 
 namespace ChainUtils
 {
@@ -11,13 +9,13 @@ namespace ChainUtils
 
 	public enum TxOutType
 	{
-		TX_NONSTANDARD,
+		TxNonstandard,
 		// 'standard' transaction types:
-		TX_PUBKEY,
-		TX_PUBKEYHASH,
-		TX_SCRIPTHASH,
-		TX_MULTISIG,
-		TX_NULL_DATA,
+		TxPubkey,
+		TxPubkeyhash,
+		TxScripthash,
+		TxMultisig,
+		TxNullData,
 	};
 
 	public class TxNullDataTemplate : ScriptTemplate
@@ -33,18 +31,18 @@ namespace ChainUtils
 		protected override bool FastCheckScriptPubKey(Script scriptPubKey)
 		{
 			var bytes = scriptPubKey.ToBytes(true);
-			return bytes.Length >= 1 && bytes[0] == (byte)OpcodeType.OP_RETURN;
+			return bytes.Length >= 1 && bytes[0] == (byte)OpcodeType.OpReturn;
 		}
 		protected override bool CheckScriptPubKeyCore(Script scriptPubKey, Op[] scriptPubKeyOps)
 		{
 			var ops = scriptPubKeyOps;
 			if(ops.Length < 1)
 				return false;
-			if(ops[0].Code != OpcodeType.OP_RETURN)
+			if(ops[0].Code != OpcodeType.OpReturn)
 				return false;
 			if(ops.Length == 2)
 			{
-				return ops[1].PushData != null && ops[1].PushData.Length <= MAX_OPRETURN_SIZE;
+				return ops[1].PushData != null && ops[1].PushData.Length <= MaxOpreturnSize;
 				throw new NotSupportedException();
 			}
 			return true;
@@ -56,7 +54,7 @@ namespace ChainUtils
 			var ops = scriptPubKey.ToOps().ToArray();
 			if(ops.Length != 2)
 				return null;
-			if(ops[1].PushData == null || ops[1].PushData.Length > MAX_OPRETURN_SIZE)
+			if(ops[1].PushData == null || ops[1].PushData.Length > MaxOpreturnSize)
 				return null;
 			return ops[1].PushData;
 		}
@@ -66,15 +64,15 @@ namespace ChainUtils
 			return false;
 		}
 
-		public const int MAX_OPRETURN_SIZE = 40;
+		public const int MaxOpreturnSize = 40;
 		public Script GenerateScriptPubKey(byte[] data)
 		{
 			if(data == null)
 				throw new ArgumentNullException("data");
-			if(data.Length > MAX_OPRETURN_SIZE)
-				throw new ArgumentOutOfRangeException("data", "Data in OP_RETURN should have a maximum size of " + MAX_OPRETURN_SIZE + " bytes");
+			if(data.Length > MaxOpreturnSize)
+				throw new ArgumentOutOfRangeException("data", "Data in OP_RETURN should have a maximum size of " + MaxOpreturnSize + " bytes");
 
-			return new Script(OpcodeType.OP_RETURN,
+			return new Script(OpcodeType.OpReturn,
 							  Op.GetPushOp(data));
 		}
 
@@ -82,7 +80,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return TxOutType.TX_NULL_DATA;
+				return TxOutType.TxNullData;
 			}
 		}
 	}
@@ -118,7 +116,7 @@ namespace ChainUtils
 		}
 		public Script GenerateScriptPubKey(int sigCount, params PubKey[] keys)
 		{
-			List<Op> ops = new List<Op>();
+			var ops = new List<Op>();
 			var push = Op.GetPushOp(sigCount);
 			if(!push.IsSmallUInt)
 				throw new ArgumentOutOfRangeException("sigCount should be less or equal to 16");
@@ -131,7 +129,7 @@ namespace ChainUtils
 				ops.Add(Op.GetPushOp(key.ToBytes()));
 			}
 			ops.Add(keyCount);
-			ops.Add(OpcodeType.OP_CHECKMULTISIG);
+			ops.Add(OpcodeType.OpCheckmultisig);
 			return new Script(ops);
 		}
 		protected override bool CheckScriptPubKeyCore(Script scriptPubKey, Op[] scriptPubKeyOps)
@@ -149,12 +147,12 @@ namespace ChainUtils
 			var keyCount = (uint)pubKeyCount.GetValue();
 			if(1 + keyCount + 1 + 1 != ops.Length)
 				return false;
-			for(int i = 1 ; i < keyCount + 1 ; i++)
+			for(var i = 1 ; i < keyCount + 1 ; i++)
 			{
 				if(ops[i].PushData == null)
 					return false;
 			}
-			return ops[ops.Length - 1].Code == OpcodeType.OP_CHECKMULTISIG;
+			return ops[ops.Length - 1].Code == OpcodeType.OpCheckmultisig;
 		}
 
 		public PayToMultiSigTemplateParameters ExtractScriptPubKeyParameters(Script scriptPubKey)
@@ -168,9 +166,9 @@ namespace ChainUtils
 			var sigCount = (int)ops[0].GetValue();
 			var keyCount = (int)ops[ops.Length - 2].GetValue();
 
-			List<PubKey> keys = new List<PubKey>();
-			List<byte[]> invalidKeys = new List<byte[]>();
-			for(int i = 1 ; i < keyCount + 1 ; i++)
+			var keys = new List<PubKey>();
+			var invalidKeys = new List<byte[]>();
+			for(var i = 1 ; i < keyCount + 1 ; i++)
 			{
 				if(!PubKey.Check(ops[i].PushData, false))
 					invalidKeys.Add(ops[i].PushData);
@@ -199,18 +197,18 @@ namespace ChainUtils
 		{
 			var bytes = scriptSig.ToBytes(true);
 			return bytes.Length >= 1 &&
-				   bytes[0] == (byte)OpcodeType.OP_0;
+				   bytes[0] == (byte)OpcodeType.Op0;
 		}
 
 		protected override bool CheckScriptSigCore(Script scriptSig, Op[] scriptSigOps, Script scriptPubKey, Op[] scriptPubKeyOps)
 		{
 			if(!scriptSig.IsPushOnly)
 				return false;
-			if(scriptSigOps[0].Code != OpcodeType.OP_0)
+			if(scriptSigOps[0].Code != OpcodeType.Op0)
 				return false;
 			if(scriptSigOps.Length == 1)
 				return false;
-			if(!scriptSigOps.Skip(1).All(s => TransactionSignature.ValidLength(s.PushData.Length) || s.Code == OpcodeType.OP_0))
+			if(!scriptSigOps.Skip(1).All(s => TransactionSignature.ValidLength(s.PushData.Length) || s.Code == OpcodeType.Op0))
 				return false;
 			if(scriptPubKeyOps != null)
 			{
@@ -232,7 +230,7 @@ namespace ChainUtils
 				return null;
 			try
 			{
-				return ops.Skip(1).Select(i => i.Code == OpcodeType.OP_0 ? null : new TransactionSignature(i.PushData)).ToArray();
+				return ops.Skip(1).Select(i => i.Code == OpcodeType.Op0 ? null : new TransactionSignature(i.PushData)).ToArray();
 			}
 			catch(FormatException)
 			{
@@ -244,7 +242,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return TxOutType.TX_MULTISIG;
+				return TxOutType.TxMultisig;
 			}
 		}
 
@@ -255,12 +253,12 @@ namespace ChainUtils
 
 		public Script GenerateScriptSig(IEnumerable<TransactionSignature> signatures)
 		{
-			List<Op> ops = new List<Op>();
-			ops.Add(OpcodeType.OP_0);
+			var ops = new List<Op>();
+			ops.Add(OpcodeType.Op0);
 			foreach(var sig in signatures)
 			{
 				if(sig == null)
-					ops.Add(OpcodeType.OP_0);
+					ops.Add(OpcodeType.Op0);
 				else
 					ops.Add(Op.GetPushOp(sig.ToBytes()));
 			}
@@ -295,9 +293,9 @@ namespace ChainUtils
 		public Script GenerateScriptPubKey(ScriptId scriptId)
 		{
 			return new Script(
-				OpcodeType.OP_HASH160,
+				OpcodeType.OpHash160,
 				Op.GetPushOp(scriptId.ToBytes()),
-				OpcodeType.OP_EQUAL);
+				OpcodeType.OpEqual);
 		}
 		public Script GenerateScriptPubKey(Script scriptPubKey)
 		{
@@ -309,7 +307,7 @@ namespace ChainUtils
 			var bytes = scriptPubKey.ToBytes(true);
 			return
 				   bytes.Length >= 2 &&
-				   bytes[0] == (byte)OpcodeType.OP_HASH160 &&
+				   bytes[0] == (byte)OpcodeType.OpHash160 &&
 				   bytes[1] == 0x14;
 		}
 
@@ -318,9 +316,9 @@ namespace ChainUtils
 			var ops = scriptPubKeyOps;
 			if(ops.Length != 3)
 				return false;
-			return ops[0].Code == OpcodeType.OP_HASH160 &&
+			return ops[0].Code == OpcodeType.OpHash160 &&
 				   ops[1].Code == (OpcodeType)0x14 &&
-				   ops[2].Code == OpcodeType.OP_EQUAL;
+				   ops[2].Code == OpcodeType.OpEqual;
 		}
 
 		public Script GenerateScriptSig(Op[] ops, Script script)
@@ -340,13 +338,13 @@ namespace ChainUtils
 				return null;
 			try
 			{
-				var multiSig = ops.Length > 0 && ops[0].Code == OpcodeType.OP_0;
-				PayToScriptHashSigParameters result = new PayToScriptHashSigParameters();
+				var multiSig = ops.Length > 0 && ops[0].Code == OpcodeType.Op0;
+				var result = new PayToScriptHashSigParameters();
 				result.Signatures =
 					ops
 					.Skip(multiSig ? 1 : 0)
 					.Take(ops.Length - 1 - (multiSig ? 1 : 0))
-					.Select(o => o.Code == OpcodeType.OP_0 ? null : new TransactionSignature(o.PushData))
+					.Select(o => o.Code == OpcodeType.Op0 ? null : new TransactionSignature(o.PushData))
 					.ToArray();
 				result.RedeemScript = new Script(ops[ops.Length - 1].PushData);
 				return result;
@@ -359,19 +357,19 @@ namespace ChainUtils
 
 		public Script GenerateScriptSig(TransactionSignature[] signatures, Script redeemScript)
 		{
-			List<Op> ops = new List<Op>();
-			PayToMultiSigTemplate multiSigTemplate = new PayToMultiSigTemplate();
-			bool multiSig = multiSigTemplate.CheckScriptPubKey(redeemScript);
+			var ops = new List<Op>();
+			var multiSigTemplate = new PayToMultiSigTemplate();
+			var multiSig = multiSigTemplate.CheckScriptPubKey(redeemScript);
 			if(multiSig)
-				ops.Add(OpcodeType.OP_0);
+				ops.Add(OpcodeType.Op0);
 			foreach(var sig in signatures)
 			{
-				ops.Add(sig == null ? OpcodeType.OP_0 : Op.GetPushOp(sig.ToBytes()));
+				ops.Add(sig == null ? OpcodeType.Op0 : Op.GetPushOp(sig.ToBytes()));
 			}
 			return GenerateScriptSig(ops.ToArray(), redeemScript);
 		}
 
-		public Script GenerateScriptSig(ECDSASignature[] signatures, Script redeemScript)
+		public Script GenerateScriptSig(EcdsaSignature[] signatures, Script redeemScript)
 		{
 			return GenerateScriptSig(signatures.Select(s => new TransactionSignature(s, SigHash.All)).ToArray(), redeemScript);
 		}
@@ -399,7 +397,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return TxOutType.TX_SCRIPTHASH;
+				return TxOutType.TxScripthash;
 			}
 		}
 
@@ -432,7 +430,7 @@ namespace ChainUtils
 		{
 			return new Script(
 					Op.GetPushOp(pubkey.ToBytes()),
-					OpcodeType.OP_CHECKSIG
+					OpcodeType.OpChecksig
 				);
 		}
 		protected override bool CheckScriptPubKeyCore(Script scriptPubKey, Op[] scriptPubKeyOps)
@@ -441,10 +439,10 @@ namespace ChainUtils
 			if(ops.Length != 2)
 				return false;
 			return ops[0].PushData != null && PubKey.Check(ops[0].PushData, false) &&
-				   ops[1].Code == OpcodeType.OP_CHECKSIG;
+				   ops[1].Code == OpcodeType.OpChecksig;
 		}
 
-		public Script GenerateScriptSig(ECDSASignature signature)
+		public Script GenerateScriptSig(EcdsaSignature signature)
 		{
 			return GenerateScriptSig(new TransactionSignature(signature, SigHash.All));
 		}
@@ -487,7 +485,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return TxOutType.TX_PUBKEY;
+				return TxOutType.TxPubkey;
 			}
 		}
 
@@ -547,11 +545,11 @@ namespace ChainUtils
 		public Script GenerateScriptPubKey(KeyId pubkeyHash)
 		{
 			return new Script(
-					OpcodeType.OP_DUP,
-					OpcodeType.OP_HASH160,
+					OpcodeType.OpDup,
+					OpcodeType.OpHash160,
 					Op.GetPushOp(pubkeyHash.ToBytes()),
-					OpcodeType.OP_EQUALVERIFY,
-					OpcodeType.OP_CHECKSIG
+					OpcodeType.OpEqualverify,
+					OpcodeType.OpChecksig
 				);
 		}
 
@@ -560,7 +558,7 @@ namespace ChainUtils
 			if(publicKey == null)
 				throw new ArgumentNullException("publicKey");
 			return new Script(
-				signature == null ? OpcodeType.OP_0 : Op.GetPushOp(signature.ToBytes()),
+				signature == null ? OpcodeType.Op0 : Op.GetPushOp(signature.ToBytes()),
 				Op.GetPushOp(publicKey.ToBytes())
 				);
 		}
@@ -569,8 +567,8 @@ namespace ChainUtils
 		{
 			var bytes = scriptPubKey.ToBytes(true);
 			return bytes.Length >= 3 &&
-				   bytes[0] == (byte)OpcodeType.OP_DUP &&
-				   bytes[1] == (byte)OpcodeType.OP_HASH160 &&
+				   bytes[0] == (byte)OpcodeType.OpDup &&
+				   bytes[1] == (byte)OpcodeType.OpHash160 &&
 				   bytes[2] == 0x14;
 		}
 
@@ -579,11 +577,11 @@ namespace ChainUtils
 			var ops = scriptPubKeyOps;
 			if(ops.Length != 5)
 				return false;
-			return ops[0].Code == OpcodeType.OP_DUP &&
-				   ops[1].Code == OpcodeType.OP_HASH160 &&
+			return ops[0].Code == OpcodeType.OpDup &&
+				   ops[1].Code == OpcodeType.OpHash160 &&
 				   ops[2].PushData != null && ops[2].PushData.Length == 0x14 &&
-				   ops[3].Code == OpcodeType.OP_EQUALVERIFY &&
-				   ops[4].Code == OpcodeType.OP_CHECKSIG;
+				   ops[3].Code == OpcodeType.OpEqualverify &&
+				   ops[4].Code == OpcodeType.OpChecksig;
 		}
 		public KeyId ExtractScriptPubKeyParameters(Script scriptPubKey)
 		{
@@ -618,7 +616,7 @@ namespace ChainUtils
 			{
 				return new PayToPubkeyHashScriptSigParameters()
 				{
-					TransactionSignature = ops[0].Code == OpcodeType.OP_0 ? null : new TransactionSignature(ops[0].PushData),
+					TransactionSignature = ops[0].Code == OpcodeType.Op0 ? null : new TransactionSignature(ops[0].PushData),
 					PublicKey = new PubKey(ops[1].PushData, true),
 				};
 			}
@@ -634,7 +632,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return TxOutType.TX_PUBKEYHASH;
+				return TxOutType.TxPubkeyhash;
 			}
 		}
 

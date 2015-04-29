@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Crmf

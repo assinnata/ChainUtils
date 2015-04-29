@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math.EC.Abc;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
@@ -27,14 +26,14 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
             if (!(point is F2mPoint))
                 throw new ArgumentException("Only F2mPoint can be used in WTauNafMultiplier");
 
-            F2mPoint p = (F2mPoint)point;
-            F2mCurve curve = (F2mCurve)p.Curve;
-            int m = curve.M;
-            sbyte a = (sbyte) curve.A.ToBigInteger().IntValue;
-            sbyte mu = curve.GetMu();
-            BigInteger[] s = curve.GetSi();
+            var p = (F2mPoint)point;
+            var curve = (F2mCurve)p.Curve;
+            var m = curve.M;
+            var a = (sbyte) curve.A.ToBigInteger().IntValue;
+            var mu = curve.GetMu();
+            var s = curve.GetSi();
 
-            ZTauElement rho = Tnaf.PartModReduction(k, m, a, s, mu, (sbyte)10);
+            var rho = Tnaf.PartModReduction(k, m, a, s, mu, (sbyte)10);
 
             return MultiplyWTnaf(p, rho, curve.GetPreCompInfo(p, PRECOMP_NAME), a, mu);
         }
@@ -52,11 +51,11 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
         private F2mPoint MultiplyWTnaf(F2mPoint p, ZTauElement lambda,
             PreCompInfo preCompInfo, sbyte a, sbyte mu)
         {
-            ZTauElement[] alpha = (a == 0) ? Tnaf.Alpha0 : Tnaf.Alpha1;
+            var alpha = (a == 0) ? Tnaf.Alpha0 : Tnaf.Alpha1;
 
-            BigInteger tw = Tnaf.GetTw(mu, Tnaf.Width);
+            var tw = Tnaf.GetTw(mu, Tnaf.Width);
 
-            sbyte[]u = Tnaf.TauAdicWNaf(mu, lambda, Tnaf.Width,
+            var u = Tnaf.TauAdicWNaf(mu, lambda, Tnaf.Width,
                 BigInteger.ValueOf(Tnaf.Pow2Width), tw, alpha);
 
             return MultiplyFromWTnaf(p, u, preCompInfo);
@@ -73,15 +72,15 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
         */
         private static F2mPoint MultiplyFromWTnaf(F2mPoint p, sbyte[] u, PreCompInfo preCompInfo)
         {
-            F2mCurve curve = (F2mCurve)p.Curve;
-            sbyte a = (sbyte)curve.A.ToBigInteger().IntValue;
+            var curve = (F2mCurve)p.Curve;
+            var a = (sbyte)curve.A.ToBigInteger().IntValue;
 
             F2mPoint[] pu;
             if ((preCompInfo == null) || !(preCompInfo is WTauNafPreCompInfo))
             {
                 pu = Tnaf.GetPreComp(p, a);
 
-                WTauNafPreCompInfo pre = new WTauNafPreCompInfo();
+                var pre = new WTauNafPreCompInfo();
                 pre.PreComp = pu;
                 curve.SetPreCompInfo(p, PRECOMP_NAME, pre);
             }
@@ -91,11 +90,11 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
             }
 
             // q = infinity
-            F2mPoint q = (F2mPoint)curve.Infinity;
-            for (int i = u.Length - 1; i >= 0; i--)
+            var q = (F2mPoint)curve.Infinity;
+            for (var i = u.Length - 1; i >= 0; i--)
             {
                 q = Tnaf.Tau(q);
-                sbyte ui = u[i];
+                var ui = u[i];
                 if (ui != 0)
                 {
                     if (ui > 0)

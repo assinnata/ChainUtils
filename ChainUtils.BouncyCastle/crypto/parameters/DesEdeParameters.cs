@@ -15,7 +15,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			int		keyOff,
 			int		keyLen)
 		{
-			byte[] tmp = new byte[24];
+			var tmp = new byte[24];
 
 			switch (keyLen)
 			{
@@ -62,7 +62,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
             int     offset,
             int     length)
         {
-            for (int i = offset; i < length; i += DesKeyLength)
+            for (var i = offset; i < length; i += DesKeyLength)
             {
                 if (DesParameters.IsWeakKey(key, i))
                 {

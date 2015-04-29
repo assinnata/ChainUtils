@@ -1,6 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
@@ -24,7 +21,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
          */
         public DsaSigner()
         {
-            this.kCalculator = new RandomDsaKCalculator();
+            kCalculator = new RandomDsaKCalculator();
         }
 
         /**
@@ -50,7 +47,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             {
                 if (parameters is ParametersWithRandom)
                 {
-                    ParametersWithRandom rParam = (ParametersWithRandom)parameters;
+                    var rParam = (ParametersWithRandom)parameters;
 
                     providedRandom = rParam.Random;
                     parameters = rParam.Parameters;
@@ -59,17 +56,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 if (!(parameters is DsaPrivateKeyParameters))
                     throw new InvalidKeyException("DSA private key required for signing");
 
-                this.key = (DsaPrivateKeyParameters)parameters;
+                key = (DsaPrivateKeyParameters)parameters;
             }
             else
             {
                 if (!(parameters is DsaPublicKeyParameters))
                     throw new InvalidKeyException("DSA public key required for verification");
 
-                this.key = (DsaPublicKeyParameters)parameters;
+                key = (DsaPublicKeyParameters)parameters;
             }
 
-            this.random = InitSecureRandom(forSigning && !kCalculator.IsDeterministic, providedRandom);
+            random = InitSecureRandom(forSigning && !kCalculator.IsDeterministic, providedRandom);
         }
 
         /**
@@ -81,10 +78,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
          */
         public virtual BigInteger[] GenerateSignature(byte[] message)
         {
-            DsaParameters parameters = key.Parameters;
-            BigInteger q = parameters.Q;
-            BigInteger m = CalculateE(q, message);
-            BigInteger x = ((DsaPrivateKeyParameters)key).X;
+            var parameters = key.Parameters;
+            var q = parameters.Q;
+            var m = CalculateE(q, message);
+            var x = ((DsaPrivateKeyParameters)key).X;
 
             if (kCalculator.IsDeterministic)
             {
@@ -95,13 +92,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 kCalculator.Init(q, random);
             }
 
-            BigInteger k = kCalculator.NextK();
+            var k = kCalculator.NextK();
 
-            BigInteger r = parameters.G.ModPow(k, parameters.P).Mod(q);
+            var r = parameters.G.ModPow(k, parameters.P).Mod(q);
 
             k = k.ModInverse(q).Multiply(m.Add(x.Multiply(r)));
 
-            BigInteger s = k.Mod(q);
+            var s = k.Mod(q);
 
             return new BigInteger[]{ r, s };
         }
@@ -113,9 +110,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
          */
         public virtual bool VerifySignature(byte[] message, BigInteger r, BigInteger s)
         {
-            DsaParameters parameters = key.Parameters;
-            BigInteger q = parameters.Q;
-            BigInteger m = CalculateE(q, message);
+            var parameters = key.Parameters;
+            var q = parameters.Q;
+            var m = CalculateE(q, message);
 
             if (r.SignValue <= 0 || q.CompareTo(r) <= 0)
             {
@@ -127,23 +124,23 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 return false;
             }
 
-            BigInteger w = s.ModInverse(q);
+            var w = s.ModInverse(q);
 
-            BigInteger u1 = m.Multiply(w).Mod(q);
-            BigInteger u2 = r.Multiply(w).Mod(q);
+            var u1 = m.Multiply(w).Mod(q);
+            var u2 = r.Multiply(w).Mod(q);
 
-            BigInteger p = parameters.P;
+            var p = parameters.P;
             u1 = parameters.G.ModPow(u1, p);
             u2 = ((DsaPublicKeyParameters)key).Y.ModPow(u2, p);
 
-            BigInteger v = u1.Multiply(u2).Mod(p).Mod(q);
+            var v = u1.Multiply(u2).Mod(p).Mod(q);
 
             return v.Equals(r);
         }
 
         protected virtual BigInteger CalculateE(BigInteger n, byte[] message)
         {
-            int length = System.Math.Min(message.Length, n.BitLength / 8);
+            var length = System.Math.Min(message.Length, n.BitLength / 8);
 
             return new BigInteger(1, message, 0, length);
         }

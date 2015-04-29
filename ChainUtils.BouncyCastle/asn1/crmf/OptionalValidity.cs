@@ -1,6 +1,4 @@
-﻿using System;
-
-using ChainUtils.BouncyCastle.Asn1.X509;
+﻿using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Crmf
 {
@@ -53,7 +51,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Crmf
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
             if (notBefore != null)
             {

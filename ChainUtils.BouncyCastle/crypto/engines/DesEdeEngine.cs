@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -26,23 +25,23 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             if (!(parameters is KeyParameter))
                 throw new ArgumentException("invalid parameter passed to DESede init - " + parameters.GetType().ToString());
 
-            byte[] keyMaster = ((KeyParameter)parameters).GetKey();
+            var keyMaster = ((KeyParameter)parameters).GetKey();
             if (keyMaster.Length != 24 && keyMaster.Length != 16)
                 throw new ArgumentException("key size must be 16 or 24 bytes.");
 
             this.forEncryption = forEncryption;
 
-            byte[] key1 = new byte[8];
+            var key1 = new byte[8];
             Array.Copy(keyMaster, 0, key1, 0, key1.Length);
             workingKey1 = GenerateWorkingKey(forEncryption, key1);
 
-            byte[] key2 = new byte[8];
+            var key2 = new byte[8];
             Array.Copy(keyMaster, 8, key2, 0, key2.Length);
             workingKey2 = GenerateWorkingKey(!forEncryption, key2);
 
             if (keyMaster.Length == 24)
             {
-                byte[] key3 = new byte[8];
+                var key3 = new byte[8];
                 Array.Copy(keyMaster, 16, key3, 0, key3.Length);
                 workingKey3 = GenerateWorkingKey(forEncryption, key3);
             }
@@ -75,7 +74,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             if ((outOff + BLOCK_SIZE) > output.Length)
                 throw new DataLengthException("output buffer too short");
 
-            byte[] temp = new byte[BLOCK_SIZE];
+            var temp = new byte[BLOCK_SIZE];
 
             if (forEncryption)
             {

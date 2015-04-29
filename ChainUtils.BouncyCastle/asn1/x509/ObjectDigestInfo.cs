@@ -109,7 +109,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 			digestedObjectType = DerEnumerated.GetInstance(seq[0]);
 
-			int offset = 0;
+			var offset = 0;
 
 			if (seq.Count == 4)
             {
@@ -162,7 +162,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		 */
 		public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(digestedObjectType);
+            var v = new Asn1EncodableVector(digestedObjectType);
 
 			if (otherObjectTypeID != null)
             {

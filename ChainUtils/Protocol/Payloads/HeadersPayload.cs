@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ChainUtils.Protocol
 {
 	[Payload("headers")]
 	public class HeadersPayload : Payload
 	{
-		List<BlockHeader> headers = new List<BlockHeader>();
+		List<BlockHeader> _headers = new List<BlockHeader>();
 
 		public List<BlockHeader> Headers
 		{
 			get
 			{
-				return headers;
+				return _headers;
 			}
 		}
 
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref headers);
+			stream.ReadWrite(ref _headers);
 		}
 	}
 }

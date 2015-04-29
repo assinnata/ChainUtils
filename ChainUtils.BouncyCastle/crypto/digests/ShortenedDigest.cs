@@ -1,5 +1,4 @@
 using System;
-using ChainUtils.BouncyCastle.Crypto;
 
 namespace ChainUtils.BouncyCastle.Crypto.Digests
 {
@@ -60,7 +59,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public int DoFinal(byte[] output, int outOff)
 		{
-			byte[] tmp = new byte[baseDigest.GetDigestSize()];
+			var tmp = new byte[baseDigest.GetDigestSize()];
 
 			baseDigest.DoFinal(tmp, 0);
 

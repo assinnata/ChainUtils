@@ -1,10 +1,6 @@
-﻿using ChainUtils.Protocol;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.Protocol;
 
 namespace ChainUtils
 {
@@ -17,7 +13,7 @@ namespace ChainUtils
 	{
 		public static void ReadWrite(this IBitcoinSerializable serializable, Stream stream, bool serializing, ProtocolVersion version = ProtocolVersion.PROTOCOL_VERSION)
 		{
-			BitcoinStream s = new BitcoinStream(stream, serializing)
+			var s = new BitcoinStream(stream, serializing)
 			{
 				ProtocolVersion = version
 			};
@@ -47,7 +43,7 @@ namespace ChainUtils
 		}
 		public static byte[] ToBytes(this IBitcoinSerializable serializable, ProtocolVersion version = ProtocolVersion.PROTOCOL_VERSION)
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			serializable.ReadWrite(new BitcoinStream(ms, true)
 			{
 				ProtocolVersion = version

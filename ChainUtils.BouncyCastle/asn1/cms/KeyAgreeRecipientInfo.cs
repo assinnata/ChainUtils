@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -20,7 +18,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             AlgorithmIdentifier         keyEncryptionAlgorithm,
             Asn1Sequence                recipientEncryptedKeys)
         {
-            this.version = new DerInteger(3);
+            version = new DerInteger(3);
             this.originator = originator;
             this.ukm = ukm;
             this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
@@ -30,7 +28,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		public KeyAgreeRecipientInfo(
             Asn1Sequence seq)
         {
-            int index = 0;
+            var index = 0;
 
             version = (DerInteger) seq[index++];
             originator = OriginatorIdentifierOrKey.GetInstance(
@@ -125,7 +123,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
 				version, new DerTaggedObject(true, 0, originator));
 
 			if (ukm != null)

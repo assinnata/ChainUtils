@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
 
@@ -33,7 +32,7 @@ namespace ChainUtils.BouncyCastle.Utilities
          */
         public static byte[] AsUnsignedByteArray(int length, BigInteger n)
         {
-            byte[] bytes = n.ToByteArrayUnsigned();
+            var bytes = n.ToByteArrayUnsigned();
 
             if (bytes.Length > length)
                 throw new ArgumentException("standard length exceeded", "n");
@@ -41,7 +40,7 @@ namespace ChainUtils.BouncyCastle.Utilities
             if (bytes.Length == length)
                 return bytes;
 
-            byte[] tmp = new byte[length];
+            var tmp = new byte[length];
             Array.Copy(bytes, 0, tmp, tmp.Length - bytes.Length, bytes.Length);
             return tmp;
         }
@@ -60,7 +59,7 @@ namespace ChainUtils.BouncyCastle.Utilities
             // TODO Should have been just Random class
             SecureRandom	random)
         {
-            int cmp = min.CompareTo(max);
+            var cmp = min.CompareTo(max);
             if (cmp >= 0)
             {
                 if (cmp > 0)
@@ -74,9 +73,9 @@ namespace ChainUtils.BouncyCastle.Utilities
                 return CreateRandomInRange(BigInteger.Zero, max.Subtract(min), random).Add(min);
             }
 
-            for (int i = 0; i < MaxIterations; ++i)
+            for (var i = 0; i < MaxIterations; ++i)
             {
-                BigInteger x = new BigInteger(max.BitLength, random);
+                var x = new BigInteger(max.BitLength, random);
                 if (x.CompareTo(min) >= 0 && x.CompareTo(max) <= 0)
                 {
                     return x;

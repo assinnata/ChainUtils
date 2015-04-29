@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -156,16 +155,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		{
 			if (parameters is ParametersWithSBox)
 			{
-				ParametersWithSBox   param = (ParametersWithSBox)parameters;
+				var   param = (ParametersWithSBox)parameters;
 
 				//
 				// Set the S-Box
 				//
-				byte[] sBox = param.GetSBox();
+				var sBox = param.GetSBox();
 				if (sBox.Length != Sbox_Default.Length)
 					throw new ArgumentException("invalid S-box passed to GOST28147 init");
 
-				this.S = Arrays.Clone(sBox);
+				S = Arrays.Clone(sBox);
 
 				//
 				// set key if there is one
@@ -243,8 +242,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				throw new ArgumentException("Key length invalid. Key needs to be 32 byte - 256 bit!!!");
 			}
 
-			int[] key = new int[8];
-			for(int i=0; i!=8; i++)
+			var key = new int[8];
+			for(var i=0; i!=8; i++)
 			{
 				key[i] = bytesToint(userKey,i*4);
 			}
@@ -254,11 +253,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		private int Gost28147_mainStep(int n1, int key)
 		{
-			int cm = (key + n1); // CM1
+			var cm = (key + n1); // CM1
 
 			// S-box replacing
 
-			int om = S[  0 + ((cm >> (0 * 4)) & 0xF)] << (0 * 4);
+			var om = S[  0 + ((cm >> (0 * 4)) & 0xF)] << (0 * 4);
 			om += S[ 16 + ((cm >> (1 * 4)) & 0xF)] << (1 * 4);
 			om += S[ 32 + ((cm >> (2 * 4)) & 0xF)] << (2 * 4);
 			om += S[ 48 + ((cm >> (3 * 4)) & 0xF)] << (3 * 4);
@@ -268,8 +267,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			om += S[112 + ((cm >> (7 * 4)) & 0xF)] << (7 * 4);
 
 //			return om << 11 | om >>> (32-11); // 11-leftshift
-			int omLeft = om << 11;
-			int omRight = (int)(((uint) om) >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
+			var omLeft = om << 11;
+			var omRight = (int)(((uint) om) >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
 
 			return omLeft | omRight;
 		}
@@ -285,19 +284,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			N1 = bytesToint(inBytes, inOff);
 			N2 = bytesToint(inBytes, inOff + 4);
 
-			if (this.forEncryption)
+			if (forEncryption)
 			{
-			for(int k = 0; k < 3; k++)  // 1-24 steps
+			for(var k = 0; k < 3; k++)  // 1-24 steps
 			{
-				for(int j = 0; j < 8; j++)
+				for(var j = 0; j < 8; j++)
 				{
 					tmp = N1;
-					int step = Gost28147_mainStep(N1, workingKey[j]);
+					var step = Gost28147_mainStep(N1, workingKey[j]);
 					N1 = N2 ^ step; // CM2
 					N2 = tmp;
 				}
 			}
-			for(int j = 7; j > 0; j--)  // 25-31 steps
+			for(var j = 7; j > 0; j--)  // 25-31 steps
 			{
 				tmp = N1;
 				N1 = N2 ^ Gost28147_mainStep(N1, workingKey[j]); // CM2
@@ -306,15 +305,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			}
 			else //decrypt
 			{
-			for(int j = 0; j < 8; j++)  // 1-8 steps
+			for(var j = 0; j < 8; j++)  // 1-8 steps
 			{
 				tmp = N1;
 				N1 = N2 ^ Gost28147_mainStep(N1, workingKey[j]); // CM2
 				N2 = tmp;
 			}
-			for(int k = 0; k < 3; k++)  //9-31 steps
+			for(var k = 0; k < 3; k++)  //9-31 steps
 			{
-				for(int j = 7; j >= 0; j--)
+				for(var j = 7; j >= 0; j--)
 				{
 					if ((k == 2) && (j==0))
 					{
@@ -362,7 +361,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		public static byte[] GetSBox(
 			string sBoxName)
 		{
-			byte[] sBox = (byte[])sBoxes[Platform.ToUpperInvariant(sBoxName)];
+			var sBox = (byte[])sBoxes[Platform.ToUpperInvariant(sBoxName)];
 
             if (sBox == null)
 			{

@@ -1,6 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Math;
 
@@ -16,7 +13,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         {
             if (obj == null)
                 return null;
-            IssuerAndSerialNumber existing = obj as IssuerAndSerialNumber;
+            var existing = obj as IssuerAndSerialNumber;
             if (existing != null)
                 return existing;
             return new IssuerAndSerialNumber(Asn1Sequence.GetInstance(obj));
@@ -25,8 +22,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         public IssuerAndSerialNumber(
             Asn1Sequence seq)
         {
-            this.name = X509Name.GetInstance(seq[0]);
-            this.serialNumber = (DerInteger) seq[1];
+            name = X509Name.GetInstance(seq[0]);
+            serialNumber = (DerInteger) seq[1];
         }
 
         public IssuerAndSerialNumber(

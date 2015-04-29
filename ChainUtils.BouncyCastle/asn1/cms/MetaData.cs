@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
 	public class MetaData
@@ -24,21 +22,21 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 		private MetaData(Asn1Sequence seq)
 		{
-			this.hashProtected = DerBoolean.GetInstance(seq[0]);
+			hashProtected = DerBoolean.GetInstance(seq[0]);
 
-			int index = 1;
+			var index = 1;
 
 			if (index < seq.Count && seq[index] is DerUtf8String)
 			{
-				this.fileName = DerUtf8String.GetInstance(seq[index++]);
+				fileName = DerUtf8String.GetInstance(seq[index++]);
 			}
 			if (index < seq.Count && seq[index] is DerIA5String)
 			{
-				this.mediaType = DerIA5String.GetInstance(seq[index++]);
+				mediaType = DerIA5String.GetInstance(seq[index++]);
 			}
 			if (index < seq.Count)
 			{
-				this.otherMetaData = Attributes.GetInstance(seq[index++]);
+				otherMetaData = Attributes.GetInstance(seq[index++]);
 			}
 		}
 
@@ -66,7 +64,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(hashProtected);
+			var v = new Asn1EncodableVector(hashProtected);
 			v.AddOptional(fileName, mediaType, otherMetaData);
 			return new DerSequence(v);
 		}

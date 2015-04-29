@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChainUtils.BouncyCastle.Asn1.Cms
+﻿namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
     public class ScvpReqRes
         : Asn1Encodable
@@ -21,13 +19,13 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         {
             if (seq[0] is Asn1TaggedObject)
             {
-                this.request = ContentInfo.GetInstance(Asn1TaggedObject.GetInstance(seq[0]), true);
-                this.response = ContentInfo.GetInstance(seq[1]);
+                request = ContentInfo.GetInstance(Asn1TaggedObject.GetInstance(seq[0]), true);
+                response = ContentInfo.GetInstance(seq[1]);
             }
             else
             {
-                this.request = null;
-                this.response = ContentInfo.GetInstance(seq[0]);
+                request = null;
+                response = ContentInfo.GetInstance(seq[0]);
             }
         }
 
@@ -62,7 +60,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
             if (request != null)
             {

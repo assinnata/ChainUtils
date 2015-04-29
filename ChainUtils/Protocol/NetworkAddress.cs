@@ -1,19 +1,15 @@
 ﻿#if !NOSOCKET
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Protocol
 {
 	public class NetworkAddress : IBitcoinSerializable
 	{
-		uint time;
-		ulong service = 1;
-		byte[] ip = new byte[16];
-		ushort port;
+		uint _time;
+		ulong _service = 1;
+		byte[] _ip = new byte[16];
+		ushort _port;
 
 		public TimeSpan Ago
 		{
@@ -30,31 +26,31 @@ namespace ChainUtils.Protocol
 		public void Adjust()
 		{
 			var nNow = Utils.DateTimeToUnixTime(DateTimeOffset.UtcNow);
-			if(time <= 100000000 || time > nNow + 10 * 60)
-				time = nNow - 5 * 24 * 60 * 60;
+			if(_time <= 100000000 || _time > nNow + 10 * 60)
+				_time = nNow - 5 * 24 * 60 * 60;
 		}
 
 		public IPEndPoint Endpoint
 		{
 			get
 			{
-				return new IPEndPoint(new IPAddress(ip), port);
+				return new IPEndPoint(new IPAddress(_ip), _port);
 			}
 			set
 			{
-				port = (ushort)value.Port;
+				_port = (ushort)value.Port;
 				var ipBytes = value.Address.GetAddressBytes();
 				if(ipBytes.Length == 16)
 				{
-					ip = ipBytes;
+					_ip = ipBytes;
 				}
 				else if(ipBytes.Length == 4)
 				{
 					//Convert to ipv4 mapped to ipv6
 					//In these addresses, the first 80 bits are zero, the next 16 bits are one, and the remaining 32 bits are the IPv4 address
-					ip = new byte[16];
-					Array.Copy(ipBytes, 0, ip, 12, 4);
-					Array.Copy(new byte[] { 0xFF, 0xFF }, 0, ip, 10, 2);
+					_ip = new byte[16];
+					Array.Copy(ipBytes, 0, _ip, 12, 4);
+					Array.Copy(new byte[] { 0xFF, 0xFF }, 0, _ip, 10, 2);
 				}
 				else
 					throw new NotSupportedException("Invalid IP address type");
@@ -65,11 +61,11 @@ namespace ChainUtils.Protocol
 		{
 			get
 			{
-				return Utils.UnixTimeToDateTime(time);
+				return Utils.UnixTimeToDateTime(_time);
 			}
 			set
 			{
-				time = Utils.DateTimeToUnixTime(value);
+				_time = Utils.DateTimeToUnixTime(value);
 			}
 		}
 
@@ -77,13 +73,13 @@ namespace ChainUtils.Protocol
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			if(stream.ProtocolVersion >= ProtocolVersion.CADDR_TIME_VERSION)
-				stream.ReadWrite(ref time);
-			stream.ReadWrite(ref service);
-			stream.ReadWrite(ref ip);
+			if(stream.ProtocolVersion >= ProtocolVersion.CaddrTimeVersion)
+				stream.ReadWrite(ref _time);
+			stream.ReadWrite(ref _service);
+			stream.ReadWrite(ref _ip);
 			using(stream.BigEndianScope())
 			{
-				stream.ReadWrite(ref port);
+				stream.ReadWrite(ref _port);
 			}
 		}
 
@@ -91,7 +87,7 @@ namespace ChainUtils.Protocol
 
 		public void ZeroTime()
 		{
-			this.time = 0;
+			_time = 0;
 		}
 	}
 }

@@ -67,7 +67,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(policyIdentifier);
+            var v = new Asn1EncodableVector(policyIdentifier);
 
 			if (policyQualifiers != null)
             {

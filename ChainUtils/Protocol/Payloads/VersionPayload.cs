@@ -1,133 +1,129 @@
 ﻿#if !NOSOCKET
-using ChainUtils.DataEncoders;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils.Protocol
 {
 	[Payload("version")]
 	public class VersionPayload : Payload, IBitcoinSerializable
 	{
-		static string _NUserAgent;
+		static string _nUserAgent;
 		public static string GetChainUtilsUserAgent()
 		{
-			if(_NUserAgent == null)
+			if(_nUserAgent == null)
 			{
 				var version = typeof(VersionPayload).Assembly.GetName().Version;
-				_NUserAgent = "/ChainUtils:" + version.Major + "." + version.MajorRevision + "." + version.Minor + "/";
+				_nUserAgent = "/ChainUtils:" + version.Major + "." + version.MajorRevision + "." + version.Minor + "/";
 			}
-			return _NUserAgent;
+			return _nUserAgent;
 		}
-		uint version;
+		uint _version;
 
 		public ProtocolVersion Version
 		{
 			get
 			{
-				if(version == 10300) //A version number of 10300 is converted to 300 before being processed
+				if(_version == 10300) //A version number of 10300 is converted to 300 before being processed
 					return (ProtocolVersion)(300);  //https://en.bitcoin.it/wiki/Version_Handshake
-				return (ProtocolVersion)version;
+				return (ProtocolVersion)_version;
 			}
 			set
 			{
 				if(value == (ProtocolVersion)10300)
 					value = (ProtocolVersion)300;
-				version = (uint)value;
+				_version = (uint)value;
 			}
 		}
-		ulong services;
-		long timestamp;
+		ulong _services;
+		long _timestamp;
 
 		public DateTimeOffset Timestamp
 		{
 			get
 			{
-				return Utils.UnixTimeToDateTime((uint)timestamp);
+				return Utils.UnixTimeToDateTime((uint)_timestamp);
 			}
 			set
 			{
-				timestamp = Utils.DateTimeToUnixTime(value);
+				_timestamp = Utils.DateTimeToUnixTime(value);
 			}
 		}
 
-		NetworkAddress addr_recv = new NetworkAddress();
+		NetworkAddress _addrRecv = new NetworkAddress();
 		public IPEndPoint AddressReceiver
 		{
 			get
 			{
-				return addr_recv.Endpoint;
+				return _addrRecv.Endpoint;
 			}
 			set
 			{
-				addr_recv.Endpoint = value;
+				_addrRecv.Endpoint = value;
 			}
 		}
-		NetworkAddress addr_from = new NetworkAddress();
+		NetworkAddress _addrFrom = new NetworkAddress();
 		public IPEndPoint AddressFrom
 		{
 			get
 			{
-				return addr_from.Endpoint;
+				return _addrFrom.Endpoint;
 			}
 			set
 			{
-				addr_from.Endpoint = value;
+				_addrFrom.Endpoint = value;
 			}
 		}
 
-		ulong nonce;
+		ulong _nonce;
 		public ulong Nonce
 		{
 			get
 			{
-				return nonce;
+				return _nonce;
 			}
 			set
 			{
-				nonce = value;
+				_nonce = value;
 			}
 		}
-		int start_height;
+		int _startHeight;
 
 		public int StartHeight
 		{
 			get
 			{
-				return start_height;
+				return _startHeight;
 			}
 			set
 			{
-				start_height = value;
+				_startHeight = value;
 			}
 		}
 
-		bool relay;
+		bool _relay;
 		public bool Relay
 		{
 			get
 			{
-				return relay;
+				return _relay;
 			}
 			set
 			{
-				relay = value;
+				_relay = value;
 			}
 		}
 
-		VarString user_agent;
+		VarString _userAgent;
 		public string UserAgent
 		{
 			get
 			{
-				return Encoders.ASCII.EncodeData(user_agent.GetString());
+				return Encoders.ASCII.EncodeData(_userAgent.GetString());
 			}
 			set
 			{
-				user_agent = new VarString(Encoders.ASCII.DecodeData(value));
+				_userAgent = new VarString(Encoders.ASCII.DecodeData(value));
 			}
 		}
 
@@ -135,29 +131,29 @@ namespace ChainUtils.Protocol
 
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref version);
-			using(stream.ProtocolVersionScope((ProtocolVersion)version))
+			stream.ReadWrite(ref _version);
+			using(stream.ProtocolVersionScope((ProtocolVersion)_version))
 			{
-				stream.ReadWrite(ref services);
-				stream.ReadWrite(ref timestamp);
-				using(stream.ProtocolVersionScope(ProtocolVersion.CADDR_TIME_VERSION - 1)) //No time field in version message
+				stream.ReadWrite(ref _services);
+				stream.ReadWrite(ref _timestamp);
+				using(stream.ProtocolVersionScope(ProtocolVersion.CaddrTimeVersion - 1)) //No time field in version message
 				{
-					stream.ReadWrite(ref addr_recv);
+					stream.ReadWrite(ref _addrRecv);
 				}
-				if(version >= 106)
+				if(_version >= 106)
 				{
-					using(stream.ProtocolVersionScope(ProtocolVersion.CADDR_TIME_VERSION - 1)) //No time field in version message
+					using(stream.ProtocolVersionScope(ProtocolVersion.CaddrTimeVersion - 1)) //No time field in version message
 					{
-						stream.ReadWrite(ref addr_from);
+						stream.ReadWrite(ref _addrFrom);
 					}
-					stream.ReadWrite(ref nonce);
-					stream.ReadWrite(ref user_agent);
-					if(version < 60002)
-						if(user_agent.Length != 0)
-							throw new FormatException("Should not find user agent for current version " + version);
-					stream.ReadWrite(ref start_height);
-					if(version >= 70001)
-						stream.ReadWrite(ref relay);
+					stream.ReadWrite(ref _nonce);
+					stream.ReadWrite(ref _userAgent);
+					if(_version < 60002)
+						if(_userAgent.Length != 0)
+							throw new FormatException("Should not find user agent for current version " + _version);
+					stream.ReadWrite(ref _startHeight);
+					if(_version >= 70001)
+						stream.ReadWrite(ref _relay);
 				}
 			}
 		}

@@ -1,89 +1,83 @@
-﻿using ChainUtils.DataEncoders;
+﻿using System;
+using System.IO;
+using System.Text;
 using ChainUtils.BouncyCastle.Asn1;
+using ChainUtils.BouncyCastle.Asn1.Sec;
 using ChainUtils.BouncyCastle.Asn1.X9;
-using ChainUtils.BouncyCastle.Crypto;
-using ChainUtils.BouncyCastle.Crypto.Generators;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Crypto.Prng;
 using ChainUtils.BouncyCastle.Crypto.Signers;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
-using ChainUtils.BouncyCastle.Security;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils.Crypto
 {
-	public class ECKey
+	public class EcKey
 	{
 		public ECPrivateKeyParameters PrivateKey
 		{
 			get
 			{
-				return _Key as ECPrivateKeyParameters;
+				return _key as ECPrivateKeyParameters;
 			}
 		}
-		ECKeyParameters _Key;
+		ECKeyParameters _key;
 
 
-		public static BigInteger HALF_CURVE_ORDER = null;
-		public static ECDomainParameters CURVE = null;
-		static ECKey()
+		public static BigInteger HalfCurveOrder = null;
+		public static ECDomainParameters Curve = null;
+		static EcKey()
 		{
-			X9ECParameters @params = CreateCurve();
-			CURVE = new ECDomainParameters(@params.Curve, @params.G, @params.N, @params.H);
-			HALF_CURVE_ORDER = @params.N.ShiftRight(1);
+			var @params = CreateCurve();
+			Curve = new ECDomainParameters(@params.Curve, @params.G, @params.N, @params.H);
+			HalfCurveOrder = @params.N.ShiftRight(1);
 		}
 
-		public ECKey(byte[] vch, bool isPrivate)
+		public EcKey(byte[] vch, bool isPrivate)
 		{
 			if(isPrivate)
-				_Key = new ECPrivateKeyParameters(new ChainUtils.BouncyCastle.Math.BigInteger(1, vch), DomainParameter);
+				_key = new ECPrivateKeyParameters(new BigInteger(1, vch), DomainParameter);
 			else
 			{
-				var q = Secp256k1.Curve.DecodePoint(vch);
-				_Key = new ECPublicKeyParameters("EC", q, DomainParameter);
+				var q = Secp256K1.Curve.DecodePoint(vch);
+				_key = new ECPublicKeyParameters("EC", q, DomainParameter);
 			}
 		}
 
 
-		X9ECParameters _Secp256k1;
-		public X9ECParameters Secp256k1
+		X9ECParameters _secp256K1;
+		public X9ECParameters Secp256K1
 		{
 			get
 			{
-				if(_Secp256k1 == null)
-					_Secp256k1 = CreateCurve();
-				return _Secp256k1;
+				if(_secp256K1 == null)
+					_secp256K1 = CreateCurve();
+				return _secp256K1;
 			}
 		}
 
 		public static X9ECParameters CreateCurve()
 		{
-			return ChainUtils.BouncyCastle.Asn1.Sec.SecNamedCurves.GetByName("secp256k1");
+			return SecNamedCurves.GetByName("secp256k1");
 		}
-		ECDomainParameters _DomainParameter;
+		ECDomainParameters _domainParameter;
 		public ECDomainParameters DomainParameter
 		{
 			get
 			{
-				if(_DomainParameter == null)
-					_DomainParameter = new ECDomainParameters(Secp256k1.Curve, Secp256k1.G, Secp256k1.N, Secp256k1.H);
-				return _DomainParameter;
+				if(_domainParameter == null)
+					_domainParameter = new ECDomainParameters(Secp256K1.Curve, Secp256K1.G, Secp256K1.N, Secp256K1.H);
+				return _domainParameter;
 			}
 		}
 
 
-		public ECDSASignature Sign(uint256 hash)
+		public EcdsaSignature Sign(Uint256 hash)
 		{
 			AssertPrivateKey();
-			DeterministicECDSA signer = new DeterministicECDSA();
+			var signer = new DeterministicEcdsa();
 			signer.setPrivateKey(PrivateKey);
-			var sig = ECDSASignature.FromDER(signer.signHash(hash.ToBytes()));
+			var sig = EcdsaSignature.FromDer(signer.SignHash(hash.ToBytes()));
 			return sig.MakeCanonical();
 		}
 
@@ -95,7 +89,7 @@ namespace ChainUtils.Crypto
 
 
 
-		internal bool Verify(uint256 hash, ECDSASignature sig)
+		internal bool Verify(Uint256 hash, EcdsaSignature sig)
 		{
 			var signer = new ECDsaSigner();
 			signer.Init(false, GetPublicKeyParameters());
@@ -107,7 +101,7 @@ namespace ChainUtils.Crypto
 		{
 			var q = GetPublicKeyParameters().Q;
 			//Pub key (q) is composed into X and Y, the compressed form only include X, which can derive Y along with 02 or 03 prepent depending on whether Y in even or odd.
-			var result = Secp256k1.Curve.CreatePoint(q.X.ToBigInteger(), q.Y.ToBigInteger(), isCompressed).GetEncoded();
+			var result = Secp256K1.Curve.CreatePoint(q.X.ToBigInteger(), q.Y.ToBigInteger(), isCompressed).GetEncoded();
 			return new PubKey(result);
 		}
 
@@ -115,17 +109,17 @@ namespace ChainUtils.Crypto
 
 		public ECPublicKeyParameters GetPublicKeyParameters()
 		{
-			if(_Key is ECPublicKeyParameters)
-				return (ECPublicKeyParameters)_Key;
+			if(_key is ECPublicKeyParameters)
+				return (ECPublicKeyParameters)_key;
 			else
 			{
-				ECPoint q = Secp256k1.G.Multiply(PrivateKey.D);
+				var q = Secp256K1.G.Multiply(PrivateKey.D);
 				return new ECPublicKeyParameters("EC", q, DomainParameter);
 			}
 		}
 
 
-		public static ECKey RecoverFromSignature(int recId, ECDSASignature sig, uint256 message, bool compressed)
+		public static EcKey RecoverFromSignature(int recId, EcdsaSignature sig, Uint256 message, bool compressed)
 		{
 			if(recId < 0)
 				throw new ArgumentException("recId should be positive");
@@ -137,13 +131,13 @@ namespace ChainUtils.Crypto
 				throw new ArgumentNullException("message");
 
 
-			var curve = ECKey.CreateCurve();
+			var curve = CreateCurve();
 
 			// 1.0 For j from 0 to h   (h == recId here and the loop is outside this function)
 			//   1.1 Let x = r + jn
 
 			var n = curve.N;
-			var i = ChainUtils.BouncyCastle.Math.BigInteger.ValueOf((long)recId / 2);
+			var i = BigInteger.ValueOf((long)recId / 2);
 			var x = sig.R.Add(i.Multiply(n));
 
 			//   1.2. Convert the integer x to an octet string X of length mlen using the conversion routine
@@ -161,14 +155,14 @@ namespace ChainUtils.Crypto
 
 			// Compressed keys require you to know an extra bit of data about the y-coord as there are two possibilities.
 			// So it's encoded in the recId.
-			ECPoint R = DecompressKey(x, (recId & 1) == 1);
+			var r = DecompressKey(x, (recId & 1) == 1);
 			//   1.4. If nR != point at infinity, then do another iteration of Step 1 (callers responsibility).
 
-			if(!R.Multiply(n).IsInfinity)
+			if(!r.Multiply(n).IsInfinity)
 				return null;
 
 			//   1.5. Compute e from M using Steps 2 and 3 of ECDSA signature verification.
-			var e = new ChainUtils.BouncyCastle.Math.BigInteger(1, message.ToBytes());
+			var e = new BigInteger(1, message.ToBytes());
 			//   1.6. For k from 1 to 2 do the following.   (loop is outside this function via iterating recId)
 			//   1.6.1. Compute a candidate public key as:
 			//               Q = mi(r) * (sR - eG)
@@ -181,29 +175,29 @@ namespace ChainUtils.Crypto
 			// We can find the additive inverse by subtracting e from zero then taking the mod. For example the additive
 			// inverse of 3 modulo 11 is 8 because 3 + 8 mod 11 = 0, and -3 mod 11 = 8.
 
-			var eInv = ChainUtils.BouncyCastle.Math.BigInteger.Zero.Subtract(e).Mod(n);
+			var eInv = BigInteger.Zero.Subtract(e).Mod(n);
 			var rInv = sig.R.ModInverse(n);
 			var srInv = rInv.Multiply(sig.S).Mod(n);
 			var eInvrInv = rInv.Multiply(eInv).Mod(n);
-			var q = (FpPoint)ECAlgorithms.SumOfTwoMultiplies(curve.G, eInvrInv, R, srInv);
+			var q = (FpPoint)ECAlgorithms.SumOfTwoMultiplies(curve.G, eInvrInv, r, srInv);
 			if(compressed)
 			{
 				q = new FpPoint(curve.Curve, q.X, q.Y, true);
 			}
-			return new ECKey(q.GetEncoded(), false);
+			return new EcKey(q.GetEncoded(), false);
 		}
 
-		private static ECPoint DecompressKey(ChainUtils.BouncyCastle.Math.BigInteger xBN, bool yBit)
+		private static ECPoint DecompressKey(BigInteger xBn, bool yBit)
 		{
-			var curve = ECKey.CreateCurve().Curve;
-			byte[] compEnc = X9IntegerConverter.IntegerToBytes(xBN, 1 + X9IntegerConverter.GetByteLength(curve));
+			var curve = CreateCurve().Curve;
+			var compEnc = X9IntegerConverter.IntegerToBytes(xBn, 1 + X9IntegerConverter.GetByteLength(curve));
 			compEnc[0] = (byte)(yBit ? 0x03 : 0x02);
 			return curve.DecodePoint(compEnc);
 		}
 
 
 
-		public static ECKey FromDER(byte[] der)
+		public static EcKey FromDer(byte[] der)
 		{
 
 			// To understand this code, see the definition of the ASN.1 format for EC private keys in the OpenSSL source
@@ -217,25 +211,25 @@ namespace ChainUtils.Crypto
 			// } ASN1_SEQUENCE_END(EC_PRIVATEKEY)
 			//
 
-			Asn1InputStream decoder = new Asn1InputStream(der);
-			DerSequence seq = (DerSequence)decoder.ReadObject();
+			var decoder = new Asn1InputStream(der);
+			var seq = (DerSequence)decoder.ReadObject();
 			CheckArgument(seq.Count == 4, "Input does not appear to be an ASN.1 OpenSSL EC private key");
 			CheckArgument(((DerInteger)seq[0]).Value.Equals(BigInteger.One),
 					"Input is of wrong version");
-			byte[] bits = ((DerOctetString)seq[1]).GetOctets();
+			var bits = ((DerOctetString)seq[1]).GetOctets();
 #if !PORTABLE
 			decoder.Close();
 #else
 			decoder.Dispose();
 #endif
-			return new ECKey(bits, true);
+			return new EcKey(bits, true);
 		}
 
 		public static string DumpDer(byte[] der)
 		{
-			StringBuilder builder = new StringBuilder();
-			Asn1InputStream decoder = new Asn1InputStream(der);
-			DerSequence seq = (DerSequence)decoder.ReadObject();
+			var builder = new StringBuilder();
+			var decoder = new Asn1InputStream(der);
+			var seq = (DerSequence)decoder.ReadObject();
 			builder.AppendLine("Version : " + Encoders.Hex.EncodeData(seq[0].GetDerEncoded()));
 			builder.AppendLine("Private : " + Encoders.Hex.EncodeData(seq[1].GetDerEncoded()));
 			builder.AppendLine("Params : " + Encoders.Hex.EncodeData(((DerTaggedObject)seq[2]).GetObject().GetDerEncoded()));
@@ -256,10 +250,10 @@ namespace ChainUtils.Crypto
 			}
 		}
 
-		public byte[] ToDER(bool compressed)
+		public byte[] ToDer(bool compressed)
 		{
 			AssertPrivateKey();
-			MemoryStream baos = new MemoryStream();
+			var baos = new MemoryStream();
 
 			// ASN1_SEQUENCE(EC_PRIVATEKEY) = {
 			//   ASN1_SIMPLE(EC_PRIVATEKEY, version, LONG),
@@ -267,23 +261,23 @@ namespace ChainUtils.Crypto
 			//   ASN1_EXP_OPT(EC_PRIVATEKEY, parameters, ECPKPARAMETERS, 0),
 			//   ASN1_EXP_OPT(EC_PRIVATEKEY, publicKey, ASN1_BIT_STRING, 1)
 			// } ASN1_SEQUENCE_END(EC_PRIVATEKEY)
-			DerSequenceGenerator seq = new DerSequenceGenerator(baos);
+			var seq = new DerSequenceGenerator(baos);
 			seq.AddObject(new DerInteger(1)); // version
 			seq.AddObject(new DerOctetString(PrivateKey.D.ToByteArrayUnsigned()));
 
 
 			//Did not managed to generate the same der as brainwallet by using this
 			//seq.AddObject(new DerTaggedObject(0, Secp256k1.ToAsn1Object()));
-			Asn1Object secp256k1Der = null;
+			Asn1Object secp256K1Der = null;
 			if(compressed)
 			{
-				secp256k1Der = DerSequence.FromByteArray(DataEncoders.Encoders.Hex.DecodeData("308182020101302c06072a8648ce3d0101022100fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f300604010004010704210279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141020101"));
+				secp256K1Der = Asn1Object.FromByteArray(Encoders.Hex.DecodeData("308182020101302c06072a8648ce3d0101022100fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f300604010004010704210279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141020101"));
 			}
 			else
 			{
-				secp256k1Der = DerSequence.FromByteArray(DataEncoders.Encoders.Hex.DecodeData("3081a2020101302c06072a8648ce3d0101022100fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f300604010004010704410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141020101"));
+				secp256K1Der = Asn1Object.FromByteArray(Encoders.Hex.DecodeData("3081a2020101302c06072a8648ce3d0101022100fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f300604010004010704410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141020101"));
 			}
-			seq.AddObject(new DerTaggedObject(0, secp256k1Der));
+			seq.AddObject(new DerTaggedObject(0, secp256K1Der));
 			seq.AddObject(new DerTaggedObject(1, new DerBitString(GetPubKey(compressed).ToBytes())));
 			seq.Close();
 			return baos.ToArray();

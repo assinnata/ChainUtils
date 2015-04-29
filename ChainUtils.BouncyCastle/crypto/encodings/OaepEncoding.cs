@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Security;
@@ -47,10 +46,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             IDigest					mgf1Hash,
             byte[]					encodingParams)
         {
-            this.engine = cipher;
+            engine = cipher;
             this.hash = hash;
             this.mgf1Hash = mgf1Hash;
-            this.defHash = new byte[hash.GetDigestSize()];
+            defHash = new byte[hash.GetDigestSize()];
 
             if (encodingParams != null)
             {
@@ -76,12 +75,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
         {
             if (param is ParametersWithRandom)
             {
-                ParametersWithRandom rParam = (ParametersWithRandom)param;
-                this.random = rParam.Random;
+                var rParam = (ParametersWithRandom)param;
+                random = rParam.Random;
             }
             else
             {
-                this.random = new SecureRandom();
+                random = new SecureRandom();
             }
 
             engine.Init(forEncryption, param);
@@ -91,7 +90,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 
         public int GetInputBlockSize()
         {
-            int baseBlockSize = engine.GetInputBlockSize();
+            var baseBlockSize = engine.GetInputBlockSize();
 
             if (forEncryption)
             {
@@ -105,7 +104,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 
         public int GetOutputBlockSize()
         {
-            int baseBlockSize = engine.GetOutputBlockSize();
+            var baseBlockSize = engine.GetOutputBlockSize();
 
             if (forEncryption)
             {
@@ -137,7 +136,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             int		inOff,
             int		inLen)
         {
-            byte[] block = new byte[GetInputBlockSize() + 1 + 2 * defHash.Length];
+            var block = new byte[GetInputBlockSize() + 1 + 2 * defHash.Length];
 
             //
             // copy in the message
@@ -161,14 +160,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             //
             // generate the seed.
             //
-            byte[] seed = random.GenerateSeed(defHash.Length);
+            var seed = random.GenerateSeed(defHash.Length);
 
             //
             // mask the message block.
             //
-            byte[] mask = maskGeneratorFunction1(seed, 0, seed.Length, block.Length - defHash.Length);
+            var mask = maskGeneratorFunction1(seed, 0, seed.Length, block.Length - defHash.Length);
 
-            for (int i = defHash.Length; i != block.Length; i++)
+            for (var i = defHash.Length; i != block.Length; i++)
             {
                 block[i] ^= mask[i - defHash.Length];
             }
@@ -184,7 +183,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             mask = maskGeneratorFunction1(
                 block, defHash.Length, block.Length - defHash.Length, defHash.Length);
 
-            for (int i = 0; i != defHash.Length; i++)
+            for (var i = 0; i != defHash.Length; i++)
             {
                 block[i] ^= mask[i];
             }
@@ -201,7 +200,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             int		inOff,
             int		inLen)
         {
-            byte[] data = engine.ProcessBlock(inBytes, inOff, inLen);
+            var data = engine.ProcessBlock(inBytes, inOff, inLen);
             byte[] block;
 
             //
@@ -228,10 +227,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             //
             // unmask the seed.
             //
-            byte[] mask = maskGeneratorFunction1(
+            var mask = maskGeneratorFunction1(
                 block, defHash.Length, block.Length - defHash.Length, defHash.Length);
 
-            for (int i = 0; i != defHash.Length; i++)
+            for (var i = 0; i != defHash.Length; i++)
             {
                 block[i] ^= mask[i];
             }
@@ -241,7 +240,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             //
             mask = maskGeneratorFunction1(block, 0, defHash.Length, block.Length - defHash.Length);
 
-            for (int i = defHash.Length; i != block.Length; i++)
+            for (var i = defHash.Length; i != block.Length; i++)
             {
                 block[i] ^= mask[i - defHash.Length];
             }
@@ -251,8 +250,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             // long check to try to avoid this been a source of a timing attack.
             //
             {
-                int diff = 0;
-                for (int i = 0; i < defHash.Length; ++i)
+                var diff = 0;
+                for (var i = 0; i < defHash.Length; ++i)
                 {
                     diff |= (byte)(defHash[i] ^ block[defHash.Length + i]);
                 }
@@ -283,7 +282,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             //
             // extract the data block
             //
-            byte[] output = new byte[block.Length - start];
+            var output = new byte[block.Length - start];
 
             Array.Copy(block, start, output, 0, output.Length);
 
@@ -312,10 +311,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             int		zLen,
             int		length)
         {
-            byte[] mask = new byte[length];
-            byte[] hashBuf = new byte[mgf1Hash.GetDigestSize()];
-            byte[] C = new byte[4];
-            int counter = 0;
+            var mask = new byte[length];
+            var hashBuf = new byte[mgf1Hash.GetDigestSize()];
+            var C = new byte[4];
+            var counter = 0;
 
             hash.Reset();
 

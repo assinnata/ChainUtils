@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -92,21 +91,21 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         public virtual void Init(bool forEncryption, ICipherParameters parameters)
         {
-            bool oldForEncryption = this.forEncryption;
+            var oldForEncryption = this.forEncryption;
             this.forEncryption = forEncryption;
-            this.macBlock = null;
+            macBlock = null;
 
             KeyParameter keyParameter;
 
             byte[] N;
             if (parameters is AeadParameters)
             {
-                AeadParameters aeadParameters = (AeadParameters) parameters;
+                var aeadParameters = (AeadParameters) parameters;
 
                 N = aeadParameters.GetNonce();
                 initialAssociatedText = aeadParameters.GetAssociatedText();
 
-                int macSizeBits = aeadParameters.MacSize;
+                var macSizeBits = aeadParameters.MacSize;
                 if (macSizeBits < 64 || macSizeBits > 128 || macSizeBits % 8 != 0)
                     throw new ArgumentException("Invalid value for MAC size: " + macSizeBits);
 
@@ -115,7 +114,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             }
             else if (parameters is ParametersWithIV)
             {
-                ParametersWithIV parametersWithIV = (ParametersWithIV) parameters;
+                var parametersWithIV = (ParametersWithIV) parameters;
 
                 N = parametersWithIV.GetIV();
                 initialAssociatedText = null;
@@ -127,8 +126,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 throw new ArgumentException("invalid parameters passed to OCB");
             }
 
-            this.hashBlock = new byte[16];
-            this.mainBlock = new byte[forEncryption ? BLOCK_SIZE : (BLOCK_SIZE + macSize)];
+            hashBlock = new byte[16];
+            mainBlock = new byte[forEncryption ? BLOCK_SIZE : (BLOCK_SIZE + macSize)];
 
             if (N == null)
             {
@@ -156,19 +155,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 throw new ArgumentException("cannot change encrypting state without providing key.");
             }
 
-            this.L_Asterisk = new byte[16];
+            L_Asterisk = new byte[16];
             hashCipher.ProcessBlock(L_Asterisk, 0, L_Asterisk, 0);
 
-            this.L_Dollar = OCB_double(L_Asterisk);
+            L_Dollar = OCB_double(L_Asterisk);
 
-            this.L = Platform.CreateArrayList();
-            this.L.Add(OCB_double(L_Dollar));
+            L = Platform.CreateArrayList();
+            L.Add(OCB_double(L_Dollar));
 
             /*
              * NONCE-DEPENDENT AND PER-ENCRYPTION/DECRYPTION INITIALISATION
              */
 
-            int bottom = ProcessNonce(N);
+            var bottom = ProcessNonce(N);
 
             int bits = bottom % 8, bytes = bottom / 8;
             if (bits == 0)
@@ -177,24 +176,24 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             }
             else
             {
-                for (int i = 0; i < 16; ++i)
+                for (var i = 0; i < 16; ++i)
                 {
                     uint b1 = Stretch[bytes];
                     uint b2 = Stretch[++bytes];
-                    this.OffsetMAIN_0[i] = (byte) ((b1 << bits) | (b2 >> (8 - bits)));
+                    OffsetMAIN_0[i] = (byte) ((b1 << bits) | (b2 >> (8 - bits)));
                 }
             }
 
-            this.hashBlockPos = 0;
-            this.mainBlockPos = 0;
+            hashBlockPos = 0;
+            mainBlockPos = 0;
 
-            this.hashBlockCount = 0;
-            this.mainBlockCount = 0;
+            hashBlockCount = 0;
+            mainBlockCount = 0;
 
-            this.OffsetHASH = new byte[16];
-            this.Sum = new byte[16];
+            OffsetHASH = new byte[16];
+            Sum = new byte[16];
             Array.Copy(OffsetMAIN_0, 0, OffsetMAIN, 0, 16);
-            this.Checksum = new byte[16];
+            Checksum = new byte[16];
 
             if (initialAssociatedText != null)
             {
@@ -204,12 +203,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         protected virtual int ProcessNonce(byte[] N)
         {
-            byte[] nonce = new byte[16];
+            var nonce = new byte[16];
             Array.Copy(N, 0, nonce, nonce.Length - N.Length, N.Length);
             nonce[0] = (byte)(macSize << 4);
             nonce[15 - N.Length] |= 1;
 
-            int bottom = nonce[15] & 0x3F;
+            var bottom = nonce[15] & 0x3F;
             nonce[15] &= 0xC0;
 
             /*
@@ -217,11 +216,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
              */
             if (KtopInput == null || !Arrays.AreEqual(nonce, KtopInput))
             {
-                byte[] Ktop = new byte[16];
+                var Ktop = new byte[16];
                 KtopInput = nonce;
                 hashCipher.ProcessBlock(KtopInput, 0, Ktop, 0);
                 Array.Copy(Ktop, 0, Stretch, 0, 16);
-                for (int i = 0; i < 8; ++i)
+                for (var i = 0; i < 8; ++i)
                 {
                     Stretch[16 + i] = (byte)(Ktop[i] ^ Ktop[i + 1]);
                 }
@@ -242,7 +241,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         public virtual int GetOutputSize(int len)
         {
-            int totalData = len + mainBlockPos;
+            var totalData = len + mainBlockPos;
             if (forEncryption)
             {
                 return totalData + macSize;
@@ -252,7 +251,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         public virtual int GetUpdateOutputSize(int len)
         {
-            int totalData = len + mainBlockPos;
+            var totalData = len + mainBlockPos;
             if (!forEncryption)
             {
                 if (totalData < macSize)
@@ -275,7 +274,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         public virtual void ProcessAadBytes(byte[] input, int off, int len)
         {
-            for (int i = 0; i < len; ++i)
+            for (var i = 0; i < len; ++i)
             {
                 hashBlock[hashBlockPos] = input[off + i];
                 if (++hashBlockPos == hashBlock.Length)
@@ -298,9 +297,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         public virtual int ProcessBytes(byte[] input, int inOff, int len, byte[] output, int outOff)
         {
-            int resultLen = 0;
+            var resultLen = 0;
 
-            for (int i = 0; i < len; ++i)
+            for (var i = 0; i < len; ++i)
             {
                 mainBlock[mainBlockPos] = input[inOff + i];
                 if (++mainBlockPos == mainBlock.Length)
@@ -350,7 +349,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
                 Xor(OffsetMAIN, L_Asterisk);
 
-                byte[] Pad = new byte[16];
+                var Pad = new byte[16];
                 hashCipher.ProcessBlock(OffsetMAIN, 0, Pad, 0);
 
                 Xor(mainBlock, Pad);
@@ -372,13 +371,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             hashCipher.ProcessBlock(Checksum, 0, Checksum, 0);
             Xor(Checksum, Sum);
 
-            this.macBlock = new byte[macSize];
+            macBlock = new byte[macSize];
             Array.Copy(Checksum, 0, macBlock, 0, macSize);
 
             /*
              * Validate or append tag and reset this cipher for the next run
              */
-            int resultLen = mainBlockPos;
+            var resultLen = mainBlockPos;
 
             if (forEncryption)
             {
@@ -497,8 +496,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         protected static byte[] OCB_double(byte[] block)
         {
-            byte[] result = new byte[16];
-            int carry = ShiftLeft(block, result);
+            var result = new byte[16];
+            var carry = ShiftLeft(block, result);
 
             /*
              * NOTE: This construction is an attempt at a constant-time implementation.
@@ -524,8 +523,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 return 64;
             }
 
-            int n = 0;
-            ulong ux = (ulong)x;
+            var n = 0;
+            var ux = (ulong)x;
             while ((ux & 1UL) == 0UL)
             {
                 ++n;
@@ -536,7 +535,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         protected static int ShiftLeft(byte[] block, byte[] output)
         {
-            int i = 16;
+            var i = 16;
             uint bit = 0;
             while (--i >= 0)
             {
@@ -549,7 +548,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         protected static void Xor(byte[] block, byte[] val)
         {
-            for (int i = 15; i >= 0; --i)
+            for (var i = 15; i >= 0; --i)
             {
                 block[i] ^= val[i];
             }

@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -34,7 +33,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			this.p = p;
             this.q = q;
 			this.g = g;
-			this.validation = parameters;
+			validation = parameters;
         }
 
         public BigInteger P
@@ -63,7 +62,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (obj == this)
 				return true;
 
-			DsaParameters other = obj as DsaParameters;
+			var other = obj as DsaParameters;
 
 			if (other == null)
 				return false;

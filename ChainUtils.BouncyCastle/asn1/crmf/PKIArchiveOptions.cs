@@ -42,17 +42,17 @@ namespace ChainUtils.BouncyCastle.Asn1.Crmf
 
         public PkiArchiveOptions(EncryptedKey encKey)
         {
-            this.value = encKey;
+            value = encKey;
         }
 
         public PkiArchiveOptions(Asn1OctetString keyGenParameters)
         {
-            this.value = keyGenParameters;
+            value = keyGenParameters;
         }
 
         public PkiArchiveOptions(bool archiveRemGenPrivKey)
         {
-            this.value = DerBoolean.GetInstance(archiveRemGenPrivKey);
+            value = DerBoolean.GetInstance(archiveRemGenPrivKey);
         }
 
         public virtual int Type

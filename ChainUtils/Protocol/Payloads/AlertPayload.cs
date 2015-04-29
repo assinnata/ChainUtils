@@ -1,11 +1,9 @@
-﻿using ChainUtils.Crypto;
-using ChainUtils.DataEncoders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.Crypto;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils.Protocol
 {
@@ -21,41 +19,41 @@ namespace ChainUtils.Protocol
 			set;
 		}
 
-		VarString payload;
-		VarString signature;
+		VarString _payload;
+		VarString _signature;
 
-		int version;
-		long relayUntil;
-		long expiration;
+		int _version;
+		long _relayUntil;
+		long _expiration;
 		public DateTimeOffset Expiration
 		{
 			get
 			{
-				return Utils.UnixTimeToDateTime((uint)expiration);
+				return Utils.UnixTimeToDateTime((uint)_expiration);
 			}
 			set
 			{
-				expiration = Utils.DateTimeToUnixTime(value);
+				_expiration = Utils.DateTimeToUnixTime(value);
 			}
 		}
 
-		int id;
-		int cancel;
-		int[] setCancel = new int[0];
-		int minVer;
-		int maxVer;
-		VarString[] setSubVer = new VarString[0];
-		int priority;
-		VarString comment;
-		VarString statusBar;
-		VarString reserved;
+		int _id;
+		int _cancel;
+		int[] _setCancel = new int[0];
+		int _minVer;
+		int _maxVer;
+		VarString[] _setSubVer = new VarString[0];
+		int _priority;
+		VarString _comment;
+		VarString _statusBar;
+		VarString _reserved;
 
 		public string[] SetSubVer
 		{
 			get
 			{
-				List<string> messages = new List<string>();
-				foreach(var v in setSubVer)
+				var messages = new List<string>();
+				foreach(var v in _setSubVer)
 				{
 					messages.Add(Encoders.ASCII.EncodeData(v.GetString()));
 				}
@@ -63,12 +61,12 @@ namespace ChainUtils.Protocol
 			}
 			set
 			{
-				List<VarString> messages = new List<VarString>();
+				var messages = new List<VarString>();
 				foreach(var v in value)
 				{
 					messages.Add(new VarString(Encoders.ASCII.DecodeData(v)));
 				}
-				setSubVer = messages.ToArray();
+				_setSubVer = messages.ToArray();
 			}
 		}
 
@@ -76,22 +74,22 @@ namespace ChainUtils.Protocol
 		{
 			get
 			{
-				return Encoders.ASCII.EncodeData(comment.GetString());
+				return Encoders.ASCII.EncodeData(_comment.GetString());
 			}
 			set
 			{
-				comment = new VarString(Encoders.ASCII.DecodeData(value));
+				_comment = new VarString(Encoders.ASCII.DecodeData(value));
 			}
 		}
 		public string StatusBar
 		{
 			get
 			{
-				return Encoders.ASCII.EncodeData(statusBar.GetString());
+				return Encoders.ASCII.EncodeData(_statusBar.GetString());
 			}
 			set
 			{
-				statusBar = new VarString(Encoders.ASCII.DecodeData(value));
+				_statusBar = new VarString(Encoders.ASCII.DecodeData(value));
 			}
 		}
 
@@ -99,43 +97,43 @@ namespace ChainUtils.Protocol
 
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref payload);
+			stream.ReadWrite(ref _payload);
 			if(!stream.Serializing)
 			{
-				var payloadStream = new BitcoinStream(payload.GetString());
+				var payloadStream = new BitcoinStream(_payload.GetString());
 				payloadStream.CopyParameters(stream);
 
 				ReadWritePayloadFields(payloadStream);
 
 			}
 
-			stream.ReadWrite(ref signature);
+			stream.ReadWrite(ref _signature);
 		}
 
 		private void ReadWritePayloadFields(BitcoinStream payloadStream)
 		{
-			payloadStream.ReadWrite(ref version);
-			payloadStream.ReadWrite(ref relayUntil);
-			payloadStream.ReadWrite(ref expiration);
-			payloadStream.ReadWrite(ref id);
-			payloadStream.ReadWrite(ref cancel);
-			payloadStream.ReadWrite(ref setCancel);
-			payloadStream.ReadWrite(ref minVer);
-			payloadStream.ReadWrite(ref maxVer);
-			payloadStream.ReadWrite(ref setSubVer);
-			payloadStream.ReadWrite(ref priority);
-			payloadStream.ReadWrite(ref comment);
-			payloadStream.ReadWrite(ref statusBar);
-			payloadStream.ReadWrite(ref reserved);
+			payloadStream.ReadWrite(ref _version);
+			payloadStream.ReadWrite(ref _relayUntil);
+			payloadStream.ReadWrite(ref _expiration);
+			payloadStream.ReadWrite(ref _id);
+			payloadStream.ReadWrite(ref _cancel);
+			payloadStream.ReadWrite(ref _setCancel);
+			payloadStream.ReadWrite(ref _minVer);
+			payloadStream.ReadWrite(ref _maxVer);
+			payloadStream.ReadWrite(ref _setSubVer);
+			payloadStream.ReadWrite(ref _priority);
+			payloadStream.ReadWrite(ref _comment);
+			payloadStream.ReadWrite(ref _statusBar);
+			payloadStream.ReadWrite(ref _reserved);
 		}
 
 		private void UpdatePayload(BitcoinStream stream)
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			var seria = new BitcoinStream(ms, true);
 			seria.CopyParameters(stream);
 			ReadWritePayloadFields(seria);
-			payload = new VarString(ms.ToArray());
+			_payload = new VarString(ms.ToArray());
 		}
 
 		#endregion
@@ -143,7 +141,7 @@ namespace ChainUtils.Protocol
 		public void UpdateSignature(Key key, ProtocolVersion version = ProtocolVersion.PROTOCOL_VERSION)
 		{
 			UpdatePayload();
-			signature = new VarString(key.Sign(Hashes.Hash256(payload.GetString())).ToDER());
+			_signature = new VarString(key.Sign(Hashes.Hash256(_payload.GetString())).ToDer());
 		}
 
 		public void UpdatePayload(ProtocolVersion version = ProtocolVersion.PROTOCOL_VERSION)
@@ -160,14 +158,14 @@ namespace ChainUtils.Protocol
 		}
 		public bool CheckSignature(PubKey key)
 		{
-			return key.Verify(Hashes.Hash256(payload.GetString()), signature.GetString());
+			return key.Verify(Hashes.Hash256(_payload.GetString()), _signature.GetString());
 		}
 
 		public bool IsInEffect
 		{
 			get
 			{
-				DateTimeOffset now = Now ?? DateTimeOffset.Now;
+				var now = Now ?? DateTimeOffset.Now;
 				return now < Expiration;
 			}
 		}
@@ -175,7 +173,7 @@ namespace ChainUtils.Protocol
 		public bool AppliesTo(int nVersion, string strSubVerIn)
 		{
 			return IsInEffect
-					&& minVer <= nVersion && nVersion <= maxVer
+					&& _minVer <= nVersion && nVersion <= _maxVer
 					&& (SetSubVer.Length == 0 || SetSubVer.Contains(strSubVerIn));
 		}
 

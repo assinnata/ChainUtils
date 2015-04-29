@@ -1,6 +1,4 @@
-using System;
-
-namespace ChainUtils.BouncyCastle.Asn1.Gnu
+﻿namespace ChainUtils.BouncyCastle.Asn1.Gnu
 {
 	public abstract class GnuObjectIdentifiers
 	{

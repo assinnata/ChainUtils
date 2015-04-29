@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -44,7 +43,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				isExplicit)
         {
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is DerUniversalString)
 			{
@@ -68,10 +67,10 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         public override string GetString()
         {
-			StringBuilder buffer = new StringBuilder("#");
-			byte[] enc = GetDerEncoded();
+			var buffer = new StringBuilder("#");
+			var enc = GetDerEncoded();
 
-			for (int i = 0; i != enc.Length; i++)
+			for (var i = 0; i != enc.Length; i++)
 			{
 				uint ubyte = enc[i];
 				buffer.Append(table[(ubyte >> 4) & 0xf]);
@@ -89,19 +88,19 @@ namespace ChainUtils.BouncyCastle.Asn1
 		internal override void Encode(
             DerOutputStream derOut)
         {
-            derOut.WriteEncoded(Asn1Tags.UniversalString, this.str);
+            derOut.WriteEncoded(Asn1Tags.UniversalString, str);
         }
 
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
 		{
-			DerUniversalString other = asn1Object as DerUniversalString;
+			var other = asn1Object as DerUniversalString;
 
 			if (other == null)
 				return false;
 
 //			return this.GetString().Equals(other.GetString());
-			return Arrays.AreEqual(this.str, other.str);
+			return Arrays.AreEqual(str, other.str);
         }
     }
 }

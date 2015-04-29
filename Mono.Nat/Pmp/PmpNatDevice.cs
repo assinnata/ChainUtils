@@ -58,7 +58,7 @@ namespace Mono.Nat.Pmp
 
         public override IAsyncResult BeginCreatePortMap(Mapping mapping, AsyncCallback callback, object asyncState)
 		{
-			PortMapAsyncResult pmar = new PortMapAsyncResult (mapping.Protocol, mapping.PublicPort, PmpConstants.DefaultLeaseTime, callback, asyncState);
+			var pmar = new PortMapAsyncResult (mapping.Protocol, mapping.PublicPort, PmpConstants.DefaultLeaseTime, callback, asyncState);
 			ThreadPool.QueueUserWorkItem (delegate {
 				try {
 					CreatePortMap(pmar.Mapping, true);
@@ -72,7 +72,7 @@ namespace Mono.Nat.Pmp
 
 		public override IAsyncResult BeginDeletePortMap (Mapping mapping, AsyncCallback callback, object asyncState)
 		{
-			PortMapAsyncResult pmar =  new PortMapAsyncResult (mapping, callback, asyncState);
+			var pmar =  new PortMapAsyncResult (mapping, callback, asyncState);
 			ThreadPool.QueueUserWorkItem (delegate {
 				try {
 					CreatePortMap(pmar.Mapping, false);
@@ -86,13 +86,13 @@ namespace Mono.Nat.Pmp
 
 		public override void EndCreatePortMap (IAsyncResult result)
 		{
-			PortMapAsyncResult pmar = result as PortMapAsyncResult;
+			var pmar = result as PortMapAsyncResult;
 			pmar.AsyncWaitHandle.WaitOne ();
 		}
 
 		public override void EndDeletePortMap (IAsyncResult result)
 		{
-			PortMapAsyncResult pmar = result as PortMapAsyncResult;
+			var pmar = result as PortMapAsyncResult;
 			pmar.AsyncWaitHandle.WaitOne ();
 		}
 		
@@ -105,7 +105,7 @@ namespace Mono.Nat.Pmp
 		public override IAsyncResult BeginGetExternalIP (AsyncCallback callback, object asyncState)
 		{
             StartOp(ref externalIpResult, callback, asyncState);
-            AsyncResult result = externalIpResult;
+            var result = externalIpResult;
             result.Complete();
             return result;
 		}
@@ -163,7 +163,7 @@ namespace Mono.Nat.Pmp
 		
 		public override bool Equals(object obj)
 		{
-			PmpNatDevice device = obj as PmpNatDevice;
+			var device = obj as PmpNatDevice;
 			return (device == null) ? false : this.Equals(device);
 		}
 		
@@ -179,7 +179,7 @@ namespace Mono.Nat.Pmp
 
 		private Mapping CreatePortMap (Mapping mapping, bool create)
 		{
-			List<byte> package = new List<byte> ();
+			var package = new List<byte> ();
 			
 			package.Add (PmpConstants.Version);
 			package.Add (mapping.Protocol == Protocol.Tcp ? PmpConstants.OperationCodeTcp : PmpConstants.OperationCodeUdp);
@@ -189,7 +189,7 @@ namespace Mono.Nat.Pmp
 			package.AddRange (BitConverter.GetBytes (create ? IPAddress.HostToNetworkOrder((short)mapping.PublicPort) : (short)0));
 			package.AddRange (BitConverter.GetBytes (IPAddress.HostToNetworkOrder(mapping.Lifetime)));
 
-			CreatePortMapAsyncState state = new CreatePortMapAsyncState ();
+			var state = new CreatePortMapAsyncState ();
 			state.Buffer = package.ToArray ();
 			state.Mapping = mapping;
 
@@ -197,7 +197,7 @@ namespace Mono.Nat.Pmp
 			WaitHandle.WaitAll (new WaitHandle[] {state.ResetEvent});
 			
 			if (!state.Success) {
-				string type = create ? "create" : "delete";
+				var type = create ? "create" : "delete";
 				throw new MappingException (String.Format ("Failed to {0} portmap (protocol={1}, private port={2}", type, mapping.Protocol, mapping.PrivatePort));
 			}
 			
@@ -206,13 +206,13 @@ namespace Mono.Nat.Pmp
 		
 		private void CreatePortMapAsync (object obj)
 		{
-			CreatePortMapAsyncState state = obj as CreatePortMapAsyncState;
+			var state = obj as CreatePortMapAsyncState;
 			
-			UdpClient udpClient = new UdpClient ();
-			CreatePortMapListenState listenState = new CreatePortMapListenState (state, udpClient);
+			var udpClient = new UdpClient ();
+			var listenState = new CreatePortMapListenState (state, udpClient);
 
-			int attempt = 0;
-			int delay = PmpConstants.RetryDelay;
+			var attempt = 0;
+			var delay = PmpConstants.RetryDelay;
 			
 			ThreadPool.QueueUserWorkItem (new WaitCallback (CreatePortMapListen), listenState);
 
@@ -233,11 +233,11 @@ namespace Mono.Nat.Pmp
 		
 		private void CreatePortMapListen (object obj)
 		{
-			CreatePortMapListenState state = obj as CreatePortMapListenState;
+			var state = obj as CreatePortMapListenState;
 
-            UdpClient udpClient = state.UdpClient;
+            var udpClient = state.UdpClient;
             state.UdpClientReady.WaitOne(); // Evidently UdpClient has some lazy-init Send/Receive race?
-			IPEndPoint endPoint = new IPEndPoint (localAddress, PmpConstants.ServerPort);
+			var endPoint = new IPEndPoint (localAddress, PmpConstants.ServerPort);
 			
 			while (!state.Success) {
                 byte[] data;
@@ -257,19 +257,19 @@ namespace Mono.Nat.Pmp
 				if (data[0] != PmpConstants.Version)
 					continue;
 			
-				byte opCode = (byte)(data[1] & (byte)127);
+				var opCode = (byte)(data[1] & (byte)127);
 				
-				Protocol protocol = Protocol.Tcp;
+				var protocol = Protocol.Tcp;
 				if (opCode == PmpConstants.OperationCodeUdp)
 					protocol = Protocol.Udp;
 
-				short resultCode = IPAddress.NetworkToHostOrder (BitConverter.ToInt16 (data, 2));
-				uint epoch = (uint)IPAddress.NetworkToHostOrder (BitConverter.ToInt32 (data, 4));
+				var resultCode = IPAddress.NetworkToHostOrder (BitConverter.ToInt16 (data, 2));
+				var epoch = (uint)IPAddress.NetworkToHostOrder (BitConverter.ToInt32 (data, 4));
 
 				int privatePort = (ushort)IPAddress.NetworkToHostOrder (BitConverter.ToInt16 (data, 8));
 				int publicPort = (ushort)IPAddress.NetworkToHostOrder (BitConverter.ToInt16 (data, 10));
 
-				uint lifetime = (uint)IPAddress.NetworkToHostOrder (BitConverter.ToInt32 (data, 12));
+				var lifetime = (uint)IPAddress.NetworkToHostOrder (BitConverter.ToInt32 (data, 12));
 				
 				if (resultCode != PmpConstants.ResultCodeSuccess) {
 					state.Success = false;
@@ -284,7 +284,7 @@ namespace Mono.Nat.Pmp
 				} else {
 					//mapping was created
 					//TODO: verify that the private port+protocol are a match
-					Mapping mapping = state.Mapping;
+					var mapping = state.Mapping;
 					mapping.PublicPort = publicPort;
                     mapping.Protocol = protocol;
 					mapping.Expiration = DateTime.Now.AddSeconds (lifetime);

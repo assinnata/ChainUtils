@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC.Multiplier;
@@ -20,14 +18,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             DHParameters	dhParams,
             SecureRandom	random)
         {
-            int limit = dhParams.L;
+            var limit = dhParams.L;
 
             if (limit != 0)
             {
-                int minWeight = limit >> 2;
+                var minWeight = limit >> 2;
                 for (;;)
                 {
-                    BigInteger x = new BigInteger(limit, random).SetBit(limit - 1);
+                    var x = new BigInteger(limit, random).SetBit(limit - 1);
                     if (WNafUtilities.GetNafWeight(x) >= minWeight)
                     {
                         return x;
@@ -35,25 +33,25 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                 }
             }
 
-            BigInteger min = BigInteger.Two;
-            int m = dhParams.M;
+            var min = BigInteger.Two;
+            var m = dhParams.M;
             if (m != 0)
             {
                 min = BigInteger.One.ShiftLeft(m - 1);
             }
 
-            BigInteger q = dhParams.Q;
+            var q = dhParams.Q;
             if (q == null)
             {
                 q = dhParams.P;
             }
-            BigInteger max = q.Subtract(BigInteger.Two);
+            var max = q.Subtract(BigInteger.Two);
 
             {
-                int minWeight = max.BitLength >> 2;
+                var minWeight = max.BitLength >> 2;
                 for (;;)
                 {
-                    BigInteger x = BigIntegers.CreateRandomInRange(min, max, random);
+                    var x = BigIntegers.CreateRandomInRange(min, max, random);
                     if (WNafUtilities.GetNafWeight(x) >= minWeight)
                     {
                         return x;

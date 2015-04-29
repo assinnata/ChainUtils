@@ -29,15 +29,15 @@ namespace ChainUtils.BouncyCastle.Asn1
                 return null;
             }
 
-            int end = oid.IndexOf('.', index);
+            var end = oid.IndexOf('.', index);
             if (end == -1)
             {
-                string lastToken = oid.Substring(index);
+                var lastToken = oid.Substring(index);
                 index = -1;
                 return lastToken;
             }
 
-            string nextToken = oid.Substring(index, end - index);
+            var nextToken = oid.Substring(index, end - index);
 			index = end + 1;
             return nextToken;
         }

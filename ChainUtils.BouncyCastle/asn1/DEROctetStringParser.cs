@@ -1,31 +1,29 @@
 using System;
 using System.IO;
 
-using ChainUtils.BouncyCastle.Utilities.IO;
-
 namespace ChainUtils.BouncyCastle.Asn1
 {
 	public class DerOctetStringParser
 		: Asn1OctetStringParser
 	{
-		private readonly DefiniteLengthInputStream stream;
+		private readonly DefiniteLengthInputStream _stream;
 
 		internal DerOctetStringParser(
 			DefiniteLengthInputStream stream)
 		{
-			this.stream = stream;
+			_stream = stream;
 		}
 
 		public Stream GetOctetStream()
 		{
-			return stream;
+			return _stream;
 		}
 
 		public Asn1Object ToAsn1Object()
 		{
 			try
 			{
-				return new DerOctetString(stream.ToArray());
+				return new DerOctetString(_stream.ToArray());
 			}
 			catch (IOException e)
 			{

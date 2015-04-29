@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -64,7 +62,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (obj == this)
 				return true;
 
-			Gost3410Parameters other = obj as Gost3410Parameters;
+			var other = obj as Gost3410Parameters;
 
 			if (other == null)
 				return false;

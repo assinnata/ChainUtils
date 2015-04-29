@@ -1,12 +1,9 @@
-﻿using ChainUtils.DataEncoders;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ChainUtils.RPC
 {
@@ -14,22 +11,22 @@ namespace ChainUtils.RPC
 	{
 		protected override void BuildTransaction(JObject json, Transaction tx)
 		{
-			var txid = new uint256((string)json.GetValue("txid"));
+			var txid = new Uint256((string)json.GetValue("txid"));
 			tx.Version = (uint)json.GetValue("version");
 			tx.LockTime = (uint)json.GetValue("locktime");
 
 			var vin = (JArray)json.GetValue("vin");
-			for(int i = 0 ; i < vin.Count ; i++)
+			for(var i = 0 ; i < vin.Count ; i++)
 			{
 				var jsonIn = (JObject)vin[i];
-				var txin = new ChainUtils.TxIn();
+				var txin = new TxIn();
 				tx.Inputs.Add(txin);
 
 				var script = (JObject)jsonIn.GetValue("scriptSig");
 				if(script != null)
 				{
 					txin.ScriptSig = new Script(Encoders.Hex.DecodeData((string)script.GetValue("hex")));
-					txin.PrevOut.Hash = new uint256((string)jsonIn.GetValue("txid"));
+					txin.PrevOut.Hash = new Uint256((string)jsonIn.GetValue("txid"));
 					txin.PrevOut.N = (uint)jsonIn.GetValue("vout");
 				}
 				else
@@ -43,14 +40,14 @@ namespace ChainUtils.RPC
 			}
 
 			var vout = (JArray)json.GetValue("vout");
-			for(int i = 0 ; i < vout.Count ; i++)
+			for(var i = 0 ; i < vout.Count ; i++)
 			{
 				var jsonOut = (JObject)vout[i];
-				var txout = new ChainUtils.TxOut();
+				var txout = new TxOut();
 				tx.Outputs.Add(txout);
 
 				var btc = (decimal)jsonOut.GetValue("value");
-				var satoshis = btc * Money.COIN;
+				var satoshis = btc * Money.Coin;
 				txout.Value = new Money((long)(satoshis));
 
 				var script = (JObject)jsonOut.GetValue("scriptPubKey");
@@ -70,7 +67,7 @@ namespace ChainUtils.RPC
 			{
 				writer.WriteStartObject();
 
-				if(txin.PrevOut.Hash == new uint256(0))
+				if(txin.PrevOut.Hash == new Uint256(0))
 				{
 					WritePropertyValue(writer, "coinbase", Encoders.Hex.EncodeData(txin.ScriptSig.ToBytes()));
 				}
@@ -94,7 +91,7 @@ namespace ChainUtils.RPC
 			writer.WritePropertyName("vout");
 			writer.WriteStartArray();
 
-			int i = 0;
+			var i = 0;
 			foreach(var txout in tx.Outputs)
 			{
 				writer.WriteStartObject();
@@ -147,7 +144,7 @@ namespace ChainUtils.RPC
 		private string ValueFromAmount(Money money)
 		{
 			var satoshis = (decimal)money.Satoshi;
-			var btc = satoshis / Money.COIN;
+			var btc = satoshis / Money.Coin;
 			//return btc.ToString("0.###E+00", CultureInfo.InvariantCulture);
 			var result = ((double)btc).ToString(CultureInfo.InvariantCulture);
 			if(!result.ToCharArray().Contains('.'))
@@ -161,15 +158,15 @@ namespace ChainUtils.RPC
 				return "nonstandard";
 			switch(template.Type)
 			{
-				case TxOutType.TX_PUBKEY:
+				case TxOutType.TxPubkey:
 					return "pubkey";
-				case TxOutType.TX_PUBKEYHASH:
+				case TxOutType.TxPubkeyhash:
 					return "pubkeyhash";
-				case TxOutType.TX_SCRIPTHASH:
+				case TxOutType.TxScripthash:
 					return "scripthash";
-				case TxOutType.TX_MULTISIG:
+				case TxOutType.TxMultisig:
 					return "multisig";
-				case TxOutType.TX_NULL_DATA:
+				case TxOutType.TxNullData:
 					return "nulldata";
 			}
 			return "nonstandard";

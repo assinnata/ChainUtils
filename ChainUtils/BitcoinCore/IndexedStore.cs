@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
@@ -12,21 +11,21 @@ namespace ChainUtils.BitcoinCore
 		where TStoredItem : StoredItem<TItem>
 		where TItem : IBitcoinSerializable, new()
 	{
-		private readonly NoSqlRepository _Index;
-		private readonly Store<TStoredItem, TItem> _Store;
+		private readonly NoSqlRepository _index;
+		private readonly Store<TStoredItem, TItem> _store;
 
 		public Store<TStoredItem, TItem> Store
 		{
 			get
 			{
-				return _Store;
+				return _store;
 			}
 		}
 		public NoSqlRepository Index
 		{
 			get
 			{
-				return _Index;
+				return _index;
 			}
 		}
 		public IndexedStore(NoSqlRepository index, Store<TStoredItem, TItem> store)
@@ -35,8 +34,8 @@ namespace ChainUtils.BitcoinCore
 				throw new ArgumentNullException("index");
 			if(store == null)
 				throw new ArgumentNullException("store");
-			_Index = index;
-			_Store = store;
+			_index = index;
+			_store = store;
 		}
 
 		protected string IndexedLimit = "Position";
@@ -56,19 +55,19 @@ namespace ChainUtils.BitcoinCore
 
 		public async Task<int> ReIndexAsync()
 		{
-			var last = await _Index.GetAsync<DiskBlockPos>(IndexedLimit).ConfigureAwait(false);
-			int count = 0;
+			var last = await _index.GetAsync<DiskBlockPos>(IndexedLimit).ConfigureAwait(false);
+			var count = 0;
 			List<TStoredItem> lastBlocks = null;
 			foreach(var blocks in EnumerateForIndex(new DiskBlockPosRange(last)).Partition(400))
 			{
 				count += blocks.Count;
-				await _Index.PutBatch(blocks.Select(b => new Tuple<String, IBitcoinSerializable>(GetKey(b.Item), b.BlockPosition))).ConfigureAwait(false);
+				await _index.PutBatch(blocks.Select(b => new Tuple<String, IBitcoinSerializable>(GetKey(b.Item), b.BlockPosition))).ConfigureAwait(false);
 				lastBlocks = blocks;
 			}
 			if(lastBlocks != null && lastBlocks.Count > 0)
 			{
 				var block = lastBlocks.Last();
-				await _Index.PutAsync(IndexedLimit, new DiskBlockPos(block.BlockPosition.File, block.BlockPosition.Position + (uint)block.GetStorageSize())).ConfigureAwait(false);
+				await _index.PutAsync(IndexedLimit, new DiskBlockPos(block.BlockPosition.File, block.BlockPosition.Position + (uint)block.GetStorageSize())).ConfigureAwait(false);
 			}
 			return count;
 		}

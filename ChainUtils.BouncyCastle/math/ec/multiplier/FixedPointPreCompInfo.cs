@@ -22,13 +22,13 @@
         public virtual ECPoint[] PreComp
         {
             get { return m_preComp; }
-            set { this.m_preComp = value; }
+            set { m_preComp = value; }
         }
 
         public virtual int Width
         {
             get { return m_width; }
-            set { this.m_width = value; }
+            set { m_width = value; }
         }
     }
 }

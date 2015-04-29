@@ -1,6 +1,4 @@
-﻿using System;
-
-using ChainUtils.BouncyCastle.Utilities.Encoders;
+﻿using ChainUtils.BouncyCastle.Utilities.Encoders;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 {
@@ -17,16 +15,16 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public SecP192R1Curve()
             : base(q)
         {
-            this.m_infinity = new SecP192R1Point(this, null, null);
+            m_infinity = new SecP192R1Point(this, null, null);
 
-            this.m_a = FromBigInteger(new BigInteger(1,
+            m_a = FromBigInteger(new BigInteger(1,
                 Hex.Decode("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC")));
-            this.m_b = FromBigInteger(new BigInteger(1,
+            m_b = FromBigInteger(new BigInteger(1,
                 Hex.Decode("64210519E59C80E70FA7E9AB72243049FEB8DEECC146B9B1")));
-            this.m_order = new BigInteger(1, Hex.Decode("FFFFFFFFFFFFFFFFFFFFFFFF99DEF836146BC9B1B4D22831"));
-            this.m_cofactor = BigInteger.One;
+            m_order = new BigInteger(1, Hex.Decode("FFFFFFFFFFFFFFFFFFFFFFFF99DEF836146BC9B1B4D22831"));
+            m_cofactor = BigInteger.One;
 
-            this.m_coord = SecP192R1_DEFAULT_COORDS;
+            m_coord = SecP192R1_DEFAULT_COORDS;
         }
 
         protected override ECCurve CloneCurve()

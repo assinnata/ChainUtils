@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Crypto.Prng
 {
 	/// <remarks>Generic interface for objects generating random bytes.</remarks>

@@ -1,10 +1,7 @@
 using System;
 using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.Pkcs;
 using ChainUtils.BouncyCastle.Asn1.X509;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1.Smime
@@ -84,7 +81,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Smime
         public IList GetCapabilitiesForOid(
             DerObjectIdentifier capability)
         {
-            IList list = Platform.CreateArrayList();
+            var list = Platform.CreateArrayList();
             DoGetCapabilitiesForOid(capability, list);
 			return list;
         }
@@ -93,18 +90,18 @@ namespace ChainUtils.BouncyCastle.Asn1.Smime
         {
 			if (capability == null)
             {
-				foreach (object o in capabilities)
+				foreach (var o in capabilities)
 				{
-                    SmimeCapability cap = SmimeCapability.GetInstance(o);
+                    var cap = SmimeCapability.GetInstance(o);
 
 					list.Add(cap);
                 }
             }
             else
             {
-				foreach (object o in capabilities)
+				foreach (var o in capabilities)
 				{
-                    SmimeCapability cap = SmimeCapability.GetInstance(o);
+                    var cap = SmimeCapability.GetInstance(o);
 
 					if (capability.Equals(cap.CapabilityID))
                     {

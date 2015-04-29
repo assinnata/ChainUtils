@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
     public class Attribute

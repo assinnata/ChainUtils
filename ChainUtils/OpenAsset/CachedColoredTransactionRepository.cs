@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils.OpenAsset
 {
 	public class CachedColoredTransactionRepository : IColoredTransactionRepository
 	{
-		IColoredTransactionRepository _Inner;
-		CachedTransactionRepository _InnerTransactionRepository;
-		Dictionary<uint256, ColoredTransaction> _ColoredTransactions = new Dictionary<uint256, ColoredTransaction>();
-		ReaderWriterLock @lock = new ReaderWriterLock();
+		IColoredTransactionRepository _inner;
+		CachedTransactionRepository _innerTransactionRepository;
+		Dictionary<Uint256, ColoredTransaction> _coloredTransactions = new Dictionary<Uint256, ColoredTransaction>();
+		ReaderWriterLock _lock = new ReaderWriterLock();
 
-		public ColoredTransaction GetFromCache(uint256 txId)
+		public ColoredTransaction GetFromCache(Uint256 txId)
 		{
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
-				return _ColoredTransactions.TryGet(txId);
+				return _coloredTransactions.TryGet(txId);
 			}
 		}
 
@@ -25,8 +23,8 @@ namespace ChainUtils.OpenAsset
 		{
 			if(inner == null)
 				throw new ArgumentNullException("inner");
-			_Inner = inner;
-			_InnerTransactionRepository = new CachedTransactionRepository(inner.Transactions);
+			_inner = inner;
+			_innerTransactionRepository = new CachedTransactionRepository(inner.Transactions);
 		}
 		#region IColoredTransactionRepository Members
 
@@ -34,7 +32,7 @@ namespace ChainUtils.OpenAsset
 		{
 			get
 			{
-				return _InnerTransactionRepository;
+				return _innerTransactionRepository;
 			}
 		}
 
@@ -42,38 +40,38 @@ namespace ChainUtils.OpenAsset
 		{
 			get
 			{
-				return _InnerTransactionRepository;
+				return _innerTransactionRepository;
 			}
 		}
 
-		public async Task<ColoredTransaction> GetAsync(uint256 txId)
+		public async Task<ColoredTransaction> GetAsync(Uint256 txId)
 		{
 			ColoredTransaction result = null;
 			bool found;
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
-				found = _ColoredTransactions.TryGetValue(txId, out result);
+				found = _coloredTransactions.TryGetValue(txId, out result);
 			}
 			if(!found)
 			{
-				result = await _Inner.GetAsync(txId).ConfigureAwait(false);
-				using(@lock.LockWrite())
+				result = await _inner.GetAsync(txId).ConfigureAwait(false);
+				using(_lock.LockWrite())
 				{
-					_ColoredTransactions.AddOrReplace(txId, result);
+					_coloredTransactions.AddOrReplace(txId, result);
 				}
 			}
 			return result;
 		}
 
-		public Task PutAsync(uint256 txId, ColoredTransaction tx)
+		public Task PutAsync(Uint256 txId, ColoredTransaction tx)
 		{
-			using(@lock.LockWrite())
+			using(_lock.LockWrite())
 			{
-				if(!_ColoredTransactions.ContainsKey(txId))
-					_ColoredTransactions.AddOrReplace(txId, tx);
+				if(!_coloredTransactions.ContainsKey(txId))
+					_coloredTransactions.AddOrReplace(txId, tx);
 				else
-					_ColoredTransactions[txId] = tx;
-				return _Inner.PutAsync(txId, tx);
+					_coloredTransactions[txId] = tx;
+				return _inner.PutAsync(txId, tx);
 			}
 		}
 

@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -38,8 +37,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		public SignedDataParser(
 			Asn1SequenceParser seq)
 		{
-			this._seq = seq;
-			this._version = (DerInteger)seq.ReadObject();
+			_seq = seq;
+			_version = (DerInteger)seq.ReadObject();
 		}
 
 		public DerInteger Version
@@ -64,7 +63,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 			if (_nextObject is Asn1TaggedObjectParser && ((Asn1TaggedObjectParser)_nextObject).TagNo == 0)
 			{
-				Asn1SetParser certs = (Asn1SetParser)((Asn1TaggedObjectParser)_nextObject).GetObjectParser(Asn1Tags.Set, false);
+				var certs = (Asn1SetParser)((Asn1TaggedObjectParser)_nextObject).GetObjectParser(Asn1Tags.Set, false);
 				_nextObject = null;
 
 				return certs;
@@ -87,7 +86,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 			if (_nextObject is Asn1TaggedObjectParser && ((Asn1TaggedObjectParser)_nextObject).TagNo == 1)
 			{
-				Asn1SetParser crls = (Asn1SetParser)((Asn1TaggedObjectParser)_nextObject).GetObjectParser(Asn1Tags.Set, false);
+				var crls = (Asn1SetParser)((Asn1TaggedObjectParser)_nextObject).GetObjectParser(Asn1Tags.Set, false);
 				_nextObject = null;
 
 				return crls;

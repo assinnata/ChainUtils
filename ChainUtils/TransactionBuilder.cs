@@ -1,11 +1,9 @@
-﻿using ChainUtils.DataEncoders;
-using ChainUtils.OpenAsset;
-using ChainUtils.Stealth;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
+using ChainUtils.OpenAsset;
+using ChainUtils.Stealth;
 using Builder = System.Func<ChainUtils.TransactionBuilder.TransactionBuildingContext, ChainUtils.Money>;
 
 namespace ChainUtils
@@ -32,10 +30,10 @@ namespace ChainUtils
 		{
 
 		}
-		Random _Rand = new Random();
+		Random _rand = new Random();
 		public DefaultCoinSelector(int seed)
 		{
-			_Rand = new Random(seed);
+			_rand = new Random(seed);
 		}
 		#region ICoinSelector Members
 
@@ -47,8 +45,8 @@ namespace ChainUtils
 			if(targetCoin != null)
 				return new[] { targetCoin };
 
-			List<ICoin> result = new List<ICoin>();
-			Money total = Money.Zero;
+			var result = new List<ICoin>();
+			var total = Money.Zero;
 
 			if(target == Money.Zero)
 				return result;
@@ -82,12 +80,12 @@ namespace ChainUtils
 						var allCoins = orderedCoins.ToArray();
 						Money minTotal = null;
 						List<ICoin> minSelection = null;
-						for(int _ = 0 ; _ < 1000 ; _++)
+						for(var _ = 0 ; _ < 1000 ; _++)
 						{
 							var selection = new List<ICoin>();
-							Shuffle(allCoins, _Rand);
+							Shuffle(allCoins, _rand);
 							total = Money.Zero;
-							for(int i = 0 ; i < allCoins.Length ; i++)
+							for(var i = 0 ; i < allCoins.Length ; i++)
 							{
 								selection.Add(allCoins[i]);
 								total += allCoins[i].Amount;
@@ -116,24 +114,24 @@ namespace ChainUtils
 
 		internal static void Shuffle<T>(T[] list, Random random)
 		{
-			int n = list.Length;
+			var n = list.Length;
 			while(n > 1)
 			{
 				n--;
-				int k = random.Next(n + 1);
-				T value = list[k];
+				var k = random.Next(n + 1);
+				var value = list[k];
 				list[k] = list[n];
 				list[n] = value;
 			}
 		}
 		internal static void Shuffle<T>(List<T> list, Random random)
 		{
-			int n = list.Count;
+			var n = list.Count;
 			while(n > 1)
 			{
 				n--;
-				int k = random.Next(n + 1);
-				T value = list[k];
+				var k = random.Next(n + 1);
+				var value = list[k];
 				list[k] = list[n];
 				list[n] = value;
 			}
@@ -180,12 +178,12 @@ namespace ChainUtils
 				set;
 			}
 
-			private readonly List<Key> _AdditionalKeys = new List<Key>();
+			private readonly List<Key> _additionalKeys = new List<Key>();
 			public List<Key> AdditionalKeys
 			{
 				get
 				{
-					return _AdditionalKeys;
+					return _additionalKeys;
 				}
 			}
 
@@ -204,18 +202,18 @@ namespace ChainUtils
 				ChangeAmount = Money.Zero;
 				AdditionalFees = Money.Zero;
 			}
-			public TransactionBuilder.BuilderGroup Group
+			public BuilderGroup Group
 			{
 				get;
 				set;
 			}
 
-			private readonly List<ICoin> _ConsumedCoins = new List<ICoin>();
+			private readonly List<ICoin> _consumedCoins = new List<ICoin>();
 			public List<ICoin> ConsumedCoins
 			{
 				get
 				{
-					return _ConsumedCoins;
+					return _consumedCoins;
 				}
 			}
 			public TransactionBuilder Builder
@@ -235,24 +233,24 @@ namespace ChainUtils
 				set;
 			}
 
-			private readonly List<Builder> _AdditionalBuilders = new List<Builder>();
+			private readonly List<Builder> _additionalBuilders = new List<Builder>();
 			public List<Builder> AdditionalBuilders
 			{
 				get
 				{
-					return _AdditionalBuilders;
+					return _additionalBuilders;
 				}
 			}
 
-			ColorMarker _Marker;
+			ColorMarker _marker;
 
 			public ColorMarker GetColorMarker(bool issuance)
 			{
-				if(_Marker == null)
-					_Marker = new ColorMarker();
+				if(_marker == null)
+					_marker = new ColorMarker();
 				if(!issuance)
 					EnsureMarkerInserted();
-				return _Marker;
+				return _marker;
 			}
 
 			private TxOut EnsureMarkerInserted()
@@ -270,10 +268,10 @@ namespace ChainUtils
 
 			public void Finish()
 			{
-				if(_Marker != null)
+				if(_marker != null)
 				{
 					var txout = EnsureMarkerInserted();
-					txout.ScriptPubKey = _Marker.GetScript();
+					txout.ScriptPubKey = _marker.GetScript();
 				}
 			}
 
@@ -298,7 +296,7 @@ namespace ChainUtils
 
 			public void RestoreMemento(TransactionBuildingContext memento)
 			{
-				_Marker = memento._Marker == null ? null : new ColorMarker(memento._Marker.GetScript());
+				_marker = memento._marker == null ? null : new ColorMarker(memento._marker.GetScript());
 				Transaction = memento.Transaction.Clone();
 				AdditionalFees = memento.AdditionalFees;
 			}
@@ -330,10 +328,10 @@ namespace ChainUtils
 
 		internal class BuilderGroup
 		{
-			TransactionBuilder _Parent;
+			TransactionBuilder _parent;
 			public BuilderGroup(TransactionBuilder parent)
 			{
-				_Parent = parent;
+				_parent = parent;
 				Builders.Add(SetChange);
 			}
 
@@ -358,7 +356,7 @@ namespace ChainUtils
 			}
 			private void Shuffle(List<Builder> builders)
 			{
-				DefaultCoinSelector.Shuffle(builders, _Parent._Rand);
+				DefaultCoinSelector.Shuffle(builders, _parent.Rand);
 			}
 
 			public Money CoverOnly
@@ -368,31 +366,31 @@ namespace ChainUtils
 			}
 		}
 
-		List<BuilderGroup> _BuilderGroups = new List<BuilderGroup>();
-		BuilderGroup _CurrentGroup = null;
+		List<BuilderGroup> _builderGroups = new List<BuilderGroup>();
+		BuilderGroup _currentGroup = null;
 		internal BuilderGroup CurrentGroup
 		{
 			get
 			{
-				if(_CurrentGroup == null)
+				if(_currentGroup == null)
 				{
-					_CurrentGroup = new BuilderGroup(this);
-					_BuilderGroups.Add(_CurrentGroup);
+					_currentGroup = new BuilderGroup(this);
+					_builderGroups.Add(_currentGroup);
 				}
-				return _CurrentGroup;
+				return _currentGroup;
 			}
 		}
 		public TransactionBuilder()
 		{
-			_Rand = new Random();
+			Rand = new Random();
 			CoinSelector = new DefaultCoinSelector();
 			ColoredDust = Money.Dust;
 			DustPrevention = true;
 		}
-		internal Random _Rand;
+		internal Random Rand;
 		public TransactionBuilder(int seed)
 		{
-			_Rand = new Random(seed);
+			Rand = new Random(seed);
 			CoinSelector = new DefaultCoinSelector(seed);
 			ColoredDust = Money.Dust;
 			DustPrevention = true;
@@ -419,24 +417,24 @@ namespace ChainUtils
 			set;
 		}
 
-		LockTime? _LockTime;
+		LockTime? _lockTime;
 		public TransactionBuilder SetLockTime(LockTime lockTime)
 		{
-			_LockTime = lockTime;
+			_lockTime = lockTime;
 			return this;
 		}
 
-		List<Key> _Keys = new List<Key>();
+		List<Key> _keys = new List<Key>();
 
 		public TransactionBuilder AddKeys(params ISecret[] keys)
 		{
-			_Keys.AddRange(keys.Select(k => k.PrivateKey));
+			_keys.AddRange(keys.Select(k => k.PrivateKey));
 			return this;
 		}
 
 		public TransactionBuilder AddKeys(params Key[] keys)
 		{
-			_Keys.AddRange(keys);
+			_keys.AddRange(keys);
 			return this;
 		}
 
@@ -488,8 +486,8 @@ namespace ChainUtils
 
 		public TransactionBuilder Shuffle()
 		{
-			DefaultCoinSelector.Shuffle(_BuilderGroups, _Rand);
-			foreach(var group in _BuilderGroups)
+			DefaultCoinSelector.Shuffle(_builderGroups, Rand);
+			foreach(var group in _builderGroups)
 				group.Shuffle();
 			return this;
 		}
@@ -538,17 +536,17 @@ namespace ChainUtils
 		}
 
 
-		string _OpReturnUser;
+		string _opReturnUser;
 		private void AssertOpReturn(string name)
 		{
-			if(_OpReturnUser == null)
+			if(_opReturnUser == null)
 			{
-				_OpReturnUser = name;
+				_opReturnUser = name;
 			}
 			else
 			{
-				if(_OpReturnUser != name)
-					throw new InvalidOperationException("Op return already used for " + _OpReturnUser);
+				if(_opReturnUser != name)
+					throw new InvalidOperationException("Op return already used for " + _opReturnUser);
 			}
 		}
 
@@ -557,10 +555,10 @@ namespace ChainUtils
 			if(amount < Money.Zero)
 				throw new ArgumentOutOfRangeException("amount", "amount can't be negative");
 
-			if(_OpReturnUser == null)
-				_OpReturnUser = "Stealth Payment";
+			if(_opReturnUser == null)
+				_opReturnUser = "Stealth Payment";
 			else
-				throw new InvalidOperationException("Op return already used for " + _OpReturnUser);
+				throw new InvalidOperationException("Op return already used for " + _opReturnUser);
 
 			if(DustPrevention && amount < ColoredDust)
 			{
@@ -581,14 +579,14 @@ namespace ChainUtils
 			return IssueAsset(destination.ScriptPubKey, asset);
 		}
 
-		AssetId _IssuedAsset;
+		AssetId _issuedAsset;
 
 		public TransactionBuilder IssueAsset(Script scriptPubKey, Asset asset)
 		{
 			AssertOpReturn("Colored Coin");
-			if(_IssuedAsset == null)
-				_IssuedAsset = asset.Id;
-			else if(_IssuedAsset != asset.Id)
+			if(_issuedAsset == null)
+				_issuedAsset = asset.Id;
+			else if(_issuedAsset != asset.Id)
 				throw new InvalidOperationException("You can issue only one asset type in a transaction");
 
 			CurrentGroup.IssuanceBuilders.Add(ctx =>
@@ -624,10 +622,10 @@ namespace ChainUtils
 			return this;
 		}
 
-		public TransactionBuilder SendEstimatedFees(Money feesPerKB)
+		public TransactionBuilder SendEstimatedFees(Money feesPerKb)
 		{
 			var tx = BuildTransaction(false);
-			var fees = EstimateFees(tx, feesPerKB);
+			var fees = EstimateFees(tx, feesPerKb);
 			SendFees(fees);
 			return this;
 		}
@@ -641,10 +639,10 @@ namespace ChainUtils
 		/// </summary>
 		/// <param name="fees"></param>
 		/// <returns></returns>
-		public TransactionBuilder SendEstimatedFeesSplit(Money feesPerKB)
+		public TransactionBuilder SendEstimatedFeesSplit(Money feesPerKb)
 		{
 			var tx = BuildTransaction(false);
-			var fees = EstimateFees(tx, feesPerKB);
+			var fees = EstimateFees(tx, feesPerKb);
 			return SendFeesSplit(fees);
 		}
 		public TransactionBuilder SendEstimatedFeesSplit()
@@ -660,8 +658,8 @@ namespace ChainUtils
 		{
 			if(fees == null)
 				throw new ArgumentNullException("fees");
-			var perGroup = fees / _BuilderGroups.Count;
-			foreach(var group in _BuilderGroups)
+			var perGroup = fees / _builderGroups.Count;
+			foreach(var group in _builderGroups)
 			{
 				group.Builders.Add(ctx => perGroup);
 			}
@@ -700,12 +698,12 @@ namespace ChainUtils
 		}
 		public Transaction BuildTransaction(bool sign, SigHash sigHash)
 		{
-			TransactionBuildingContext ctx = new TransactionBuildingContext(this);
-			if(_CompletedTransaction != null)
-				ctx.Transaction = _CompletedTransaction;
-			if(_LockTime != null && _LockTime.HasValue)
-				ctx.Transaction.LockTime = _LockTime.Value;
-			foreach(var group in _BuilderGroups)
+			var ctx = new TransactionBuildingContext(this);
+			if(_completedTransaction != null)
+				ctx.Transaction = _completedTransaction;
+			if(_lockTime != null && _lockTime.HasValue)
+				ctx.Transaction.LockTime = _lockTime.Value;
+			foreach(var group in _builderGroups)
 			{
 				ctx.Group = group;
 				ctx.AdditionalBuilders.Clear();
@@ -785,7 +783,7 @@ namespace ChainUtils
 				var input = ctx.Transaction.Inputs.FirstOrDefault(i => i.PrevOut == coin.Outpoint);
 				if(input == null)
 					input = ctx.Transaction.AddInput(new TxIn(coin.Outpoint));
-				if(_LockTime != null && _LockTime.HasValue && !ctx.NonFinalSequenceSet)
+				if(_lockTime != null && _lockTime.HasValue && !ctx.NonFinalSequenceSet)
 				{
 					input.Sequence = 0;
 					ctx.NonFinalSequenceSet = true;
@@ -811,7 +809,7 @@ namespace ChainUtils
 		}
 		public Transaction SignTransactionInPlace(Transaction transaction, SigHash sigHash)
 		{
-			TransactionSigningContext ctx = new TransactionSigningContext(this, transaction);
+			var ctx = new TransactionSigningContext(this, transaction);
 			ctx.SigHash = sigHash;
 			foreach(var input in transaction.Inputs.AsIndexedInputs())
 			{
@@ -839,10 +837,10 @@ namespace ChainUtils
 				{
 					var expectedId = PayToScriptHashTemplate.Instance.ExtractScriptPubKeyParameters(coin.TxOut.ScriptPubKey);
 					//Try to extract redeem from this transaction
-					var p2shParams = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(txIn.ScriptSig, coin.TxOut.ScriptPubKey);
-					if(p2shParams == null || p2shParams.RedeemScript.Hash != expectedId)
+					var p2ShParams = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(txIn.ScriptSig, coin.TxOut.ScriptPubKey);
+					if(p2ShParams == null || p2ShParams.RedeemScript.Hash != expectedId)
 					{
-						var redeem = _ScriptIdToRedeem.TryGet(expectedId);
+						var redeem = _scriptIdToRedeem.TryGet(expectedId);
 						if(redeem == null)
 							return null;
 						//throw new InvalidOperationException("A coin with a P2SH scriptPubKey was detected, however this coin is not a ScriptCoin, and no information about the redeem script was found in the input, and from the KnownRedeems");
@@ -851,7 +849,7 @@ namespace ChainUtils
 					}
 					else
 					{
-						return ((Coin)coin).ToScriptCoin(p2shParams.RedeemScript);
+						return ((Coin)coin).ToScriptCoin(p2ShParams.RedeemScript);
 					}
 				}
 			}
@@ -860,7 +858,7 @@ namespace ChainUtils
 
 		public bool Verify(Transaction tx, Money expectedFees = null)
 		{
-			Money spent = Money.Zero;
+			var spent = Money.Zero;
 			foreach(var input in tx.Inputs.AsIndexedInputs())
 			{
 				var duplicates = tx.Inputs.Where(_ => _.PrevOut == input.PrevOut).Count();
@@ -896,7 +894,7 @@ namespace ChainUtils
 
 		public ICoin FindCoin(OutPoint outPoint)
 		{
-			var result = _BuilderGroups.Select(c => c.Coins.TryGet(outPoint)).Where(r => r != null).FirstOrDefault();
+			var result = _builderGroups.Select(c => c.Coins.TryGet(outPoint)).Where(r => r != null).FirstOrDefault();
 			if(result == null && CoinFinder != null)
 				result = CoinFinder(outPoint);
 			return result;
@@ -910,8 +908,8 @@ namespace ChainUtils
 			clone.Inputs.Clear();
 			var baseSize = clone.ToBytes().Length;
 
-			int inputSize = 0;
-			for(int i = 0 ; i < tx.Inputs.Count ; i++)
+			var inputSize = 0;
+			for(var i = 0 ; i < tx.Inputs.Count ; i++)
 			{
 				var txin = tx.Inputs[i];
 				var coin = FindCoin(txin.PrevOut);
@@ -923,14 +921,14 @@ namespace ChainUtils
 			return baseSize + inputSize;
 		}
 
-		static PubKey DummyPubKey = new PubKey(Encoders.Hex.DecodeData("022c2b9e61169fb1b1f2f3ff15ad52a21745e268d358ba821d36da7d7cd92dee0e"));
-		static TransactionSignature DummySignature = new TransactionSignature(Encoders.Hex.DecodeData("3045022100b9d685584f46554977343009c04b3091e768c23884fa8d2ce2fb59e5290aa45302203b2d49201c7f695f434a597342eb32dfd81137014fcfb3bb5edc7a19c77774d201"));
+		static PubKey _dummyPubKey = new PubKey(Encoders.Hex.DecodeData("022c2b9e61169fb1b1f2f3ff15ad52a21745e268d358ba821d36da7d7cd92dee0e"));
+		static TransactionSignature _dummySignature = new TransactionSignature(Encoders.Hex.DecodeData("3045022100b9d685584f46554977343009c04b3091e768c23884fa8d2ce2fb59e5290aa45302203b2d49201c7f695f434a597342eb32dfd81137014fcfb3bb5edc7a19c77774d201"));
 		private int EstimateScriptSigSize(ICoin coin)
 		{
 			if(coin is IColoredCoin)
 				coin = ((IColoredCoin)coin).Bearer;
 
-			int size = 0;
+			var size = 0;
 			if(coin is ScriptCoin)
 			{
 				var scriptCoin = (ScriptCoin)coin;
@@ -938,24 +936,24 @@ namespace ChainUtils
 				size += new Script(Op.GetPushOp(scriptCoin.Redeem.ToBytes(true))).Length;
 			}
 
-			var p2pk = PayToPubkeyTemplate.Instance.ExtractScriptPubKeyParameters(coin.TxOut.ScriptPubKey);
-			if(p2pk != null)
+			var p2Pk = PayToPubkeyTemplate.Instance.ExtractScriptPubKeyParameters(coin.TxOut.ScriptPubKey);
+			if(p2Pk != null)
 			{
-				size += PayToPubkeyTemplate.Instance.GenerateScriptSig(DummySignature).Length;
+				size += PayToPubkeyTemplate.Instance.GenerateScriptSig(_dummySignature).Length;
 				return size;
 			}
 
-			var p2pkh = PayToPubkeyHashTemplate.Instance.ExtractScriptPubKeyParameters(coin.TxOut.ScriptPubKey);
-			if(p2pkh != null)
+			var p2Pkh = PayToPubkeyHashTemplate.Instance.ExtractScriptPubKeyParameters(coin.TxOut.ScriptPubKey);
+			if(p2Pkh != null)
 			{
-				size += PayToPubkeyHashTemplate.Instance.GenerateScriptSig(DummySignature, DummyPubKey).Length;
+				size += PayToPubkeyHashTemplate.Instance.GenerateScriptSig(_dummySignature, _dummyPubKey).Length;
 				return size;
 			}
 
-			var p2mk = PayToMultiSigTemplate.Instance.ExtractScriptPubKeyParameters(coin.TxOut.ScriptPubKey);
-			if(p2mk != null)
+			var p2Mk = PayToMultiSigTemplate.Instance.ExtractScriptPubKeyParameters(coin.TxOut.ScriptPubKey);
+			if(p2Mk != null)
 			{
-				size += PayToMultiSigTemplate.Instance.GenerateScriptSig(Enumerable.Range(0, p2mk.SignatureCount).Select(o => DummySignature).ToArray()).Length;
+				size += PayToMultiSigTemplate.Instance.GenerateScriptSig(Enumerable.Range(0, p2Mk.SignatureCount).Select(o => _dummySignature).ToArray()).Length;
 				return size;
 			}
 
@@ -968,13 +966,13 @@ namespace ChainUtils
 		/// </summary>
 		/// <param name="tx"></param>
 		/// <returns></returns>
-		public Money EstimateFees(Transaction tx, Money feesPerKB)
+		public Money EstimateFees(Transaction tx, Money feesPerKb)
 		{
-			if(feesPerKB == null)
-				feesPerKB = Money.Satoshis(10000);
+			if(feesPerKb == null)
+				feesPerKb = Money.Satoshis(10000);
 			var len = EstimateSize(tx);
-			long nBaseFee = feesPerKB.Satoshi;
-			long nMinFee = (1 + (long)len / 1000) * nBaseFee;
+			var nBaseFee = feesPerKb.Satoshi;
+			var nMinFee = (1 + (long)len / 1000) * nBaseFee;
 			return new Money(nMinFee);
 		}
 		/// <summary>
@@ -1042,7 +1040,7 @@ namespace ChainUtils
 					ops.RemoveAt(ops.Count - 1);
 					alreadySigned = PayToMultiSigTemplate.Instance.ExtractScriptSigParameters(new Script(ops));
 				}
-				List<TransactionSignature> signatures = new List<TransactionSignature>();
+				var signatures = new List<TransactionSignature>();
 				if(alreadySigned != null)
 				{
 					signatures.AddRange(alreadySigned);
@@ -1053,8 +1051,8 @@ namespace ChainUtils
 					.Select(p => FindKey(ctx, p))
 					.ToArray();
 
-				int sigCount = signatures.Where(s => s != TransactionSignature.Empty && s != null).Count();
-				for(int i = 0 ; i < keys.Length ; i++)
+				var sigCount = signatures.Where(s => s != TransactionSignature.Empty && s != null).Count();
+				for(var i = 0 ; i < keys.Length ; i++)
 				{
 					if(sigCount == multiSigParams.SignatureCount)
 						break;
@@ -1096,21 +1094,21 @@ namespace ChainUtils
 
 		private Key FindKey(TransactionSigningContext ctx, TxDestination id)
 		{
-			return _Keys
+			return _keys
 					.Concat(ctx.AdditionalKeys)
 					.FirstOrDefault(k => k.PubKey.Hash == id);
 		}
 
 		private Key FindKey(TransactionSigningContext ctx, PubKey pubKey)
 		{
-			return _Keys
+			return _keys
 				.Concat(ctx.AdditionalKeys)
 				.FirstOrDefault(k => k.PubKey == pubKey);
 		}
 
 		public TransactionBuilder Then()
 		{
-			_CurrentGroup = null;
+			_currentGroup = null;
 			return this;
 		}
 
@@ -1126,7 +1124,7 @@ namespace ChainUtils
 		}
 
 
-		Transaction _CompletedTransaction;
+		Transaction _completedTransaction;
 
 		/// <summary>
 		/// Allows to keep building on the top of a partially built transaction
@@ -1135,9 +1133,9 @@ namespace ChainUtils
 		/// <returns></returns>
 		public TransactionBuilder ContinueToBuild(Transaction transaction)
 		{
-			if(_CompletedTransaction != null)
+			if(_completedTransaction != null)
 				throw new InvalidOperationException("Transaction to complete already set");
-			_CompletedTransaction = transaction.Clone();
+			_completedTransaction = transaction.Clone();
 			return this;
 		}
 
@@ -1147,10 +1145,10 @@ namespace ChainUtils
 		/// <returns></returns>
 		public TransactionBuilder CoverTheRest()
 		{
-			if(_CompletedTransaction == null)
+			if(_completedTransaction == null)
 				throw new InvalidOperationException("A partially built transaction should be specified by calling ContinueToBuild");
 
-			var spent = _CompletedTransaction.Inputs.Select(txin =>
+			var spent = _completedTransaction.Inputs.Select(txin =>
 			{
 				var c = FindCoin(txin.PrevOut);
 				if(c == null)
@@ -1163,7 +1161,7 @@ namespace ChainUtils
 					.Select(c => c.Amount)
 					.Sum();
 
-			var toComplete = _CompletedTransaction.TotalOut - spent;
+			var toComplete = _completedTransaction.TotalOut - spent;
 			CurrentGroup.Builders.Add(ctx =>
 			{
 				if(toComplete < Money.Zero)
@@ -1180,12 +1178,12 @@ namespace ChainUtils
 			return this;
 		}
 
-		Dictionary<ScriptId, Script> _ScriptIdToRedeem = new Dictionary<ScriptId, Script>();
+		Dictionary<ScriptId, Script> _scriptIdToRedeem = new Dictionary<ScriptId, Script>();
 		public TransactionBuilder AddKnownRedeems(params Script[] knownRedeems)
 		{
 			foreach(var redeem in knownRedeems)
 			{
-				_ScriptIdToRedeem.AddOrReplace(redeem.Hash, redeem);
+				_scriptIdToRedeem.AddOrReplace(redeem.Hash, redeem);
 			}
 			return this;
 		}
@@ -1197,8 +1195,8 @@ namespace ChainUtils
 			if(transactions.Length == 0)
 				return null;
 
-			Transaction tx = transactions[0].Clone();
-			for(int i = 1 ; i < transactions.Length ; i++)
+			var tx = transactions[0].Clone();
+			for(var i = 1 ; i < transactions.Length ; i++)
 			{
 				var signed = transactions[i];
 				tx = CombineSignaturesCore(tx, signed);
@@ -1213,7 +1211,7 @@ namespace ChainUtils
 			if(signed2 == null)
 				return signed1;
 			var tx = signed1.Clone();
-			for(int i = 0 ; i < tx.Inputs.Count ; i++)
+			for(var i = 0 ; i < tx.Inputs.Count ; i++)
 			{
 				if(i >= signed2.Inputs.Count)
 					break;
@@ -1236,15 +1234,15 @@ namespace ChainUtils
 
 		private Script DeduceScriptPubKey(Script scriptSig)
 		{
-			var p2pkh = PayToPubkeyHashTemplate.Instance.ExtractScriptSigParameters(scriptSig);
-			if(p2pkh != null && p2pkh.PublicKey != null)
+			var p2Pkh = PayToPubkeyHashTemplate.Instance.ExtractScriptSigParameters(scriptSig);
+			if(p2Pkh != null && p2Pkh.PublicKey != null)
 			{
-				return p2pkh.PublicKey.Hash.ScriptPubKey;
+				return p2Pkh.PublicKey.Hash.ScriptPubKey;
 			}
-			var p2sh = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(scriptSig);
-			if(p2sh != null && p2sh.RedeemScript != null)
+			var p2Sh = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(scriptSig);
+			if(p2Sh != null && p2Sh.RedeemScript != null)
 			{
-				return p2sh.RedeemScript.Hash.ScriptPubKey;
+				return p2Sh.RedeemScript.Hash.ScriptPubKey;
 			}
 			return null;
 		}

@@ -1,36 +1,33 @@
-﻿using ChainUtils.DataEncoders;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils
 {
 	public abstract class Base58Data
 	{
-		protected byte[] vchData = new byte[0];
-		protected byte[] vchVersion = new byte[0];
-		protected string wifData = "";
-		private Network _Network;
+		protected byte[] VchData = new byte[0];
+		protected byte[] VchVersion = new byte[0];
+		protected string WifData = "";
+		private Network _network;
 		public Network Network
 		{
 			get
 			{
-				return _Network;
+				return _network;
 			}
 		}
 
 		public Base58Data(string base64, Network expectedNetwork = null)
 		{
-			_Network = expectedNetwork;
+			_network = expectedNetwork;
 			SetString(base64);
 		}
 		public Base58Data(byte[] rawBytes, Network network)
 		{
 			if(network == null)
 				throw new ArgumentNullException("network");
-			_Network = network;
+			_network = network;
 			SetData(rawBytes);
 		}
 
@@ -41,38 +38,38 @@ namespace ChainUtils
 
 		private void SetString(string psz)
 		{
-			if(_Network == null)
+			if(_network == null)
 			{
-				_Network = Network.GetNetworkFromBase58Data(psz);
-				if(_Network == null)
-					throw new FormatException("Invalid " + this.GetType().Name);
+				_network = Network.GetNetworkFromBase58Data(psz);
+				if(_network == null)
+					throw new FormatException("Invalid " + GetType().Name);
 			}
 
-			byte[] vchTemp = Encoders.Base58Check.DecodeData(psz);
-			var expectedVersion = _Network.GetVersionBytes(Type);
+			var vchTemp = Encoders.Base58Check.DecodeData(psz);
+			var expectedVersion = _network.GetVersionBytes(Type);
 
 
-			vchVersion = vchTemp.Take((int)expectedVersion.Length).ToArray();
-			if(!Utils.ArrayEqual(vchVersion, expectedVersion))
+			VchVersion = vchTemp.Take((int)expectedVersion.Length).ToArray();
+			if(!Utils.ArrayEqual(VchVersion, expectedVersion))
 				throw new FormatException("The version prefix does not match the expected one " + String.Join(",", expectedVersion));
 
-			vchData = vchTemp.Skip((int)expectedVersion.Length).ToArray();
-			wifData = psz;
+			VchData = vchTemp.Skip((int)expectedVersion.Length).ToArray();
+			WifData = psz;
 
 			if(!IsValid)
-				throw new FormatException("Invalid " + this.GetType().Name);
+				throw new FormatException("Invalid " + GetType().Name);
 
 		}
 
 
 		private void SetData(byte[] vchData)
 		{
-			this.vchData = vchData;
-			this.vchVersion = _Network.GetVersionBytes(Type);
-			wifData = Encoders.Base58Check.EncodeData(vchVersion.Concat(vchData).ToArray());
+			this.VchData = vchData;
+			VchVersion = _network.GetVersionBytes(Type);
+			WifData = Encoders.Base58Check.EncodeData(VchVersion.Concat(vchData).ToArray());
 
 			if(!IsValid)
-				throw new FormatException("Invalid " + this.GetType().Name);
+				throw new FormatException("Invalid " + GetType().Name);
 		}
 
 
@@ -93,27 +90,27 @@ namespace ChainUtils
 
 		public string ToWif()
 		{
-			return wifData;
+			return WifData;
 		}
 		public byte[] ToBytes()
 		{
-			return vchData.ToArray();
+			return VchData.ToArray();
 		}
 		public override string ToString()
 		{
-			return wifData;
+			return WifData;
 		}
 
 		public override bool Equals(object obj)
 		{
-			Base58Data item = obj as Base58Data;
+			var item = obj as Base58Data;
 			if(item == null)
 				return false;
 			return ToString().Equals(item.ToString());
 		}
 		public static bool operator ==(Base58Data a, Base58Data b)
 		{
-			if(System.Object.ReferenceEquals(a, b))
+			if(ReferenceEquals(a, b))
 				return true;
 			if(((object)a == null) || ((object)b == null))
 				return false;

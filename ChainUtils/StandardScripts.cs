@@ -1,16 +1,12 @@
-﻿using ChainUtils.BitcoinCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using ChainUtils.BitcoinCore;
 
 namespace ChainUtils
 {
 
 	public static class StandardScripts
 	{
-		static readonly ScriptTemplate[] _StandardTemplates = new ScriptTemplate[] 
+		static readonly ScriptTemplate[] StandardTemplates = new ScriptTemplate[] 
 		{
 			PayToPubkeyHashTemplate.Instance, 
 			PayToPubkeyTemplate.Instance,
@@ -35,7 +31,7 @@ namespace ChainUtils
 
 		public static bool IsStandardTransaction(Transaction tx)
 		{
-			if(tx.Version > Transaction.CURRENT_VERSION || tx.Version < 1)
+			if(tx.Version > Transaction.CurrentVersion || tx.Version < 1)
 			{
 				return false;
 			}
@@ -66,12 +62,12 @@ namespace ChainUtils
 			// almost as much to process as they cost the sender in fees, because
 			// computing signature hashes is O(ninputs*txsize). Limiting transactions
 			// to MAX_STANDARD_TX_SIZE mitigates CPU exhaustion attacks.
-			int sz = tx.GetSerializedSize();
-			if(sz >= Transaction.MAX_STANDARD_TX_SIZE)
+			var sz = tx.GetSerializedSize();
+			if(sz >= Transaction.MaxStandardTxSize)
 				return false;
 
 
-			foreach(TxIn txin in tx.Inputs)
+			foreach(var txin in tx.Inputs)
 			{
 				// Biggest 'standard' txin is a 15-of-15 P2SH multisig with compressed
 				// keys. (remember the 520 byte limit on redeemScript size) That works
@@ -95,13 +91,13 @@ namespace ChainUtils
 			}
 
 			uint nDataOut = 0;
-			foreach(TxOut txout in tx.Outputs)
+			foreach(var txout in tx.Outputs)
 			{
-				var template = StandardScripts.GetTemplateFromScriptPubKey(txout.ScriptPubKey);
+				var template = GetTemplateFromScriptPubKey(txout.ScriptPubKey);
 				if(template == null)
 					return false;
 
-				if(template.Type == TxOutType.TX_NULL_DATA)
+				if(template.Type == TxOutType.TxNullData)
 					nDataOut++;
 				else if(txout.IsDust)
 					return false;
@@ -122,12 +118,12 @@ namespace ChainUtils
 
 		public static ScriptTemplate GetTemplateFromScriptPubKey(Script script)
 		{
-			return _StandardTemplates.FirstOrDefault(t => t.CheckScriptPubKey(script));
+			return StandardTemplates.FirstOrDefault(t => t.CheckScriptPubKey(script));
 		}
 
 		public static bool IsStandardScriptPubKey(Script scriptPubKey)
 		{
-			return _StandardTemplates.Any(template => template.CheckScriptPubKey(scriptPubKey));
+			return StandardTemplates.Any(template => template.CheckScriptPubKey(scriptPubKey));
 		}
 		private static bool IsStandardScriptSig(Script scriptSig, Script scriptPubKey)
 		{
@@ -154,9 +150,9 @@ namespace ChainUtils
 			if(tx.IsCoinBase)
 				return true; // Coinbases don't use vin normally
 
-			for(int i = 0 ; i < tx.Inputs.Count ; i++)
+			for(var i = 0 ; i < tx.Inputs.Count ; i++)
 			{
-				TxOut prev = coinsView.GetOutputFor(tx.Inputs[i]);
+				var prev = coinsView.GetOutputFor(tx.Inputs[i]);
 				if(prev == null)
 					return false;
 				if(!IsStandardScriptSig(tx.Inputs[i].ScriptSig, prev.ScriptPubKey))

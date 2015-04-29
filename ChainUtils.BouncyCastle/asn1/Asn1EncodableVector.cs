@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -13,7 +12,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		public static Asn1EncodableVector FromEnumerable(
 			IEnumerable e)
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 			foreach (Asn1Encodable obj in e)
 			{
 				v.Add(obj);
@@ -40,7 +39,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		public void Add(
 			params Asn1Encodable[] objs)
 		{
-			foreach (Asn1Encodable obj in objs)
+			foreach (var obj in objs)
 			{
 				v.Add(obj);
 			}
@@ -51,7 +50,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		{
 			if (objs != null)
 			{
-				foreach (Asn1Encodable obj in objs)
+				foreach (var obj in objs)
 				{
 					if (obj != null)
 					{

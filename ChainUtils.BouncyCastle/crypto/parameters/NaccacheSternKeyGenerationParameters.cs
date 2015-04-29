@@ -1,7 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
-using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters

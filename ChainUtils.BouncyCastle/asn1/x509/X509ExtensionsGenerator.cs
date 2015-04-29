@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
@@ -40,7 +39,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 				throw new ArgumentException("error encoding value: " + e);
 			}
 
-			this.AddExtension(oid, critical, encoded);
+			AddExtension(oid, critical, encoded);
 		}
 
 		/// <summary>

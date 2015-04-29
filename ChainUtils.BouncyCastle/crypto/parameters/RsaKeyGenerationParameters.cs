@@ -1,6 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
 
@@ -36,7 +33,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 		public override bool Equals(
 			object obj)
 		{
-			RsaKeyGenerationParameters other = obj as RsaKeyGenerationParameters;
+			var other = obj as RsaKeyGenerationParameters;
 
 			if (other == null)
 			{

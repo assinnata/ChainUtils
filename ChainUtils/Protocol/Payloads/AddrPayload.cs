@@ -1,21 +1,17 @@
 ﻿#if !NOSOCKET
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Protocol
 {
 	[Payload("addr")]
 	public class AddrPayload : Payload, IBitcoinSerializable
 	{
-		NetworkAddress[] addr_list = new NetworkAddress[0];
+		NetworkAddress[] _addrList = new NetworkAddress[0];
 		public NetworkAddress[] Addresses
 		{
 			get
 			{
-				return addr_list;
+				return _addrList;
 			}
 		}
 
@@ -25,18 +21,18 @@ namespace ChainUtils.Protocol
 		}
 		public AddrPayload(NetworkAddress address)
 		{
-			addr_list = new NetworkAddress[] { address };
+			_addrList = new[] { address };
 		}
 		public AddrPayload(NetworkAddress[] addresses)
 		{
-			addr_list = addresses.ToArray();
+			_addrList = addresses.ToArray();
 		}
 
 		#region IBitcoinSerializable Members
 
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref addr_list);
+			stream.ReadWrite(ref _addrList);
 		}
 
 		#endregion

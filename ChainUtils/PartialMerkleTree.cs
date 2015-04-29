@@ -1,47 +1,44 @@
-﻿using ChainUtils.Crypto;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public class PartialMerkleTree : IBitcoinSerializable
 	{
-		uint _TransactionCount;
+		uint _transactionCount;
 		public uint TransactionCount
 		{
 			get
 			{
-				return _TransactionCount;
+				return _transactionCount;
 			}
 			set
 			{
-				_TransactionCount = value;
+				_transactionCount = value;
 			}
 		}
 
-		List<uint256> _Hashes = new List<uint256>();
-		public List<uint256> Hashes
+		List<Uint256> _hashes = new List<Uint256>();
+		public List<Uint256> Hashes
 		{
 			get
 			{
-				return _Hashes;
+				return _hashes;
 			}
 		}
 
-		BitArray _Flags = new BitArray(0);
+		BitArray _flags = new BitArray(0);
 		public BitArray Flags
 		{
 			get
 			{
-				return _Flags;
+				return _flags;
 			}
 			set
 			{
-				_Flags = value;
+				_flags = value;
 			}
 		}
 
@@ -50,23 +47,23 @@ namespace ChainUtils
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref _TransactionCount);
-			stream.ReadWrite(ref _Hashes);
+			stream.ReadWrite(ref _transactionCount);
+			stream.ReadWrite(ref _hashes);
 			byte[] vBytes = null;
 			if(!stream.Serializing)
 			{
 				stream.ReadWriteAsVarString(ref vBytes);
-				BitWriter writer = new BitWriter();
-				for(int p = 0 ; p < vBytes.Length * 8 ; p++)
+				var writer = new BitWriter();
+				for(var p = 0 ; p < vBytes.Length * 8 ; p++)
 					writer.Write((vBytes[p / 8] & (1 << (p % 8))) != 0);
 
 
 			}
 			else
 			{
-				vBytes = new byte[(_Flags.Length + 7) / 8];
-				for(int p = 0 ; p < _Flags.Length ; p++)
-					vBytes[p / 8] |= (byte)(ToByte(_Flags.Get(p)) << (p % 8));
+				vBytes = new byte[(_flags.Length + 7) / 8];
+				for(var p = 0 ; p < _flags.Length ; p++)
+					vBytes[p / 8] |= (byte)(ToByte(_flags.Get(p)) << (p % 8));
 				stream.ReadWriteAsVarString(ref vBytes);
 			}
 		}
@@ -78,14 +75,14 @@ namespace ChainUtils
 
 		#endregion
 
-		public PartialMerkleTree(uint256[] vTxid, bool[] vMatch)
+		public PartialMerkleTree(Uint256[] vTxid, bool[] vMatch)
 		{
 			if(vMatch.Length != vTxid.Length)
 				throw new ArgumentException("The size of the array of txid and matches is different");
 			TransactionCount = (uint)vTxid.Length;
 
-			MerkleNode root = MerkleNode.GetRoot(vTxid);
-			BitWriter flags = new BitWriter();
+			var root = MerkleNode.GetRoot(vTxid);
+			var flags = new BitWriter();
 
 			MarkNodes(root, vMatch);
 			BuildCore(root, flags);
@@ -95,7 +92,7 @@ namespace ChainUtils
 
 		private static void MarkNodes(MerkleNode root, bool[] vMatch)
 		{
-			BitReader matches = new BitReader(new BitArray(vMatch));
+			var matches = new BitReader(new BitArray(vMatch));
 			foreach(var leaf in root.GetLeafs())
 			{
 				if(matches.Read())
@@ -111,13 +108,13 @@ namespace ChainUtils
 
 		public MerkleNode GetMerkleRoot()
 		{
-			MerkleNode node = MerkleNode.GetRoot((int)TransactionCount);
-			BitReader flags = new BitReader(Flags);
+			var node = MerkleNode.GetRoot((int)TransactionCount);
+			var flags = new BitReader(Flags);
 			var hashes = Hashes.GetEnumerator();
 			GetMatchedTransactionsCore(node, flags, hashes, true).AsEnumerable();
 			return node;
 		}
-		public bool Check(uint256 expectedMerkleRootHash = null)
+		public bool Check(Uint256 expectedMerkleRootHash = null)
 		{
 			try
 			{
@@ -147,18 +144,18 @@ namespace ChainUtils
 			}
 		}
 
-		public IEnumerable<uint256> GetMatchedTransactions()
+		public IEnumerable<Uint256> GetMatchedTransactions()
 		{
-			BitReader flags = new BitReader(Flags);
-			MerkleNode root = MerkleNode.GetRoot((int)TransactionCount);
+			var flags = new BitReader(Flags);
+			var root = MerkleNode.GetRoot((int)TransactionCount);
 			var hashes = Hashes.GetEnumerator();
 			return GetMatchedTransactionsCore(root, flags, hashes, false);
 		}
 
-		private IEnumerable<uint256> GetMatchedTransactionsCore(MerkleNode node, BitReader flags, IEnumerator<uint256> hashes, bool calculateHash)
+		private IEnumerable<Uint256> GetMatchedTransactionsCore(MerkleNode node, BitReader flags, IEnumerator<Uint256> hashes, bool calculateHash)
 		{
 			if(node == null)
-				return new uint256[0];
+				return new Uint256[0];
 			node.IsMarked = flags.Read();
 
 			if(node.IsLeaf || !node.IsMarked)
@@ -167,9 +164,9 @@ namespace ChainUtils
 				node.Hash = hashes.Current;
 			}
 			if(!node.IsMarked)
-				return new uint256[0];
+				return new Uint256[0];
 			if(node.IsLeaf)
-				return new uint256[] { node.Hash };
+				return new[] { node.Hash };
 			var left = GetMatchedTransactionsCore(node.Left, flags, hashes, calculateHash);
 			var right = GetMatchedTransactionsCore(node.Right, flags, hashes, calculateHash);
 			if(calculateHash)

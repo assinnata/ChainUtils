@@ -1,8 +1,3 @@
-using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
     public class EnvelopedData
@@ -20,7 +15,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             EncryptedContentInfo	encryptedContentInfo,
             Asn1Set					unprotectedAttrs)
         {
-            this.version = new DerInteger(CalculateVersion(originatorInfo, recipientInfos, unprotectedAttrs));
+            version = new DerInteger(CalculateVersion(originatorInfo, recipientInfos, unprotectedAttrs));
             this.originatorInfo = originatorInfo;
             this.recipientInfos = recipientInfos;
             this.encryptedContentInfo = encryptedContentInfo;
@@ -33,7 +28,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             EncryptedContentInfo encryptedContentInfo,
             Attributes unprotectedAttrs)
         {
-            this.version = new DerInteger(CalculateVersion(originatorInfo, recipientInfos, Asn1Set.GetInstance(unprotectedAttrs)));
+            version = new DerInteger(CalculateVersion(originatorInfo, recipientInfos, Asn1Set.GetInstance(unprotectedAttrs)));
             this.originatorInfo = originatorInfo;
             this.recipientInfos = recipientInfos;
             this.encryptedContentInfo = encryptedContentInfo;
@@ -43,7 +38,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         public EnvelopedData(
             Asn1Sequence seq)
         {
-            int index = 0;
+            var index = 0;
 
             version = (DerInteger) seq[index++];
 
@@ -135,7 +130,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(version);
+            var v = new Asn1EncodableVector(version);
 
             if (originatorInfo != null)
             {
@@ -159,9 +154,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
                 return 2;
             }
 
-            foreach (object o in recipientInfos)
+            foreach (var o in recipientInfos)
             {
-                RecipientInfo ri = RecipientInfo.GetInstance(o);
+                var ri = RecipientInfo.GetInstance(o);
 
                 if (ri.Version.Value.IntValue != 0)
                 {

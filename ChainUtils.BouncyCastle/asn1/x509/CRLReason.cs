@@ -53,8 +53,8 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 		public override string ToString()
 		{
-			int reason = Value.IntValue;
-			string str = (reason < 0 || reason > 10) ? "Invalid" : ReasonString[reason];
+			var reason = Value.IntValue;
+			var str = (reason < 0 || reason > 10) ? "Invalid" : ReasonString[reason];
 			return "CrlReason: " + str;
 		}    
 	}

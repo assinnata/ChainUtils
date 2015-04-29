@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChainUtils.BouncyCastle.Math.EC.Endo
+﻿namespace ChainUtils.BouncyCastle.Math.EC.Endo
 {
     public class GlvTypeBParameters
     {
@@ -13,13 +11,13 @@ namespace ChainUtils.BouncyCastle.Math.EC.Endo
         public GlvTypeBParameters(BigInteger beta, BigInteger lambda, BigInteger[] v1, BigInteger[] v2,
             BigInteger g1, BigInteger g2, int bits)
         {
-            this.m_beta = beta;
-            this.m_lambda = lambda;
-            this.m_v1 = v1;
-            this.m_v2 = v2;
-            this.m_g1 = g1;
-            this.m_g2 = g2;
-            this.m_bits = bits;
+            m_beta = beta;
+            m_lambda = lambda;
+            m_v1 = v1;
+            m_v2 = v2;
+            m_g1 = g1;
+            m_g2 = g2;
+            m_bits = bits;
         }
 
         public virtual BigInteger Beta

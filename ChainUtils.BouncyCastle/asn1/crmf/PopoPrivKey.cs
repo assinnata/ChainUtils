@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Asn1.Cms;
 
 namespace ChainUtils.BouncyCastle.Asn1.Crmf
@@ -18,7 +17,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Crmf
 
         private PopoPrivKey(Asn1TaggedObject obj)
         {
-            this.tagNo = obj.TagNo;
+            tagNo = obj.TagNo;
 
             switch (tagNo)
             {
@@ -49,8 +48,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Crmf
 
         public PopoPrivKey(SubsequentMessage msg)
         {
-            this.tagNo = subsequentMessage;
-            this.obj = msg;
+            tagNo = subsequentMessage;
+            obj = msg;
         }
 
         public virtual int Type

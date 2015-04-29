@@ -1,7 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto;
-
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
 {
 	public class ParametersWithSBox : ICipherParameters

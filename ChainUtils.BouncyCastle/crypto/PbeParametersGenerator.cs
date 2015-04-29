@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto
@@ -39,9 +38,9 @@ namespace ChainUtils.BouncyCastle.Crypto
             if (salt == null)
                 throw new ArgumentNullException("salt");
 
-            this.mPassword = Arrays.Clone(password);
-            this.mSalt = Arrays.Clone(salt);
-            this.mIterationCount = iterationCount;
+            mPassword = Arrays.Clone(password);
+            mSalt = Arrays.Clone(salt);
+            mIterationCount = iterationCount;
         }
 
         public virtual byte[] Password
@@ -192,7 +191,7 @@ namespace ChainUtils.BouncyCastle.Crypto
             }
 
             // +1 for extra 2 pad bytes.
-            byte[] bytes = new byte[(password.Length + 1) * 2];
+            var bytes = new byte[(password.Length + 1) * 2];
 
             Encoding.BigEndianUnicode.GetBytes(password, 0, password.Length, bytes, 0);
 

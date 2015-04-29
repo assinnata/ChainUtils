@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities.Collections;
 
 namespace ChainUtils.BouncyCastle.Asn1.Esf
@@ -48,12 +47,12 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count < 2 || seq.Count > 3)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.sigPolicyIdentifier = (DerObjectIdentifier) seq[0].ToAsn1Object();
-			this.sigPolicyHash = OtherHashAlgAndValue.GetInstance(seq[1].ToAsn1Object());
+			sigPolicyIdentifier = (DerObjectIdentifier) seq[0].ToAsn1Object();
+			sigPolicyHash = OtherHashAlgAndValue.GetInstance(seq[1].ToAsn1Object());
 
 			if (seq.Count > 2)
 			{
-				this.sigPolicyQualifiers = (Asn1Sequence) seq[2].ToAsn1Object();
+				sigPolicyQualifiers = (Asn1Sequence) seq[2].ToAsn1Object();
 			}
 		}
 
@@ -121,8 +120,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (sigPolicyQualifiers == null)
 				return null;
 
-			SigPolicyQualifierInfo[] infos = new SigPolicyQualifierInfo[sigPolicyQualifiers.Count];
-			for (int i = 0; i < sigPolicyQualifiers.Count; ++i)
+			var infos = new SigPolicyQualifierInfo[sigPolicyQualifiers.Count];
+			for (var i = 0; i < sigPolicyQualifiers.Count; ++i)
 			{
 				infos[i] = SigPolicyQualifierInfo.GetInstance(sigPolicyQualifiers[i]);
 			}
@@ -131,7 +130,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(
+			var v = new Asn1EncodableVector(
 				sigPolicyIdentifier, sigPolicyHash.ToAsn1Object());
 
 			if (sigPolicyQualifiers != null)

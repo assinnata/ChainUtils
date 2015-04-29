@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChainUtils.BouncyCastle.Asn1.Cms
+﻿namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
     public class OtherRevocationInfoFormat
         : Asn1Encodable

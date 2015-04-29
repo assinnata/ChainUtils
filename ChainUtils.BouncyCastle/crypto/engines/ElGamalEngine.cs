@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
@@ -34,19 +33,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		{
 			if (parameters is ParametersWithRandom)
 			{
-				ParametersWithRandom p = (ParametersWithRandom) parameters;
+				var p = (ParametersWithRandom) parameters;
 
-				this.key = (ElGamalKeyParameters) p.Parameters;
-				this.random = p.Random;
+				key = (ElGamalKeyParameters) p.Parameters;
+				random = p.Random;
 			}
 			else
 			{
-				this.key = (ElGamalKeyParameters) parameters;
-				this.random = new SecureRandom();
+				key = (ElGamalKeyParameters) parameters;
+				random = new SecureRandom();
 			}
 
 			this.forEncryption = forEncryption;
-			this.bitSize = key.Parameters.P.BitLength;
+			bitSize = key.Parameters.P.BitLength;
 
 			if (forEncryption)
 			{
@@ -115,41 +114,41 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			if (key == null)
 				throw new InvalidOperationException("ElGamal engine not initialised");
 
-			int maxLength = forEncryption
+			var maxLength = forEncryption
 				?	(bitSize - 1 + 7) / 8
 				:	GetInputBlockSize();
 
 			if (length > maxLength)
 				throw new DataLengthException("input too large for ElGamal cipher.\n");
 
-			BigInteger p = key.Parameters.P;
+			var p = key.Parameters.P;
 
 			byte[] output;
 			if (key is ElGamalPrivateKeyParameters) // decryption
 			{
-				int halfLength = length / 2;
-				BigInteger gamma = new BigInteger(1, input, inOff, halfLength);
-				BigInteger phi = new BigInteger(1, input, inOff + halfLength, halfLength);
+				var halfLength = length / 2;
+				var gamma = new BigInteger(1, input, inOff, halfLength);
+				var phi = new BigInteger(1, input, inOff + halfLength, halfLength);
 
-				ElGamalPrivateKeyParameters priv = (ElGamalPrivateKeyParameters) key;
+				var priv = (ElGamalPrivateKeyParameters) key;
 
 				// a shortcut, which generally relies on p being prime amongst other things.
 				// if a problem with this shows up, check the p and g values!
-				BigInteger m = gamma.ModPow(p.Subtract(BigInteger.One).Subtract(priv.X), p).Multiply(phi).Mod(p);
+				var m = gamma.ModPow(p.Subtract(BigInteger.One).Subtract(priv.X), p).Multiply(phi).Mod(p);
 
 				output = m.ToByteArrayUnsigned();
 			}
 			else // encryption
 			{
-				BigInteger tmp = new BigInteger(1, input, inOff, length);
+				var tmp = new BigInteger(1, input, inOff, length);
 
 				if (tmp.BitLength >= p.BitLength)
 					throw new DataLengthException("input too large for ElGamal cipher.\n");
 
 
-				ElGamalPublicKeyParameters pub = (ElGamalPublicKeyParameters) key;
+				var pub = (ElGamalPublicKeyParameters) key;
 
-				BigInteger pSub2 = p.Subtract(BigInteger.Two);
+				var pSub2 = p.Subtract(BigInteger.Two);
 
 				// TODO In theory, a series of 'k', 'g.ModPow(k, p)' and 'y.ModPow(k, p)' can be pre-calculated
 				BigInteger k;
@@ -159,15 +158,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				}
 				while (k.SignValue == 0 || k.CompareTo(pSub2) > 0);
 
-				BigInteger g = key.Parameters.G;
-				BigInteger gamma = g.ModPow(k, p);
-				BigInteger phi = tmp.Multiply(pub.Y.ModPow(k, p)).Mod(p);
+				var g = key.Parameters.G;
+				var gamma = g.ModPow(k, p);
+				var phi = tmp.Multiply(pub.Y.ModPow(k, p)).Mod(p);
 
-				output = new byte[this.GetOutputBlockSize()];
+				output = new byte[GetOutputBlockSize()];
 
 				// TODO Add methods to allow writing BigInteger to existing byte array?
-				byte[] out1 = gamma.ToByteArrayUnsigned();
-				byte[] out2 = phi.ToByteArrayUnsigned();
+				var out1 = gamma.ToByteArrayUnsigned();
+				var out2 = phi.ToByteArrayUnsigned();
 				out1.CopyTo(output, output.Length / 2 - out1.Length);
 				out2.CopyTo(output, output.Length - out2.Length);
 			}

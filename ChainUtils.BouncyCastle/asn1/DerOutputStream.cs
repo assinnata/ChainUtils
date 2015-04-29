@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Asn1.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -18,8 +17,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 		{
 			if (length > 127)
 			{
-				int size = 1;
-				uint val = (uint) length;
+				var size = 1;
+				var val = (uint) length;
 
 				while ((val >>= 8) != 0)
 				{
@@ -28,7 +27,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 				WriteByte((byte)(size | 0x80));
 
-				for (int i = (size - 1) * 8; i >= 0; i -= 8)
+				for (var i = (size - 1) * 8; i >= 0; i -= 8)
 				{
 					WriteByte((byte)(length >> i));
 				}
@@ -76,8 +75,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 				}
 				else
 				{
-					byte[] stack = new byte[5];
-					int pos = stack.Length;
+					var stack = new byte[5];
+					var pos = stack.Length;
 
 					stack[--pos] = (byte)(tagNo & 0x7F);
 

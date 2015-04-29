@@ -1,6 +1,4 @@
-﻿using System;
-
-using ChainUtils.BouncyCastle.Utilities;
+﻿using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math.Field
 {
@@ -30,7 +28,7 @@ namespace ChainUtils.BouncyCastle.Math.Field
             {
                 return true;
             }
-            GF2Polynomial other = obj as GF2Polynomial;
+            var other = obj as GF2Polynomial;
             if (null == other)
             {
                 return false;

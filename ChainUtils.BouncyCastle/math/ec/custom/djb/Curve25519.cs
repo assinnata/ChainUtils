@@ -1,6 +1,4 @@
-﻿using System;
-
-using ChainUtils.BouncyCastle.Math.EC.Custom.Sec;
+﻿using ChainUtils.BouncyCastle.Math.EC.Custom.Sec;
 using ChainUtils.BouncyCastle.Utilities.Encoders;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
@@ -17,15 +15,15 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
         public Curve25519()
             : base(q)
         {
-            this.m_infinity = new Curve25519Point(this, null, null);
+            m_infinity = new Curve25519Point(this, null, null);
 
-            this.m_a = FromBigInteger(new BigInteger(1,
+            m_a = FromBigInteger(new BigInteger(1,
                 Hex.Decode("2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA984914A144")));
-            this.m_b = FromBigInteger(new BigInteger(1,
+            m_b = FromBigInteger(new BigInteger(1,
                 Hex.Decode("7B425ED097B425ED097B425ED097B425ED097B425ED097B4260B5E9C7710C864")));
-            this.m_order = new BigInteger(1, Hex.Decode("1000000000000000000000000000000014DEF9DEA2F79CD65812631A5CF5D3ED"));
-            this.m_cofactor = BigInteger.ValueOf(8);
-            this.m_coord = Curve25519_DEFAULT_COORDS;
+            m_order = new BigInteger(1, Hex.Decode("1000000000000000000000000000000014DEF9DEA2F79CD65812631A5CF5D3ED"));
+            m_cofactor = BigInteger.ValueOf(8);
+            m_coord = Curve25519_DEFAULT_COORDS;
         }
 
         protected override ECCurve CloneCurve()

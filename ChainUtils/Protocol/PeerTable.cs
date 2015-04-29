@@ -1,11 +1,8 @@
 ﻿#if !NOSOCKET
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net.Sockets;
 
 namespace ChainUtils.Protocol
@@ -15,30 +12,30 @@ namespace ChainUtils.Protocol
 		Manual,
 		Addr,
 		Advertised,
-		DNSSeed,
+		DnsSeed,
 		HardSeed,
 	}
 	public class Peer
 	{
 		public Peer(PeerOrigin origin, NetworkAddress address)
 		{
-			_Origin = origin;
-			_NetworkAddress = address;
+			_origin = origin;
+			_networkAddress = address;
 		}
-		private readonly PeerOrigin _Origin;
+		private readonly PeerOrigin _origin;
 		public PeerOrigin Origin
 		{
 			get
 			{
-				return _Origin;
+				return _origin;
 			}
 		}
-		private readonly NetworkAddress _NetworkAddress;
+		private readonly NetworkAddress _networkAddress;
 		public NetworkAddress NetworkAddress
 		{
 			get
 			{
-				return _NetworkAddress;
+				return _networkAddress;
 			}
 		}
 
@@ -49,7 +46,7 @@ namespace ChainUtils.Protocol
 	}
 	public class PeerTable : InMemoryPeerTableRepository
 	{
-		Dictionary<string, Peer> _PeerSeeds = new Dictionary<string, Peer>();
+		Dictionary<string, Peer> _peerSeeds = new Dictionary<string, Peer>();
 		public PeerTable()
 		{
 			ValiditySpan = TimeSpan.FromHours(3.0);
@@ -66,12 +63,12 @@ namespace ChainUtils.Protocol
 		public Peer[] GetActivePeers(int maxCount)
 		{
 			maxCount = Math.Min(1000, maxCount);
-			List<Peer> result = new List<Peer>();
-			lock(_Peers)
+			var result = new List<Peer>();
+			lock(Peers)
 			{
-				result.AddRange(_Peers
+				result.AddRange(Peers
 									.Select(p => p.Value)
-									.Concat(_PeerSeeds.Select(p => p.Value))
+									.Concat(_peerSeeds.Select(p => p.Value))
 									.OrderBy(p => p.Origin)
 									.ThenBy(p => p.NetworkAddress.Ago)
 									.Take(maxCount));
@@ -84,23 +81,23 @@ namespace ChainUtils.Protocol
 
 		public override void WritePeers(IEnumerable<Peer> peers)
 		{
-			lock(_Peers)
+			lock(Peers)
 			{
-				var normalPeers = peers.Where(p => p.Origin != PeerOrigin.DNSSeed && p.Origin != PeerOrigin.HardSeed);
+				var normalPeers = peers.Where(p => p.Origin != PeerOrigin.DnsSeed && p.Origin != PeerOrigin.HardSeed);
 				base.WritePeers(normalPeers);
-				var seedPeers = peers.Where(p => p.Origin == PeerOrigin.DNSSeed || p.Origin == PeerOrigin.HardSeed);
+				var seedPeers = peers.Where(p => p.Origin == PeerOrigin.DnsSeed || p.Origin == PeerOrigin.HardSeed);
 				foreach(var s in seedPeers)
 				{
-					_PeerSeeds.AddOrReplace(s.NetworkAddress.Endpoint.ToString(), s);
+					_peerSeeds.AddOrReplace(s.NetworkAddress.Endpoint.ToString(), s);
 				}
 			}
 		}
 
 		public override IEnumerable<Peer> GetPeers()
 		{
-			lock(_Peers)
+			lock(Peers)
 			{
-				return base.GetPeers().Concat(_PeerSeeds.Select(s => s.Value)).ToList();
+				return base.GetPeers().Concat(_peerSeeds.Select(s => s.Value)).ToList();
 			}
 		}
 
@@ -110,7 +107,7 @@ namespace ChainUtils.Protocol
 			if(p == null)
 				return true;
 			var isExpired = p.NetworkAddress.Ago > TimeSpan.FromHours(3.0);
-			var isSeed = p.Origin == PeerOrigin.DNSSeed ||
+			var isSeed = p.Origin == PeerOrigin.DnsSeed ||
 							p.Origin == PeerOrigin.HardSeed;
 
 			return isSeed ? seedsAsFree : isExpired;
@@ -118,9 +115,9 @@ namespace ChainUtils.Protocol
 
 		public int CountUsed(bool seedsAsFree = true)
 		{
-			lock(_Peers)
+			lock(Peers)
 			{
-				return _Peers.Concat(_PeerSeeds).Where(p => !IsFree(p.Value, seedsAsFree)).Count();
+				return Peers.Concat(_peerSeeds).Where(p => !IsFree(p.Value, seedsAsFree)).Count();
 			}
 		}
 
@@ -130,12 +127,12 @@ namespace ChainUtils.Protocol
 		{
 			if(endpoint == null)
 				throw new ArgumentNullException("endpoint");
-			if(endpoint.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+			if(endpoint.AddressFamily == AddressFamily.InterNetwork)
 				endpoint = new IPEndPoint(endpoint.Address.MapToIPv6(), endpoint.Port);
-			lock(_Peers)
+			lock(Peers)
 			{
 				Peer existing = null;
-				_Peers.TryGetValue(endpoint.ToString(), out existing);
+				Peers.TryGetValue(endpoint.ToString(), out existing);
 				return existing;
 			}
 		}
@@ -144,10 +141,10 @@ namespace ChainUtils.Protocol
 
 		public void RemovePeer(Peer peer)
 		{
-			lock(_Peers)
+			lock(Peers)
 			{
-				_Peers.Remove(peer.NetworkAddress.Endpoint.ToString());
-				_PeerSeeds.Remove(peer.NetworkAddress.Endpoint.ToString());
+				Peers.Remove(peer.NetworkAddress.Endpoint.ToString());
+				_peerSeeds.Remove(peer.NetworkAddress.Endpoint.ToString());
 			}
 		}
 	}

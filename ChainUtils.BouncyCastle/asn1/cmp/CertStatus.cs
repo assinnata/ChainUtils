@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cmp
@@ -76,7 +75,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(certHash, certReqId);
+			var v = new Asn1EncodableVector(certHash, certReqId);
 			v.AddOptional(statusInfo);
 			return new DerSequence(v);
 		}

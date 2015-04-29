@@ -1,9 +1,6 @@
 using System;
 using System.Diagnostics;
 
-using ChainUtils.BouncyCastle.Crypto;
-using ChainUtils.BouncyCastle.Crypto.Parameters;
-
 namespace ChainUtils.BouncyCastle.Crypto.Modes
 {
     /**
@@ -45,8 +42,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
         public override int GetUpdateOutputSize(
             int length)
         {
-            int total = length + bufOff;
-            int leftOver = total % buf.Length;
+            var total = length + bufOff;
+            var leftOver = total % buf.Length;
 
 			if (leftOver == 0)
             {
@@ -85,7 +82,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             byte[]	output,
             int		outOff)
         {
-            int resultLen = 0;
+            var resultLen = 0;
 
             if (bufOff == buf.Length)
             {
@@ -125,8 +122,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 throw new ArgumentException("Can't have a negative input outLength!");
             }
 
-            int blockSize = GetBlockSize();
-            int outLength = GetUpdateOutputSize(length);
+            var blockSize = GetBlockSize();
+            var outLength = GetUpdateOutputSize(length);
 
             if (outLength > 0)
             {
@@ -136,8 +133,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 }
             }
 
-            int resultLen = 0;
-            int gapLen = buf.Length - bufOff;
+            var resultLen = 0;
+            var gapLen = buf.Length - bufOff;
 
             if (length > gapLen)
             {
@@ -191,9 +188,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 throw new DataLengthException("output buffer too small in doFinal");
             }
 
-            int blockSize = cipher.GetBlockSize();
-            int length = bufOff - blockSize;
-            byte[] block = new byte[blockSize];
+            var blockSize = cipher.GetBlockSize();
+            var length = bufOff - blockSize;
+            var block = new byte[blockSize];
 
             if (forEncryption)
             {
@@ -204,17 +201,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 					throw new DataLengthException("need at least one block of input for CTS");
 				}
 
-                for (int i = bufOff; i != buf.Length; i++)
+                for (var i = bufOff; i != buf.Length; i++)
                 {
                     buf[i] = block[i - blockSize];
                 }
 
-                for (int i = blockSize; i != bufOff; i++)
+                for (var i = blockSize; i != bufOff; i++)
                 {
                     buf[i] ^= block[i - blockSize];
                 }
 
-				IBlockCipher c = (cipher is CbcBlockCipher)
+				var c = (cipher is CbcBlockCipher)
 					?	((CbcBlockCipher)cipher).GetUnderlyingCipher()
 					:	cipher;
 
@@ -224,15 +221,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             }
             else
             {
-                byte[] lastBlock = new byte[blockSize];
+                var lastBlock = new byte[blockSize];
 
-				IBlockCipher c = (cipher is CbcBlockCipher)
+				var c = (cipher is CbcBlockCipher)
 					?	((CbcBlockCipher)cipher).GetUnderlyingCipher()
 					:	cipher;
 
 				c.ProcessBlock(buf, 0, block, 0);
 
-				for (int i = blockSize; i != bufOff; i++)
+				for (var i = blockSize; i != bufOff; i++)
                 {
                     lastBlock[i - blockSize] = (byte)(block[i - blockSize] ^ buf[i]);
                 }
@@ -243,7 +240,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 Array.Copy(lastBlock, 0, output, outOff + blockSize, length);
             }
 
-            int offset = bufOff;
+            var offset = bufOff;
 
             Reset();
 

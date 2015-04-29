@@ -8,15 +8,15 @@
     {
         protected override ECPoint MultiplyPositive(ECPoint p, BigInteger k)
         {
-            int[] naf = WNafUtilities.GenerateCompactNaf(k);
+            var naf = WNafUtilities.GenerateCompactNaf(k);
 
             ECPoint R0 = p.Curve.Infinity, R1 = p;
 
-            int zeroes = 0;
-            for (int i = 0; i < naf.Length; ++i)
+            var zeroes = 0;
+            for (var i = 0; i < naf.Length; ++i)
             {
-                int ni = naf[i];
-                int digit = ni >> 16;
+                var ni = naf[i];
+                var digit = ni >> 16;
                 zeroes += ni & 0xFFFF;
 
                 R1 = R1.TimesPow2(zeroes);

@@ -75,10 +75,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
                 throw new ArgumentException("key material too short.");
 
 			//nextkey:
-            for (int i = 0; i < N_DES_WEAK_KEYS; i++)
+            for (var i = 0; i < N_DES_WEAK_KEYS; i++)
             {
-                bool unmatch = false;
-                for (int j = 0; j < DesKeyLength; j++)
+                var unmatch = false;
+                for (var j = 0; j < DesKeyLength; j++)
                 {
                     if (key[j + offset] != DES_weak_keys[i * DesKeyLength + j])
                     {
@@ -112,7 +112,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
         public static void SetOddParity(
             byte[] bytes)
         {
-            for (int i = 0; i < bytes.Length; i++)
+            for (var i = 0; i < bytes.Length; i++)
             {
                 int b = bytes[i];
                 bytes[i] = (byte)((b & 0xfe) |

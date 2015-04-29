@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
@@ -38,7 +35,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
             if (seq.Count > 1)
             {
-                Asn1TaggedObject tagged = (Asn1TaggedObject) seq[1];
+                var tagged = (Asn1TaggedObject) seq[1];
                 if (!tagged.IsExplicit() || tagged.TagNo != 0)
                     throw new ArgumentException("Bad tag for 'content'", "seq");
 
@@ -75,7 +72,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(contentType);
+            var v = new Asn1EncodableVector(contentType);
 
             if (content != null)
             {

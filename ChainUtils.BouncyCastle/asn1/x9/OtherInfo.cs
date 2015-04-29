@@ -1,5 +1,3 @@
-using System.Collections;
-
 namespace ChainUtils.BouncyCastle.Asn1.X9
 {
     /**
@@ -26,14 +24,14 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
 		public OtherInfo(
             Asn1Sequence seq)
         {
-            IEnumerator e = seq.GetEnumerator();
+            var e = seq.GetEnumerator();
 
 			e.MoveNext();
             keyInfo = new KeySpecificInfo((Asn1Sequence) e.Current);
 
 			while (e.MoveNext())
             {
-                DerTaggedObject o = (DerTaggedObject) e.Current;
+                var o = (DerTaggedObject) e.Current;
 
 				if (o.TagNo == 0)
                 {
@@ -73,7 +71,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(keyInfo);
+            var v = new Asn1EncodableVector(keyInfo);
 
 			if (partyAInfo != null)
             {

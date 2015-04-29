@@ -3,43 +3,41 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
 	public class BlockStore : Store<StoredBlock, Block>
 	{
-		public const int MAX_BLOCKFILE_SIZE = 0x8000000; // 128 MiB
+		public const int MaxBlockfileSize = 0x8000000; // 128 MiB
 
 
 
 		public BlockStore(string folder, Network network)
 			: base(folder, network)
 		{
-			MaxFileSize = MAX_BLOCKFILE_SIZE;
+			MaxFileSize = MaxBlockfileSize;
 			FilePrefix = "blk";
 		}
 
 
 		public ConcurrentChain GetChain()
 		{
-			ConcurrentChain chain = new ConcurrentChain(Network);
+			var chain = new ConcurrentChain(Network);
 			SynchronizeChain(chain);
 			return chain;
 		}
 
 		public void SynchronizeChain(ChainBase chain)
 		{
-			Dictionary<uint256, BlockHeader> headers = new Dictionary<uint256, BlockHeader>();
-			HashSet<uint256> inChain = new HashSet<uint256>();
+			var headers = new Dictionary<Uint256, BlockHeader>();
+			var inChain = new HashSet<Uint256>();
 			inChain.Add(chain.GetBlock(0).HashBlock);
 			foreach(var header in Enumerate(true).Select(b => b.Item.Header))
 			{
 				var hash = header.GetHash();
 				headers.Add(hash, header);
 			}
-			List<uint256> toRemove = new List<uint256>();
+			var toRemove = new List<Uint256>();
 			while(headers.Count != 0)
 			{
 				foreach(var header in headers)
@@ -61,7 +59,7 @@ namespace ChainUtils.BitcoinCore
 
 
 		[ThreadStatic]
-		bool headerOnly;
+		bool _headerOnly;
 		public IEnumerable<StoredBlock> Enumerate(Stream stream, uint fileIndex = 0, DiskBlockPosRange range = null, bool headersOnly = false)
 		{
 			using(HeaderOnlyScope(headersOnly))
@@ -80,12 +78,12 @@ namespace ChainUtils.BitcoinCore
 			var oldBuff = BufferSize;
 			return new Scope(() =>
 			{
-				this.headerOnly = headersOnly;
-				if(!headerOnly)
+				_headerOnly = headersOnly;
+				if(!_headerOnly)
 					BufferSize = 1024 * 1024;
 			}, () =>
 			{
-				this.headerOnly = old;
+				_headerOnly = old;
 				BufferSize = oldBuff;
 			});
 		}
@@ -99,7 +97,7 @@ namespace ChainUtils.BitcoinCore
 		/// <returns></returns>
 		public IEnumerable<StoredBlock> Enumerate(bool headersOnly, int blockCountStart, int count = 999999999)
 		{
-			int blockCount = 0;
+			var blockCount = 0;
 			DiskBlockPos start = null;
 			foreach(var block in Enumerate(true, null))
 			{
@@ -113,7 +111,7 @@ namespace ChainUtils.BitcoinCore
 				yield break;
 
 
-			int i = 0;
+			var i = 0;
 			foreach(var result in Enumerate(headersOnly, new DiskBlockPosRange(start)))
 			{
 				if(i >= count)
@@ -138,8 +136,8 @@ namespace ChainUtils.BitcoinCore
 
 		protected override StoredBlock ReadStoredItem(Stream stream, DiskBlockPos pos)
 		{
-			StoredBlock block = new StoredBlock(Network, pos);
-			block.ParseSkipBlockContent = headerOnly;
+			var block = new StoredBlock(Network, pos);
+			block.ParseSkipBlockContent = _headerOnly;
 			block.ReadWrite(stream, false);
 			return block;
 		}

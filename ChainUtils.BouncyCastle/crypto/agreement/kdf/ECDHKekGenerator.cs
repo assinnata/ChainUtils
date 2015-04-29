@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Crypto.Generators;
@@ -22,16 +20,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement.Kdf
 
         public ECDHKekGenerator(IDigest digest)
         {
-            this.kdf = new Kdf2BytesGenerator(digest);
+            kdf = new Kdf2BytesGenerator(digest);
         }
 
         public virtual void Init(IDerivationParameters param)
         {
-            DHKdfParameters parameters = (DHKdfParameters)param;
+            var parameters = (DHKdfParameters)param;
 
-            this.algorithm = parameters.Algorithm;
-            this.keySize = parameters.KeySize;
-            this.z = parameters.GetZ(); // TODO Clone?
+            algorithm = parameters.Algorithm;
+            keySize = parameters.KeySize;
+            z = parameters.GetZ(); // TODO Clone?
         }
 
         public virtual IDigest Digest
@@ -43,7 +41,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement.Kdf
         {
             // TODO Create an ASN.1 class for this (RFC3278)
             // ECC-CMS-SharedInfo
-            DerSequence s = new DerSequence(
+            var s = new DerSequence(
                 new AlgorithmIdentifier(algorithm, DerNull.Instance),
                 new DerTaggedObject(true, 2, new DerOctetString(Pack.UInt32_To_BE((uint)keySize))));
 

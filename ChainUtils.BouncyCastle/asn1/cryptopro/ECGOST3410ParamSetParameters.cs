@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
@@ -55,12 +53,12 @@ namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
 			if (seq.Count != 6)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-			this.a = DerInteger.GetInstance(seq[0]);
-			this.b = DerInteger.GetInstance(seq[1]);
-			this.p = DerInteger.GetInstance(seq[2]);
-			this.q = DerInteger.GetInstance(seq[3]);
-			this.x = DerInteger.GetInstance(seq[4]);
-			this.y = DerInteger.GetInstance(seq[5]);
+			a = DerInteger.GetInstance(seq[0]);
+			b = DerInteger.GetInstance(seq[1]);
+			p = DerInteger.GetInstance(seq[2]);
+			q = DerInteger.GetInstance(seq[3]);
+			x = DerInteger.GetInstance(seq[4]);
+			y = DerInteger.GetInstance(seq[5]);
         }
 
 		public BigInteger P

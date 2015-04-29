@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -41,7 +40,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 			this.macAlgorithm = macAlgorithm;
 			this.digestAlgorithm = digestAlgorithm;
 			this.recipientInfos = recipientInfos;
-			this.encapsulatedContentInfo = encapsulatedContent;
+			encapsulatedContentInfo = encapsulatedContent;
 			this.authAttrs = authAttrs;
 			this.mac = mac;
 			this.unauthAttrs = unauthAttrs;
@@ -50,11 +49,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		private AuthenticatedData(
 			Asn1Sequence	seq)
 		{
-			int index = 0;
+			var index = 0;
 
 			version = (DerInteger)seq[index++];
 
-			Asn1Encodable tmp = seq[index++];
+			var tmp = seq[index++];
 			if (tmp is Asn1TaggedObject)
 			{
 				originatorInfo = OriginatorInfo.GetInstance((Asn1TaggedObject)tmp, false);
@@ -194,7 +193,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(version);
+			var v = new Asn1EncodableVector(version);
 
 			if (originatorInfo != null)
 			{
@@ -230,13 +229,13 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 			if (origInfo == null)
 				return 0;
 
-			int ver = 0;
+			var ver = 0;
 
-			foreach (object obj in origInfo.Certificates)
+			foreach (var obj in origInfo.Certificates)
 			{
 				if (obj is Asn1TaggedObject)
 				{
-					Asn1TaggedObject tag = (Asn1TaggedObject)obj;
+					var tag = (Asn1TaggedObject)obj;
 
 					if (tag.TagNo == 2)
 					{
@@ -250,11 +249,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 				}
 			}
 
-			foreach (object obj in origInfo.Crls)
+			foreach (var obj in origInfo.Crls)
 			{
 				if (obj is Asn1TaggedObject)
 				{
-					Asn1TaggedObject tag = (Asn1TaggedObject)obj;
+					var tag = (Asn1TaggedObject)obj;
 
 					if (tag.TagNo == 1)
 					{

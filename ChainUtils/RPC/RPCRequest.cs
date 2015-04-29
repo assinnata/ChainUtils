@@ -1,23 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using System.IO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.RPC
 {
-	public class RPCRequest
+	public class RpcRequest
 	{
-		public RPCRequest(string method, object[] parameters)
+		public RpcRequest(string method, object[] parameters)
 			: this()
 		{
 			Method = method;
 			Params = parameters;
 		}
-		public RPCRequest()
+		public RpcRequest()
 		{
 			JsonRpc = "1.0";
 			Id = 1;
@@ -62,7 +57,7 @@ namespace ChainUtils.RPC
 
 			if(Params != null)
 			{
-				for(int i = 0 ; i < Params.Length ; i++)
+				for(var i = 0 ; i < Params.Length ; i++)
 				{
 					if(Params[i] is JToken)
 					{

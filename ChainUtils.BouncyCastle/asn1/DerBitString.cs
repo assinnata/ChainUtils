@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -21,8 +20,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 		static internal int GetPadBits(
 			int bitString)
 		{
-			int val = 0;
-			for (int i = 3; i >= 0; i--)
+			var val = 0;
+			for (var i = 3; i >= 0; i--)
 			{
 				//
 				// this may look a little odd, but if it isn't done like this pre jdk1.2
@@ -51,7 +50,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 				return 7;
 			}
 
-			int bits = 1;
+			var bits = 1;
 
 			while (((val <<= 1) & 0xFF) != 0)
 			{
@@ -68,8 +67,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 		static internal byte[] GetBytes(
 			int bitString)
 		{
-			int bytes = 4;
-			for (int i = 3; i >= 1; i--)
+			var bytes = 4;
+			for (var i = 3; i >= 1; i--)
 			{
 				if ((bitString & (0xFF << (i * 8))) != 0)
 				{
@@ -78,8 +77,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 				bytes--;
 			}
 
-			byte[] result = new byte[bytes];
-			for (int i = 0; i < bytes; i++)
+			var result = new byte[bytes];
+			for (var i = 0; i < bytes; i++)
 			{
 				result[i] = (byte) ((bitString >> (i * 8)) & 0xFF);
 			}
@@ -116,7 +115,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			Asn1TaggedObject	obj,
 			bool				isExplicit)
 		{
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is DerBitString)
 			{
@@ -157,7 +156,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		public DerBitString(
 			Asn1Encodable obj)
 		{
-			this.data = obj.GetDerEncoded();
+			data = obj.GetDerEncoded();
 			//this.padBits = 0;
 		}
 
@@ -178,9 +177,9 @@ namespace ChainUtils.BouncyCastle.Asn1
 		{
 			get
 			{
-				int value = 0;
+				var value = 0;
 
-				for (int i = 0; i != data.Length && i != 4; i++)
+				for (var i = 0; i != data.Length && i != 4; i++)
 				{
 					value |= (data[i] & 0xff) << (8 * i);
 				}
@@ -192,7 +191,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		internal override void Encode(
 			DerOutputStream derOut)
 		{
-			byte[] bytes = new byte[GetBytes().Length + 1];
+			var bytes = new byte[GetBytes().Length + 1];
 
 			bytes[0] = (byte) PadBits;
 			Array.Copy(GetBytes(), 0, bytes, 1, bytes.Length - 1);
@@ -208,22 +207,22 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
 		{
-			DerBitString other = asn1Object as DerBitString;
+			var other = asn1Object as DerBitString;
 
 			if (other == null)
 				return false;
 
-			return this.padBits == other.padBits
-				&& Arrays.AreEqual(this.data, other.data);
+			return padBits == other.padBits
+				&& Arrays.AreEqual(data, other.data);
 		}
 
 		public override string GetString()
 		{
-			StringBuilder buffer = new StringBuilder("#");
+			var buffer = new StringBuilder("#");
 
-			byte[] str = GetDerEncoded();
+			var str = GetDerEncoded();
 
-			for (int i = 0; i != str.Length; i++)
+			for (var i = 0; i != str.Length; i++)
 			{
 				uint ubyte = str[i];
 				buffer.Append(table[(ubyte >> 4) & 0xf]);
@@ -239,7 +238,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 	            throw new ArgumentException("truncated BIT STRING detected");
 
 			int padBits = octets[0];
-			byte[] data = new byte[octets.Length - 1];
+			var data = new byte[octets.Length - 1];
 			Array.Copy(octets, 1, data, 0, data.Length);
 			return new DerBitString(data, padBits);
 		}

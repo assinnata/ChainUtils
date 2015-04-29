@@ -1,11 +1,10 @@
-using System.Collections;
 using System.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1
 {
     public abstract class Asn1Generator
     {
-		private Stream _out;
+		private readonly Stream _out;
 
 		protected Asn1Generator(
 			Stream outStream)

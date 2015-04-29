@@ -15,8 +15,8 @@ namespace ChainUtils.Tests
 		{
 			// Create a fake TX of sufficient realism to exercise the unit tests. Two outputs, one to us, one to somewhere
 			// else to simulate change.
-			Transaction t = new Transaction();
-			TxOut outputToMe = new TxOut(coin, to);
+			var t = new Transaction();
+			var outputToMe = new TxOut(coin, to);
 			t.AddOutput(outputToMe);
 
 			//TxOut change = new TxOut(Money.Parse("1.11"),
@@ -25,8 +25,8 @@ namespace ChainUtils.Tests
 
 			// Make a previous tx simply to send us sufficient coins. This prev tx is not really valid but it doesn't
 			// matter for our purposes.
-			Transaction prevTx = new Transaction();
-			TxOut prevOut = new TxOut(coin, to);
+			var prevTx = new Transaction();
+			var prevOut = new TxOut(coin, to);
 			prevTx.AddOutput(prevOut);
 			// Connect it.
 			t.AddInput(prevTx, 0);
@@ -41,8 +41,8 @@ namespace ChainUtils.Tests
 
 		public static byte[] ToBytes(string str)
 		{
-			byte[] result = new byte[str.Length];
-			for(int i = 0 ; i < str.Length ; i++)
+			var result = new byte[str.Length];
+			for(var i = 0 ; i < str.Length ; i++)
 			{
 				result[i] = (byte)str[i];
 			}
@@ -69,7 +69,7 @@ namespace ChainUtils.Tests
 
 		public static ConcurrentChain CreateBlockChain(List<Block> blocks)
 		{
-			ConcurrentChain chain = new ConcurrentChain(Network.Main.GetGenesis().Header);
+			var chain = new ConcurrentChain(Network.Main.GetGenesis().Header);
 			foreach(var b in blocks)
 			{
 				b.Header.HashPrevBlock = chain.Tip.Header.GetHash();

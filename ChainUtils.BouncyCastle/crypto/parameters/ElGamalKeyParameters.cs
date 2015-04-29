@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -29,7 +27,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (obj == this)
 				return true;
 
-			ElGamalKeyParameters other = obj as ElGamalKeyParameters;
+			var other = obj as ElGamalKeyParameters;
 
 			if (other == null)
 				return false;
@@ -40,13 +38,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 		protected bool Equals(
 			ElGamalKeyParameters other)
 		{
-			return Platform.Equals(parameters, other.parameters)
+			return Equals(parameters, other.parameters)
 				&& base.Equals(other);
 		}
 
 		public override int GetHashCode()
         {
-			int hc = base.GetHashCode();
+			var hc = base.GetHashCode();
 
 			if (parameters != null)
 			{

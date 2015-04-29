@@ -34,7 +34,7 @@ namespace ChainUtils.Crypto.Internal
 
         public static byte[] TruncateAndCopy(byte[] buffer, int maxLength)
         {
-            byte[] truncatedBuffer = new byte[Math.Min(buffer.Length, maxLength)];
+            var truncatedBuffer = new byte[Math.Min(buffer.Length, maxLength)];
             Array.Copy(buffer, truncatedBuffer, truncatedBuffer.Length);
             return truncatedBuffer;
         }

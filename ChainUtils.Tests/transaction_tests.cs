@@ -40,7 +40,7 @@ namespace ChainUtils.Tests
 			var key = new Key();
 			var scriptPubKey = PayToPubkeyHashTemplate.Instance.GenerateScriptPubKey(key.PubKey);
 
-			Transaction tx = new Transaction();
+			var tx = new Transaction();
 			tx.AddInput(new TxIn(new OutPoint(tx.GetHash(), 0))
 			{
 				ScriptSig = scriptPubKey
@@ -164,7 +164,7 @@ namespace ChainUtils.Tests
 
 			Assert.True(txBuilder.Verify(funding));
 
-			List<ICoin> aliceBobCoins = new List<ICoin>();
+			var aliceBobCoins = new List<ICoin>();
 			aliceBobCoins.Add(new ScriptCoin(funding, funding.Outputs.To(aliceBobRedeemScript.Hash).First(), aliceBobRedeemScript));
 
 			// first Bob constructs the TX
@@ -318,7 +318,7 @@ namespace ChainUtils.Tests
 
 
 			var cc = ColoredCoin.Find(tx, repo);
-			for(int i = 0 ; i < 20 ; i++)
+			for(var i = 0 ; i < 20 ; i++)
 			{
 				txBuilder = new TransactionBuilder(i);
 				tx = txBuilder
@@ -631,7 +631,7 @@ namespace ChainUtils.Tests
 				} };
 
 			//Bob sends money to satoshi
-			TransactionBuilder builder = new TransactionBuilder();
+			var builder = new TransactionBuilder();
 			var tx =
 				builder
 				.AddCoins(coins)
@@ -699,7 +699,7 @@ namespace ChainUtils.Tests
 			var aliceCoins = new ICoin[] { RandomCoin("0.4", alice), RandomCoin("0.6", alice) };
 			var bobCoins = new ICoin[] { RandomCoin("0.2", bob), RandomCoin("0.3", bob) };
 
-			TransactionBuilder builder = new TransactionBuilder();
+			var builder = new TransactionBuilder();
 			var tx = builder
 				.AddCoins(aliceCoins)
 				.AddKeys(alice)
@@ -735,7 +735,7 @@ namespace ChainUtils.Tests
 			var bobCoins = new ICoin[] { RandomCoin("0.2", bob), RandomCoin("0.3", bob) };
 			var bobAliceCoins = new ICoin[] { RandomCoin("1.5", bobAlice, false), RandomCoin("0.25", bobAlice, true) };
 
-			TransactionBuilder builder = new TransactionBuilder();
+			var builder = new TransactionBuilder();
 			var unsigned = builder
 				.AddCoins(aliceCoins)
 				.Send(bobAlice, "1.0")
@@ -931,7 +931,7 @@ namespace ChainUtils.Tests
 			Assert.True(txBuilder.Verify(tx));
 
 			//Using the same set of coin in 2 group should not use two times the sames coins
-			for(int i = 0 ; i < 3 ; i++)
+			for(var i = 0 ; i < 3 ; i++)
 			{
 				txBuilder = new TransactionBuilder();
 				tx =
@@ -1054,7 +1054,7 @@ namespace ChainUtils.Tests
 
 		private void AssertCorrectlySigned(Transaction tx, Script scriptPubKey)
 		{
-			for(int i = 0 ; i < tx.Inputs.Count ; i++)
+			for(var i = 0 ; i < tx.Inputs.Count ; i++)
 			{
 				Assert.True(Script.VerifyScript(tx.Inputs[i].ScriptSig, scriptPubKey, tx, i));
 			}
@@ -1091,12 +1091,12 @@ namespace ChainUtils.Tests
 			foreach(var test in tests.Select(t => t.GetDynamic(0)))
 			{
 				string raw = test.Raw;
-				Transaction tx = new Transaction(raw);
+				var tx = new Transaction(raw);
 				Assert.Equal((int)test.JSON.vin_sz, tx.Inputs.Count);
 				Assert.Equal((int)test.JSON.vout_sz, tx.Outputs.Count);
 				Assert.Equal((uint)test.JSON.lock_time, (uint)tx.LockTime);
 
-				for(int i = 0 ; i < tx.Inputs.Count ; i++)
+				for(var i = 0 ; i < tx.Inputs.Count ; i++)
 				{
 					var actualVIn = tx.Inputs[i];
 					var expectedVIn = test.JSON.@in[i];
@@ -1109,7 +1109,7 @@ namespace ChainUtils.Tests
 					Assert.Equal((string)expectedVIn.scriptSig, (string)expectedVIn.scriptSig.ToString());
 				}
 
-				for(int i = 0 ; i < tx.Outputs.Count ; i++)
+				for(var i = 0 ; i < tx.Outputs.Count ; i++)
 				{
 					var actualVOut = tx.Outputs[i];
 					var expectedVOut = test.JSON.@out[i];
@@ -1135,7 +1135,7 @@ namespace ChainUtils.Tests
 			var tests = TestCase.read_json("data/tx_valid.json");
 			foreach(var test in tests)
 			{
-				string strTest = test.ToString();
+				var strTest = test.ToString();
 				//Skip comments
 				if(!(test[0] is JArray))
 					continue;
@@ -1146,19 +1146,19 @@ namespace ChainUtils.Tests
 					continue;
 				}
 
-				Dictionary<OutPoint, Script> mapprevOutScriptPubKeys = new Dictionary<OutPoint, Script>();
+				var mapprevOutScriptPubKeys = new Dictionary<OutPoint, Script>();
 				foreach(var vinput in inputs)
 				{
 					mapprevOutScriptPubKeys[new OutPoint(new uint256(vinput[0].ToString()), int.Parse(vinput[1].ToString()))] = script_tests.ParseScript(vinput[2].ToString());
 				}
 
-				Transaction tx = new Transaction((string)test[1]);
-				ValidationState state = Network.Main.CreateValidationState();
+				var tx = new Transaction((string)test[1]);
+				var state = Network.Main.CreateValidationState();
 				Assert.True(state.CheckTransaction(tx), strTest);
 				Assert.True(state.IsValid);
 
 
-				for(int i = 0 ; i < tx.Inputs.Count ; i++)
+				for(var i = 0 ; i < tx.Inputs.Count ; i++)
 				{
 					if(!mapprevOutScriptPubKeys.ContainsKey(tx.Inputs[i].PrevOut))
 					{
@@ -1187,7 +1187,7 @@ namespace ChainUtils.Tests
 
 
 			// Note how NOCACHE is not included as it is a runtime-only flag.
-			Dictionary<string, ScriptVerify> mapFlagNames = new Dictionary<string, ScriptVerify>();
+			var mapFlagNames = new Dictionary<string, ScriptVerify>();
 			if(mapFlagNames.Count == 0)
 			{
 				mapFlagNames["NONE"] = ScriptVerify.None;
@@ -1197,7 +1197,7 @@ namespace ChainUtils.Tests
 				mapFlagNames["NULLDUMMY"] = ScriptVerify.NullDummy;
 			}
 
-			foreach(string word in words)
+			foreach(var word in words)
 			{
 				if(!mapFlagNames.ContainsKey(word))
 					Assert.False(true, "Bad test: unknown verification flag '" + word + "'");
@@ -1219,7 +1219,7 @@ namespace ChainUtils.Tests
 			var tests = TestCase.read_json("data/tx_invalid.json");
 			foreach(var test in tests)
 			{
-				string strTest = test.ToString();
+				var strTest = test.ToString();
 				//Skip comments
 				if(!(test[0] is JArray))
 					continue;
@@ -1230,18 +1230,18 @@ namespace ChainUtils.Tests
 					continue;
 				}
 
-				Dictionary<OutPoint, Script> mapprevOutScriptPubKeys = new Dictionary<OutPoint, Script>();
+				var mapprevOutScriptPubKeys = new Dictionary<OutPoint, Script>();
 				foreach(var vinput in inputs)
 				{
 					mapprevOutScriptPubKeys[new OutPoint(new uint256(vinput[0].ToString()), int.Parse(vinput[1].ToString()))] = script_tests.ParseScript(vinput[2].ToString());
 				}
 
-				Transaction tx = new Transaction((string)test[1]);
+				var tx = new Transaction((string)test[1]);
 
-				ValidationState state = Network.Main.CreateValidationState();
+				var state = Network.Main.CreateValidationState();
 				var fValid = state.CheckTransaction(tx) && state.IsValid;
 
-				for(int i = 0 ; i < tx.Inputs.Count && fValid ; i++)
+				for(var i = 0 ; i < tx.Inputs.Count && fValid ; i++)
 				{
 					if(!mapprevOutScriptPubKeys.ContainsKey(tx.Inputs[i].PrevOut))
 					{
@@ -1271,8 +1271,8 @@ namespace ChainUtils.Tests
 			var ch = new byte[] { 0x01, 0x00, 0x00, 0x00, 0x01, 0x6b, 0xff, 0x7f, 0xcd, 0x4f, 0x85, 0x65, 0xef, 0x40, 0x6d, 0xd5, 0xd6, 0x3d, 0x4f, 0xf9, 0x4f, 0x31, 0x8f, 0xe8, 0x20, 0x27, 0xfd, 0x4d, 0xc4, 0x51, 0xb0, 0x44, 0x74, 0x01, 0x9f, 0x74, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x8c, 0x49, 0x30, 0x46, 0x02, 0x21, 0x00, 0xda, 0x0d, 0xc6, 0xae, 0xce, 0xfe, 0x1e, 0x06, 0xef, 0xdf, 0x05, 0x77, 0x37, 0x57, 0xde, 0xb1, 0x68, 0x82, 0x09, 0x30, 0xe3, 0xb0, 0xd0, 0x3f, 0x46, 0xf5, 0xfc, 0xf1, 0x50, 0xbf, 0x99, 0x0c, 0x02, 0x21, 0x00, 0xd2, 0x5b, 0x5c, 0x87, 0x04, 0x00, 0x76, 0xe4, 0xf2, 0x53, 0xf8, 0x26, 0x2e, 0x76, 0x3e, 0x2d, 0xd5, 0x1e, 0x7f, 0xf0, 0xbe, 0x15, 0x77, 0x27, 0xc4, 0xbc, 0x42, 0x80, 0x7f, 0x17, 0xbd, 0x39, 0x01, 0x41, 0x04, 0xe6, 0xc2, 0x6e, 0xf6, 0x7d, 0xc6, 0x10, 0xd2, 0xcd, 0x19, 0x24, 0x84, 0x78, 0x9a, 0x6c, 0xf9, 0xae, 0xa9, 0x93, 0x0b, 0x94, 0x4b, 0x7e, 0x2d, 0xb5, 0x34, 0x2b, 0x9d, 0x9e, 0x5b, 0x9f, 0xf7, 0x9a, 0xff, 0x9a, 0x2e, 0xe1, 0x97, 0x8d, 0xd7, 0xfd, 0x01, 0xdf, 0xc5, 0x22, 0xee, 0x02, 0x28, 0x3d, 0x3b, 0x06, 0xa9, 0xd0, 0x3a, 0xcf, 0x80, 0x96, 0x96, 0x8d, 0x7d, 0xbb, 0x0f, 0x91, 0x78, 0xff, 0xff, 0xff, 0xff, 0x02, 0x8b, 0xa7, 0x94, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x19, 0x76, 0xa9, 0x14, 0xba, 0xde, 0xec, 0xfd, 0xef, 0x05, 0x07, 0x24, 0x7f, 0xc8, 0xf7, 0x42, 0x41, 0xd7, 0x3b, 0xc0, 0x39, 0x97, 0x2d, 0x7b, 0x88, 0xac, 0x40, 0x94, 0xa8, 0x02, 0x00, 0x00, 0x00, 0x00, 0x19, 0x76, 0xa9, 0x14, 0xc1, 0x09, 0x32, 0x48, 0x3f, 0xec, 0x93, 0xed, 0x51, 0xf5, 0xfe, 0x95, 0xe7, 0x25, 0x59, 0xf2, 0xcc, 0x70, 0x43, 0xf9, 0x88, 0xac, 0x00, 0x00, 0x00, 0x00, 0x00 };
 			var vch = ch.Take(ch.Length - 1).ToArray();
 
-			Transaction tx = new Transaction(vch);
-			ValidationState state = Network.Main.CreateValidationState();
+			var tx = new Transaction(vch);
+			var state = Network.Main.CreateValidationState();
 			Assert.True(state.CheckTransaction(tx) && state.IsValid, "Simple deserialized transaction should be valid.");
 
 			// Check that duplicate txins fail
@@ -1286,17 +1286,17 @@ namespace ChainUtils.Tests
 		[Trait("Core", "Core")]
 		public void test_Get()
 		{
-			byte[] dummyPubKey = new byte[65];
+			var dummyPubKey = new byte[65];
 			dummyPubKey[0] = 0x04;
 
-			byte[] dummyPubKey2 = new byte[33];
+			var dummyPubKey2 = new byte[33];
 			dummyPubKey2[0] = 0x02;
 			//CBasicKeyStore keystore;
 			//CCoinsView coinsDummy;
-			CoinsView coins = new CoinsView();//(coinsDummy);
-			Transaction[] dummyTransactions = SetupDummyInputs(coins);//(keystore, coins);
+			var coins = new CoinsView();//(coinsDummy);
+			var dummyTransactions = SetupDummyInputs(coins);//(keystore, coins);
 
-			Transaction t1 = new Transaction();
+			var t1 = new Transaction();
 			t1.Inputs.AddRange(Enumerable.Range(0, 3).Select(_ => new TxIn()));
 			t1.Inputs[0].PrevOut.Hash = dummyTransactions[0].GetHash();
 			t1.Inputs[0].PrevOut.N = 1;
@@ -1325,10 +1325,10 @@ namespace ChainUtils.Tests
 
 		private Transaction[] SetupDummyInputs(CoinsView coinsRet)
 		{
-			Transaction[] dummyTransactions = Enumerable.Range(0, 2).Select(_ => new Transaction()).ToArray();
+			var dummyTransactions = Enumerable.Range(0, 2).Select(_ => new Transaction()).ToArray();
 
 			// Add some keys to the keystore:
-			Key[] key = Enumerable.Range(0, 4).Select((_, i) => new Key(i % 2 != 0)).ToArray();
+			var key = Enumerable.Range(0, 4).Select((_, i) => new Key(i % 2 != 0)).ToArray();
 
 
 			// Create some dummy input transactions
@@ -1357,16 +1357,16 @@ namespace ChainUtils.Tests
 		public void test_IsStandard()
 		{
 			var coins = new CoinsView();
-			Transaction[] dummyTransactions = SetupDummyInputs(coins);
+			var dummyTransactions = SetupDummyInputs(coins);
 
-			Transaction t = new Transaction();
+			var t = new Transaction();
 			t.Inputs.Add(new TxIn());
 			t.Inputs[0].PrevOut.Hash = dummyTransactions[0].GetHash();
 			t.Inputs[0].PrevOut.N = 1;
 			t.Inputs[0].ScriptSig = new Script(Op.GetPushOp(new byte[65]));
 			t.Outputs.Add(new TxOut());
 			t.Outputs[0].Value = 90 * Money.CENT;
-			Key key = new Key(true);
+			var key = new Key(true);
 			t.Outputs[0].ScriptPubKey = PayToPubkeyHashTemplate.Instance.GenerateScriptPubKey(key.PubKey.Hash);
 
 			Assert.True(StandardScripts.IsStandardTransaction(t));

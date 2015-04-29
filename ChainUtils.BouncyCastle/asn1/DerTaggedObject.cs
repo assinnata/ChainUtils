@@ -47,7 +47,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		{
 			if (!IsEmpty())
 			{
-				byte[] bytes = obj.GetDerEncoded();
+				var bytes = obj.GetDerEncoded();
 
 				if (explicitly)
 				{
@@ -58,7 +58,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 					//
 					// need to mark constructed types... (preserve Constructed tag)
 					//
-					int flags = (bytes[0] & Asn1Tags.Constructed) | Asn1Tags.Tagged;
+					var flags = (bytes[0] & Asn1Tags.Constructed) | Asn1Tags.Tagged;
 					derOut.WriteTag(flags, tagNo);
 					derOut.Write(bytes, 1, bytes.Length - 1);
 				}

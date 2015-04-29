@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChainUtils.BouncyCastle.Math.EC
+﻿namespace ChainUtils.BouncyCastle.Math.EC
 {
     public class ScaleYPointMap
         : ECPointMap

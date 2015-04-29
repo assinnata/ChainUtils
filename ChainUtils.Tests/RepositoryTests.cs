@@ -55,7 +55,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanReadStoredBlockFile()
 		{
-			int count = 0;
+			var count = 0;
 
 			foreach(var stored in StoredBlock.EnumerateFile(@"data\blocks\blk00000.dat"))
 			{
@@ -100,7 +100,7 @@ namespace ChainUtils.Tests
 		{
 			foreach(var block in StoredBlock.EnumerateFolder(@"data\blocks"))
 			{
-				ValidationState validation = Network.Main.CreateValidationState();
+				var validation = Network.Main.CreateValidationState();
 				validation.Now = block.Item.Header.BlockTime;
 				Assert.True(validation.CheckBlock(block.Item));
 			}
@@ -188,7 +188,7 @@ namespace ChainUtils.Tests
 			var test = new IndexedBlockStore(new SQLiteNoSqlRepository("CanReIndex", true), store);
 			var reIndexed = test.ReIndex();
 			Assert.Equal(100, reIndexed);
-			int i = 0;
+			var i = 0;
 			foreach(var b in store.Enumerate(true))
 			{
 				var result = test.Get(b.Item.GetHash());
@@ -212,9 +212,9 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public static void CanParseRev()
 		{
-			BlockUndoStore src = new BlockUndoStore(@"data\blocks", Network.Main);
-			BlockUndoStore dest = CreateBlockUndoStore();
-			int count = 0;
+			var src = new BlockUndoStore(@"data\blocks", Network.Main);
+			var dest = CreateBlockUndoStore();
+			var count = 0;
 			foreach(var un in src.EnumerateFolder())
 			{
 				var expectedSize = un.Header.ItemSize;
@@ -334,7 +334,7 @@ namespace ChainUtils.Tests
 			var blk0 = StoredBlock.EnumerateFile(@"data\blocks\blk00000.dat", (uint)0).ToList();
 			var blk1 = StoredBlock.EnumerateFile(@"data\blocks\blk00001.dat", (uint)1).ToList();
 
-			int count = 0;
+			var count = 0;
 			foreach(var stored in StoredBlock.EnumerateFolder(@"data\blocks"))
 			{
 				if(count == 0)
@@ -382,8 +382,8 @@ namespace ChainUtils.Tests
 		public void CanCacheNoSqlRepository()
 		{
 			var cached = new CachedNoSqlRepository(CreateNoSqlRepository());
-			byte[] data1 = new byte[] { 1, 2, 3, 4, 5, 6 };
-			byte[] data2 = new byte[] { 11, 22, 33, 4, 5, 66 };
+			var data1 = new byte[] { 1, 2, 3, 4, 5, 6 };
+			var data2 = new byte[] { 11, 22, 33, 4, 5, 66 };
 			cached.InnerRepository.Put("data1", new RawData(data1));
 			Assert.NotNull(cached.Get<RawData>("data1"));
 			cached.InnerRepository.Put("data1", new RawData(data2));
@@ -428,8 +428,8 @@ namespace ChainUtils.Tests
 
 			foreach(var repository in repositories)
 			{
-				byte[] data1 = new byte[] { 1, 2, 3, 4, 5, 6 };
-				byte[] data2 = new byte[] { 11, 22, 33, 4, 5, 66 };
+				var data1 = new byte[] { 1, 2, 3, 4, 5, 6 };
+				var data2 = new byte[] { 11, 22, 33, 4, 5, 66 };
 				Assert.Null(repository.Get<RawData>("data1"));
 
 				repository.Put("data1", new RawData(data1));
@@ -475,7 +475,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanStorePeers()
 		{
-			SqLitePeerTableRepository repository = CreateTableRepository();
+			var repository = CreateTableRepository();
 			CanStorePeer(repository);
 			CanStorePeer(new InMemoryPeerTableRepository());
 		}

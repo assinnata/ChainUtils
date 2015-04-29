@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -68,7 +66,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 							}
 							else
 							{
-								Asn1OctetString octs = (Asn1OctetString)obj;
+								var octs = (Asn1OctetString)obj;
 								eObj = new BerOctetString(octs.GetOctets());
 							}
 						}

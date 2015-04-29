@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 
 namespace ChainUtils.BouncyCastle.Utilities.Encoders
@@ -21,7 +20,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
         {
             Arrays.Fill(decodingTable, (byte)0xff);
 
-            for (int i = 0; i < encodingTable.Length; i++)
+            for (var i = 0; i < encodingTable.Length; i++)
             {
                 decodingTable[encodingTable[i]] = (byte)i;
             }
@@ -50,7 +49,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             int		length,
             Stream	outStream)
         {
-            for (int i = off; i < (off + length); i++)
+            for (var i = off; i < (off + length); i++)
             {
                 int v = data[i];
 
@@ -79,8 +78,8 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             Stream	outStream)
         {
             byte b1, b2;
-            int outLen = 0;
-            int end = off + length;
+            var outLen = 0;
+            var end = off + length;
 
             while (end > off)
             {
@@ -92,7 +91,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
                 end--;
             }
 
-            int i = off;
+            var i = off;
             while (i < end)
             {
                 while (i < end && Ignore((char)data[i]))
@@ -131,9 +130,9 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             Stream	outStream)
         {
             byte    b1, b2;
-            int     length = 0;
+            var     length = 0;
 
-            int     end = data.Length;
+            var     end = data.Length;
 
             while (end > 0)
             {
@@ -145,7 +144,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
                 end--;
             }
 
-            int i = 0;
+            var i = 0;
             while (i < end)
             {
                 while (i < end && Ignore(data[i]))

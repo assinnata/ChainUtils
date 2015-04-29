@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -30,33 +28,33 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
             M[1][0] = new uint[4];
             M[1][8] = GcmUtilities.AsUints(H);
 
-            for (int j = 4; j >= 1; j >>= 1)
+            for (var j = 4; j >= 1; j >>= 1)
             {
-                uint[] tmp = (uint[])M[1][j + j].Clone();
+                var tmp = (uint[])M[1][j + j].Clone();
                 GcmUtilities.MultiplyP(tmp);
                 M[1][j] = tmp;
             }
 
             {
-                uint[] tmp = (uint[])M[1][1].Clone();
+                var tmp = (uint[])M[1][1].Clone();
                 GcmUtilities.MultiplyP(tmp);
                 M[0][8] = tmp;
             }
 
-            for (int j = 4; j >= 1; j >>= 1)
+            for (var j = 4; j >= 1; j >>= 1)
             {
-                uint[] tmp = (uint[])M[0][j + j].Clone();
+                var tmp = (uint[])M[0][j + j].Clone();
                 GcmUtilities.MultiplyP(tmp);
                 M[0][j] = tmp;
             }
 
-            for (int i = 0; ; )
+            for (var i = 0; ; )
             {
-                for (int j = 2; j < 16; j += j)
+                for (var j = 2; j < 16; j += j)
                 {
-                    for (int k = 1; k < j; ++k)
+                    for (var k = 1; k < j; ++k)
                     {
-                        uint[] tmp = (uint[])M[i][j].Clone();
+                        var tmp = (uint[])M[i][j].Clone();
                         GcmUtilities.Xor(tmp, M[i][k]);
                         M[i][j + k] = tmp;
                     }
@@ -68,9 +66,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
                 {
                     M[i] = new uint[16][];
                     M[i][0] = new uint[4];
-                    for (int j = 8; j > 0; j >>= 1)
+                    for (var j = 8; j > 0; j >>= 1)
                     {
-                        uint[] tmp = (uint[])M[i - 2][j].Clone();
+                        var tmp = (uint[])M[i - 2][j].Clone();
                         GcmUtilities.MultiplyP8(tmp);
                         M[i][j] = tmp;
                     }
@@ -80,11 +78,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         public void MultiplyH(byte[] x)
         {
-            uint[] z = new uint[4];
-            for (int i = 15; i >= 0; --i)
+            var z = new uint[4];
+            for (var i = 15; i >= 0; --i)
             {
                 //GcmUtilities.Xor(z, M[i + i][x[i] & 0x0f]);
-                uint[] m = M[i + i][x[i] & 0x0f];
+                var m = M[i + i][x[i] & 0x0f];
                 z[0] ^= m[0];
                 z[1] ^= m[1];
                 z[2] ^= m[2];

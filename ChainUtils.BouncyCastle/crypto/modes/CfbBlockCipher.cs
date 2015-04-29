@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Modes
@@ -30,10 +29,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             int          bitBlockSize)
         {
             this.cipher = cipher;
-            this.blockSize = bitBlockSize / 8;
-            this.IV = new byte[cipher.GetBlockSize()];
-            this.cfbV = new byte[cipher.GetBlockSize()];
-            this.cfbOutV = new byte[cipher.GetBlockSize()];
+            blockSize = bitBlockSize / 8;
+            IV = new byte[cipher.GetBlockSize()];
+            cfbV = new byte[cipher.GetBlockSize()];
+            cfbOutV = new byte[cipher.GetBlockSize()];
         }
         /**
         * return the underlying block cipher that we are wrapping.
@@ -59,12 +58,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             bool forEncryption,
             ICipherParameters parameters)
         {
-            this.encrypting = forEncryption;
+            encrypting = forEncryption;
             if (parameters is ParametersWithIV)
             {
-                ParametersWithIV ivParam = (ParametersWithIV) parameters;
-                byte[] iv = ivParam.GetIV();
-                int diff = IV.Length - iv.Length;
+                var ivParam = (ParametersWithIV) parameters;
+                var iv = ivParam.GetIV();
+                var diff = IV.Length - iv.Length;
                 Array.Copy(iv, 0, IV, diff, iv.Length);
                 Array.Clear(IV, 0, diff);
 
@@ -159,7 +158,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             //
             // XOR the cfbV with the plaintext producing the ciphertext
             //
-            for (int i = 0; i < blockSize; i++)
+            for (var i = 0; i < blockSize; i++)
             {
                 outBytes[outOff + i] = (byte)(cfbOutV[i] ^ input[inOff + i]);
             }
@@ -205,7 +204,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             //
             // XOR the cfbV with the ciphertext producing the plaintext
             //
-            for (int i = 0; i < blockSize; i++)
+            for (var i = 0; i < blockSize; i++)
             {
                 outBytes[outOff + i] = (byte)(cfbOutV[i] ^ input[inOff + i]);
             }

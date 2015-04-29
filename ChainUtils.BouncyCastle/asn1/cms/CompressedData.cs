@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -26,7 +24,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             AlgorithmIdentifier	compressionAlgorithm,
             ContentInfo			encapContentInfo)
         {
-            this.version = new DerInteger(0);
+            version = new DerInteger(0);
             this.compressionAlgorithm = compressionAlgorithm;
             this.encapContentInfo = encapContentInfo;
         }
@@ -34,9 +32,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		public CompressedData(
             Asn1Sequence seq)
         {
-            this.version = (DerInteger) seq[0];
-            this.compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
-            this.encapContentInfo = ContentInfo.GetInstance(seq[2]);
+            version = (DerInteger) seq[0];
+            compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq[1]);
+            encapContentInfo = ContentInfo.GetInstance(seq[2]);
         }
 
 		/**

@@ -1,6 +1,4 @@
-﻿using System;
-
-using ChainUtils.BouncyCastle.Utilities.Encoders;
+﻿using ChainUtils.BouncyCastle.Utilities.Encoders;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 {
@@ -17,13 +15,13 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public SecP256K1Curve()
             : base(q)
         {
-            this.m_infinity = new SecP256K1Point(this, null, null);
+            m_infinity = new SecP256K1Point(this, null, null);
 
-            this.m_a = FromBigInteger(BigInteger.Zero);
-            this.m_b = FromBigInteger(BigInteger.ValueOf(7));
-            this.m_order = new BigInteger(1, Hex.Decode("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141"));
-            this.m_cofactor = BigInteger.One;
-            this.m_coord = SECP256K1_DEFAULT_COORDS;
+            m_a = FromBigInteger(BigInteger.Zero);
+            m_b = FromBigInteger(BigInteger.ValueOf(7));
+            m_order = new BigInteger(1, Hex.Decode("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141"));
+            m_cofactor = BigInteger.One;
+            m_coord = SECP256K1_DEFAULT_COORDS;
         }
 
         protected override ECCurve CloneCurve()

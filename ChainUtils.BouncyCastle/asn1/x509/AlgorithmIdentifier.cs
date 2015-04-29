@@ -51,7 +51,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
         {
             this.objectID = objectID;
             this.parameters = parameters;
-            this.parametersDefined = true;
+            parametersDefined = true;
         }
 
         internal AlgorithmIdentifier(
@@ -60,12 +60,12 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
             if (seq.Count < 1 || seq.Count > 2)
                 throw new ArgumentException("Bad sequence size: " + seq.Count);
 
-            this.objectID = DerObjectIdentifier.GetInstance(seq[0]);
-            this.parametersDefined = (seq.Count == 2);
+            objectID = DerObjectIdentifier.GetInstance(seq[0]);
+            parametersDefined = (seq.Count == 2);
 
             if (parametersDefined)
             {
-                this.parameters = seq[1];
+                parameters = seq[1];
             }
         }
 
@@ -89,7 +89,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(objectID);
+            var v = new Asn1EncodableVector(objectID);
 
             if (parametersDefined)
             {

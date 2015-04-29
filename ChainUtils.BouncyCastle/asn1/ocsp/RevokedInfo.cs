@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
@@ -54,11 +52,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 		private RevokedInfo(
             Asn1Sequence seq)
         {
-            this.revocationTime = (DerGeneralizedTime) seq[0];
+            revocationTime = (DerGeneralizedTime) seq[0];
 
 			if (seq.Count > 1)
             {
-                this.revocationReason = new CrlReason(
+                revocationReason = new CrlReason(
 					DerEnumerated.GetInstance((Asn1TaggedObject) seq[1], true));
             }
         }
@@ -83,7 +81,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
          */
         public override Asn1Object ToAsn1Object()
         {
-			Asn1EncodableVector v = new Asn1EncodableVector(revocationTime);
+			var v = new Asn1EncodableVector(revocationTime);
 
 			if (revocationReason != null)
             {

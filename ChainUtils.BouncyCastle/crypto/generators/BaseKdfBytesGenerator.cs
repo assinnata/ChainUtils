@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -35,14 +33,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             if (parameters is KdfParameters)
             {
-                KdfParameters   p = (KdfParameters)parameters;
+                var   p = (KdfParameters)parameters;
 
                 shared = p.GetSharedSecret();
                 iv = p.GetIV();
             }
             else if (parameters is Iso18033KdfParameters)
             {
-                Iso18033KdfParameters p = (Iso18033KdfParameters)parameters;
+                var p = (Iso18033KdfParameters)parameters;
 
                 shared = p.GetSeed();
                 iv = null;
@@ -74,7 +72,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                 throw new DataLengthException("output buffer too small");
 
             long oBytes = length;
-            int outLen = digest.GetDigestSize();
+            var outLen = digest.GetDigestSize();
 
             //
             // this is at odds with the standard implementation, the
@@ -85,16 +83,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             if (oBytes > ((2L << 32) - 1))
                 throw new ArgumentException("Output length too large");
 
-            int cThreshold = (int)((oBytes + outLen - 1) / outLen);
+            var cThreshold = (int)((oBytes + outLen - 1) / outLen);
 
-            byte[] dig = new byte[digest.GetDigestSize()];
+            var dig = new byte[digest.GetDigestSize()];
 
-            byte[] C = new byte[4];
+            var C = new byte[4];
             Pack.UInt32_To_BE((uint)counterStart, C, 0);
 
-            uint counterBase = (uint)(counterStart & ~0xFF);
+            var counterBase = (uint)(counterStart & ~0xFF);
 
-            for (int i = 0; i < cThreshold; i++)
+            for (var i = 0; i < cThreshold; i++)
             {
                 digest.BlockUpdate(shared, 0, shared.Length);
                 digest.BlockUpdate(C, 0, 4);

@@ -1,34 +1,27 @@
-﻿using ChainUtils.Crypto;
-using ChainUtils.DataEncoders;
-using ChainUtils.BouncyCastle.Math;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Stealth
 {
 	public class BitField
 	{
-		byte[] _Rawform;
-		byte[] _Mask;
-		private readonly int _BitCount;
+		byte[] _rawform;
+		byte[] _mask;
+		private readonly int _bitCount;
 		public int BitCount
 		{
 			get
 			{
-				return _BitCount;
+				return _bitCount;
 			}
 		}
 		public int ByteCount
 		{
 			get
 			{
-				return _Rawform.Length;
+				return _rawform.Length;
 			}
 		}
 
@@ -36,29 +29,29 @@ namespace ChainUtils.Stealth
 		{
 			get
 			{
-				return _Mask;
+				return _mask;
 			}
 		}
 
 		public BitField(byte[] rawform, int bitcount)
 		{
-			_BitCount = bitcount;
+			_bitCount = bitcount;
 
 			var byteCount = GetPrefixByteLength(bitcount);
 			if(rawform.Length == byteCount)
-				_Rawform = rawform.ToArray();
+				_rawform = rawform.ToArray();
 			if(rawform.Length < byteCount)
-				_Rawform = rawform.Concat(new byte[byteCount - rawform.Length]).ToArray();
+				_rawform = rawform.Concat(new byte[byteCount - rawform.Length]).ToArray();
 			if(rawform.Length > byteCount)
-				_Rawform = rawform.Take(byteCount).ToArray();
+				_rawform = rawform.Take(byteCount).ToArray();
 
-			_Mask = new byte[byteCount];
-			int bitleft = bitcount;
+			_mask = new byte[byteCount];
+			var bitleft = bitcount;
 
-			for(int i = 0 ; i < byteCount ; i++)
+			for(var i = 0 ; i < byteCount ; i++)
 			{
 				var numberBits = Math.Min(8, bitleft);
-				_Mask[i] = (byte)((1 << numberBits) - 1);
+				_mask[i] = (byte)((1 << numberBits) - 1);
 				bitleft -= numberBits;
 				if(bitleft == 0)
 					break;
@@ -81,13 +74,13 @@ namespace ChainUtils.Stealth
 
 		public byte[] GetRawForm()
 		{
-			return _Rawform.ToArray();
+			return _rawform.ToArray();
 		}
 
 		public uint GetEncodedForm()
 		{
 			var encoded =
-				_Rawform.Length == 4 ? _Rawform : _Rawform.Concat(new byte[4 - _Rawform.Length]).ToArray();
+				_rawform.Length == 4 ? _rawform : _rawform.Concat(new byte[4 - _rawform.Length]).ToArray();
 
 			return Utils.ToUInt32(encoded, true);
 		}
@@ -95,12 +88,12 @@ namespace ChainUtils.Stealth
 		public bool Match(uint value)
 		{
 			var data = Utils.ToBytes(value, true);
-			if(data.Length * 8 < _BitCount)
+			if(data.Length * 8 < _bitCount)
 				return false;
 
-			for(int i = 0 ; i < _Mask.Length ; i++)
+			for(var i = 0 ; i < _mask.Length ; i++)
 			{
-				if((data[i] & _Mask[i]) != (_Rawform[i] & _Mask[i]))
+				if((data[i] & _mask[i]) != (_rawform[i] & _mask[i]))
 					return false;
 			}
 			return true;
@@ -173,12 +166,12 @@ namespace ChainUtils.Stealth
 			{
 				try
 				{
-					MemoryStream ms = new MemoryStream(vchData);
-					this.Options = (byte)ms.ReadByte();
-					this.ScanPubKey = new PubKey(ms.ReadBytes(33));
+					var ms = new MemoryStream(VchData);
+					Options = (byte)ms.ReadByte();
+					ScanPubKey = new PubKey(ms.ReadBytes(33));
 					var pubkeycount = (byte)ms.ReadByte();
-					List<PubKey> pubKeys = new List<PubKey>();
-					for(int i = 0 ; i < pubkeycount ; i++)
+					var pubKeys = new List<PubKey>();
+					for(var i = 0 ; i < pubkeycount ; i++)
 					{
 						pubKeys.Add(new PubKey(ms.ReadBytes(33)));
 					}
@@ -200,7 +193,7 @@ namespace ChainUtils.Stealth
 		}
 		private static byte[] GenerateBytes(PubKey scanKey, PubKey[] pubKeys, BitField bitField, int signatureCount)
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			ms.WriteByte(0); //Options
 			ms.Write(scanKey.Compress().ToBytes(), 0, 33);
 			ms.WriteByte((byte)pubKeys.Length);
@@ -224,7 +217,7 @@ namespace ChainUtils.Stealth
 		{
 			get
 			{
-				return Base58Type.STEALTH_ADDRESS;
+				return Base58Type.StealthAddress;
 			}
 		}
 
@@ -263,7 +256,7 @@ namespace ChainUtils.Stealth
 			if(ephemKey == null)
 				ephemKey = new Key();
 
-			var metadata = StealthMetadata.CreateMetadata(ephemKey, this.Prefix);
+			var metadata = StealthMetadata.CreateMetadata(ephemKey, Prefix);
 			return new StealthPayment(this, ephemKey, metadata);
 		}
 

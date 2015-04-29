@@ -64,9 +64,9 @@ namespace ChainUtils.Tests
 		//Encrypted keys base58 string do not have network information
 		public void DoNotThrowFormatExceptionIfNetworkInformationNotPresentInBase58()
 		{
-			Network network = Network.TestNet;
+			var network = Network.TestNet;
 			var encryptedPrivateKey = new Key().GetEncryptedBitcoinSecret("abc123", network).ToString();
-			Key key = Key.Parse(encryptedPrivateKey, "abc123", network);
+			var key = Key.Parse(encryptedPrivateKey, "abc123", network);
 		}
 
 		[Fact]
@@ -240,14 +240,14 @@ namespace ChainUtils.Tests
 			Assert.Equal(seed, actualSeed);
 
 			//The real deal
-			for(int i = 0 ; i < 5 ; i++)
+			for(var i = 0 ; i < 5 ; i++)
 			{
 				seed = RandomUtils.GetBytes(24);
 				derived = RandomUtils.GetBytes(64);
 				encrypted = BitcoinEncryptedSecret.EncryptSeed(seed, derived);
 
 				var encryptedBefore = encrypted.ToArray();
-				for(int u = 8 ; u < 16 ; u++)
+				for(var u = 8 ; u < 16 ; u++)
 				{
 					encrypted[u] = 0;
 				}
@@ -269,7 +269,7 @@ namespace ChainUtils.Tests
 			Assert.Equal(key, actualSeed);
 
 			//The real deal
-			for(int i = 0 ; i < 5 ; i++)
+			for(var i = 0 ; i < 5 ; i++)
 			{
 				key = RandomUtils.GetBytes(32);
 				derived = RandomUtils.GetBytes(64);

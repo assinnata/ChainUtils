@@ -57,7 +57,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 			KeyAgreeRecipientIdentifier	id,
 			Asn1OctetString				encryptedKey)
 		{
-			this.identifier = id;
+			identifier = id;
 			this.encryptedKey = encryptedKey;
 		}
 

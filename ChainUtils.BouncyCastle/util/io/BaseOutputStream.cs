@@ -34,13 +34,13 @@ namespace ChainUtils.BouncyCastle.Utilities.IO
             Debug.Assert(0 <= offset && offset <= buffer.Length);
             Debug.Assert(count >= 0);
 
-            int end = offset + count;
+            var end = offset + count;
 
             Debug.Assert(0 <= end && end <= buffer.Length);
 
-            for (int i = offset; i < end; ++i)
+            for (var i = offset; i < end; ++i)
             {
-                this.WriteByte(buffer[i]);
+                WriteByte(buffer[i]);
             }
         }
 

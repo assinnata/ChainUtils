@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -279,7 +278,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		private static uint bytes2uint(byte[] src, int offset)
 		{
 			uint word = 0;
-			for (int i = 0; i < 4; i++)
+			for (var i = 0; i < 4; i++)
 			{
 				word = (word << 8) + (uint)src[i + offset];
 			}
@@ -288,7 +287,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		private static void uint2bytes(uint word, byte[] dst, int offset)
 		{
-			for (int i = 0; i < 4; i++)
+			for (var i = 0; i < 4; i++)
 			{
 				dst[(3 - i) + offset] = (byte)word;
 				word >>= 8;
@@ -340,10 +339,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		private void setKey(bool forEncryption, byte[] key)
 		{
-			uint[] k = new uint[8];
-			uint[] ka = new uint[4];
-			uint[] kb = new uint[4];
-			uint[] t = new uint[4];
+			var k = new uint[8];
+			var ka = new uint[4];
+			var kb = new uint[4];
+			var t = new uint[4];
 
 			switch (key.Length)
 			{
@@ -381,13 +380,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 					throw new ArgumentException("key sizes are only 16/24/32 bytes.");
 			}
 
-			for (int i = 0; i < 4; i++)
+			for (var i = 0; i < 4; i++)
 			{
 				ka[i] = k[i] ^ k[i + 4];
 			}
 			/* compute KA */
 			camelliaF2(ka, SIGMA, 0);
-			for (int i = 0; i < 4; i++)
+			for (var i = 0; i < 4; i++)
 			{
 				ka[i] ^= k[i];
 			}
@@ -458,7 +457,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			else
 			{ // 192bit or 256bit
 				/* compute KB */
-				for (int i = 0; i < 4; i++)
+				for (var i = 0; i < 4; i++)
 				{
 					kb[i] = ka[i] ^ k[i + 4];
 				}
@@ -540,7 +539,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		private int processBlock128(byte[] input, int inOff, byte[] output, int outOff)
 		{
-			for (int i = 0; i < 4; i++)
+			for (var i = 0; i < 4; i++)
 			{
 				state[i] = bytes2uint(input, inOff + (i * 4));
 				state[i] ^= kw[i];
@@ -573,7 +572,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		private int processBlock192or256(byte[] input, int inOff, byte[] output, int outOff)
 		{
-			for (int i = 0; i < 4; i++)
+			for (var i = 0; i < 4; i++)
 			{
 				state[i] = bytes2uint(input, inOff + (i * 4));
 				state[i] ^= kw[i];

@@ -67,7 +67,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void BitcoinUrlKeepUnknowParameter()
 		{
-			BitcoinUrlBuilder url = new BitcoinUrlBuilder("bitcoin:?r=https://merchant.com/pay.php?h%3D2a8628fc2fbe&idontknow=test");
+			var url = new BitcoinUrlBuilder("bitcoin:?r=https://merchant.com/pay.php?h%3D2a8628fc2fbe&idontknow=test");
 
 			Assert.Equal("test", url.UnknowParameters["idontknow"]);
 			Assert.Equal(1, url.UnknowParameters.Count);
@@ -179,7 +179,7 @@ namespace ChainUtils.Tests
 		}
 		private T Reserialize<T>(T data)
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			PaymentRequest.Serializer.Serialize(ms, data);
 			ms.Position = 0;
 			return (T)PaymentRequest.Serializer.Deserialize(ms, null, typeof(T));
@@ -192,7 +192,7 @@ namespace ChainUtils.Tests
 			using(var server = new PaymentServerTester())
 			{
 				var uri = server.GetPaymentRequestUri(2);
-				BitcoinUrlBuilder btcUri = new BitcoinUrlBuilder(uri);
+				var btcUri = new BitcoinUrlBuilder(uri);
 				var request = btcUri.GetPaymentRequest();
 				Assert.True(request.VerifySignature());
 				Assert.Equal(2, BitConverter.ToInt32(request.Details.MerchantData, 0));
@@ -227,7 +227,7 @@ namespace ChainUtils.Tests
 				{
 					Assert.Equal(PaymentRequest.MediaType, context.Request.AcceptTypes[0]);
 					context.Response.ContentType = PaymentRequest.MediaType;
-					PaymentRequest request = new PaymentRequest();
+					var request = new PaymentRequest();
 					request.Details.MerchantData = BitConverter.GetBytes(businessId);
 					request.Details.PaymentUrl = new Uri(_Prefix + "?id=" + businessId + "&type=Payment");
 					request.Sign(new X509Certificate2("data/NicolasDorierMerchant.pfx"), PKIType.X509SHA256);
@@ -259,7 +259,7 @@ namespace ChainUtils.Tests
 		}
 		public Uri GetPaymentRequestUri(int businessId)
 		{
-			BitcoinUrlBuilder builder = new BitcoinUrlBuilder()
+			var builder = new BitcoinUrlBuilder()
 			{
 				PaymentRequestUrl = new Uri(_Prefix + "?id=" + businessId + "&type=Request")
 			};

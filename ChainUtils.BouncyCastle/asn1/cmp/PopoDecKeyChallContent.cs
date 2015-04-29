@@ -25,8 +25,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 
 	    public virtual Challenge[] ToChallengeArray()
 	    {
-	        Challenge[] result = new Challenge[content.Count];
-	        for (int i = 0; i != result.Length; ++i)
+	        var result = new Challenge[content.Count];
+	        for (var i = 0; i != result.Length; ++i)
 	        {
 	            result[i] = Challenge.GetInstance(content[i]);
 	        }

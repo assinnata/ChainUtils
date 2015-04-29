@@ -1,10 +1,7 @@
-﻿using ChainUtils.Crypto;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.Crypto;
 
 namespace ChainUtils.Stealth
 {
@@ -22,7 +19,7 @@ namespace ChainUtils.Stealth
 		}
 		public static StealthMetadata TryParse(Script metadata)
 		{
-			StealthMetadata result = new StealthMetadata();
+			var result = new StealthMetadata();
 			try
 			{
 				if(!Fill(result, metadata))
@@ -50,18 +47,18 @@ namespace ChainUtils.Stealth
 			var b = Utils.ToBytes(nonce, true);
 			data.Write(b, 0, b.Length);
 			data.Write(ephemKey.PubKey.Compress().ToBytes(), 0, 33);
-			Fill(this, new Script(OpcodeType.OP_RETURN, Op.GetPushOp(data.ToArray())));
+			Fill(this, new Script(OpcodeType.OpReturn, Op.GetPushOp(data.ToArray())));
 		}
 
 		private static bool Fill(StealthMetadata output, Script metadata)
 		{
 			var ops = metadata.ToOps().ToArray();
-			if(ops.Length != 2 || ops[0].Code != OpcodeType.OP_RETURN)
+			if(ops.Length != 2 || ops[0].Code != OpcodeType.OpReturn)
 				return false;
 			var data = ops[1].PushData;
 			if(data == null || data.Length != 1 + 4 + 33)
 				return false;
-			MemoryStream ms = new MemoryStream(data);
+			var ms = new MemoryStream(data);
 			output.Version = ms.ReadByte();
 			if(output.Version != 6)
 				return false;
@@ -95,7 +92,7 @@ namespace ChainUtils.Stealth
 			get;
 			private set;
 		}
-		public uint256 Hash
+		public Uint256 Hash
 		{
 			get;
 			private set;

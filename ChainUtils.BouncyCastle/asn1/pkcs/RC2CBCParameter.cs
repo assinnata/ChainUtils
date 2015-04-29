@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -33,7 +31,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             int		parameterVersion,
             byte[]	iv)
         {
-            this.version = new DerInteger(parameterVersion);
+            version = new DerInteger(parameterVersion);
             this.iv = new DerOctetString(iv);
         }
 
@@ -66,7 +64,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 
 		public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
 			if (version != null)
             {

@@ -1,8 +1,5 @@
-using System;
-
-using ChainUtils.BouncyCastle.Math;
-using ChainUtils.BouncyCastle.Security;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
+using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
 {
@@ -34,11 +31,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 			//
 			// find a safe prime p where p = 2*q + 1, where p and q are prime.
 			//
-			BigInteger[] safePrimes = DHParametersHelper.GenerateSafePrimes(size, certainty, random);
+			var safePrimes = DHParametersHelper.GenerateSafePrimes(size, certainty, random);
 
-			BigInteger p = safePrimes[0];
-			BigInteger q = safePrimes[1];
-			BigInteger g = DHParametersHelper.SelectGenerator(p, q, random);
+			var p = safePrimes[0];
+			var q = safePrimes[1];
+			var g = DHParametersHelper.SelectGenerator(p, q, random);
 
 			return new ElGamalParameters(p, g);
         }

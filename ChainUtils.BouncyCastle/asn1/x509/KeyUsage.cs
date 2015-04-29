@@ -67,7 +67,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 		public override string ToString()
         {
-			byte[] data = GetBytes();
+			var data = GetBytes();
             if (data.Length == 1)
             {
 				return "KeyUsage: 0x" + (data[0] & 0xff).ToString("X");

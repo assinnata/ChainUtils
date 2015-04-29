@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -36,7 +34,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 	        Asn1SequenceParser	seq)
 	    {
 	        this.seq = seq;
-	        this.version = (DerInteger)seq.ReadObject();
+	        version = (DerInteger)seq.ReadObject();
 	    }
 
 	    public DerInteger Version
@@ -55,7 +53,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 	        if (nextObject is Asn1TaggedObjectParser && ((Asn1TaggedObjectParser)nextObject).TagNo == 0)
 	        {
-	            Asn1SequenceParser originatorInfo = (Asn1SequenceParser) ((Asn1TaggedObjectParser)nextObject).GetObjectParser(Asn1Tags.Sequence, false);
+	            var originatorInfo = (Asn1SequenceParser) ((Asn1TaggedObjectParser)nextObject).GetObjectParser(Asn1Tags.Sequence, false);
 	            nextObject = null;
 	            return OriginatorInfo.GetInstance(originatorInfo.ToAsn1Object());
 	        }
@@ -75,7 +73,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 	            nextObject = seq.ReadObject();
 	        }
 
-	        Asn1SetParser recipientInfos = (Asn1SetParser)nextObject;
+	        var recipientInfos = (Asn1SetParser)nextObject;
 	        nextObject = null;
 	        return recipientInfos;
 	    }
@@ -89,7 +87,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 	        if (nextObject != null)
 	        {
-	            Asn1SequenceParser o = (Asn1SequenceParser)nextObject;
+	            var o = (Asn1SequenceParser)nextObject;
 	            nextObject = null;
 	            return AlgorithmIdentifier.GetInstance(o.ToAsn1Object());
 	        }
@@ -106,7 +104,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 			if (nextObject is Asn1TaggedObjectParser)
 			{
-				AlgorithmIdentifier obj = AlgorithmIdentifier.GetInstance(
+				var obj = AlgorithmIdentifier.GetInstance(
 					(Asn1TaggedObject)nextObject.ToAsn1Object(), false);
 				nextObject = null;
 				return obj;
@@ -124,7 +122,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 	        if (nextObject != null)
 	        {
-	            Asn1SequenceParser o = (Asn1SequenceParser)nextObject;
+	            var o = (Asn1SequenceParser)nextObject;
 	            nextObject = null;
 	            return new ContentInfoParser(o);
 	        }
@@ -141,7 +139,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 	        if (nextObject is Asn1TaggedObjectParser)
 	        {
-	            IAsn1Convertible o = nextObject;
+	            var o = nextObject;
 	            nextObject = null;
 	            return (Asn1SetParser)((Asn1TaggedObjectParser)o).GetObjectParser(Asn1Tags.Set, false);
 	        }
@@ -156,7 +154,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 	            nextObject = seq.ReadObject();
 	        }
 
-	        IAsn1Convertible o = nextObject;
+	        var o = nextObject;
 	        nextObject = null;
 
 	        return Asn1OctetString.GetInstance(o.ToAsn1Object());
@@ -171,7 +169,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 	        if (nextObject != null)
 	        {
-	            IAsn1Convertible o = nextObject;
+	            var o = nextObject;
 	            nextObject = null;
 	            return (Asn1SetParser)((Asn1TaggedObjectParser)o).GetObjectParser(Asn1Tags.Set, false);
 	        }

@@ -1,5 +1,3 @@
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 {
     public class AuthenticatedSafe
@@ -12,7 +10,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
         {
             info = new ContentInfo[seq.Count];
 
-			for (int i = 0; i != info.Length; i++)
+			for (var i = 0; i != info.Length; i++)
             {
                 info[i] = ContentInfo.GetInstance(seq[i]);
             }

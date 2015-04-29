@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
 using ChainUtils.BouncyCastle.Utilities;
@@ -85,7 +84,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
             if (obj == this)
                 return true;
 
-            ECDomainParameters other = obj as ECDomainParameters;
+            var other = obj as ECDomainParameters;
 
             if (other == null)
                 return false;

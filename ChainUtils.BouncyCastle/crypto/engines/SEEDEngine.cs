@@ -204,14 +204,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			if (outOff + BlockSize > outBuf.Length)
 				throw new DataLengthException("output buffer too short");
 
-			long l = bytesToLong(inBuf, inOff + 0);
-			long r = bytesToLong(inBuf, inOff + 8);
+			var l = bytesToLong(inBuf, inOff + 0);
+			var r = bytesToLong(inBuf, inOff + 8);
 
 			if (forEncryption)
 			{
-				for (int i = 0; i < 16; i++)
+				for (var i = 0; i < 16; i++)
 				{
-					long nl = r;
+					var nl = r;
 
 					r = l ^ F(wKey[2 * i], wKey[(2 * i) + 1], r);
 					l = nl;
@@ -219,9 +219,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			}
 			else
 			{
-				for (int i = 15; i >= 0; i--)
+				for (var i = 15; i >= 0; i--)
 				{
-					long nl = r;
+					var nl = r;
 
 					r = l ^ F(wKey[2 * i], wKey[(2 * i) + 1], r);
 					l = nl;
@@ -241,16 +241,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		private int[] createWorkingKey(
 			byte[] inKey)
 		{
-			int[] key = new int[32];
-			long lower = bytesToLong(inKey, 0);
-			long upper = bytesToLong(inKey, 8);
+			var key = new int[32];
+			var lower = bytesToLong(inKey, 0);
+			var upper = bytesToLong(inKey, 8);
 
-			int key0 = extractW0(lower);
-			int key1 = extractW1(lower);
-			int key2 = extractW0(upper);
-			int key3 = extractW1(upper);
+			var key0 = extractW0(lower);
+			var key1 = extractW1(lower);
+			var key2 = extractW0(upper);
+			var key3 = extractW1(upper);
 
-			for (int i = 0; i < 16; i++)
+			for (var i = 0; i < 16; i++)
 			{
 				key[2 * i] = G(key0 + key2 - (int)KC[i]);
 				key[2 * i + 1] = G(key1 - key3 + (int)KC[i]);
@@ -302,7 +302,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		{
 			long word = 0;
 
-			for (int i = 0; i <= 7; i++)
+			for (var i = 0; i <= 7; i++)
 			{
 				word = (word << 8) + (src[i + srcOff] & 0xff);
 			}
@@ -315,7 +315,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			int		destOff,
 			long	value)
 		{
-			for (int i = 0; i < 8; i++)
+			for (var i = 0; i < 8; i++)
 			{
 				dest[i + destOff] = (byte)(value >> ((7 - i) * 8));
 			}
@@ -332,10 +332,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			int		ki1,
 			long	r)
 		{
-			int r0 = (int)(r >> 32);
-			int r1 = (int)r;
-			int rd1 = phaseCalc2(r0, ki0, r1, ki1);
-			int rd0 = rd1 + phaseCalc1(r0, ki0, r1, ki1);
+			var r0 = (int)(r >> 32);
+			var r1 = (int)r;
+			var rd1 = phaseCalc2(r0, ki0, r1, ki1);
+			var rd0 = rd1 + phaseCalc1(r0, ki0, r1, ki1);
 
 			return ((long)rd0 << 32) | (rd1 & 0xffffffffL);
 		}

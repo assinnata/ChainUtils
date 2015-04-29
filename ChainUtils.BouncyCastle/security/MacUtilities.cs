@@ -1,5 +1,4 @@
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.Iana;
 using ChainUtils.BouncyCastle.Asn1.Pkcs;
@@ -103,9 +102,9 @@ namespace ChainUtils.BouncyCastle.Security
         public static IMac GetMac(
             string algorithm)
         {
-            string upper = Platform.ToUpperInvariant(algorithm);
+            var upper = Platform.ToUpperInvariant(algorithm);
 
-            string mechanism = (string) algorithms[upper];
+            var mechanism = (string) algorithms[upper];
 
             if (mechanism == null)
             {
@@ -232,7 +231,7 @@ namespace ChainUtils.BouncyCastle.Security
 
         public static byte[] DoFinal(IMac mac)
         {
-            byte[] b = new byte[mac.GetMacSize()];
+            var b = new byte[mac.GetMacSize()];
             mac.DoFinal(b, 0);
             return b;
         }

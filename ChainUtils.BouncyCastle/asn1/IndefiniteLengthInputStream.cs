@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -32,7 +31,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		{
             if (_lookAhead == 0x00)
             {
-                int extra = RequireByte();
+                var extra = RequireByte();
                 if (extra != 0)
                 {
                     throw new IOException("malformed end-of-contents marker");
@@ -57,7 +56,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (_lookAhead < 0)
 				return 0;
 
-			int numRead = _in.Read(buffer, offset + 1, count - 1);
+			var numRead = _in.Read(buffer, offset + 1, count - 1);
 
 			if (numRead <= 0)
 			{
@@ -76,14 +75,14 @@ namespace ChainUtils.BouncyCastle.Asn1
             if (_eofOn00 && CheckForEof())
 				return -1;
 
-            int result = _lookAhead;
+            var result = _lookAhead;
             _lookAhead = RequireByte();
             return result;
 		}
 
         private int RequireByte()
         {
-            int b = _in.ReadByte();
+            var b = _in.ReadByte();
             if (b < 0)
             {
                 // Corrupted stream

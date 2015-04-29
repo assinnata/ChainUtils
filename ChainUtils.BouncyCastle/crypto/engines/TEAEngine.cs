@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -72,7 +71,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			_forEncryption = forEncryption;
 			_initialised = true;
 
-			KeyParameter p = (KeyParameter) parameters;
+			var p = (KeyParameter) parameters;
 
 			setKey(p.GetKey());
 		}
@@ -122,12 +121,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			int		outOff)
 		{
 			// Pack bytes into integers
-			uint v0 = Pack.BE_To_UInt32(inBytes, inOff);
-			uint v1 = Pack.BE_To_UInt32(inBytes, inOff + 4);
+			var v0 = Pack.BE_To_UInt32(inBytes, inOff);
+			var v1 = Pack.BE_To_UInt32(inBytes, inOff + 4);
 	        
 			uint sum = 0;
 	        
-			for (int i = 0; i != rounds; i++)
+			for (var i = 0; i != rounds; i++)
 			{
 				sum += delta;
 				v0  += ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);
@@ -147,12 +146,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			int		outOff)
 		{
 			// Pack bytes into integers
-			uint v0 = Pack.BE_To_UInt32(inBytes, inOff);
-			uint v1 = Pack.BE_To_UInt32(inBytes, inOff + 4);
+			var v0 = Pack.BE_To_UInt32(inBytes, inOff);
+			var v1 = Pack.BE_To_UInt32(inBytes, inOff + 4);
 
-			uint sum = d_sum;
+			var sum = d_sum;
 
-			for (int i = 0; i != rounds; i++)
+			for (var i = 0; i != rounds; i++)
 			{
 				v1  -= ((v0 << 4) + _c) ^ (v0 + sum) ^ ((v0 >> 5) + _d);
 				v0  -= ((v1 << 4) + _a) ^ (v1 + sum) ^ ((v1 >> 5) + _b);

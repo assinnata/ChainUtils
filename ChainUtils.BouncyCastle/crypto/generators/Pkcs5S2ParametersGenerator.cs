@@ -1,11 +1,7 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
-using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Macs;
-using ChainUtils.BouncyCastle.Crypto.Utilities;
-using ChainUtils.BouncyCastle.Math;
+using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
@@ -34,8 +30,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
         public Pkcs5S2ParametersGenerator(IDigest digest)
         {
-            this.hMac = new HMac(digest);
-            this.state = new byte[hMac.GetMacSize()];
+            hMac = new HMac(digest);
+            state = new byte[hMac.GetMacSize()];
         }
 
         private void F(
@@ -58,12 +54,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
             Array.Copy(state, 0, outBytes, outOff, state.Length);
 
-            for (int count = 1; count < c; ++count)
+            for (var count = 1; count < c; ++count)
             {
                 hMac.BlockUpdate(state, 0, state.Length);
                 hMac.DoFinal(state, 0);
 
-                for (int j = 0; j < state.Length; ++j)
+                for (var j = 0; j < state.Length; ++j)
                 {
                     outBytes[outOff + j] ^= state[j];
                 }
@@ -73,20 +69,20 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         private byte[] GenerateDerivedKey(
             int dkLen)
         {
-            int     hLen = hMac.GetMacSize();
-            int     l = (dkLen + hLen - 1) / hLen;
-            byte[]  iBuf = new byte[4];
-            byte[]  outBytes = new byte[l * hLen];
-            int     outPos = 0;
+            var     hLen = hMac.GetMacSize();
+            var     l = (dkLen + hLen - 1) / hLen;
+            var  iBuf = new byte[4];
+            var  outBytes = new byte[l * hLen];
+            var     outPos = 0;
 
             ICipherParameters param = new KeyParameter(mPassword);
 
             hMac.Init(param);
 
-            for (int i = 1; i <= l; i++)
+            for (var i = 1; i <= l; i++)
             {
                 // Increment the value in 'iBuf'
-                int pos = 3;
+                var pos = 3;
                 while (++iBuf[pos] == 0)
                 {
                     --pos;
@@ -119,7 +115,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             keySize /= 8;
 
-            byte[] dKey = GenerateDerivedKey(keySize);
+            var dKey = GenerateDerivedKey(keySize);
 
             return ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
         }
@@ -141,7 +137,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             keySize /= 8;
             ivSize /= 8;
 
-            byte[] dKey = GenerateDerivedKey(keySize + ivSize);
+            var dKey = GenerateDerivedKey(keySize + ivSize);
 
             return new ParametersWithIV(new KeyParameter(dKey, 0, keySize), dKey, keySize, ivSize);
         }
@@ -154,8 +150,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             keySize /= 8;
             ivSize /= 8;
 
-            byte[] dKey = GenerateDerivedKey(keySize + ivSize);
-            KeyParameter key = ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
+            var dKey = GenerateDerivedKey(keySize + ivSize);
+            var key = ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
 
             return new ParametersWithIV(key, dKey, keySize, ivSize);
         }
@@ -172,7 +168,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             keySize /= 8;
 
-            byte[] dKey = GenerateDerivedKey(keySize);
+            var dKey = GenerateDerivedKey(keySize);
 
             return new KeyParameter(dKey, 0, keySize);
         }

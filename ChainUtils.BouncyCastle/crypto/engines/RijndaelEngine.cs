@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -254,7 +253,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		{
 			//return (((long)((ulong) r >> shift) | (r << (BC - shift)))) & BC_MASK;
 
-			ulong temp = (ulong) r >> shift;
+			var temp = (ulong) r >> shift;
 
 			// NB: This corrects for Mono Bug #79087 (fixed in 1.1.17)
 			if (shift > 31)
@@ -283,7 +282,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		{
 			long    res = 0;
 
-			for (int j = 0; j < BC; j += 8)
+			for (var j = 0; j < BC; j += 8)
 			{
 				res |= (long)(box[(int)((r >> j) & 0xff)] & 0xff) << j;
 			}
@@ -313,12 +312,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			r0 = r1 = r2 = r3 = 0;
 
-			for (int j = 0; j < BC; j += 8)
+			for (var j = 0; j < BC; j += 8)
 			{
-				int a0 = (int)((A0 >> j) & 0xff);
-				int a1 = (int)((A1 >> j) & 0xff);
-				int a2 = (int)((A2 >> j) & 0xff);
-				int a3 = (int)((A3 >> j) & 0xff);
+				var a0 = (int)((A0 >> j) & 0xff);
+				var a1 = (int)((A1 >> j) & 0xff);
+				var a2 = (int)((A2 >> j) & 0xff);
+				var a3 = (int)((A3 >> j) & 0xff);
 
 				r0 |= (long)((Mul0x2(a0) ^ Mul0x3(a1) ^ a2 ^ a3) & 0xff) << j;
 
@@ -344,12 +343,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			long r0, r1, r2, r3;
 
 			r0 = r1 = r2 = r3 = 0;
-			for (int j = 0; j < BC; j += 8)
+			for (var j = 0; j < BC; j += 8)
 			{
-				int a0 = (int)((A0 >> j) & 0xff);
-				int a1 = (int)((A1 >> j) & 0xff);
-				int a2 = (int)((A2 >> j) & 0xff);
-				int a3 = (int)((A3 >> j) & 0xff);
+				var a0 = (int)((A0 >> j) & 0xff);
+				var a1 = (int)((A1 >> j) & 0xff);
+				var a2 = (int)((A2 >> j) & 0xff);
+				var a3 = (int)((A3 >> j) & 0xff);
 
 				//
 				// pre-lookup the log table
@@ -383,12 +382,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		{
 			int         KC;
 			int         t, rconpointer = 0;
-			int         keyBits = key.Length * 8;
-			byte[,]    tk = new byte[4,MAXKC];
+			var         keyBits = key.Length * 8;
+			var    tk = new byte[4,MAXKC];
 			//long[,]    W = new long[MAXROUNDS+1,4];
-			long[][]    W = new long[MAXROUNDS+1][];
+			var    W = new long[MAXROUNDS+1][];
 
-			for (int i = 0; i < MAXROUNDS+1; i++) W[i] = new long[4];
+			for (var i = 0; i < MAXROUNDS+1; i++) W[i] = new long[4];
 
 			switch (keyBits)
 			{
@@ -423,9 +422,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			//
 			// copy the key into the processing area
 			//
-			int index = 0;
+			var index = 0;
 
-			for (int i = 0; i < key.Length; i++)
+			for (var i = 0; i < key.Length; i++)
 			{
 				tk[i % 4,i / 4] = key[index++];
 			}
@@ -435,9 +434,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			//
 			// copy values into round key array
 			//
-			for (int j = 0; (j < KC) && (t < (ROUNDS+1)*(BC / 8)); j++, t++)
+			for (var j = 0; (j < KC) && (t < (ROUNDS+1)*(BC / 8)); j++, t++)
 			{
-				for (int i = 0; i < 4; i++)
+				for (var i = 0; i < 4; i++)
 				{
 					W[t / (BC / 8)][i] |= (long)(tk[i,j] & 0xff) << ((t * 8) % BC);
 				}
@@ -449,7 +448,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			//
 			while (t < (ROUNDS+1)*(BC/8))
 			{
-				for (int i = 0; i < 4; i++)
+				for (var i = 0; i < 4; i++)
 				{
 					tk[i,0] ^= S[tk[(i+1)%4,KC-1] & 0xff];
 				}
@@ -457,9 +456,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 				if (KC <= 6)
 				{
-					for (int j = 1; j < KC; j++)
+					for (var j = 1; j < KC; j++)
 					{
-						for (int i = 0; i < 4; i++)
+						for (var i = 0; i < 4; i++)
 						{
 							tk[i,j] ^= tk[i,j-1];
 						}
@@ -467,20 +466,20 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				}
 				else
 				{
-					for (int j = 1; j < 4; j++)
+					for (var j = 1; j < 4; j++)
 					{
-						for (int i = 0; i < 4; i++)
+						for (var i = 0; i < 4; i++)
 						{
 							tk[i,j] ^= tk[i,j-1];
 						}
 					}
-					for (int i = 0; i < 4; i++)
+					for (var i = 0; i < 4; i++)
 					{
 						tk[i,4] ^= S[tk[i,3] & 0xff];
 					}
-					for (int j = 5; j < KC; j++)
+					for (var j = 5; j < KC; j++)
 					{
-						for (int i = 0; i < 4; i++)
+						for (var i = 0; i < 4; i++)
 						{
 							tk[i,j] ^= tk[i,j-1];
 						}
@@ -490,9 +489,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				//
 				// copy values into round key array
 				//
-				for (int j = 0; (j < KC) && (t < (ROUNDS+1)*(BC/8)); j++, t++)
+				for (var j = 0; (j < KC) && (t < (ROUNDS+1)*(BC/8)); j++, t++)
 				{
-					for (int i = 0; i < 4; i++)
+					for (var i = 0; i < 4; i++)
 					{
 						W[t / (BC/8)][i] |= (long)(tk[i,j] & 0xff) << ((t * 8) % (BC));
 					}
@@ -645,14 +644,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			byte[]      bytes,
 			int         off)
 		{
-			int     index = off;
+			var     index = off;
 
 			A0 = (long)(bytes[index++] & 0xff);
 			A1 = (long)(bytes[index++] & 0xff);
 			A2 = (long)(bytes[index++] & 0xff);
 			A3 = (long)(bytes[index++] & 0xff);
 
-			for (int j = 8; j != BC; j += 8)
+			for (var j = 8; j != BC; j += 8)
 			{
 				A0 |= (long)(bytes[index++] & 0xff) << j;
 				A1 |= (long)(bytes[index++] & 0xff) << j;
@@ -665,9 +664,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			byte[]      bytes,
 			int         off)
 		{
-			int     index = off;
+			var     index = off;
 
-			for (int j = 0; j != BC; j += 8)
+			for (var j = 0; j != BC; j += 8)
 			{
 				bytes[index++] = (byte)(A0 >> j);
 				bytes[index++] = (byte)(A1 >> j);

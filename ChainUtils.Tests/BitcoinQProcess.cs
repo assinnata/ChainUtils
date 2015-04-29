@@ -239,7 +239,7 @@ namespace ChainUtils.Watcher
 
 		public override string ToString()
 		{
-			StringBuilder builder = new StringBuilder();
+			var builder = new StringBuilder();
 			foreach(var key in Parameters.Keys)
 			{
 				builder.AppendLine(key + "=" + Parameters[key]);
@@ -267,7 +267,7 @@ namespace ChainUtils.Watcher
 		{
 			if(!Server)
 				throw new InvalidOperationException("This BitcoinQ process is not a server (-server parameter)");
-			RPCClient client = new RPCClient(new System.Net.NetworkCredential(RPCUser, RPCPassword), new Uri(RPCService, UriKind.Absolute), Network);
+			var client = new RPCClient(new System.Net.NetworkCredential(RPCUser, RPCPassword), new Uri(RPCService, UriKind.Absolute), Network);
 
 			return client;
 		}

@@ -1,26 +1,23 @@
 ﻿#if !PORTABLE
-using System.Net.Sockets;
+using System.Linq;
+using System.Reflection;
 #endif
-using ChainUtils.Protocol;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
+using System.Threading;
+using ChainUtils.Protocol;
 
 
 namespace ChainUtils
 {
 	public class Scope : IDisposable
 	{
-		Action close;
+		Action _close;
 		public Scope(Action open, Action close)
 		{
-			this.close = close;
+			this._close = close;
 			open();
 		}
 
@@ -28,7 +25,7 @@ namespace ChainUtils
 
 		public void Dispose()
 		{
-			close();
+			_close();
 		}
 
 		#endregion
@@ -47,24 +44,24 @@ namespace ChainUtils
 	}
 	public partial class BitcoinStream
 	{
-		int _MaxArraySize = Int32.MaxValue;
+		int _maxArraySize = Int32.MaxValue;
 		public int MaxArraySize
 		{
 			get
 			{
-				return _MaxArraySize;
+				return _maxArraySize;
 			}
 			set
 			{
-				_MaxArraySize = value;
+				_maxArraySize = value;
 			}
 		}
 
 		//ReadWrite<T>(ref T data)
-		static MethodInfo _ReadWriteTyped;
+		static MethodInfo _readWriteTyped;
 		static BitcoinStream()
 		{
-			_ReadWriteTyped =
+			_readWriteTyped =
 				typeof(BitcoinStream)
 				.GetTypeInfo()
 				.DeclaredMethods
@@ -76,27 +73,27 @@ namespace ChainUtils
 
 		}
 
-		private readonly Stream _Inner;
+		private readonly Stream _inner;
 		public Stream Inner
 		{
 			get
 			{
-				return _Inner;
+				return _inner;
 			}
 		}
 
-		private readonly bool _Serializing;
+		private readonly bool _serializing;
 		public bool Serializing
 		{
 			get
 			{
-				return _Serializing;
+				return _serializing;
 			}
 		}
 		public BitcoinStream(Stream inner, bool serializing)
 		{
-			_Serializing = serializing;
-			_Inner = inner;
+			_serializing = serializing;
+			_inner = inner;
 		}
 
 		public BitcoinStream(byte[] bytes)
@@ -136,7 +133,7 @@ namespace ChainUtils
 
 		public void ReadWriteAsVarString(ref byte[] bytes)
 		{
-			VarString str = new VarString(bytes);
+			var str = new VarString(bytes);
 			ReadWrite(ref str);
 			bytes = str.GetString(true);
 		}
@@ -145,8 +142,8 @@ namespace ChainUtils
 		{
 			try
 			{
-				var parameters = new object[] { obj };
-				_ReadWriteTyped.MakeGenericMethod(type).Invoke(this, parameters);
+				var parameters = new[] { obj };
+				_readWriteTyped.MakeGenericMethod(type).Invoke(this, parameters);
 				obj = parameters[0];
 			}
 			catch(TargetInvocationException ex)
@@ -167,7 +164,7 @@ namespace ChainUtils
 
 		public void ReadWrite(ref bool data)
 		{
-			byte d = data ? (byte)1 : (byte)0;
+			var d = data ? (byte)1 : (byte)0;
 			ReadWriteByte(ref d);
 			data = (d == 0 ? false : true);
 		}
@@ -230,7 +227,7 @@ namespace ChainUtils
 
 		private void ReadWriteNumber(ref long value, int size)
 		{
-			ulong uvalue = unchecked((ulong)value);
+			var uvalue = unchecked((ulong)value);
 			ReadWriteNumber(ref uvalue, size);
 			value = unchecked((long)uvalue);
 		}
@@ -239,7 +236,7 @@ namespace ChainUtils
 		{
 			var bytes = new byte[size];
 
-			for(int i = 0 ; i < size ; i++)
+			for(var i = 0 ; i < size ; i++)
 			{
 				bytes[i] = (byte)(value >> i * 8);
 			}
@@ -249,7 +246,7 @@ namespace ChainUtils
 			if(IsBigEndian)
 				Array.Reverse(bytes);
 			ulong valueTemp = 0;
-			for(int i = 0 ; i < bytes.Length ; i++)
+			for(var i = 0 ; i < bytes.Length ; i++)
 			{
 				var v = (ulong)bytes[i];
 				valueTemp += v << (i * 8);
@@ -273,14 +270,14 @@ namespace ChainUtils
 
 			}
 		}
-		private PerformanceCounter _Counter;
+		private PerformanceCounter _counter;
 		public PerformanceCounter Counter
 		{
 			get
 			{
-				if(_Counter == null)
-					_Counter = new PerformanceCounter();
-				return _Counter;
+				if(_counter == null)
+					_counter = new PerformanceCounter();
+				return _counter;
 			}
 		}
 		private void ReadWriteByte(ref byte data)
@@ -319,16 +316,16 @@ namespace ChainUtils
 			});
 		}
 
-		ProtocolVersion _ProtocolVersion = ProtocolVersion.PROTOCOL_VERSION;
+		ProtocolVersion _protocolVersion = ProtocolVersion.PROTOCOL_VERSION;
 		public ProtocolVersion ProtocolVersion
 		{
 			get
 			{
-				return _ProtocolVersion;
+				return _protocolVersion;
 			}
 			set
 			{
-				_ProtocolVersion = value;
+				_protocolVersion = value;
 			}
 		}
 
@@ -353,28 +350,28 @@ namespace ChainUtils
 			MaxArraySize = stream.MaxArraySize;
 		}
 
-		private bool _NetworkFormat;
+		private bool _networkFormat;
 		public bool NetworkFormat
 		{
 			get
 			{
-				return _NetworkFormat;
+				return _networkFormat;
 			}
 		}
 
 		public IDisposable NetworkFormatScope(bool value)
 		{
-			var old = _NetworkFormat;
+			var old = _networkFormat;
 			return new Scope(() =>
 			{
-				_NetworkFormat = value;
+				_networkFormat = value;
 			}, () =>
 			{
-				_NetworkFormat = old;
+				_networkFormat = old;
 			});
 		}
 
-		public System.Threading.CancellationToken ReadCancellationToken
+		public CancellationToken ReadCancellationToken
 		{
 			get;
 			set;

@@ -22,7 +22,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 			Asn1Set					unauthAttrs)
 		{
 			// "It MUST be set to 0."
-			this.version = new DerInteger(0);
+			version = new DerInteger(0);
 
 			this.originatorInfo = originatorInfo;
 
@@ -45,11 +45,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		private AuthEnvelopedData(
 			Asn1Sequence	seq)
 		{
-			int index = 0;
+			var index = 0;
 
 			// TODO
 			// "It MUST be set to 0."
-			Asn1Object tmp = seq[index++].ToAsn1Object();
+			var tmp = seq[index++].ToAsn1Object();
 			version = (DerInteger)tmp;
 
 			tmp = seq[index++].ToAsn1Object();
@@ -172,7 +172,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		 */
 	    public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(version);
+			var v = new Asn1EncodableVector(version);
 
 			if (originatorInfo != null)
 			{

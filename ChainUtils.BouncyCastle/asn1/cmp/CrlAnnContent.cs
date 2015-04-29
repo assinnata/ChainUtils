@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cmp
@@ -27,8 +26,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 
 		public virtual CertificateList[] ToCertificateListArray()
 		{
-			CertificateList[] result = new CertificateList[content.Count];
-			for (int i = 0; i != result.Length; ++ i)
+			var result = new CertificateList[content.Count];
+			for (var i = 0; i != result.Length; ++ i)
 			{
 				result[i] = CertificateList.GetInstance(content[i]);
 			}

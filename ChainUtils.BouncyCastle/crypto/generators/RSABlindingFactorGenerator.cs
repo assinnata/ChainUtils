@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
@@ -26,7 +25,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 		{
 			if (param is ParametersWithRandom)
 			{
-				ParametersWithRandom rParam = (ParametersWithRandom)param;
+				var rParam = (ParametersWithRandom)param;
 
 				key = (RsaKeyParameters)rParam.Parameters;
 				random = rParam.Random;
@@ -51,8 +50,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 			if (key == null)
 				throw new InvalidOperationException("generator not initialised");
 
-			BigInteger m = key.Modulus;
-			int length = m.BitLength - 1; // must be less than m.BitLength
+			var m = key.Modulus;
+			var length = m.BitLength - 1; // must be less than m.BitLength
 			BigInteger factor;
 			BigInteger gcd;
 

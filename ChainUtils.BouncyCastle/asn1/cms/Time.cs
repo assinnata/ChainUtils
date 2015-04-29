@@ -1,7 +1,4 @@
 using System;
-using System.Globalization;
-
-using ChainUtils.BouncyCastle.Asn1;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
@@ -37,9 +34,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         public Time(
             DateTime date)
         {
-            string d = date.ToString("yyyyMMddHHmmss") + "Z";
+            var d = date.ToString("yyyyMMddHHmmss") + "Z";
 
-			int year = int.Parse(d.Substring(0, 4));
+			var year = int.Parse(d.Substring(0, 4));
 
 			if (year < 1950 || year > 2049)
             {

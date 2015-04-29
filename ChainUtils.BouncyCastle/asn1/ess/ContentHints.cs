@@ -47,7 +47,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ess
 			DerObjectIdentifier contentType)
 		{
 			this.contentType = contentType;
-			this.contentDescription = null;
+			contentDescription = null;
 		}
 
 		public ContentHints(
@@ -77,7 +77,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ess
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 
 			if (contentDescription != null)
 			{

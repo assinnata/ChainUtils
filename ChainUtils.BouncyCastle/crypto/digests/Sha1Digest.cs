@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -146,27 +145,27 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             //
             // expand 16 word block into 80 word block.
             //
-            for (int i = 16; i < 80; i++)
+            for (var i = 16; i < 80; i++)
             {
-                uint t = X[i - 3] ^ X[i - 8] ^ X[i - 14] ^ X[i - 16];
+                var t = X[i - 3] ^ X[i - 8] ^ X[i - 14] ^ X[i - 16];
                 X[i] = t << 1 | t >> 31;
             }
 
             //
             // set up working variables.
             //
-            uint A = H1;
-            uint B = H2;
-            uint C = H3;
-            uint D = H4;
-            uint E = H5;
+            var A = H1;
+            var B = H2;
+            var C = H3;
+            var D = H4;
+            var E = H5;
 
             //
             // round 1
             //
-            int idx = 0;
+            var idx = 0;
 
-            for (int j = 0; j < 4; j++)
+            for (var j = 0; j < 4; j++)
             {
                 // E = rotateLeft(A, 5) + F(B, C, D) + E + X[idx++] + Y1
                 // B = rotateLeft(B, 30)
@@ -189,7 +188,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             //
             // round 2
             //
-            for (int j = 0; j < 4; j++)
+            for (var j = 0; j < 4; j++)
             {
                 // E = rotateLeft(A, 5) + H(B, C, D) + E + X[idx++] + Y2
                 // B = rotateLeft(B, 30)
@@ -212,7 +211,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             //
             // round 3
             //
-            for (int j = 0; j < 4; j++)
+            for (var j = 0; j < 4; j++)
             {
                 // E = rotateLeft(A, 5) + G(B, C, D) + E + X[idx++] + Y3
                 // B = rotateLeft(B, 30)
@@ -235,7 +234,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             //
             // round 4
             //
-            for (int j = 0; j < 4; j++)
+            for (var j = 0; j < 4; j++)
             {
                 // E = rotateLeft(A, 5) + H(B, C, D) + E + X[idx++] + Y4
                 // B = rotateLeft(B, 30)
@@ -275,7 +274,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public override void Reset(IMemoable other)
 		{
-			Sha1Digest d = (Sha1Digest)other;
+			var d = (Sha1Digest)other;
 
 			CopyIn(d);
 		}

@@ -1,19 +1,15 @@
-﻿using ChainUtils.DataEncoders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils.OpenAsset
 {
 	public class AssetId
 	{
-		internal byte[] _Bytes;
+		internal byte[] Bytes;
 
 		public AssetId()
 		{
-			_Bytes = new byte[] { 0 };
+			Bytes = new byte[] { 0 };
 		}
 
 		public AssetId(IDestination assetScriptPubKey)
@@ -25,7 +21,7 @@ namespace ChainUtils.OpenAsset
 		{
 			if(assetId == null)
 				throw new ArgumentNullException("assetId");
-			_Bytes = assetId.AssetId._Bytes;
+			Bytes = assetId.AssetId.Bytes;
 		}
 
 		public AssetId(Script assetScriptPubKey)
@@ -35,23 +31,23 @@ namespace ChainUtils.OpenAsset
 
 		public AssetId(ScriptId scriptId)
 		{
-			_Bytes = scriptId.ToBytes(true);
+			Bytes = scriptId.ToBytes(true);
 		}
 		public AssetId(byte[] value)
 		{
 			if(value == null)
 				throw new ArgumentNullException("value");
-			_Bytes = value;
+			Bytes = value;
 		}
-		public AssetId(uint160 value)
+		public AssetId(Uint160 value)
 			: this(value.ToBytes())
 		{
 		}
 
 		public AssetId(string value)
 		{
-			_Bytes = Encoders.Hex.DecodeData(value);
-			_Str = value;
+			Bytes = Encoders.Hex.DecodeData(value);
+			_str = value;
 		}
 
 		public BitcoinAssetId GetWif(Network network)
@@ -66,26 +62,26 @@ namespace ChainUtils.OpenAsset
 		public byte[] ToBytes(bool @unsafe)
 		{
 			if(@unsafe)
-				return _Bytes;
-			var array = new byte[_Bytes.Length];
-			Array.Copy(_Bytes, array, _Bytes.Length);
+				return Bytes;
+			var array = new byte[Bytes.Length];
+			Array.Copy(Bytes, array, Bytes.Length);
 			return array;
 		}
 
 		public override bool Equals(object obj)
 		{
-			AssetId item = obj as AssetId;
+			var item = obj as AssetId;
 			if(item == null)
 				return false;
-			return Utils.ArrayEqual(_Bytes, item._Bytes);
+			return Utils.ArrayEqual(Bytes, item.Bytes);
 		}
 		public static bool operator ==(AssetId a, AssetId b)
 		{
-			if(System.Object.ReferenceEquals(a, b))
+			if(ReferenceEquals(a, b))
 				return true;
 			if(((object)a == null) || ((object)b == null))
 				return false;
-			return Utils.ArrayEqual(a._Bytes, b._Bytes);
+			return Utils.ArrayEqual(a.Bytes, b.Bytes);
 		}
 
 		public static bool operator !=(AssetId a, AssetId b)
@@ -95,15 +91,15 @@ namespace ChainUtils.OpenAsset
 
 		public override int GetHashCode()
 		{
-			return Utils.GetHashCode(_Bytes);
+			return Utils.GetHashCode(Bytes);
 		}
 
-		string _Str;
+		string _str;
 		public override string ToString()
 		{
-			if(_Str == null)
-				_Str = Encoders.Hex.EncodeData(_Bytes);
-			return _Str;
+			if(_str == null)
+				_str = Encoders.Hex.EncodeData(Bytes);
+			return _str;
 		}
 	}
 }

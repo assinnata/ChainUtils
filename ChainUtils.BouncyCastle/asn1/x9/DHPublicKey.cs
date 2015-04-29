@@ -33,12 +33,12 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
 
 		public DerInteger Y
 		{
-			get { return this.y; }
+			get { return y; }
 		}
 
 		public override Asn1Object ToAsn1Object()
 		{
-			return this.y;
+			return y;
 		}
 	}
 }

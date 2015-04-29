@@ -1,27 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.OpenAsset
 {
 	public class Asset : IBitcoinSerializable
 	{
-		ulong _Quantity;
+		ulong _quantity;
 		public ulong Quantity
 		{
 			get
 			{
-				return _Quantity;
+				return _quantity;
 			}
 			set
 			{
-				_Quantity = value;
+				_quantity = value;
 			}
 		}
 
-		AssetId _Id = new AssetId(0);
+		AssetId _id = new AssetId(0);
 
 		public Asset(AssetId id, ulong quantity)
 		{
@@ -51,11 +47,11 @@ namespace ChainUtils.OpenAsset
 		{
 			get
 			{
-				return _Id;
+				return _id;
 			}
 			set
 			{
-				_Id = value;
+				_id = value;
 			}
 		}
 
@@ -63,11 +59,11 @@ namespace ChainUtils.OpenAsset
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			byte[] assetId = _Id.ToBytes();
+			var assetId = _id.ToBytes();
 			stream.ReadWrite(ref assetId);
 			if(!stream.Serializing)
-				_Id = new AssetId(assetId);
-			stream.ReadWrite(ref _Quantity);
+				_id = new AssetId(assetId);
+			stream.ReadWrite(ref _quantity);
 		}
 
 		#endregion

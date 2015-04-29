@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -50,19 +49,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             if (!(parameters is KeyParameter))
 	            throw new ArgumentException("invalid parameter passed to SKIPJACK init - " + parameters.GetType().ToString());
 
-			byte[] keyBytes = ((KeyParameter)parameters).GetKey();
+			var keyBytes = ((KeyParameter)parameters).GetKey();
 
-            this.encrypting = forEncryption;
-            this.key0 = new int[32];
-            this.key1 = new int[32];
-            this.key2 = new int[32];
-            this.key3 = new int[32];
+            encrypting = forEncryption;
+            key0 = new int[32];
+            key1 = new int[32];
+            key2 = new int[32];
+            key3 = new int[32];
 
             //
             // expand the key to 128 bytes in 4 parts (saving us a modulo, multiply
             // and an addition).
             //
-            for (int i = 0; i < 32; i ++)
+            for (var i = 0; i < 32; i ++)
             {
                 key0[i] = keyBytes[(i * 4) % 10] & 0xff;
                 key1[i] = keyBytes[(i * 4 + 1) % 10] & 0xff;
@@ -141,18 +140,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]      outBytes,
             int         outOff)
         {
-            int w1 = (input[inOff + 0] << 8) + (input[inOff + 1] & 0xff);
-            int w2 = (input[inOff + 2] << 8) + (input[inOff + 3] & 0xff);
-            int w3 = (input[inOff + 4] << 8) + (input[inOff + 5] & 0xff);
-            int w4 = (input[inOff + 6] << 8) + (input[inOff + 7] & 0xff);
+            var w1 = (input[inOff + 0] << 8) + (input[inOff + 1] & 0xff);
+            var w2 = (input[inOff + 2] << 8) + (input[inOff + 3] & 0xff);
+            var w3 = (input[inOff + 4] << 8) + (input[inOff + 5] & 0xff);
+            var w4 = (input[inOff + 6] << 8) + (input[inOff + 7] & 0xff);
 
-            int k = 0;
+            var k = 0;
 
-            for (int t = 0; t < 2; t++)
+            for (var t = 0; t < 2; t++)
             {
-                for(int i = 0; i < 8; i++)
+                for(var i = 0; i < 8; i++)
                 {
-                    int tmp = w4;
+                    var tmp = w4;
                     w4 = w3;
                     w3 = w2;
                     w2 = G(k, w1);
@@ -160,9 +159,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                     k++;
                 }
 
-                for(int i = 0; i < 8; i++)
+                for(var i = 0; i < 8; i++)
                 {
-                    int tmp = w4;
+                    var tmp = w4;
                     w4 = w3;
                     w3 = w1 ^ w2 ^ (k + 1);
                     w2 = G(k, w1);
@@ -209,18 +208,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]      outBytes,
             int         outOff)
         {
-            int w2 = (input[inOff + 0] << 8) + (input[inOff + 1] & 0xff);
-            int w1 = (input[inOff + 2] << 8) + (input[inOff + 3] & 0xff);
-            int w4 = (input[inOff + 4] << 8) + (input[inOff + 5] & 0xff);
-            int w3 = (input[inOff + 6] << 8) + (input[inOff + 7] & 0xff);
+            var w2 = (input[inOff + 0] << 8) + (input[inOff + 1] & 0xff);
+            var w1 = (input[inOff + 2] << 8) + (input[inOff + 3] & 0xff);
+            var w4 = (input[inOff + 4] << 8) + (input[inOff + 5] & 0xff);
+            var w3 = (input[inOff + 6] << 8) + (input[inOff + 7] & 0xff);
 
-            int k = 31;
+            var k = 31;
 
-            for (int t = 0; t < 2; t++)
+            for (var t = 0; t < 2; t++)
             {
-                for(int i = 0; i < 8; i++)
+                for(var i = 0; i < 8; i++)
                 {
-                    int tmp = w4;
+                    var tmp = w4;
                     w4 = w3;
                     w3 = w2;
                     w2 = H(k, w1);
@@ -228,9 +227,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                     k--;
                 }
 
-                for(int i = 0; i < 8; i++)
+                for(var i = 0; i < 8; i++)
                 {
-                    int tmp = w4;
+                    var tmp = w4;
                     w4 = w3;
                     w3 = w1 ^ w2 ^ (k + 1);
                     w2 = H(k, w1);

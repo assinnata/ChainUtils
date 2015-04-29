@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -79,7 +78,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			{
 				while (len > 0)
 				{
-					int numToCopy = System.Math.Min(len, _buf.Length - _off);
+					var numToCopy = System.Math.Min(len, _buf.Length - _off);
 
 					if (numToCopy == _buf.Length)
 					{

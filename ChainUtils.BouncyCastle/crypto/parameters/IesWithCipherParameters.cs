@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
 {
     public class IesWithCipherParameters : IesParameters

@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
 {
     public class Gost3410PublicKeyAlgParameters
@@ -59,12 +57,12 @@ namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
 		public Gost3410PublicKeyAlgParameters(
             Asn1Sequence seq)
         {
-            this.publicKeyParamSet = (DerObjectIdentifier) seq[0];
-            this.digestParamSet = (DerObjectIdentifier) seq[1];
+            publicKeyParamSet = (DerObjectIdentifier) seq[0];
+            digestParamSet = (DerObjectIdentifier) seq[1];
 
 			if (seq.Count > 2)
             {
-                this.encryptionParamSet = (DerObjectIdentifier) seq[2];
+                encryptionParamSet = (DerObjectIdentifier) seq[2];
             }
         }
 
@@ -85,7 +83,7 @@ namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
 
 		public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
 				publicKeyParamSet, digestParamSet);
 
 			if (encryptionParamSet != null)

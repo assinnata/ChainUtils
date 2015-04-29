@@ -1,8 +1,3 @@
-using System;
-using System.Globalization;
-using System.IO;
-using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities.Encoders;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
@@ -61,7 +56,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
             string	hexString,
             int		offset)
         {
-			string str = hexString.Substring(offset);
+			var str = hexString.Substring(offset);
 
 			return Asn1Object.FromByteArray(Hex.Decode(str));
         }

@@ -1,6 +1,4 @@
 using System;
-using System.Globalization;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Math;
 
@@ -65,7 +63,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
             if (obj == this)
                 return true;
 
-            ECPrivateKeyParameters other = obj as ECPrivateKeyParameters;
+            var other = obj as ECPrivateKeyParameters;
 
             if (other == null)
                 return false;

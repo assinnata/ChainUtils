@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
@@ -49,9 +47,9 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 			if (seq.Count != 3)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.p = DerInteger.GetInstance(seq[0]);
-			this.q = DerInteger.GetInstance(seq[1]);
-			this.g = DerInteger.GetInstance(seq[2]);
+			p = DerInteger.GetInstance(seq[0]);
+			q = DerInteger.GetInstance(seq[1]);
+			g = DerInteger.GetInstance(seq[2]);
         }
 
 		public BigInteger P

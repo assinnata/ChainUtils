@@ -1,7 +1,4 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
 {
@@ -19,17 +16,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         public void Init(
 			KeyGenerationParameters parameters)
         {
-            this.param = (ElGamalKeyGenerationParameters) parameters;
+            param = (ElGamalKeyGenerationParameters) parameters;
         }
 
         public AsymmetricCipherKeyPair GenerateKeyPair()
         {
-			DHKeyGeneratorHelper helper = DHKeyGeneratorHelper.Instance;
-			ElGamalParameters egp = param.Parameters;
-			DHParameters dhp = new DHParameters(egp.P, egp.G, null, 0, egp.L);
+			var helper = DHKeyGeneratorHelper.Instance;
+			var egp = param.Parameters;
+			var dhp = new DHParameters(egp.P, egp.G, null, 0, egp.L);
 
-			BigInteger x = helper.CalculatePrivate(dhp, param.Random);
-			BigInteger y = helper.CalculatePublic(dhp, x);
+			var x = helper.CalculatePrivate(dhp, param.Random);
+			var y = helper.CalculatePublic(dhp, x);
 
 			return new AsymmetricCipherKeyPair(
                 new ElGamalPublicKeyParameters(y, egp),

@@ -31,7 +31,7 @@ namespace ChainUtils.Tests
 			public TestVector Add(string pub, string prv, uint nChild)
 			{
 				vDerive.Add(new TestDerivation());
-				TestDerivation der = vDerive.Last();
+				var der = vDerive.Last();
 				der.pub = pub;
 				der.prv = prv;
 				der.nChild = nChild;
@@ -100,12 +100,12 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanRecoverExtKeyFromExtPubKeyAndOneChildExtKey()
 		{
-			ExtKey key = ExtKey.Parse("xprv9s21ZrQH143K3Z9EwCXrA5VbypnvWGiE9z22S1cLLPi7r8DVUkTabBvMjeirS8KCyppw24KoD4sFmja8UDU4VL32SBdip78LY6sz3X2GPju")
+			var key = ExtKey.Parse("xprv9s21ZrQH143K3Z9EwCXrA5VbypnvWGiE9z22S1cLLPi7r8DVUkTabBvMjeirS8KCyppw24KoD4sFmja8UDU4VL32SBdip78LY6sz3X2GPju")
 				.Derive(1);
 			var pubkey = key.Neuter();
 			var childKey = key.Derive(1);
 
-			ExtKey recovered = childKey.GetParentExtKey(pubkey);
+			var recovered = childKey.GetParentExtKey(pubkey);
 			Assert.Equal(recovered.ToString(Network.Main), key.ToString(Network.Main));
 
 			childKey = key.Derive(1, true);
@@ -119,12 +119,12 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanRecoverExtKeyFromExtPubKeyAndOneChildExtKey2()
 		{
-			for(int i = 0 ; i < 255 ; i++)
+			for(var i = 0 ; i < 255 ; i++)
 			{
-				ExtKey key = new ExtKey().Derive((uint)i);
+				var key = new ExtKey().Derive((uint)i);
 				var childKey = key.Derive((uint)i);
 				var pubKey = key.Neuter();
-				ExtKey recovered = childKey.GetParentExtKey(pubKey);
+				var recovered = childKey.GetParentExtKey(pubKey);
 				Assert.Equal(recovered.ToString(Network.Main), key.ToString(Network.Main));
 			}
 		}
@@ -133,10 +133,10 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanRecoverExtKeyFromExtPubKeyAndSecret()
 		{
-			ExtKey key = new ExtKey().Derive(1);
+			var key = new ExtKey().Derive(1);
 			var underlying = key.PrivateKey.GetBitcoinSecret(Network.Main);
 			var pubKey = key.Neuter().GetWif(Network.Main);
-			ExtKey key2 = new ExtKey(pubKey, underlying);
+			var key2 = new ExtKey(pubKey, underlying);
 			Assert.Equal(key.ToString(Network.Main), key2.ToString(Network.Main));
 		}
 
@@ -220,27 +220,27 @@ namespace ChainUtils.Tests
 		private void RunTest(TestVector test)
 		{
 			var seed = TestUtils.ParseHex(test.strHexMaster);
-			ExtKey key = new ExtKey(seed);
-			ExtPubKey pubkey = key.Neuter();
-			foreach(TestDerivation derive in test.vDerive)
+			var key = new ExtKey(seed);
+			var pubkey = key.Neuter();
+			foreach(var derive in test.vDerive)
 			{
-				byte[] data = key.ToBytes();
+				var data = key.ToBytes();
 				Assert.Equal(74, data.Length);
 				data = pubkey.ToBytes();
 				Assert.Equal(74, data.Length);
 				// Test private key
-				BitcoinExtKey b58key = Network.Main.CreateBitcoinExtKey(key);
+				var b58key = Network.Main.CreateBitcoinExtKey(key);
 				Assert.True(b58key.ToString() == derive.prv);
 				// Test public key
-				BitcoinExtPubKey b58pubkey = Network.Main.CreateBitcoinExtPubKey(pubkey);
+				var b58pubkey = Network.Main.CreateBitcoinExtPubKey(pubkey);
 				Assert.True(b58pubkey.ToString() == derive.pub);
 				// Derive new keys
-				ExtKey keyNew = key.Derive(derive.nChild);
-				ExtPubKey pubkeyNew = keyNew.Neuter();
+				var keyNew = key.Derive(derive.nChild);
+				var pubkeyNew = keyNew.Neuter();
 				if(!((derive.nChild & 0x80000000) != 0))
 				{
 					// Compare with public derivation
-					ExtPubKey pubkeyNew2 = pubkey.Derive(derive.nChild);
+					var pubkeyNew2 = pubkey.Derive(derive.nChild);
 					Assert.True(pubkeyNew == pubkeyNew2);
 				}
 				key = keyNew;

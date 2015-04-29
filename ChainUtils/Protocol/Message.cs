@@ -1,80 +1,75 @@
-﻿using ChainUtils.Crypto;
-using ChainUtils.DataEncoders;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
+using System.Threading;
+using ChainUtils.Crypto;
+using ChainUtils.DataEncoders;
 #if !NOSOCKET
 using System.Net.Sockets;
 #endif
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Protocol
 {
 	public class Message : IBitcoinSerializable
 	{
-		uint magic;
+		uint _magic;
 
 		public uint Magic
 		{
 			get
 			{
-				return magic;
+				return _magic;
 			}
 			set
 			{
-				magic = value;
+				_magic = value;
 			}
 		}
-		byte[] command = new byte[12];
+		byte[] _command = new byte[12];
 
 		public string Command
 		{
 			get
 			{
-				return Encoders.ASCII.EncodeData(command);
+				return Encoders.ASCII.EncodeData(_command);
 			}
 			set
 			{
-				command = Encoders.ASCII.DecodeData(value.Trim().PadRight(12, '\0'));
+				_command = Encoders.ASCII.DecodeData(value.Trim().PadRight(12, '\0'));
 			}
 		}
-		uint length;
+		uint _length;
 
 		public uint Length
 		{
 			get
 			{
-				return length;
+				return _length;
 			}
 			set
 			{
-				length = value;
+				_length = value;
 			}
 		}
-		uint checksum;
+		uint _checksum;
 
 		public uint Checksum
 		{
 			get
 			{
-				return checksum;
+				return _checksum;
 			}
 			set
 			{
-				checksum = value;
+				_checksum = value;
 			}
 		}
-		byte[] payload;
-		object _PayloadObject;
+		byte[] _payload;
+		object _payloadObject;
 		public object Payload
 		{
 			get
 			{
-				return _PayloadObject;
+				return _payloadObject;
 			}
 		}
 
@@ -84,29 +79,29 @@ namespace ChainUtils.Protocol
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			bool verifyChechksum = false;
-			if(stream.Serializing || (!stream.Serializing && !_SkipMagic))
-				stream.ReadWrite(ref magic);
-			stream.ReadWrite(ref command);
-			stream.ReadWrite(ref length);
-			if(stream.ProtocolVersion >= ProtocolVersion.MEMPOOL_GD_VERSION)
+			var verifyChechksum = false;
+			if(stream.Serializing || (!stream.Serializing && !_skipMagic))
+				stream.ReadWrite(ref _magic);
+			stream.ReadWrite(ref _command);
+			stream.ReadWrite(ref _length);
+			if(stream.ProtocolVersion >= ProtocolVersion.MempoolGdVersion)
 			{
-				stream.ReadWrite(ref checksum);
+				stream.ReadWrite(ref _checksum);
 				verifyChechksum = true;
 			}
 			if(stream.Serializing)
 			{
-				stream.ReadWrite(ref payload);
+				stream.ReadWrite(ref _payload);
 			}
 			else
 			{
 				NodeServerTrace.Trace.TraceEvent(TraceEventType.Verbose, 0, "Message type readen : " + Command);
-				if(length > 0x02000000) //MAX_SIZE 0x02000000 Serialize.h
+				if(_length > 0x02000000) //MAX_SIZE 0x02000000 Serialize.h
 				{
 					throw new FormatException("Message payload too big ( > 0x02000000 bytes)");
 				}
-				payload = new byte[length];
-				stream.ReadWrite(ref payload);
+				_payload = new byte[_length];
+				stream.ReadWrite(ref _payload);
 
 				if(verifyChechksum)
 				{
@@ -117,14 +112,14 @@ namespace ChainUtils.Protocol
 						throw new FormatException("Message checksum invalid");
 					}
 				}
-				BitcoinStream payloadStream = new BitcoinStream(payload);
+				var payloadStream = new BitcoinStream(_payload);
 				payloadStream.CopyParameters(stream);
 
 				var payloadType = PayloadAttribute.GetCommandType(Command);
 				if(payloadType == typeof(UnknowPayload))
 					NodeServerTrace.Trace.TraceEvent(TraceEventType.Warning, 0, "Unknown command received : " + Command);
-				payloadStream.ReadWrite(payloadType, ref _PayloadObject);
-				NodeServerTrace.Verbose("Payload : " + _PayloadObject);
+				payloadStream.ReadWrite(payloadType, ref _payloadObject);
+				NodeServerTrace.Verbose("Payload : " + _payloadObject);
 			}
 		}
 
@@ -132,17 +127,17 @@ namespace ChainUtils.Protocol
 
 		public bool VerifyChecksum()
 		{
-			return Checksum == Hashes.Hash256(payload).GetLow32();
+			return Checksum == Hashes.Hash256(_payload).GetLow32();
 		}
 
 		public void UpdatePayload(Payload payload, ProtocolVersion version)
 		{
 			if(payload == null)
 				throw new ArgumentNullException("payload");
-			this._PayloadObject = payload;
-			this.payload = payload.ToBytes(version);
-			length = (uint)this.payload.Length;
-			checksum = Hashes.Hash256(this.payload).GetLow32();
+			_payloadObject = payload;
+			this._payload = payload.ToBytes(version);
+			_length = (uint)this._payload.Length;
+			_checksum = Hashes.Hash256(this._payload).GetLow32();
 			Command = payload.Command;
 		}
 
@@ -150,7 +145,7 @@ namespace ChainUtils.Protocol
 		/// <summary>
 		/// When parsing, maybe Magic is already parsed
 		/// </summary>
-		bool _SkipMagic;
+		bool _skipMagic;
 
 		public override string ToString()
 		{
@@ -183,7 +178,7 @@ namespace ChainUtils.Protocol
 		public static Message ReadNext(Socket socket, Network network, ProtocolVersion version, CancellationToken cancellationToken, out PerformanceCounter counter)
 		{
 			var stream = new CustomNetworkStream(socket, false);
-			BitcoinStream bitStream = new BitcoinStream(stream, false)
+			var bitStream = new BitcoinStream(stream, false)
 			{
 				ProtocolVersion = version,
 				ReadCancellationToken = cancellationToken
@@ -191,7 +186,7 @@ namespace ChainUtils.Protocol
 
 			network.ReadMagic(stream, cancellationToken);
 
-			Message message = new Message();
+			var message = new Message();
 			using(message.SkipMagicScope(true))
 			{
 				message.Magic = network.Magic;
@@ -203,8 +198,8 @@ namespace ChainUtils.Protocol
 #endif
 		private IDisposable SkipMagicScope(bool value)
 		{
-			var old = _SkipMagic;
-			return new Scope(() => _SkipMagic = value, () => _SkipMagic = old);
+			var old = _skipMagic;
+			return new Scope(() => _skipMagic = value, () => _skipMagic = old);
 		}
 
 	}

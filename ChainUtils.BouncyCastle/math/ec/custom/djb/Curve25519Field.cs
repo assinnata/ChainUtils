@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-
+﻿using System.Diagnostics;
 using ChainUtils.BouncyCastle.Math.EC.Custom.Sec;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
@@ -45,7 +43,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public static uint[] FromBigInteger(BigInteger x)
         {
-            uint[] z = Nat256.FromBigInteger(x);
+            var z = Nat256.FromBigInteger(x);
             while (Nat256.Gte(z, P))
             {
                 Nat256.SubFrom(P, z);
@@ -68,7 +66,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public static void Multiply(uint[] x, uint[] y, uint[] z)
         {
-            uint[] tt = Nat256.CreateExt();
+            var tt = Nat256.CreateExt();
             Nat256.Mul(x, y, tt);
             Reduce(tt, z);
         }
@@ -98,10 +96,10 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
         {
             Debug.Assert(xx[15] >> 30 == 0);
 
-            uint xx07 = xx[7];
+            var xx07 = xx[7];
             Nat.ShiftUpBit(8, xx, 8, xx07, z, 0);
-            uint c = Nat256.MulByWordAddTo(PInv, xx, z) << 1;
-            uint z7 = z[7];
+            var c = Nat256.MulByWordAddTo(PInv, xx, z) << 1;
+            var z7 = z[7];
             c += (z7 >> 31) - (xx07 >> 31);
             z7 &= P7;
             z7 += Nat.AddWordTo(7, c * PInv, z);
@@ -116,8 +114,8 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
         {
             Debug.Assert(x >> 26 == 0);
 
-            uint z7 = z[7];
-            uint c = (x << 1 | z7 >> 31);
+            var z7 = z[7];
+            var c = (x << 1 | z7 >> 31);
             z7 &= P7;
             z7 += Nat.AddWordTo(7, c * PInv, z);
             z[7] = z7;
@@ -129,7 +127,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public static void Square(uint[] x, uint[] z)
         {
-            uint[] tt = Nat256.CreateExt();
+            var tt = Nat256.CreateExt();
             Nat256.Square(x, tt);
             Reduce(tt, z);
         }
@@ -138,7 +136,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
         {
             Debug.Assert(n > 0);
 
-            uint[] tt = Nat256.CreateExt();
+            var tt = Nat256.CreateExt();
             Nat256.Square(x, tt);
             Reduce(tt, z);
 
@@ -151,7 +149,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public static void Subtract(uint[] x, uint[] y, uint[] z)
         {
-            int c = Nat256.Sub(x, y, z);
+            var c = Nat256.Sub(x, y, z);
             if (c != 0)
             {
                 AddPTo(z);
@@ -160,7 +158,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public static void SubtractExt(uint[] xx, uint[] yy, uint[] zz)
         {
-            int c = Nat.Sub(16, xx, yy, zz);
+            var c = Nat.Sub(16, xx, yy, zz);
             if (c != 0)
             {
                 AddPExtTo(zz);
@@ -178,7 +176,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         private static uint AddPTo(uint[] z)
         {
-            long c = (long)z[0] - PInv;
+            var c = (long)z[0] - PInv;
             z[0] = (uint)c;
             c >>= 32;
             if (c != 0)
@@ -193,7 +191,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         private static uint AddPExtTo(uint[] zz)
         {
-            long c = (long)zz[0] + PExt[0];
+            var c = (long)zz[0] + PExt[0];
             zz[0] = (uint)c;
             c >>= 32;
             if (c != 0)
@@ -215,7 +213,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         private static int SubPFrom(uint[] z)
         {
-            long c = (long)z[0] + PInv;
+            var c = (long)z[0] + PInv;
             z[0] = (uint)c;
             c >>= 32;
             if (c != 0)
@@ -230,7 +228,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         private static int SubPExtFrom(uint[] zz)
         {
-            long c = (long)zz[0] - PExt[0];
+            var c = (long)zz[0] - PExt[0];
             zz[0] = (uint)c;
             c >>= 32;
             if (c != 0)

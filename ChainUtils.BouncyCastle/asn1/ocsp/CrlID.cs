@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 {
@@ -59,7 +58,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
 			if (crlUrl != null)
             {

@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Math;
 
@@ -32,16 +30,16 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 		private MacData(
             Asn1Sequence seq)
         {
-            this.digInfo = DigestInfo.GetInstance(seq[0]);
-            this.salt = ((Asn1OctetString) seq[1]).GetOctets();
+            digInfo = DigestInfo.GetInstance(seq[0]);
+            salt = ((Asn1OctetString) seq[1]).GetOctets();
 
 			if (seq.Count == 3)
             {
-                this.iterationCount = ((DerInteger) seq[2]).Value;
+                iterationCount = ((DerInteger) seq[2]).Value;
             }
             else
             {
-                this.iterationCount = BigInteger.One;
+                iterationCount = BigInteger.One;
             }
         }
 
@@ -83,7 +81,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 		 */
 		public override Asn1Object ToAsn1Object()
         {
-			Asn1EncodableVector v = new Asn1EncodableVector(digInfo, new DerOctetString(salt));
+			var v = new Asn1EncodableVector(digInfo, new DerOctetString(salt));
 
 			if (!iterationCount.Equals(BigInteger.One))
 			{

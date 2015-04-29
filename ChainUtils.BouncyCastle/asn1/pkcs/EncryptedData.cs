@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
@@ -51,13 +50,13 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 			if (seq.Count != 2)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-			int version = ((DerInteger) seq[0]).Value.IntValue;
+			var version = ((DerInteger) seq[0]).Value.IntValue;
 			if (version != 0)
             {
                 throw new ArgumentException("sequence not version 0");
             }
 
-			this.data = (Asn1Sequence) seq[1];
+			data = (Asn1Sequence) seq[1];
         }
 
 		public EncryptedData(
@@ -87,7 +86,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 			{
 				if (data.Count == 3)
 				{
-					DerTaggedObject o = (DerTaggedObject) data[2];
+					var o = (DerTaggedObject) data[2];
 
 					return Asn1OctetString.GetInstance(o, false);
 				}

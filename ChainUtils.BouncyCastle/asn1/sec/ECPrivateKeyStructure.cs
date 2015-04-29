@@ -1,8 +1,5 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Math;
-using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1.Sec
 {
@@ -38,7 +35,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Sec
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            this.seq = new DerSequence(
+            seq = new DerSequence(
                 new DerInteger(1),
                 new DerOctetString(key.ToByteArrayUnsigned()));
         }
@@ -58,7 +55,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Sec
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
                 new DerInteger(1),
                 new DerOctetString(key.ToByteArrayUnsigned()));
 
@@ -72,12 +69,12 @@ namespace ChainUtils.BouncyCastle.Asn1.Sec
                 v.Add(new DerTaggedObject(true, 1, publicKey));
             }
 
-            this.seq = new DerSequence(v);
+            seq = new DerSequence(v);
         }
 
         public virtual BigInteger GetKey()
         {
-            Asn1OctetString octs = (Asn1OctetString) seq[1];
+            var octs = (Asn1OctetString) seq[1];
 
             return new BigInteger(1, octs.GetOctets());
         }
@@ -96,11 +93,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Sec
         {
             foreach (Asn1Encodable ae in seq)
             {
-                Asn1Object obj = ae.ToAsn1Object();
+                var obj = ae.ToAsn1Object();
 
                 if (obj is Asn1TaggedObject)
                 {
-                    Asn1TaggedObject tag = (Asn1TaggedObject) obj;
+                    var tag = (Asn1TaggedObject) obj;
                     if (tag.TagNo == tagNo)
                     {
                         return tag.GetObject();

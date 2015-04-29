@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
@@ -50,23 +49,23 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
         {
             this.seq = seq;
 
-            foreach (object o in seq)
+            foreach (var o in seq)
             {
                 if (!(o is DerObjectIdentifier))
                     throw new ArgumentException("Only DerObjectIdentifier instances allowed in ExtendedKeyUsage.");
 
-                this.usageTable[o] = o;
+                usageTable[o] = o;
             }
         }
 
         public ExtendedKeyUsage(
             params KeyPurposeID[] usages)
         {
-            this.seq = new DerSequence(usages);
+            seq = new DerSequence(usages);
 
-            foreach (KeyPurposeID usage in usages)
+            foreach (var usage in usages)
             {
-                this.usageTable[usage] = usage;
+                usageTable[usage] = usage;
             }
         }
 
@@ -82,17 +81,17 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
         public ExtendedKeyUsage(
             IEnumerable usages)
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
-            foreach (object usage in usages)
+            foreach (var usage in usages)
             {
-                Asn1Encodable o = KeyPurposeID.GetInstance(usage);
+                Asn1Encodable o = DerObjectIdentifier.GetInstance(usage);
 
                 v.Add(o);
-                this.usageTable[o] = o;
+                usageTable[o] = o;
             }
 
-            this.seq = new DerSequence(v);
+            seq = new DerSequence(v);
         }
 
         public bool HasKeyPurposeId(

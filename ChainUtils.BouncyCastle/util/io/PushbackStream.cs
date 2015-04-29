@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Asn1.Utilities;
 
 namespace ChainUtils.BouncyCastle.Utilities.IO
@@ -20,7 +19,7 @@ namespace ChainUtils.BouncyCastle.Utilities.IO
 		{
 			if (buf != -1)
 			{
-				int tmp = buf;
+				var tmp = buf;
 				buf = -1;
 				return tmp;
 			}

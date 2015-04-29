@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -357,7 +356,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]	output,
             int		outOff)
         {
-			int blockSize = GetBlockSize();
+			var blockSize = GetBlockSize();
             if (_workingKey == null)
                 throw new InvalidOperationException(AlgorithmName + " not initialised");
             if ((inOff + blockSize) > input.Length)
@@ -410,14 +409,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                 _rounds = RED_ROUNDS;
             }
 
-            int [] z = new int[16];
-            int [] x = new int[16];
+            var z = new int[16];
+            var x = new int[16];
 
             uint z03, z47, z8B, zCF;
             uint x03, x47, x8B, xCF;
 
             /* copy the key into x */
-            for (int i=0; i< key.Length; i++)
+            for (var i=0; i< key.Length; i++)
             {
                 x[i] = (int)(key[i] & 0xff);
             }
@@ -585,10 +584,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             // batch the units up into a 32 bit chunk and go for it
             // the array is in bytes, the increment is 8x8 bits = 64
 
-            uint L0 = Pack.BE_To_UInt32(src, srcIndex);
-            uint R0 = Pack.BE_To_UInt32(src, srcIndex + 4);
+            var L0 = Pack.BE_To_UInt32(src, srcIndex);
+            var R0 = Pack.BE_To_UInt32(src, srcIndex + 4);
 
-            uint[] result = new uint[2];
+            var result = new uint[2];
             CAST_Encipher(L0, R0, result);
 
             // now stuff them into the destination block
@@ -616,10 +615,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             // process the input block
             // batch the units up into a 32 bit chunk and go for it
             // the array is in bytes, the increment is 8x8 bits = 64
-            uint L16 = Pack.BE_To_UInt32(src, srcIndex);
-            uint R16 = Pack.BE_To_UInt32(src, srcIndex + 4);
+            var L16 = Pack.BE_To_UInt32(src, srcIndex);
+            var R16 = Pack.BE_To_UInt32(src, srcIndex + 4);
 
-            uint[] result = new uint[2];
+            var result = new uint[2];
             CAST_Decipher(L16, R16, result);
 
             // now stuff them into the destination block
@@ -640,7 +639,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         internal static uint F1(uint D, uint Kmi, int Kri)
         {
-            uint I = Kmi + D;
+            var I = Kmi + D;
             I = I << Kri | (I >> (32-Kri));
             return ((S1[(I>>24)&0xff]^S2[(I>>16)&0xff])-S3[(I>>8)&0xff])+S4[I&0xff];
         }
@@ -656,7 +655,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         internal static uint F2(uint D, uint Kmi, int Kri)
         {
-            uint I = Kmi ^ D;
+            var I = Kmi ^ D;
             I = I << Kri | (I >> (32-Kri));
             return ((S1[(I>>24)&0xff]-S2[(I>>16)&0xff])+S3[(I>>8)&0xff])^S4[I&0xff];
         }
@@ -672,7 +671,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         internal static uint F3(uint D, uint Kmi, int Kri)
         {
-            uint I = Kmi - D;
+            var I = Kmi - D;
             I = I << Kri | (I >> (32-Kri));
             return ((S1[(I>>24)&0xff]+S2[(I>>16)&0xff])^S3[(I>>8)&0xff])-S4[I&0xff];
         }
@@ -685,8 +684,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         internal void CAST_Encipher(uint L0, uint R0, uint[] result)
         {
-            uint Lp = L0;        // the previous value, equiv to L[i-1]
-            uint Rp = R0;        // equivalent to R[i-1]
+            var Lp = L0;        // the previous value, equiv to L[i-1]
+            var Rp = R0;        // equivalent to R[i-1]
 
             /*
             * numbering consistent with paper to make
@@ -694,7 +693,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             */
             uint Li = L0, Ri = R0;
 
-            for (int i = 1; i<=_rounds ; i++)
+            for (var i = 1; i<=_rounds ; i++)
             {
                 Lp = Li;
                 Rp = Ri;
@@ -735,8 +734,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
         internal void CAST_Decipher(uint L16, uint R16, uint[] result)
         {
-            uint Lp = L16;        // the previous value, equiv to L[i-1]
-            uint Rp = R16;        // equivalent to R[i-1]
+            var Lp = L16;        // the previous value, equiv to L[i-1]
+            var Rp = R16;        // equivalent to R[i-1]
 
             /*
             * numbering consistent with paper to make
@@ -744,7 +743,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             */
             uint Li = L16, Ri = R16;
 
-            for (int i = _rounds; i > 0; i--)
+            for (var i = _rounds; i > 0; i--)
             {
                 Lp = Li;
                 Rp = Ri;

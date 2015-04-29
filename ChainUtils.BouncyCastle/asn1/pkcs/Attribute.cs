@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 {
     public class AttributePkcs
@@ -19,13 +17,13 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
         public static AttributePkcs GetInstance(
             object obj)
         {
-            AttributePkcs attr = obj as AttributePkcs;
+            var attr = obj as AttributePkcs;
             if (obj == null || attr != null)
             {
                 return attr;
             }
 
-			Asn1Sequence seq = obj as Asn1Sequence;
+			var seq = obj as Asn1Sequence;
             if (seq != null)
             {
                 return new AttributePkcs(seq);

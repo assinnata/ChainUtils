@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Security;
@@ -53,9 +52,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 		private byte[] GenerateDerivedKey(
 			int bytesNeeded)
 		{
-			byte[] buf = new byte[digest.GetDigestSize()];
-			byte[] key = new byte[bytesNeeded];
-			int offset = 0;
+			var buf = new byte[digest.GetDigestSize()];
+			var key = new byte[bytesNeeded];
+			var offset = 0;
         
 			for (;;)
 			{
@@ -64,7 +63,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
 				digest.DoFinal(buf, 0);
 
-				int len = (bytesNeeded > buf.Length) ? buf.Length : bytesNeeded;
+				var len = (bytesNeeded > buf.Length) ? buf.Length : bytesNeeded;
 				Array.Copy(buf, 0, key, offset, len);
 				offset += len;
 
@@ -104,7 +103,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 		{
 			keySize /= 8;
 
-			byte[] dKey = GenerateDerivedKey(keySize);
+			var dKey = GenerateDerivedKey(keySize);
 
 			return ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
 		}
@@ -127,7 +126,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 			keySize = keySize / 8;
 			ivSize = ivSize / 8;
 
-			byte[] dKey = GenerateDerivedKey(keySize + ivSize);
+			var dKey = GenerateDerivedKey(keySize + ivSize);
 
 			return new ParametersWithIV(new KeyParameter(dKey, 0, keySize), dKey, keySize, ivSize);
 		}
@@ -140,8 +139,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 			keySize /= 8;
 			ivSize /= 8;
 
-			byte[] dKey = GenerateDerivedKey(keySize + ivSize);
-			KeyParameter key = ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
+			var dKey = GenerateDerivedKey(keySize + ivSize);
+			var key = ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
 
 			return new ParametersWithIV(key, dKey, keySize, ivSize);
 		}
@@ -159,7 +158,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 		{
 			keySize = keySize / 8;
 
-			byte[] dKey = GenerateDerivedKey(keySize);
+			var dKey = GenerateDerivedKey(keySize);
 
 			return new KeyParameter(dKey, 0, keySize);
 		}

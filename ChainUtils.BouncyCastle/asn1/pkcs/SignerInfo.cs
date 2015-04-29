@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
@@ -57,7 +54,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 		public SignerInfo(
             Asn1Sequence seq)
         {
-            IEnumerator e = seq.GetEnumerator();
+            var e = seq.GetEnumerator();
 
 			e.MoveNext();
             version = (DerInteger) e.Current;
@@ -69,7 +66,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             digAlgorithm = AlgorithmIdentifier.GetInstance(e.Current);
 
 			e.MoveNext();
-            object obj = e.Current;
+            var obj = e.Current;
 
 			if (obj is Asn1TaggedObject)
             {
@@ -85,7 +82,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             }
 
 			e.MoveNext();
-            encryptedDigest = DerOctetString.GetInstance(e.Current);
+            encryptedDigest = Asn1OctetString.GetInstance(e.Current);
 
 			if (e.MoveNext())
             {
@@ -133,7 +130,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
 				version, issuerAndSerialNumber, digAlgorithm);
 
 			if (authenticatedAttributes != null)

@@ -50,31 +50,31 @@ namespace Mono.Nat
 
 		public virtual void CreatePortMap (Mapping mapping)
 		{
-			IAsyncResult result = BeginCreatePortMap (mapping, null, null);
+			var result = BeginCreatePortMap (mapping, null, null);
 		    EndCreatePortMap(result);
 		}
 
 		public virtual void DeletePortMap (Mapping mapping)
 		{
-			IAsyncResult result = BeginDeletePortMap (mapping, null, mapping);
+			var result = BeginDeletePortMap (mapping, null, mapping);
 			EndDeletePortMap(result);
 		}
 
 		public virtual Mapping[] GetAllMappings ()
 		{
-			IAsyncResult result = BeginGetAllMappings (null, null);
+			var result = BeginGetAllMappings (null, null);
 			return EndGetAllMappings (result);
 		}
 
 		public virtual IPAddress GetExternalIP ()
 		{
-			IAsyncResult result = BeginGetExternalIP(null, null);
+			var result = BeginGetExternalIP(null, null);
 			return EndGetExternalIP(result);
 		}
 
 		public virtual Mapping GetSpecificMapping (Protocol protocol, int port)
 		{
-			IAsyncResult result = this.BeginGetSpecificMapping (protocol, port, null, null);
+			var result = this.BeginGetSpecificMapping (protocol, port, null, null);
 			return this.EndGetSpecificMapping(result);
 		}
 

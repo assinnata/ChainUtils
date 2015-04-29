@@ -1,6 +1,4 @@
-﻿using System;
-
-using ChainUtils.BouncyCastle.Security;
+﻿using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
 {
@@ -39,8 +37,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
          */
         public DsaParameterGenerationParameters(int L, int N, int certainty, SecureRandom random, int usageIndex)
         {
-            this.l = L;
-            this.n = N;
+            l = L;
+            n = N;
             this.certainty = certainty;
             this.random = random;
             this.usageIndex = usageIndex;

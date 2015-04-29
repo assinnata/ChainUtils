@@ -1,13 +1,10 @@
-﻿using ChainUtils.Crypto;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ChainUtils.Crypto;
 using ChainUtils.DataEncoders;
 using ChainUtils.Protocol;
 using ChainUtils.RPC;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
@@ -17,33 +14,33 @@ namespace ChainUtils
 		{
 			get
 			{
-				return (hash == 0 && n == uint.MaxValue);
+				return (_hash == 0 && _n == uint.MaxValue);
 			}
 		}
-		private uint256 hash;
-		private uint n;
+		private Uint256 _hash;
+		private uint _n;
 
 
-		public uint256 Hash
+		public Uint256 Hash
 		{
 			get
 			{
-				return hash;
+				return _hash;
 			}
 			set
 			{
-				hash = value;
+				_hash = value;
 			}
 		}
 		public uint N
 		{
 			get
 			{
-				return n;
+				return _n;
 			}
 			set
 			{
-				n = value;
+				_n = value;
 			}
 		}
 
@@ -51,15 +48,15 @@ namespace ChainUtils
 		{
 			SetNull();
 		}
-		public OutPoint(uint256 hashIn, uint nIn)
+		public OutPoint(Uint256 hashIn, uint nIn)
 		{
-			hash = hashIn;
-			n = nIn;
+			_hash = hashIn;
+			_n = nIn;
 		}
-		public OutPoint(uint256 hashIn, int nIn)
+		public OutPoint(Uint256 hashIn, int nIn)
 		{
-			hash = hashIn;
-			this.n = nIn == -1 ? n = uint.MaxValue : (uint)nIn;
+			_hash = hashIn;
+			_n = nIn == -1 ? _n = uint.MaxValue : (uint)nIn;
 		}
 
 		public OutPoint(Transaction tx, uint i)
@@ -80,37 +77,37 @@ namespace ChainUtils
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref hash);
-			stream.ReadWrite(ref n);
+			stream.ReadWrite(ref _hash);
+			stream.ReadWrite(ref _n);
 		}
 
 
 		void SetNull()
 		{
-			hash = 0;
-			n = uint.MaxValue;
+			_hash = 0;
+			_n = uint.MaxValue;
 		}
 
 		public static bool operator <(OutPoint a, OutPoint b)
 		{
-			return (a.hash < b.hash || (a.hash == b.hash && a.n < b.n));
+			return (a._hash < b._hash || (a._hash == b._hash && a._n < b._n));
 		}
 		public static bool operator >(OutPoint a, OutPoint b)
 		{
-			return (a.hash > b.hash || (a.hash == b.hash && a.n > b.n));
+			return (a._hash > b._hash || (a._hash == b._hash && a._n > b._n));
 		}
 
 		public static bool operator ==(OutPoint a, OutPoint b)
 		{
-			if(Object.ReferenceEquals(a, null))
+			if(ReferenceEquals(a, null))
 			{
-				return Object.ReferenceEquals(b, null);
+				return ReferenceEquals(b, null);
 			}
-			if(Object.ReferenceEquals(b, null))
+			if(ReferenceEquals(b, null))
 			{
-				return Object.ReferenceEquals(a, null);
+				return ReferenceEquals(a, null);
 			}
-			return (a.hash == b.hash && a.n == b.n);
+			return (a._hash == b._hash && a._n == b._n);
 		}
 
 		public static bool operator !=(OutPoint a, OutPoint b)
@@ -119,15 +116,15 @@ namespace ChainUtils
 		}
 		public override bool Equals(object obj)
 		{
-			OutPoint item = obj as OutPoint;
-			if(object.ReferenceEquals(null, item))
+			var item = obj as OutPoint;
+			if(ReferenceEquals(null, item))
 				return false;
 			return item == this;
 		}
 
 		public override int GetHashCode()
 		{
-			return Tuple.Create(hash, n).GetHashCode();
+			return Tuple.Create(_hash, _n).GetHashCode();
 		}
 
 		public override string ToString()
@@ -145,33 +142,33 @@ namespace ChainUtils
 		}
 		public TxIn(OutPoint prevout)
 		{
-			this.prevout = prevout;
+			this._prevout = prevout;
 		}
-		OutPoint prevout = new OutPoint();
-		Script scriptSig = Script.Empty;
-		uint nSequence = uint.MaxValue;
-		public const uint NO_SEQUENCE = uint.MaxValue;
+		OutPoint _prevout = new OutPoint();
+		Script _scriptSig = Script.Empty;
+		uint _nSequence = uint.MaxValue;
+		public const uint NoSequence = uint.MaxValue;
 
 		public uint Sequence
 		{
 			get
 			{
-				return nSequence;
+				return _nSequence;
 			}
 			set
 			{
-				nSequence = value;
+				_nSequence = value;
 			}
 		}
 		public OutPoint PrevOut
 		{
 			get
 			{
-				return prevout;
+				return _prevout;
 			}
 			set
 			{
-				prevout = value;
+				_prevout = value;
 			}
 		}
 
@@ -180,11 +177,11 @@ namespace ChainUtils
 		{
 			get
 			{
-				return scriptSig;
+				return _scriptSig;
 			}
 			set
 			{
-				scriptSig = value;
+				_scriptSig = value;
 			}
 		}
 
@@ -192,9 +189,9 @@ namespace ChainUtils
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref prevout);
-			stream.ReadWrite(ref scriptSig);
-			stream.ReadWrite(ref nSequence);
+			stream.ReadWrite(ref _prevout);
+			stream.ReadWrite(ref _scriptSig);
+			stream.ReadWrite(ref _nSequence);
 		}
 
 		#endregion
@@ -221,7 +218,7 @@ namespace ChainUtils
 		{
 			if(n == 0)
 				return 0;
-			int e = 0;
+			var e = 0;
 			while(((n % 10) == 0) && e < 9)
 			{
 				n /= 10;
@@ -229,7 +226,7 @@ namespace ChainUtils
 			}
 			if(e < 9)
 			{
-				int d = (int)(n % 10);
+				var d = (int)(n % 10);
 				n /= 10;
 				return 1 + (n * 9 + (ulong)(d - 1)) * 10 + (ulong)e;
 			}
@@ -246,13 +243,13 @@ namespace ChainUtils
 				return 0;
 			x--;
 			// x = 10*(9*n + d - 1) + e
-			int e = (int)(x % 10);
+			var e = (int)(x % 10);
 			x /= 10;
 			ulong n = 0;
 			if(e < 9)
 			{
 				// x = 9*n + d - 1
-				int d = (int)((x % 9) + 1);
+				var d = (int)((x % 9) + 1);
 				x /= 9;
 				// x = n
 				n = (x * 10 + (ulong)d);
@@ -270,12 +267,12 @@ namespace ChainUtils
 		}
 
 
-		private TxOut _TxOut = new TxOut();
+		private TxOut _txOut = new TxOut();
 		public TxOut TxOut
 		{
 			get
 			{
-				return _TxOut;
+				return _txOut;
 			}
 		}
 		public TxOutCompressor()
@@ -284,7 +281,7 @@ namespace ChainUtils
 		}
 		public TxOutCompressor(TxOut txOut)
 		{
-			_TxOut = txOut;
+			_txOut = txOut;
 		}
 
 		#region IBitcoinSerializable Members
@@ -293,19 +290,19 @@ namespace ChainUtils
 		{
 			if(stream.Serializing)
 			{
-				ulong val = CompressAmount((ulong)_TxOut.Value.Satoshi);
+				var val = CompressAmount((ulong)_txOut.Value.Satoshi);
 				stream.ReadWriteAsCompactVarInt(ref val);
 			}
 			else
 			{
 				ulong val = 0;
 				stream.ReadWriteAsCompactVarInt(ref val);
-				_TxOut.Value = new Money(DecompressAmount(val));
+				_txOut.Value = new Money(DecompressAmount(val));
 			}
-			ScriptCompressor cscript = new ScriptCompressor(_TxOut.ScriptPubKey);
+			var cscript = new ScriptCompressor(_txOut.ScriptPubKey);
 			stream.ReadWrite(ref cscript);
 			if(!stream.Serializing)
-				_TxOut.ScriptPubKey = new Script(cscript.ScriptBytes);
+				_txOut.ScriptPubKey = new Script(cscript.ScriptBytes);
 		}
 
 		#endregion
@@ -317,18 +314,18 @@ namespace ChainUtils
 		// this can potentially be extended together with a new nVersion for
 		// transactions, in which case this value becomes dependent on nVersion
 		// and nHeight of the enclosing transaction.
-		const uint nSpecialScripts = 6;
-		byte[] _Script;
+		const uint NSpecialScripts = 6;
+		byte[] _script;
 		public byte[] ScriptBytes
 		{
 			get
 			{
-				return _Script;
+				return _script;
 			}
 		}
 		public ScriptCompressor(Script script)
 		{
-			_Script = script.ToBytes(true);
+			_script = script.ToBytes(true);
 		}
 		public ScriptCompressor()
 		{
@@ -337,55 +334,55 @@ namespace ChainUtils
 
 		public Script GetScript()
 		{
-			return new Script(_Script);
+			return new Script(_script);
 		}
 
 		private KeyId GetKeyId()
 		{
-			if(_Script.Length == 25 && _Script[0] == (byte)OpcodeType.OP_DUP && _Script[1] == (byte)OpcodeType.OP_HASH160
-								&& _Script[2] == 20 && _Script[23] == (byte)OpcodeType.OP_EQUALVERIFY
-								&& _Script[24] == (byte)OpcodeType.OP_CHECKSIG)
+			if(_script.Length == 25 && _script[0] == (byte)OpcodeType.OpDup && _script[1] == (byte)OpcodeType.OpHash160
+								&& _script[2] == 20 && _script[23] == (byte)OpcodeType.OpEqualverify
+								&& _script[24] == (byte)OpcodeType.OpChecksig)
 			{
-				return new KeyId(_Script.Skip(3).Take(20).ToArray());
+				return new KeyId(_script.Skip(3).Take(20).ToArray());
 			}
 			return null;
 		}
 
 		private ScriptId GetScriptId()
 		{
-			if(_Script.Length == 23 && _Script[0] == (byte)OpcodeType.OP_HASH160 && _Script[1] == 20
-								&& _Script[22] == (byte)OpcodeType.OP_EQUAL)
+			if(_script.Length == 23 && _script[0] == (byte)OpcodeType.OpHash160 && _script[1] == 20
+								&& _script[22] == (byte)OpcodeType.OpEqual)
 			{
-				return new ScriptId(_Script.Skip(2).Take(20).ToArray());
+				return new ScriptId(_script.Skip(2).Take(20).ToArray());
 			}
 			return null;
 		}
 
 		private PubKey GetPubKey()
 		{
-			return PayToPubkeyTemplate.Instance.ExtractScriptPubKeyParameters(new Script(_Script));
+			return PayToPubkeyTemplate.Instance.ExtractScriptPubKeyParameters(new Script(_script));
 		}
 
 		byte[] Compress()
 		{
 			byte[] result = null;
-			KeyId keyID = GetKeyId();
-			if(keyID != null)
+			var keyId = GetKeyId();
+			if(keyId != null)
 			{
 				result = new byte[21];
 				result[0] = 0x00;
-				Array.Copy(keyID.ToBytes(), 0, result, 1, 20);
+				Array.Copy(keyId.ToBytes(), 0, result, 1, 20);
 				return result;
 			}
-			ScriptId scriptID = GetScriptId();
-			if(scriptID != null)
+			var scriptId = GetScriptId();
+			if(scriptId != null)
 			{
 				result = new byte[21];
 				result[0] = 0x01;
-				Array.Copy(scriptID.ToBytes(), 0, result, 1, 20);
+				Array.Copy(scriptId.ToBytes(), 0, result, 1, 20);
 				return result;
 			}
-			PubKey pubkey = GetPubKey();
+			var pubkey = GetPubKey();
 			if(pubkey != null)
 			{
 				result = new byte[33];
@@ -410,20 +407,20 @@ namespace ChainUtils
 			switch(nSize)
 			{
 				case 0x00:
-					return new Script(OpcodeType.OP_DUP, OpcodeType.OP_HASH160, Op.GetPushOp(data.Take(20).ToArray()), OpcodeType.OP_EQUALVERIFY, OpcodeType.OP_CHECKSIG);
+					return new Script(OpcodeType.OpDup, OpcodeType.OpHash160, Op.GetPushOp(data.Take(20).ToArray()), OpcodeType.OpEqualverify, OpcodeType.OpChecksig);
 				case 0x01:
-					return new Script(OpcodeType.OP_HASH160, Op.GetPushOp(data.Take(20).ToArray()), OpcodeType.OP_EQUAL);
+					return new Script(OpcodeType.OpHash160, Op.GetPushOp(data.Take(20).ToArray()), OpcodeType.OpEqual);
 				case 0x02:
 				case 0x03:
-					return new Script(Op.GetPushOp(new byte[] { (byte)nSize }.Concat(data.Take(32)).ToArray()), OpcodeType.OP_CHECKSIG);
+					return new Script(Op.GetPushOp(new[] { (byte)nSize }.Concat(data.Take(32)).ToArray()), OpcodeType.OpChecksig);
 				case 0x04:
 				case 0x05:
-					byte[] vch = new byte[33];
+					var vch = new byte[33];
 					vch[0] = (byte)(nSize - 2);
 					Array.Copy(data, 0, vch, 1, 32);
-					PubKey pubkey = new PubKey(vch);
+					var pubkey = new PubKey(vch);
 					pubkey = pubkey.Decompress();
-					return new Script(Op.GetPushOp(pubkey.ToBytes()), OpcodeType.OP_CHECKSIG);
+					return new Script(Op.GetPushOp(pubkey.ToBytes()), OpcodeType.OpChecksig);
 			}
 			return null;
 		}
@@ -444,24 +441,24 @@ namespace ChainUtils
 					stream.ReadWrite(ref compr);
 					return;
 				}
-				uint nSize = (uint)_Script.Length + nSpecialScripts;
+				var nSize = (uint)_script.Length + NSpecialScripts;
 				stream.ReadWriteAsCompactVarInt(ref nSize);
-				stream.ReadWrite(ref _Script);
+				stream.ReadWrite(ref _script);
 			}
 			else
 			{
 				uint nSize = 0;
 				stream.ReadWriteAsCompactVarInt(ref nSize);
-				if(nSize < nSpecialScripts)
+				if(nSize < NSpecialScripts)
 				{
-					byte[] vch = new byte[GetSpecialSize(nSize)];
+					var vch = new byte[GetSpecialSize(nSize)];
 					stream.ReadWrite(ref vch);
-					_Script = Decompress(nSize, vch).ToBytes();
+					_script = Decompress(nSize, vch).ToBytes();
 					return;
 				}
-				nSize -= nSpecialScripts;
-				_Script = new byte[nSize];
-				stream.ReadWrite(ref _Script);
+				nSize -= NSpecialScripts;
+				_script = new byte[nSize];
+				stream.ReadWrite(ref _script);
 			}
 		}
 
@@ -481,26 +478,26 @@ namespace ChainUtils
 
 	public class TxOut : IBitcoinSerializable, IDestination
 	{
-		Script publicKey = Script.Empty;
+		Script _publicKey = Script.Empty;
 		public Script ScriptPubKey
 		{
 			get
 			{
-				return this.publicKey;
+				return _publicKey;
 			}
 			set
 			{
-				this.publicKey = value;
+				_publicKey = value;
 			}
 		}
 
-		private long value = -1;
-		Money _MoneyValue;
+		private long _value = -1;
+		Money _moneyValue;
 		public bool IsNull
 		{
 			get
 			{
-				return value == -1;
+				return _value == -1;
 			}
 		}
 
@@ -528,9 +525,9 @@ namespace ChainUtils
 		{
 			get
 			{
-				if(_MoneyValue == null)
-					_MoneyValue = new Money(value);
-				return _MoneyValue;
+				if(_moneyValue == null)
+					_moneyValue = new Money(_value);
+				return _moneyValue;
 			}
 			set
 			{
@@ -538,8 +535,8 @@ namespace ChainUtils
 					throw new ArgumentNullException("value");
 				if(value.Satoshi > long.MaxValue || value.Satoshi < long.MinValue)
 					throw new ArgumentOutOfRangeException("value", "satoshi's value should be between Int64.Max and Int64.Min");
-				_MoneyValue = value;
-				this.value = (long)_MoneyValue.Satoshi;
+				_moneyValue = value;
+				this._value = (long)_moneyValue.Satoshi;
 			}
 		}
 
@@ -556,7 +553,7 @@ namespace ChainUtils
 				// need a CTxIn of at least 148 bytes to spend,
 				// so dust is a txout less than 546 satoshis 
 				// with default nMinRelayTxFee.
-				return ((value * 1000) / (3 * ((int)this.GetSerializedSize() + 148)) < Transaction.nMinRelayTxFee);
+				return ((_value * 1000) / (3 * ((int)this.GetSerializedSize() + 148)) < Transaction.NMinRelayTxFee);
 			}
 		}
 
@@ -564,9 +561,9 @@ namespace ChainUtils
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref value);
-			stream.ReadWrite(ref publicKey);
-			_MoneyValue = null; //Might been updated
+			stream.ReadWrite(ref _value);
+			stream.ReadWrite(ref _publicKey);
+			_moneyValue = null; //Might been updated
 		}
 
 		#endregion
@@ -578,7 +575,7 @@ namespace ChainUtils
 
 		internal void SetNull()
 		{
-			value = -1;
+			_value = -1;
 		}
 	}
 
@@ -623,7 +620,7 @@ namespace ChainUtils
 			return Script.VerifyScript(Transaction.Inputs[N].ScriptSig, scriptPubKey, Transaction, (int)N, scriptVerify, SigHash.Undefined, out error);
 		}
 
-		public uint256 GetSignatureHash(Script scriptPubKey, SigHash sigHash = SigHash.All)
+		public Uint256 GetSignatureHash(Script scriptPubKey, SigHash sigHash = SigHash.All)
 		{
 			return scriptPubKey.SignatureHash(Transaction, (int)N, sigHash);
 		}
@@ -748,22 +745,22 @@ namespace ChainUtils
 	//https://en.bitcoin.it/wiki/Protocol_specification
 	public class Transaction : IBitcoinSerializable
 	{
-		uint nVersion = 1;
+		uint _nVersion = 1;
 
 		public uint Version
 		{
 			get
 			{
-				return nVersion;
+				return _nVersion;
 			}
 			set
 			{
-				nVersion = value;
+				_nVersion = value;
 			}
 		}
-		TxInList vin;
-		TxOutList vout;
-		LockTime nLockTime;
+		TxInList _vin;
+		TxOutList _vout;
+		LockTime _nLockTime;
 
 		public Transaction()
 		{
@@ -772,8 +769,8 @@ namespace ChainUtils
 
 		private void Init()
 		{
-			vin = new TxInList(this);
-			vout = new TxOutList(this);
+			_vin = new TxInList(this);
+			_vout = new TxOutList(this);
 		}
 		public Transaction(string hex)
 		{
@@ -798,11 +795,11 @@ namespace ChainUtils
 		{
 			get
 			{
-				return nLockTime;
+				return _nLockTime;
 			}
 			set
 			{
-				nLockTime = value;
+				_nLockTime = value;
 			}
 		}
 
@@ -810,14 +807,14 @@ namespace ChainUtils
 		{
 			get
 			{
-				return vin;
+				return _vin;
 			}
 		}
 		public TxOutList Outputs
 		{
 			get
 			{
-				return vout;
+				return _vout;
 			}
 		}
 
@@ -825,21 +822,21 @@ namespace ChainUtils
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref nVersion);
-			stream.ReadWrite<TxInList, TxIn>(ref vin);
-			vin.Transaction = this;
-			stream.ReadWrite<TxOutList, TxOut>(ref vout);
-			vout.Transaction = this;
-			stream.ReadWriteStruct(ref nLockTime);
+			stream.ReadWrite(ref _nVersion);
+			stream.ReadWrite<TxInList, TxIn>(ref _vin);
+			_vin.Transaction = this;
+			stream.ReadWrite<TxOutList, TxOut>(ref _vout);
+			_vout.Transaction = this;
+			stream.ReadWriteStruct(ref _nLockTime);
 		}
 
 		#endregion
 
-		public uint256 GetHash()
+		public Uint256 GetHash()
 		{
 			return Hashes.Hash256(this.ToBytes());
 		}
-		public uint256 GetSignatureHash(Script scriptPubKey, int nIn, SigHash sigHash = SigHash.All)
+		public Uint256 GetSignatureHash(Script scriptPubKey, int nIn, SigHash sigHash = SigHash.All)
 		{
 			return Inputs.AsIndexedInputs().ToArray()[nIn].GetSignatureHash(scriptPubKey, sigHash);
 		}
@@ -860,11 +857,11 @@ namespace ChainUtils
 			}
 		}
 
-		public const long nMinTxFee = 10000;  // Override with -mintxfee
-		public const long nMinRelayTxFee = 1000;
+		public const long NMinTxFee = 10000;  // Override with -mintxfee
+		public const long NMinRelayTxFee = 1000;
 
-		public static uint CURRENT_VERSION = 2;
-		public static uint MAX_STANDARD_TX_SIZE = 100000;
+		public static uint CurrentVersion = 2;
+		public static uint MaxStandardTxSize = 100000;
 
 		public TxOut AddOutput(Money money, BitcoinAddress address)
 		{
@@ -880,12 +877,12 @@ namespace ChainUtils
 		}
 		public TxOut AddOutput(TxOut @out)
 		{
-			this.vout.Add(@out);
+			_vout.Add(@out);
 			return @out;
 		}
 		public TxIn AddInput(TxIn @in)
 		{
-			this.vin.Add(@in);
+			_vin.Add(@in);
 			return @in;
 		}
 
@@ -907,9 +904,9 @@ namespace ChainUtils
 		/// <para>For more complex scenario, use TransactionBuilder</para>
 		/// </summary>
 		/// <param name="secret"></param>
-		public void Sign(ISecret secret, bool assumeP2SH)
+		public void Sign(ISecret secret, bool assumeP2Sh)
 		{
-			Sign(secret.PrivateKey, assumeP2SH);
+			Sign(secret.PrivateKey, assumeP2Sh);
 		}
 
 		/// <summary>
@@ -918,19 +915,19 @@ namespace ChainUtils
 		/// <para>For more complex scenario, use TransactionBuilder</para>
 		/// </summary>
 		/// <param name="secret"></param>
-		public void Sign(Key key, bool assumeP2SH)
+		public void Sign(Key key, bool assumeP2Sh)
 		{
-			TransactionBuilder builder = new TransactionBuilder();
+			var builder = new TransactionBuilder();
 			builder.AddKeys(key);
-			for(int i = 0 ; i < Inputs.Count ; i++)
+			for(var i = 0 ; i < Inputs.Count ; i++)
 			{
 				var txin = Inputs[i];
 				if(Script.IsNullOrEmpty(txin.ScriptSig))
 					throw new InvalidOperationException("ScriptSigs should be filled with either previous scriptPubKeys or redeem script (for P2SH)");
-				if(assumeP2SH)
+				if(assumeP2Sh)
 				{
-					var p2shSig = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(txin.ScriptSig);
-					if(p2shSig == null)
+					var p2ShSig = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(txin.ScriptSig);
+					if(p2ShSig == null)
 					{
 						builder.AddCoins(new ScriptCoin(txin.PrevOut, new TxOut()
 						{
@@ -941,8 +938,8 @@ namespace ChainUtils
 					{
 						builder.AddCoins(new ScriptCoin(txin.PrevOut, new TxOut()
 						{
-							ScriptPubKey = p2shSig.RedeemScript.PaymentScript
-						}, p2shSig.RedeemScript));
+							ScriptPubKey = p2ShSig.RedeemScript.PaymentScript
+						}, p2ShSig.RedeemScript));
 					}
 				}
 				else

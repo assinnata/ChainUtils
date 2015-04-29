@@ -1,10 +1,4 @@
 using System;
-using System.Collections;
-using System.IO;
-using System.Text;
-
-using ChainUtils.BouncyCastle.Asn1;
-using ChainUtils.BouncyCastle.Crypto.Signers;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
@@ -22,7 +16,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 			IDsa	signer,
 			IDigest	digest)
 		{
-			this.dsaSigner = signer;
+			dsaSigner = signer;
 			this.digest = digest;
 		}
 
@@ -91,17 +85,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 			if (!forSigning)
 				throw new InvalidOperationException("GOST3410DigestSigner not initialised for signature generation.");
 
-			byte[] hash = new byte[digest.GetDigestSize()];
+			var hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
 
 			try
 			{
-				BigInteger[] sig = dsaSigner.GenerateSignature(hash);
-				byte[] sigBytes = new byte[64];
+				var sig = dsaSigner.GenerateSignature(hash);
+				var sigBytes = new byte[64];
 
 				// TODO Add methods to allow writing BigInteger to existing byte array?
-				byte[] r = sig[0].ToByteArrayUnsigned();
-				byte[] s = sig[1].ToByteArrayUnsigned();
+				var r = sig[0].ToByteArrayUnsigned();
+				var s = sig[1].ToByteArrayUnsigned();
 				s.CopyTo(sigBytes, 32 - s.Length);
 				r.CopyTo(sigBytes, 64 - r.Length);
 				return sigBytes;
@@ -119,7 +113,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 			if (forSigning)
 				throw new InvalidOperationException("DSADigestSigner not initialised for verification");
 
-			byte[] hash = new byte[digest.GetDigestSize()];
+			var hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
 
 			BigInteger R, S;

@@ -1,15 +1,13 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.CryptoPro;
 using ChainUtils.BouncyCastle.Asn1.Nist;
-using ChainUtils.BouncyCastle.Asn1.Pkcs;
 using ChainUtils.BouncyCastle.Asn1.Oiw;
+using ChainUtils.BouncyCastle.Asn1.Pkcs;
 using ChainUtils.BouncyCastle.Asn1.TeleTrust;
-using ChainUtils.BouncyCastle.Security;
-using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto;
+using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Security
@@ -100,10 +98,10 @@ namespace ChainUtils.BouncyCastle.Security
             string mechanism)
         {
             if (mechanism == null)
-                throw new System.ArgumentNullException("mechanism");
+                throw new ArgumentNullException("mechanism");
 
             mechanism = Platform.ToUpperInvariant(mechanism);
-            string aliased = (string) algorithms[mechanism];
+            var aliased = (string) algorithms[mechanism];
 
             if (aliased != null)
                 mechanism = aliased;
@@ -125,8 +123,8 @@ namespace ChainUtils.BouncyCastle.Security
         public static IDigest GetDigest(
             string algorithm)
         {
-            string upper = Platform.ToUpperInvariant(algorithm);
-            string mechanism = (string) algorithms[upper];
+            var upper = Platform.ToUpperInvariant(algorithm);
+            var mechanism = (string) algorithms[upper];
 
             if (mechanism == null)
             {
@@ -135,7 +133,7 @@ namespace ChainUtils.BouncyCastle.Security
 
             try
             {
-                DigestAlgorithm digestAlgorithm = (DigestAlgorithm)Enums.GetEnumValue(
+                var digestAlgorithm = (DigestAlgorithm)Enums.GetEnumValue(
                     typeof(DigestAlgorithm), mechanism);
 
                 switch (digestAlgorithm)
@@ -178,7 +176,7 @@ namespace ChainUtils.BouncyCastle.Security
 
         public static byte[] CalculateDigest(string algorithm, byte[] input)
         {
-            IDigest digest = GetDigest(algorithm);
+            var digest = GetDigest(algorithm);
             digest.BlockUpdate(input, 0, input.Length);
             return DoFinal(digest);
         }
@@ -186,7 +184,7 @@ namespace ChainUtils.BouncyCastle.Security
         public static byte[] DoFinal(
             IDigest digest)
         {
-            byte[] b = new byte[digest.GetDigestSize()];
+            var b = new byte[digest.GetDigestSize()];
             digest.DoFinal(b, 0);
             return b;
         }

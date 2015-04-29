@@ -42,18 +42,18 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 			foreach (Asn1TaggedObject taggedObj in seq)
 			{
-				Asn1Object asn1Obj = taggedObj.GetObject();
+				var asn1Obj = taggedObj.GetObject();
 
 				switch (taggedObj.TagNo)
 				{
 					case 0:
-						this.crlids = CrlListID.GetInstance(asn1Obj);
+						crlids = CrlListID.GetInstance(asn1Obj);
 						break;
 					case 1:
-						this.ocspids = OcspListID.GetInstance(asn1Obj);
+						ocspids = OcspListID.GetInstance(asn1Obj);
 						break;
 					case 2:
-						this.otherRev = OtherRevRefs.GetInstance(asn1Obj);
+						otherRev = OtherRevRefs.GetInstance(asn1Obj);
 						break;
 					default:
 						throw new ArgumentException("Illegal tag in CrlOcspRef", "seq");
@@ -88,7 +88,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 
 			if (crlids != null)
 			{

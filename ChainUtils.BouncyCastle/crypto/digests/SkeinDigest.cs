@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Crypto.Engines;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -48,18 +45,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 		///                      bytes.</param>
 		public SkeinDigest(int stateSizeBits, int digestSizeBits)
 		{
-			this.engine = new SkeinEngine(stateSizeBits, digestSizeBits);
+			engine = new SkeinEngine(stateSizeBits, digestSizeBits);
 			Init(null);
 		}
 
 		public SkeinDigest(SkeinDigest digest)
 		{
-			this.engine = new SkeinEngine(digest.engine);
+			engine = new SkeinEngine(digest.engine);
 		}
 
 		public void Reset(IMemoable other)
 		{
-			SkeinDigest d = (SkeinDigest)other;
+			var d = (SkeinDigest)other;
 			engine.Reset(d.engine);
 		}
 

@@ -1,9 +1,6 @@
 using System;
-
-using ChainUtils.BouncyCastle.Math;
-using ChainUtils.BouncyCastle.Math.EC;
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
+using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Agreement
 {
@@ -34,7 +31,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
                 parameters = ((ParametersWithRandom)parameters).Parameters;
             }
 
-            this.privKey = (ECPrivateKeyParameters)parameters;
+            privKey = (ECPrivateKeyParameters)parameters;
         }
 
         public virtual int GetFieldSize()
@@ -45,8 +42,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
         public virtual BigInteger CalculateAgreement(
             ICipherParameters pubKey)
         {
-            ECPublicKeyParameters pub = (ECPublicKeyParameters) pubKey;
-            ECPoint P = pub.Q.Multiply(privKey.D).Normalize();
+            var pub = (ECPublicKeyParameters) pubKey;
+            var P = pub.Q.Multiply(privKey.D).Normalize();
 
             if (P.IsInfinity)
                 throw new InvalidOperationException("Infinity is not a valid agreement value for ECDH");

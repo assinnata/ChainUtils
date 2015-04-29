@@ -25,13 +25,13 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 
 		public RevReqContent(params RevDetails[] revDetails)
 		{
-			this.content = new DerSequence(revDetails);
+			content = new DerSequence(revDetails);
 		}
 
 		public virtual RevDetails[] ToRevDetailsArray()
 		{
-			RevDetails[] result = new RevDetails[content.Count];
-			for (int i = 0; i != result.Length; ++i)
+			var result = new RevDetails[content.Count];
+			for (var i = 0; i != result.Length; ++i)
 			{
 				result[i] = RevDetails.GetInstance(content[i]);
 			}

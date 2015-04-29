@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.Sec;
 using ChainUtils.BouncyCastle.Asn1.X9;
 using ChainUtils.BouncyCastle.Utilities;
@@ -51,7 +48,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Nist
         public static X9ECParameters GetByName(
             string name)
         {
-            DerObjectIdentifier oid = (DerObjectIdentifier) objIds[
+            var oid = (DerObjectIdentifier) objIds[
                 Platform.ToUpperInvariant(name)];
 
             if (oid != null)

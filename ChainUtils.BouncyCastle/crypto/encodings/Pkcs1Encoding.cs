@@ -1,7 +1,5 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Security;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -39,7 +37,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 
         static Pkcs1Encoding()
         {
-            string strictProperty = Platform.GetEnvironmentVariable(StrictLengthEnabledProperty);
+            var strictProperty = Platform.GetEnvironmentVariable(StrictLengthEnabledProperty);
 
             strictLengthEnabled = new bool[]{ strictProperty == null || strictProperty.Equals("true")};
         }
@@ -60,8 +58,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
         public Pkcs1Encoding(
             IAsymmetricBlockCipher cipher)
         {
-            this.engine = cipher;
-            this.useStrictLength = StrictLengthEnabled;
+            engine = cipher;
+            useStrictLength = StrictLengthEnabled;
         }
 
         /**
@@ -72,8 +70,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
          */
         public Pkcs1Encoding(IAsymmetricBlockCipher cipher, int pLen)
         {
-            this.engine = cipher;
-            this.useStrictLength = StrictLengthEnabled;
+            engine = cipher;
+            useStrictLength = StrictLengthEnabled;
             this.pLen = pLen;
         }
 
@@ -88,10 +86,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
          */
         public Pkcs1Encoding(IAsymmetricBlockCipher cipher, byte[] fallback)
         {
-            this.engine = cipher;
-            this.useStrictLength = StrictLengthEnabled;
+            engine = cipher;
+            useStrictLength = StrictLengthEnabled;
             this.fallback = fallback;
-            this.pLen = fallback.Length;
+            pLen = fallback.Length;
         }
 
         public IAsymmetricBlockCipher GetUnderlyingCipher()
@@ -111,26 +109,26 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             AsymmetricKeyParameter kParam;
             if (parameters is ParametersWithRandom)
             {
-                ParametersWithRandom rParam = (ParametersWithRandom)parameters;
+                var rParam = (ParametersWithRandom)parameters;
 
-                this.random = rParam.Random;
+                random = rParam.Random;
                 kParam = (AsymmetricKeyParameter)rParam.Parameters;
             }
             else
             {
-                this.random = new SecureRandom();
+                random = new SecureRandom();
                 kParam = (AsymmetricKeyParameter)parameters;
             }
 
             engine.Init(forEncryption, parameters);
 
-            this.forPrivateKey = kParam.IsPrivate;
+            forPrivateKey = kParam.IsPrivate;
             this.forEncryption = forEncryption;
         }
 
         public int GetInputBlockSize()
         {
-            int baseBlockSize = engine.GetInputBlockSize();
+            var baseBlockSize = engine.GetInputBlockSize();
 
             return forEncryption
                 ?	baseBlockSize - HeaderLength
@@ -139,7 +137,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 
         public int GetOutputBlockSize()
         {
-            int baseBlockSize = engine.GetOutputBlockSize();
+            var baseBlockSize = engine.GetOutputBlockSize();
 
             return forEncryption
                 ?	baseBlockSize
@@ -164,13 +162,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             if (inLen > GetInputBlockSize())
                 throw new ArgumentException("input data too large", "inLen");
 
-            byte[] block = new byte[engine.GetInputBlockSize()];
+            var block = new byte[engine.GetInputBlockSize()];
 
             if (forPrivateKey)
             {
                 block[0] = 0x01;                        // type code 1
 
-                for (int i = 1; i != block.Length - inLen - 1; i++)
+                for (var i = 1; i != block.Length - inLen - 1; i++)
                 {
                     block[i] = (byte)0xFF;
                 }
@@ -185,7 +183,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
                 // a zero byte marks the end of the padding, so all
                 // the pad bytes must be non-zero.
                 //
-                for (int i = 1; i != block.Length - inLen - 1; i++)
+                for (var i = 1; i != block.Length - inLen - 1; i++)
                 {
                     while (block[i] == 0)
                     {
@@ -210,7 +208,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
          */
         private static int CheckPkcs1Encoding(byte[] encoded, int pLen)
         {
-            int correct = 0;
+            var correct = 0;
             /*
              * Check if the first two bytes are 0 2
              */
@@ -219,12 +217,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             /*
              * Now the padding check, check for no 0 byte in the padding
              */
-            int plen = encoded.Length - (
+            var plen = encoded.Length - (
                       pLen /* Lenght of the PMS */
                     +  1 /* Final 0-byte before PMS */
             );
 
-            for (int i = 1; i < plen; i++)
+            for (var i = 1; i < plen; i++)
             {
                 int tmp = encoded[i];
                 tmp |= tmp >> 1;
@@ -263,11 +261,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             if (!forPrivateKey)
                 throw new InvalidCipherTextException("sorry, this method is only for decryption, not for signing");
 
-            byte[] block = engine.ProcessBlock(input, inOff, inLen);
+            var block = engine.ProcessBlock(input, inOff, inLen);
             byte[] random = null;
-            if (this.fallback == null)
+            if (fallback == null)
             {
-                random = new byte[this.pLen];
+                random = new byte[pLen];
                 this.random.NextBytes(random);
             }
             else
@@ -294,14 +292,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             /*
              * Check the padding.
              */
-            int correct = Pkcs1Encoding.CheckPkcs1Encoding(block, this.pLen);
+            var correct = CheckPkcs1Encoding(block, pLen);
 
             /*
              * Now, to a constant time constant memory copy of the decrypted value
              * or the random value, depending on the validity of the padding.
              */
-            byte[] result = new byte[this.pLen];
-            for (int i = 0; i < this.pLen; i++)
+            var result = new byte[pLen];
+            for (var i = 0; i < pLen; i++)
             {
                 result[i] = (byte)((block[i+(block.Length-pLen)]&(~correct)) | (random[i]&correct));
             }
@@ -321,19 +319,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
              * If the length of the expected plaintext is known, we use a constant-time decryption.
              * If the decryption fails, we return a random value.
              */
-            if (this.pLen != -1)
+            if (pLen != -1)
             {
-                return this.DecodeBlockOrRandom(input, inOff, inLen);
+                return DecodeBlockOrRandom(input, inOff, inLen);
             }
 
-            byte[] block = engine.ProcessBlock(input, inOff, inLen);
+            var block = engine.ProcessBlock(input, inOff, inLen);
 
             if (block.Length < GetOutputBlockSize())
             {
                 throw new InvalidCipherTextException("block truncated");
             }
 
-            byte type = block[0];
+            var type = block[0];
 
             if (type != 1 && type != 2)
             {
@@ -351,7 +349,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
             int start;
             for (start = 1; start != block.Length; start++)
             {
-                byte pad = block[start];
+                var pad = block[start];
 
                 if (pad == 0)
                 {
@@ -371,7 +369,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
                 throw new InvalidCipherTextException("no data in block");
             }
 
-            byte[] result = new byte[block.Length - start];
+            var result = new byte[block.Length - start];
 
             Array.Copy(block, start, result, 0, result.Length);
 

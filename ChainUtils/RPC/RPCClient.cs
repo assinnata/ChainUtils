@@ -1,7 +1,4 @@
-﻿using ChainUtils.DataEncoders;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -10,10 +7,12 @@ using System.Net;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
+using Newtonsoft.Json.Linq;
 
 namespace ChainUtils.RPC
 {
-	public class RPCAccount
+	public class RpcAccount
 	{
 		public Money Amount
 		{
@@ -70,46 +69,46 @@ namespace ChainUtils.RPC
 		}
 	}
 
-	public class RPCClient : IBlockRepository
+	public class RpcClient : IBlockRepository
 	{
-		private readonly NetworkCredential _Credentials;
+		private readonly NetworkCredential _credentials;
 		public NetworkCredential Credentials
 		{
 			get
 			{
-				return _Credentials;
+				return _credentials;
 			}
 		}
-		private readonly Uri _Address;
+		private readonly Uri _address;
 		public Uri Address
 		{
 			get
 			{
-				return _Address;
+				return _address;
 			}
 		}
-		private readonly Network _Network;
+		private readonly Network _network;
 		public Network Network
 		{
 			get
 			{
-				return _Network;
+				return _network;
 			}
 		}
-		public RPCClient(NetworkCredential credentials, string host, Network network)
-			: this(credentials, BuildUri(host, network.RPCPort), network)
+		public RpcClient(NetworkCredential credentials, string host, Network network)
+			: this(credentials, BuildUri(host, network.RpcPort), network)
 		{
 		}
 
 		private static Uri BuildUri(string host, int port)
 		{
-			UriBuilder builder = new UriBuilder();
+			var builder = new UriBuilder();
 			builder.Host = host;
 			builder.Scheme = "http";
 			builder.Port = port;
 			return builder.Uri;
 		}
-		public RPCClient(NetworkCredential credentials, Uri address, Network network = null)
+		public RpcClient(NetworkCredential credentials, Uri address, Network network = null)
 		{
 
 			if(credentials == null)
@@ -118,20 +117,20 @@ namespace ChainUtils.RPC
 				throw new ArgumentNullException("address");
 			if(network == null)
 			{
-				network = new[] { Network.Main, Network.TestNet, Network.RegTest }.FirstOrDefault(n => n.RPCPort == address.Port);
+				network = new[] { Network.Main, Network.TestNet, Network.RegTest }.FirstOrDefault(n => n.RpcPort == address.Port);
 				if(network == null)
 					throw new ArgumentNullException("network");
 			}
-			_Credentials = credentials;
-			_Address = address;
-			_Network = network;
+			_credentials = credentials;
+			_address = address;
+			_network = network;
 		}
 
-		public RPCResponse SendCommand(RPCOperations commandName, params object[] parameters)
+		public RpcResponse SendCommand(RpcOperations commandName, params object[] parameters)
 		{
 			return SendCommand(commandName.ToString(), parameters);
 		}
-		public Task<RPCResponse> SendCommandAsync(RPCOperations commandName, params object[] parameters)
+		public Task<RpcResponse> SendCommandAsync(RpcOperations commandName, params object[] parameters)
 		{
 			return SendCommandAsync(commandName.ToString(), parameters);
 		}
@@ -142,20 +141,20 @@ namespace ChainUtils.RPC
 		/// <param name="commandName">https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list</param>
 		/// <param name="parameters"></param>
 		/// <returns></returns>
-		public RPCResponse SendCommand(string commandName, params object[] parameters)
+		public RpcResponse SendCommand(string commandName, params object[] parameters)
 		{
-			return SendCommand(new RPCRequest(commandName, parameters));
+			return SendCommand(new RpcRequest(commandName, parameters));
 		}
-		public Task<RPCResponse> SendCommandAsync(string commandName, params object[] parameters)
+		public Task<RpcResponse> SendCommandAsync(string commandName, params object[] parameters)
 		{
-			return SendCommandAsync(new RPCRequest(commandName, parameters));
+			return SendCommandAsync(new RpcRequest(commandName, parameters));
 		}
 
-		public RPCResponse SendCommand(RPCRequest request, bool throwIfRPCError = true)
+		public RpcResponse SendCommand(RpcRequest request, bool throwIfRpcError = true)
 		{
 			try
 			{
-				return SendCommandAsync(request, throwIfRPCError).Result;
+				return SendCommandAsync(request, throwIfRpcError).Result;
 			}
 			catch(AggregateException aex)
 			{
@@ -164,9 +163,9 @@ namespace ChainUtils.RPC
 			}
 		}
 
-		public async Task<RPCResponse> SendCommandAsync(RPCRequest request, bool throwIfRPCError = true)
+		public async Task<RpcResponse> SendCommandAsync(RpcRequest request, bool throwIfRpcError = true)
 		{
-			HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(Address);
+			var webRequest = (HttpWebRequest)WebRequest.Create(Address);
 			webRequest.Credentials = Credentials;
 			webRequest.ContentType = "application/json-rpc";
 			webRequest.Method = "POST";
@@ -179,25 +178,25 @@ namespace ChainUtils.RPC
 #if !PORTABLE
 			webRequest.ContentLength = bytes.Length;
 #endif
-			Stream dataStream = await webRequest.GetRequestStreamAsync().ConfigureAwait(false);
+			var dataStream = await webRequest.GetRequestStreamAsync().ConfigureAwait(false);
 			await dataStream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
 			dataStream.Dispose();
-			RPCResponse response = null;
+			RpcResponse response = null;
 			try
 			{
-				using(WebResponse webResponse = await webRequest.GetResponseAsync().ConfigureAwait(false))
+				using(var webResponse = await webRequest.GetResponseAsync().ConfigureAwait(false))
 				{
-					response = RPCResponse.Load(webResponse.GetResponseStream());
+					response = RpcResponse.Load(webResponse.GetResponseStream());
 				}
-				if(throwIfRPCError)
+				if(throwIfRpcError)
 					response.ThrowIfError();
 			}
 			catch(WebException ex)
 			{
 				if(ex.Response == null)
 					throw;
-				response = RPCResponse.Load(ex.Response.GetResponseStream());
-				if(throwIfRPCError)
+				response = RpcResponse.Load(ex.Response.GetResponseStream());
+				if(throwIfRpcError)
 					response.ThrowIfError();
 			}
 			return response;
@@ -221,8 +220,8 @@ namespace ChainUtils.RPC
 		/// <returns></returns>
 		public Money EstimateFee(int nblock)
 		{
-			var response = SendCommand(RPCOperations.estimatefee, nblock);
-			decimal result = 0.0m;
+			var response = SendCommand(RpcOperations.Estimatefee, nblock);
+			var result = 0.0m;
 			try
 			{
 				result = decimal.Parse(response.Result.ToString(), NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint);
@@ -241,7 +240,7 @@ namespace ChainUtils.RPC
 		/// <returns></returns>
 		public async Task<Money> EstimateFeeAsync(int nblock)
 		{
-			var response = await SendCommandAsync(RPCOperations.estimatefee, nblock).ConfigureAwait(false);
+			var response = await SendCommandAsync(RpcOperations.Estimatefee, nblock).ConfigureAwait(false);
 			return Money.Parse(response.Result.ToString());
 		}
 
@@ -267,13 +266,13 @@ namespace ChainUtils.RPC
 			return Network.CreateFromBase58Data<BitcoinSecret>((string)response.Result);
 		}
 
-		public uint256 GetBestBlockHash()
+		public Uint256 GetBestBlockHash()
 		{
-			return new uint256((string)SendCommand("getbestblockhash").Result);
+			return new Uint256((string)SendCommand("getbestblockhash").Result);
 		}
-		public async Task<uint256> GetBestBlockHashAsync()
+		public async Task<Uint256> GetBestBlockHashAsync()
 		{
-			return new uint256((string)(await SendCommandAsync("getbestblockhash").ConfigureAwait(false)).Result);
+			return new Uint256((string)(await SendCommandAsync("getbestblockhash").ConfigureAwait(false)).Result);
 		}
 
 		public BitcoinSecret GetAccountSecret(string account)
@@ -311,7 +310,7 @@ namespace ChainUtils.RPC
 		/// </summary>
 		/// <param name="txid"></param>
 		/// <returns></returns>
-		public Transaction GetRawTransaction(uint256 txid, bool throwIfNotFound = true)
+		public Transaction GetRawTransaction(Uint256 txid, bool throwIfNotFound = true)
 		{
 			try
 			{
@@ -324,12 +323,12 @@ namespace ChainUtils.RPC
 			}
 		}
 
-		public async Task<Transaction> GetRawTransactionAsync(uint256 txid, bool throwIfNotFound = true)
+		public async Task<Transaction> GetRawTransactionAsync(Uint256 txid, bool throwIfNotFound = true)
 		{
-			var response = await SendCommandAsync(new RPCRequest("getrawtransaction", new[] { txid.ToString() }), throwIfNotFound).ConfigureAwait(false);
+			var response = await SendCommandAsync(new RpcRequest("getrawtransaction", new[] { txid.ToString() }), throwIfNotFound).ConfigureAwait(false);
 			if(throwIfNotFound)
 				response.ThrowIfError();
-			if(response.Error != null && response.Error.Code == RPCErrorCode.RPC_INVALID_ADDRESS_OR_KEY)
+			if(response.Error != null && response.Error.Code == RpcErrorCode.RpcInvalidAddressOrKey)
 				return null;
 			else
 				response.ThrowIfError();
@@ -390,9 +389,9 @@ namespace ChainUtils.RPC
 		{
 			if(outpoints == null || outpoints.Length == 0)
 				return;
-			List<object> parameters = new List<object>();
+			var parameters = new List<object>();
 			parameters.Add(unlock);
-			JArray array = new JArray();
+			var array = new JArray();
 			parameters.Add(array);
 			foreach(var outp in outpoints)
 			{
@@ -420,7 +419,7 @@ namespace ChainUtils.RPC
 		/// </summary>
 		/// <param name="blockId"></param>
 		/// <returns></returns>
-		public async Task<Block> GetBlockAsync(uint256 blockId)
+		public async Task<Block> GetBlockAsync(Uint256 blockId)
 		{
 			var resp = await SendCommandAsync("getblock", blockId.ToString(), false).ConfigureAwait(false);
 			return new Block(Encoders.Hex.DecodeData(resp.Result.ToString()));
@@ -431,7 +430,7 @@ namespace ChainUtils.RPC
 		/// </summary>
 		/// <param name="blockId"></param>
 		/// <returns></returns>
-		public  Block GetBlock(uint256 blockId)
+		public  Block GetBlock(Uint256 blockId)
 		{
 			try
 			{
@@ -444,26 +443,26 @@ namespace ChainUtils.RPC
 			}
 		}
 
-		public BlockHeader GetBlockHeader(uint256 blockHash)
+		public BlockHeader GetBlockHeader(Uint256 blockHash)
 		{
 			var resp = SendCommand("getblock", blockHash.ToString());
 			return ParseBlockHeader(resp);
 		}
-		public async Task<BlockHeader> GetBlockHeaderAsync(uint256 blockHash)
+		public async Task<BlockHeader> GetBlockHeaderAsync(Uint256 blockHash)
 		{
 			var resp = await SendCommandAsync("getblock", blockHash.ToString()).ConfigureAwait(false);
 			return ParseBlockHeader(resp);
 		}
 
-		private BlockHeader ParseBlockHeader(RPCResponse resp)
+		private BlockHeader ParseBlockHeader(RpcResponse resp)
 		{
-			BlockHeader header = new BlockHeader();
+			var header = new BlockHeader();
 			header.Version = (int)resp.Result["version"];
 			header.Nonce = (uint)resp.Result["nonce"];
 			header.Bits = new Target(Encoders.Hex.DecodeData((string)resp.Result["bits"]));
 			if(resp.Result["previousblockhash"] != null)
 			{
-				header.HashPrevBlock = new uint256(Encoders.Hex.DecodeData((string)resp.Result["previousblockhash"]), false);
+				header.HashPrevBlock = new Uint256(Encoders.Hex.DecodeData((string)resp.Result["previousblockhash"]), false);
 			}
 			if(resp.Result["time"] != null)
 			{
@@ -471,7 +470,7 @@ namespace ChainUtils.RPC
 			}
 			if(resp.Result["merkleroot"] != null)
 			{
-				header.HashMerkleRoot = new uint256(Encoders.Hex.DecodeData((string)resp.Result["merkleroot"]), false);
+				header.HashMerkleRoot = new Uint256(Encoders.Hex.DecodeData((string)resp.Result["merkleroot"]), false);
 			}
 			return header;
 		}
@@ -481,7 +480,7 @@ namespace ChainUtils.RPC
 		/// </summary>
 		/// <param name="blockHash"></param>
 		/// <returns></returns>
-		public IEnumerable<Transaction> GetTransactions(uint256 blockHash)
+		public IEnumerable<Transaction> GetTransactions(Uint256 blockHash)
 		{
 			if(blockHash == null)
 				throw new ArgumentNullException("blockHash");
@@ -493,7 +492,7 @@ namespace ChainUtils.RPC
 			{
 				foreach(var item in tx)
 				{
-					var result = GetRawTransaction(new uint256(item.ToString()), false);
+					var result = GetRawTransaction(new Uint256(item.ToString()), false);
 					if(result != null)
 						yield return result;
 				}
@@ -506,16 +505,16 @@ namespace ChainUtils.RPC
 			return GetTransactions(GetBlockHash(height));
 		}
 
-		public uint256 GetBlockHash(int height)
+		public Uint256 GetBlockHash(int height)
 		{
 			var resp = SendCommand("getblockhash", height);
-			return new uint256(resp.Result.ToString());
+			return new Uint256(resp.Result.ToString());
 		}
 
-		public async Task<uint256> GetBlockHashAsync(int height)
+		public async Task<Uint256> GetBlockHashAsync(int height)
 		{
 			var resp = await SendCommandAsync("getblockhash", height).ConfigureAwait(false);
-			return new uint256(resp.Result.ToString());
+			return new Uint256(resp.Result.ToString());
 		}
 
 
@@ -528,17 +527,17 @@ namespace ChainUtils.RPC
 			return (int)(await SendCommandAsync("getblockcount").ConfigureAwait(false)).Result;
 		}
 
-		public uint256[] GetRawMempool()
+		public Uint256[] GetRawMempool()
 		{
 			var result = SendCommand("getrawmempool");
 			var array = (JArray)result.Result;
-			return array.Select(o => (string)o).Select(s => new uint256(s)).ToArray();
+			return array.Select(o => (string)o).Select(s => new Uint256(s)).ToArray();
 		}
-		public async Task<uint256[]> GetRawMempoolAsync()
+		public async Task<Uint256[]> GetRawMempoolAsync()
 		{
 			var result = await SendCommandAsync("getrawmempool").ConfigureAwait(false);
 			var array = (JArray)result.Result;
-			return array.Select(o => (string)o).Select(s => new uint256(s)).ToArray();
+			return array.Select(o => (string)o).Select(s => new Uint256(s)).ToArray();
 		}
 
 		public IEnumerable<BitcoinSecret> ListSecrets()
@@ -553,7 +552,7 @@ namespace ChainUtils.RPC
 
 		public IEnumerable<AddressGrouping> ListAddressGroupings()
 		{
-			var result = SendCommand(RPCOperations.listaddressgroupings);
+			var result = SendCommand(RpcOperations.Listaddressgroupings);
 			var array = (JArray)result.Result;
 			foreach(var group in array.Children<JArray>())
 			{
@@ -575,13 +574,13 @@ namespace ChainUtils.RPC
 		}
 		
 
-		public IEnumerable<RPCAccount> ListAccounts()
+		public IEnumerable<RpcAccount> ListAccounts()
 		{
-			var result = SendCommand(RPCOperations.listaccounts);
+			var result = SendCommand(RpcOperations.Listaccounts);
 			var obj = (JObject)result.Result;
 			foreach(var prop in obj.Properties())
 			{
-				yield return new RPCAccount()
+				yield return new RpcAccount()
 				{
 					AccountName = prop.Name,
 					Amount = Money.Coins((decimal)prop.Value)

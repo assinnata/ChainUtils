@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils.OpenAsset
@@ -13,23 +10,23 @@ namespace ChainUtils.OpenAsset
 		{
 			get;
 		}
-		Task<ColoredTransaction> GetAsync(uint256 txId);
-		Task PutAsync(uint256 txId, ColoredTransaction tx);
+		Task<ColoredTransaction> GetAsync(Uint256 txId);
+		Task PutAsync(Uint256 txId, ColoredTransaction tx);
 	}
 
 	public static class ColoredTxRepoExtensions
 	{
 		public static Task<ColoredTransaction> GetAsync(this IColoredTransactionRepository repo, string txId)
 		{
-			return repo.GetAsync(new uint256(txId));
+			return repo.GetAsync(new Uint256(txId));
 		}
 
 		public static ColoredTransaction Get(this IColoredTransactionRepository repo, string txId)
 		{
-			return repo.Get(new uint256(txId));
+			return repo.Get(new Uint256(txId));
 		}
 
-		public static ColoredTransaction Get(this IColoredTransactionRepository repo, uint256 txId)
+		public static ColoredTransaction Get(this IColoredTransactionRepository repo, Uint256 txId)
 		{
 			try
 			{
@@ -42,7 +39,7 @@ namespace ChainUtils.OpenAsset
 			}
 		}
 
-		public static void Put(this IColoredTransactionRepository repo, uint256 txId, ColoredTransaction tx)
+		public static void Put(this IColoredTransactionRepository repo, Uint256 txId, ColoredTransaction tx)
 		{
 			try
 			{

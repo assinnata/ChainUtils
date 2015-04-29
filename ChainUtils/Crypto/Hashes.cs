@@ -1,13 +1,6 @@
-﻿using ChainUtils.BouncyCastle.Crypto.Digests;
-using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Security;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using ChainUtils.BouncyCastle.Crypto.Digests;
 #if !USEBC
 using System.Security.Cryptography;
 #endif
@@ -16,33 +9,33 @@ namespace ChainUtils.Crypto
 {
 	public class Hashes
 	{
-		public static uint256 Hash256(byte[] data, int count)
+		public static Uint256 Hash256(byte[] data, int count)
 		{
 			data = count == 0 ? new byte[1] : data;
-			return new uint256(SHA256(SHA256(data, count)));
+			return new Uint256(SHA256(SHA256(data, count)));
 		}
 
 
-		public static uint256 Hash256(byte[] data)
+		public static Uint256 Hash256(byte[] data)
 		{
 			return Hash256(data, data.Length);
 		}
 
-		public static uint160 Hash160(byte[] data, int count)
+		public static Uint160 Hash160(byte[] data, int count)
 		{
 			data = count == 0 ? new byte[1] : data;
-			return new uint160(RIPEMD160(SHA256(data, count)));
+			return new Uint160(RIPEMD160(SHA256(data, count)));
 		}
 
 		private static byte[] RIPEMD160(byte[] data)
 		{
 			return RIPEMD160(data, data.Length);
 		}
-		public static byte[] SHA1(byte[] data, int count)
+		public static byte[] Sha1(byte[] data, int count)
 		{
 			var sha1 = new Sha1Digest();
 			sha1.BlockUpdate(data, 0, count);
-			byte[] rv = new byte[20];
+			var rv = new byte[20];
 			sha1.DoFinal(rv, 0);
 			return rv;
 		}
@@ -71,19 +64,19 @@ namespace ChainUtils.Crypto
 
 		public static byte[] RIPEMD160(byte[] data, int count)
 		{
-			RipeMD160Digest ripemd = new RipeMD160Digest();
+			var ripemd = new RipeMD160Digest();
 			ripemd.BlockUpdate(data, 0, count);
-			byte[] rv = new byte[20];
+			var rv = new byte[20];
 			ripemd.DoFinal(rv, 0);
 			return rv;
 		}
 
-		private static uint rotl32(uint x, byte r)
+		private static uint Rotl32(uint x, byte r)
 		{
 			return (x << r) | (x >> (32 - r));
 		}
 
-		private static uint fmix(uint h)
+		private static uint Fmix(uint h)
 		{
 			h ^= h >> 16;
 			h *= 0x85ebca6b;
@@ -98,13 +91,13 @@ namespace ChainUtils.Crypto
 			const uint c1 = 0xcc9e2d51;
 			const uint c2 = 0x1b873593;
 
-			uint h1 = nHashSeed;
+			var h1 = nHashSeed;
 			uint k1 = 0;
 			uint streamLength = 0;
 
-			using(BinaryReader reader = new BinaryReader(new MemoryStream(vDataToHash)))
+			using(var reader = new BinaryReader(new MemoryStream(vDataToHash)))
 			{
-				byte[] chunk = reader.ReadBytes(4);
+				var chunk = reader.ReadBytes(4);
 				while(chunk.Length > 0)
 				{
 					streamLength += (uint)chunk.Length;
@@ -120,11 +113,11 @@ namespace ChainUtils.Crypto
 
 							/* bitmagic hash */
 							k1 *= c1;
-							k1 = rotl32(k1, 15);
+							k1 = Rotl32(k1, 15);
 							k1 *= c2;
 
 							h1 ^= k1;
-							h1 = rotl32(h1, 13);
+							h1 = Rotl32(h1, 13);
 							h1 = h1 * 5 + 0xe6546b64;
 							break;
 						case 3:
@@ -133,7 +126,7 @@ namespace ChainUtils.Crypto
 							| chunk[1] << 8
 							| chunk[2] << 16);
 							k1 *= c1;
-							k1 = rotl32(k1, 15);
+							k1 = Rotl32(k1, 15);
 							k1 *= c2;
 							h1 ^= k1;
 							break;
@@ -142,14 +135,14 @@ namespace ChainUtils.Crypto
 							(chunk[0]
 							| chunk[1] << 8);
 							k1 *= c1;
-							k1 = rotl32(k1, 15);
+							k1 = Rotl32(k1, 15);
 							k1 *= c2;
 							h1 ^= k1;
 							break;
 						case 1:
 							k1 = (uint)(chunk[0]);
 							k1 *= c1;
-							k1 = rotl32(k1, 15);
+							k1 = Rotl32(k1, 15);
 							k1 *= c2;
 							h1 ^= k1;
 							break;
@@ -159,7 +152,7 @@ namespace ChainUtils.Crypto
 			}
 			// finalization, magic chants to wrap it all up
 			h1 ^= streamLength;
-			h1 = fmix(h1);
+			h1 = Fmix(h1);
 
 			unchecked //ignore overflow
 			{
@@ -167,12 +160,12 @@ namespace ChainUtils.Crypto
 			}
 		}
 
-		internal static uint160 Hash160(byte[] bytes)
+		internal static Uint160 Hash160(byte[] bytes)
 		{
 			return Hash160(bytes, bytes.Length);
 		}
 #if !USEBC
-		public static byte[] HMACSHA512(byte[] key, byte[] data)
+		public static byte[] Hmacsha512(byte[] key, byte[] data)
 		{
 			return new HMACSHA512(key).ComputeHash(data);
 		}
@@ -187,16 +180,16 @@ namespace ChainUtils.Crypto
 			return result;
 		}
 #endif
-		public static byte[] BIP32Hash(byte[] chainCode, uint nChild, byte header, byte[] data)
+		public static byte[] Bip32Hash(byte[] chainCode, uint nChild, byte header, byte[] data)
 		{
-			byte[] num = new byte[4];
+			var num = new byte[4];
 			num[0] = (byte)((nChild >> 24) & 0xFF);
 			num[1] = (byte)((nChild >> 16) & 0xFF);
 			num[2] = (byte)((nChild >> 8) & 0xFF);
 			num[3] = (byte)((nChild >> 0) & 0xFF);
 
-			return HMACSHA512(chainCode,
-				new byte[] { header }
+			return Hmacsha512(chainCode,
+				new[] { header }
 				.Concat(data)
 				.Concat(num).ToArray());
 		}

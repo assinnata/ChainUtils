@@ -34,8 +34,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 			if (encInfo == null)
 				throw new ArgumentNullException("encInfo");
 
-			this.version = new DerInteger((unprotectedAttrs == null) ? 0 : 2);
-			this.encryptedContentInfo = encInfo;
+			version = new DerInteger((unprotectedAttrs == null) ? 0 : 2);
+			encryptedContentInfo = encInfo;
 			this.unprotectedAttrs = unprotectedAttrs;
 		}
 
@@ -47,12 +47,12 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 			if (seq.Count < 2 || seq.Count > 3)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.version = DerInteger.GetInstance(seq[0]);
-			this.encryptedContentInfo = EncryptedContentInfo.GetInstance(seq[1]);
+			version = DerInteger.GetInstance(seq[0]);
+			encryptedContentInfo = EncryptedContentInfo.GetInstance(seq[1]);
 
 			if (seq.Count > 2)
 			{
-				this.unprotectedAttrs = Asn1Set.GetInstance(seq[2]);
+				unprotectedAttrs = Asn1Set.GetInstance(seq[2]);
 			}
 		}
 
@@ -82,7 +82,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		*/
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(version, encryptedContentInfo);
+			var v = new Asn1EncodableVector(version, encryptedContentInfo);
 
 			if (unprotectedAttrs != null)
 			{

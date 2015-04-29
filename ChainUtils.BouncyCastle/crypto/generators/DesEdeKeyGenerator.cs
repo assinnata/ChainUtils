@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
@@ -29,8 +28,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         protected override void engineInit(
 			KeyGenerationParameters parameters)
         {
-			this.random = parameters.Random;
-			this.strength = (parameters.Strength + 7) / 8;
+			random = parameters.Random;
+			strength = (parameters.Strength + 7) / 8;
 
 			if (strength == 0 || strength == (168 / 8))
             {
@@ -38,14 +37,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             }
             else if (strength == (112 / 8))
             {
-                strength = 2 * DesEdeParameters.DesKeyLength;
+                strength = 2 * DesParameters.DesKeyLength;
             }
             else if (strength != DesEdeParameters.DesEdeKeyLength
-                && strength != (2 * DesEdeParameters.DesKeyLength))
+                && strength != (2 * DesParameters.DesKeyLength))
             {
                 throw new ArgumentException("DESede key must be "
                     + (DesEdeParameters.DesEdeKeyLength * 8) + " or "
-                    + (2 * 8 * DesEdeParameters.DesKeyLength)
+                    + (2 * 8 * DesParameters.DesKeyLength)
                     + " bits long.");
             }
         }
@@ -57,7 +56,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 			do
             {
                 newKey = random.GenerateSeed(strength);
-                DesEdeParameters.SetOddParity(newKey);
+                DesParameters.SetOddParity(newKey);
             }
             while (DesEdeParameters.IsWeakKey(newKey, 0, newKey.Length));
 

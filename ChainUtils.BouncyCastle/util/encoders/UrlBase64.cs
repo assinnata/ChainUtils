@@ -28,7 +28,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
 		public static byte[] Encode(
 			byte[] data)
 		{
-			MemoryStream bOut = new MemoryStream();
+			var bOut = new MemoryStream();
 
 			try
 			{
@@ -62,7 +62,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
 		public static byte[] Decode(
 			byte[] data)
 		{
-			MemoryStream bOut = new MemoryStream();
+			var bOut = new MemoryStream();
 
 			try
 			{
@@ -97,7 +97,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
 		public static byte[] Decode(
 			string data)
 		{
-			MemoryStream bOut = new MemoryStream();
+			var bOut = new MemoryStream();
 
 			try
 			{

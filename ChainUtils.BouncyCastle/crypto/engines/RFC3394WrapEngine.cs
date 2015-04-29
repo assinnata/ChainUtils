@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -45,18 +44,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			if (parameters is KeyParameter)
 			{
-				this.param = (KeyParameter) parameters;
+				param = (KeyParameter) parameters;
 			}
 			else if (parameters is ParametersWithIV)
 			{
-				ParametersWithIV pIV = (ParametersWithIV) parameters;
-				byte[] iv = pIV.GetIV();
+				var pIV = (ParametersWithIV) parameters;
+				var iv = pIV.GetIV();
 
 				if (iv.Length != 8)
 					throw new ArgumentException("IV length not equal to 8", "parameters");
 
 				this.iv = iv;
-				this.param = (KeyParameter) pIV.Parameters;
+				param = (KeyParameter) pIV.Parameters;
 			}
 			else
 			{
@@ -79,33 +78,33 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				throw new InvalidOperationException("not set for wrapping");
 			}
 
-			int n = inLen / 8;
+			var n = inLen / 8;
 
 			if ((n * 8) != inLen)
 			{
 				throw new DataLengthException("wrap data must be a multiple of 8 bytes");
 			}
 
-			byte[] block = new byte[inLen + iv.Length];
-			byte[] buf = new byte[8 + iv.Length];
+			var block = new byte[inLen + iv.Length];
+			var buf = new byte[8 + iv.Length];
 
 			Array.Copy(iv, 0, block, 0, iv.Length);
 			Array.Copy(input, inOff, block, iv.Length, inLen);
 
 			engine.Init(true, param);
 
-			for (int j = 0; j != 6; j++)
+			for (var j = 0; j != 6; j++)
 			{
-				for (int i = 1; i <= n; i++)
+				for (var i = 1; i <= n; i++)
 				{
 					Array.Copy(block, 0, buf, 0, iv.Length);
 					Array.Copy(block, 8 * i, buf, iv.Length, 8);
 					engine.ProcessBlock(buf, 0, buf, 0);
 
-					int t = n * j + i;
-					for (int k = 1; t != 0; k++)
+					var t = n * j + i;
+					for (var k = 1; t != 0; k++)
 					{
-						byte v = (byte)t;
+						var v = (byte)t;
 
 						buf[iv.Length - k] ^= v;
 						t = (int) ((uint)t >> 8);
@@ -129,16 +128,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				throw new InvalidOperationException("not set for unwrapping");
 			}
 
-			int n = inLen / 8;
+			var n = inLen / 8;
 
 			if ((n * 8) != inLen)
 			{
 				throw new InvalidCipherTextException("unwrap data must be a multiple of 8 bytes");
 			}
 
-			byte[]  block = new byte[inLen - iv.Length];
-			byte[]  a = new byte[iv.Length];
-			byte[]  buf = new byte[8 + iv.Length];
+			var  block = new byte[inLen - iv.Length];
+			var  a = new byte[iv.Length];
+			var  buf = new byte[8 + iv.Length];
 
 			Array.Copy(input, inOff, a, 0, iv.Length);
             Array.Copy(input, inOff + iv.Length, block, 0, inLen - iv.Length);
@@ -147,17 +146,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			n = n - 1;
 
-			for (int j = 5; j >= 0; j--)
+			for (var j = 5; j >= 0; j--)
 			{
-				for (int i = n; i >= 1; i--)
+				for (var i = n; i >= 1; i--)
 				{
 					Array.Copy(a, 0, buf, 0, iv.Length);
 					Array.Copy(block, 8 * (i - 1), buf, iv.Length, 8);
 
-					int t = n * j + i;
-					for (int k = 1; t != 0; k++)
+					var t = n * j + i;
+					for (var k = 1; t != 0; k++)
 					{
-						byte v = (byte)t;
+						var v = (byte)t;
 
 						buf[iv.Length - k] ^= v;
 						t = (int) ((uint)t >> 8);

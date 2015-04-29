@@ -1,44 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Protocol
 {
 	public class MessageProducer<T>
 	{
-		List<MessageListener<T>> _Listeners = new List<MessageListener<T>>();
-		public IDisposable AddMessageListener(MessageListener<T> listener)
+		List<IMessageListener<T>> _listeners = new List<IMessageListener<T>>();
+		public IDisposable AddMessageListener(IMessageListener<T> listener)
 		{
-			lock(_Listeners)
+			lock(_listeners)
 			{
 				return new Scope(() =>
 				{
-					_Listeners.Add(listener);
+					_listeners.Add(listener);
 				}, () =>
 				{
-					lock(_Listeners)
+					lock(_listeners)
 					{
-						_Listeners.Remove(listener);
+						_listeners.Remove(listener);
 					}
 				});
 			}
 		}
 
-		public void RemoveMessageListener(MessageListener<T> listener)
+		public void RemoveMessageListener(IMessageListener<T> listener)
 		{
-			lock(_Listeners)
+			lock(_listeners)
 			{
-				_Listeners.Add(listener);
+				_listeners.Add(listener);
 			}
 		}
 
 		public void PushMessage(T message)
 		{
-			lock(_Listeners)
+			lock(_listeners)
 			{
-				foreach(var listener in _Listeners)
+				foreach(var listener in _listeners)
 				{
 					listener.PushMessage(message);
 				}
@@ -48,11 +45,11 @@ namespace ChainUtils.Protocol
 
 		public void PushMessages(IEnumerable<T> messages)
 		{
-			lock(_Listeners)
+			lock(_listeners)
 			{
 				foreach(var message in messages)
 				{
-					foreach(var listener in _Listeners)
+					foreach(var listener in _listeners)
 					{
 						listener.PushMessage(message);
 					}

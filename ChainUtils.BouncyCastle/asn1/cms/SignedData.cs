@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
@@ -44,14 +41,14 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             Asn1Set     crls,
             Asn1Set     signerInfos)
         {
-            this.version = CalculateVersion(contentInfo.ContentType, certificates, crls, signerInfos);
+            version = CalculateVersion(contentInfo.ContentType, certificates, crls, signerInfos);
             this.digestAlgorithms = digestAlgorithms;
             this.contentInfo = contentInfo;
             this.certificates = certificates;
             this.crls = crls;
             this.signerInfos = signerInfos;
-            this.crlsBer = crls is BerSet;
-            this.certsBer = certificates is BerSet;
+            crlsBer = crls is BerSet;
+            certsBer = certificates is BerSet;
         }
 
         // RFC3852, section 5.1:
@@ -78,18 +75,18 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             Asn1Set				crls,
             Asn1Set				signerInfs)
         {
-            bool otherCert = false;
-            bool otherCrl = false;
-            bool attrCertV1Found = false;
-            bool attrCertV2Found = false;
+            var otherCert = false;
+            var otherCrl = false;
+            var attrCertV1Found = false;
+            var attrCertV2Found = false;
 
             if (certs != null)
             {
-                foreach (object obj in certs)
+                foreach (var obj in certs)
                 {
                     if (obj is Asn1TaggedObject)
                     {
-                        Asn1TaggedObject tagged = (Asn1TaggedObject)obj;
+                        var tagged = (Asn1TaggedObject)obj;
 
                         if (tagged.TagNo == 1)
                         {
@@ -115,7 +112,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
             if (crls != null)
             {
-                foreach (object obj in crls)
+                foreach (var obj in crls)
                 {
                     if (obj is Asn1TaggedObject)
                     {
@@ -146,9 +143,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         private bool CheckForVersion3(
             Asn1Set signerInfs)
         {
-            foreach (object obj in signerInfs)
+            foreach (var obj in signerInfs)
             {
-                SignerInfo s = SignerInfo.GetInstance(obj);
+                var s = SignerInfo.GetInstance(obj);
 
                 if (s.Version.Value.IntValue == 3)
                 {
@@ -162,7 +159,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         private SignedData(
             Asn1Sequence seq)
         {
-            IEnumerator e = seq.GetEnumerator();
+            var e = seq.GetEnumerator();
 
             e.MoveNext();
             version = (DerInteger)e.Current;
@@ -175,7 +172,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
             while (e.MoveNext())
             {
-                Asn1Object o = (Asn1Object)e.Current;
+                var o = (Asn1Object)e.Current;
 
                 //
                 // an interesting feature of SignedData is that there appear
@@ -184,7 +181,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
                 //
                 if (o is Asn1TaggedObject)
                 {
-                    Asn1TaggedObject tagged = (Asn1TaggedObject)o;
+                    var tagged = (Asn1TaggedObject)o;
 
                     switch (tagged.TagNo)
                     {
@@ -252,7 +249,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
                 version, digestAlgorithms, contentInfo);
 
             if (certificates != null)

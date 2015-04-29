@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
@@ -54,11 +52,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 		private ServiceLocator(
 			Asn1Sequence seq)
 		{
-			this.issuer = X509Name.GetInstance(seq[0]);
+			issuer = X509Name.GetInstance(seq[0]);
 
 			if (seq.Count > 1)
 			{
-				this.locator = seq[1].ToAsn1Object();
+				locator = seq[1].ToAsn1Object();
 			}
 		}
 
@@ -82,7 +80,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(issuer);
+            var v = new Asn1EncodableVector(issuer);
 
 			if (locator != null)
             {

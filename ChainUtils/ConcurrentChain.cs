@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public class ConcurrentChain : ChainBase
 	{
-		Dictionary<uint256, ChainedBlock> _BlocksById = new Dictionary<uint256, ChainedBlock>();
-		Dictionary<int, ChainedBlock> _BlocksByHeight = new Dictionary<int, ChainedBlock>();
-		ReaderWriterLock @lock = new ReaderWriterLock();
+		Dictionary<Uint256, ChainedBlock> _blocksById = new Dictionary<Uint256, ChainedBlock>();
+		Dictionary<int, ChainedBlock> _blocksByHeight = new Dictionary<int, ChainedBlock>();
+		ReaderWriterLock _lock = new ReaderWriterLock();
 
 		public ConcurrentChain()
 		{
@@ -48,22 +46,22 @@ namespace ChainUtils
 
 		public void Load(BitcoinStream stream)
 		{
-			using(@lock.LockWrite())
+			using(_lock.LockWrite())
 			{
 				try
 				{
-					int height = 0;
+					var height = 0;
 					while(true)
 					{
-						uint256 id = null;
-						stream.ReadWrite<uint256>(ref id);
+						Uint256 id = null;
+						stream.ReadWrite<Uint256>(ref id);
 						BlockHeader header = null;
 						stream.ReadWrite<BlockHeader>(ref header);
 						if(height == 0)
 						{
-							_BlocksByHeight.Clear();
-							_BlocksById.Clear();
-							_Tip = null;
+							_blocksByHeight.Clear();
+							_blocksById.Clear();
+							_tip = null;
 							SetTipNoLock(new ChainedBlock(header, 0));
 						}
 						else
@@ -79,7 +77,7 @@ namespace ChainUtils
 
 		public byte[] ToBytes()
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			WriteTo(ms);
 			return ms.ToArray();
 		}
@@ -91,9 +89,9 @@ namespace ChainUtils
 
 		public void WriteTo(BitcoinStream stream)
 		{
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
-				for(int i = 0 ; i < Tip.Height + 1 ; i++)
+				for(var i = 0 ; i < Tip.Height + 1 ; i++)
 				{
 					var block = GetBlockNoLock(i);
 					stream.ReadWrite(block.HashBlock);
@@ -104,17 +102,17 @@ namespace ChainUtils
 
 		public ConcurrentChain Clone()
 		{
-			ConcurrentChain chain = new ConcurrentChain();
-			chain._Tip = _Tip;
-			using(@lock.LockRead())
+			var chain = new ConcurrentChain();
+			chain._tip = _tip;
+			using(_lock.LockRead())
 			{
-				foreach(var kv in _BlocksById)
+				foreach(var kv in _blocksById)
 				{
-					chain._BlocksById.Add(kv.Key, kv.Value);
+					chain._blocksById.Add(kv.Key, kv.Value);
 				}
-				foreach(var kv in _BlocksByHeight)
+				foreach(var kv in _blocksByHeight)
 				{
-					chain._BlocksByHeight.Add(kv.Key, kv.Value);
+					chain._blocksByHeight.Add(kv.Key, kv.Value);
 				}
 			}
 			return chain;
@@ -127,7 +125,7 @@ namespace ChainUtils
 		/// <returns>forking point</returns>
 		public override ChainedBlock SetTip(ChainedBlock block)
 		{
-			using(@lock.LockWrite())
+			using(_lock.LockWrite())
 			{
 				return SetTipNoLock(block);
 			}
@@ -135,21 +133,21 @@ namespace ChainUtils
 
 		private ChainedBlock SetTipNoLock(ChainedBlock block)
 		{
-			int height = Tip == null ? -1 : Tip.Height;
+			var height = Tip == null ? -1 : Tip.Height;
 			foreach(var orphaned in EnumerateThisToFork(block))
 			{
-				_BlocksById.Remove(orphaned.HashBlock);
-				_BlocksByHeight.Remove(orphaned.Height);
+				_blocksById.Remove(orphaned.HashBlock);
+				_blocksByHeight.Remove(orphaned.Height);
 				height--;
 			}
 			var fork = GetBlockNoLock(height);
 			foreach(var newBlock in block.EnumerateToGenesis()
 				.TakeWhile(c => c != Tip))
 			{
-				_BlocksById.AddOrReplace(newBlock.HashBlock, newBlock);
-				_BlocksByHeight.AddOrReplace(newBlock.Height, newBlock);
+				_blocksById.AddOrReplace(newBlock.HashBlock, newBlock);
+				_blocksByHeight.AddOrReplace(newBlock.Height, newBlock);
 			}
-			_Tip = block;
+			_tip = block;
 			return fork;
 		}
 
@@ -157,12 +155,12 @@ namespace ChainUtils
 
 		private IEnumerable<ChainedBlock> EnumerateThisToFork(ChainedBlock block)
 		{
-			if(_Tip == null)
+			if(_tip == null)
 				yield break;
-			var tip = _Tip;
+			var tip = _tip;
 			while(true)
 			{
-				if(object.ReferenceEquals(null, block) || object.ReferenceEquals(null, tip))
+				if(ReferenceEquals(null, block) || ReferenceEquals(null, tip))
 					throw new InvalidOperationException("No fork found between the two chains");
 				if(tip.Height > block.Height)
 				{
@@ -186,12 +184,12 @@ namespace ChainUtils
 
 		#region IChain Members
 
-		public override ChainedBlock GetBlock(uint256 id)
+		public override ChainedBlock GetBlock(Uint256 id)
 		{
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
 				ChainedBlock result;
-				_BlocksById.TryGetValue(id, out result);
+				_blocksById.TryGetValue(id, out result);
 				return result;
 			}
 		}
@@ -199,25 +197,25 @@ namespace ChainUtils
 		private ChainedBlock GetBlockNoLock(int height)
 		{
 			ChainedBlock result;
-			_BlocksByHeight.TryGetValue(height, out result);
+			_blocksByHeight.TryGetValue(height, out result);
 			return result;
 		}
 
 		public override ChainedBlock GetBlock(int height)
 		{
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
 				return GetBlockNoLock(height);
 			}
 		}
 
 
-		volatile ChainedBlock _Tip;
+		volatile ChainedBlock _tip;
 		public override ChainedBlock Tip
 		{
 			get
 			{
-				return _Tip;
+				return _tip;
 			}
 		}
 
@@ -233,9 +231,9 @@ namespace ChainUtils
 
 		protected override IEnumerable<ChainedBlock> EnumerateFromStart()
 		{
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
-				int i = 0;
+				var i = 0;
 				while(true)
 				{
 					var block = GetBlockNoLock(i);
@@ -260,11 +258,11 @@ namespace ChainUtils
 	{
 		class FuncDisposable : IDisposable
 		{
-			Action onEnter, onLeave;
+			Action _onEnter, _onLeave;
 			public FuncDisposable(Action onEnter, Action onLeave)
 			{
-				this.onEnter = onEnter;
-				this.onLeave = onLeave;
+				this._onEnter = onEnter;
+				this._onLeave = onLeave;
 				onEnter();
 			}
 
@@ -272,20 +270,20 @@ namespace ChainUtils
 
 			public void Dispose()
 			{
-				onLeave();
+				_onLeave();
 			}
 
 			#endregion
 		}
-		ReaderWriterLockSlim @lock = new ReaderWriterLockSlim();
+		ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
 		public IDisposable LockRead()
 		{
-			return new FuncDisposable(() => @lock.EnterReadLock(), () => @lock.ExitReadLock());
+			return new FuncDisposable(() => _lock.EnterReadLock(), () => _lock.ExitReadLock());
 		}
 		public IDisposable LockWrite()
 		{
-			return new FuncDisposable(() => @lock.EnterWriteLock(), () => @lock.ExitWriteLock());
+			return new FuncDisposable(() => _lock.EnterWriteLock(), () => _lock.ExitWriteLock());
 		}		
 	}
 }

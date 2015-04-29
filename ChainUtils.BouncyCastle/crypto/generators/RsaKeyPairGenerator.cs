@@ -1,6 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC.Multiplier;
@@ -23,11 +20,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             if (parameters is RsaKeyGenerationParameters)
             {
-                this.param = (RsaKeyGenerationParameters)parameters;
+                param = (RsaKeyGenerationParameters)parameters;
             }
             else
             {
-                this.param = new RsaKeyGenerationParameters(
+                param = new RsaKeyGenerationParameters(
                     DefaultPublicExponent, parameters.Random, parameters.Strength, DefaultTests);
             }
         }
@@ -39,11 +36,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             //
             // p and q values should have a length of half the strength in bits
             //
-            int strength = param.Strength;
-            int qBitlength = strength >> 1;
-            int pBitlength = strength - qBitlength;
-            int mindiffbits = strength / 3;
-            int minWeight = strength >> 2;
+            var strength = param.Strength;
+            var qBitlength = strength >> 1;
+            var pBitlength = strength - qBitlength;
+            var mindiffbits = strength / 3;
+            var minWeight = strength >> 2;
 
             e = param.PublicExponent;
 
@@ -60,7 +57,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                 q = ChooseRandomPrime(qBitlength, e);
 
                 // p and q should not be too close together (or equal!)
-                BigInteger diff = q.Subtract(p).Abs();
+                var diff = q.Subtract(p).Abs();
                 if (diff.BitLength < mindiffbits)
                     continue;
 
@@ -132,7 +129,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             for (;;)
             {
-                BigInteger p = new BigInteger(bitlength, 1, param.Random);
+                var p = new BigInteger(bitlength, 1, param.Random);
 
                 if (p.Mod(e).Equals(BigInteger.One))
                     continue;

@@ -1,8 +1,5 @@
 using System;
 using System.Threading;
-
-using ChainUtils.BouncyCastle.Crypto;
-using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Prng;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -52,10 +49,10 @@ namespace ChainUtils.BouncyCastle.Security
 
         private static DigestRandomGenerator CreatePrng(string digestName, bool autoSeed)
         {
-            IDigest digest = DigestUtilities.GetDigest(digestName);
+            var digest = DigestUtilities.GetDigest(digestName);
             if (digest == null)
                 return null;
-            DigestRandomGenerator prng = new DigestRandomGenerator(digest);
+            var prng = new DigestRandomGenerator(digest);
             if (autoSeed)
             {
                 prng.AddSeedMaterial(NextCounterValue());
@@ -81,11 +78,11 @@ namespace ChainUtils.BouncyCastle.Security
         /// <param name="autoSeed">If true, the instance will be auto-seeded.</param>
         public static SecureRandom GetInstance(string algorithm, bool autoSeed)
         {
-            string upper = Platform.ToUpperInvariant(algorithm);
+            var upper = Platform.ToUpperInvariant(algorithm);
             if (upper.EndsWith("PRNG"))
             {
-                string digestName = upper.Substring(0, upper.Length - "PRNG".Length);
-                DigestRandomGenerator prng = CreatePrng(digestName, autoSeed);
+                var digestName = upper.Substring(0, upper.Length - "PRNG".Length);
+                var prng = CreatePrng(digestName, autoSeed);
                 if (prng != null)
                 {
                     return new SecureRandom(prng);
@@ -138,7 +135,7 @@ namespace ChainUtils.BouncyCastle.Security
         {
             SetSeed(DateTime.Now.Ticks);
 
-            byte[] rv = new byte[length];
+            var rv = new byte[length];
             NextBytes(rv);
             return rv;
         }
@@ -157,7 +154,7 @@ namespace ChainUtils.BouncyCastle.Security
         {
             for (;;)
             {
-                int i = NextInt() & int.MaxValue;
+                var i = NextInt() & int.MaxValue;
 
                 if (i != int.MaxValue)
                     return i;
@@ -177,8 +174,8 @@ namespace ChainUtils.BouncyCastle.Security
             // Test whether maxValue is a power of 2
             if ((maxValue & -maxValue) == maxValue)
             {
-                int val = NextInt() & int.MaxValue;
-                long lr = ((long) maxValue * (long) val) >> 31;
+                var val = NextInt() & int.MaxValue;
+                var lr = ((long) maxValue * (long) val) >> 31;
                 return (int) lr;
             }
 
@@ -203,13 +200,13 @@ namespace ChainUtils.BouncyCastle.Security
                 throw new ArgumentException("maxValue cannot be less than minValue");
             }
 
-            int diff = maxValue - minValue;
+            var diff = maxValue - minValue;
             if (diff > 0)
                 return minValue + Next(diff);
 
             for (;;)
             {
-                int i = NextInt();
+                var i = NextInt();
 
                 if (i >= minValue && i < maxValue)
                     return i;
@@ -235,11 +232,11 @@ namespace ChainUtils.BouncyCastle.Security
 
         public virtual int NextInt()
         {
-            byte[] intBytes = new byte[4];
+            var intBytes = new byte[4];
             NextBytes(intBytes);
 
-            int result = 0;
-            for (int i = 0; i < 4; i++)
+            var result = 0;
+            for (var i = 0; i < 4; i++)
             {
                 result = (result << 8) + (intBytes[i] & 0xff);
             }

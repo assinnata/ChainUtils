@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 {
     public class CertStatus
@@ -37,7 +35,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 		public CertStatus(
             Asn1TaggedObject choice)
         {
-            this.tagNo = choice.TagNo;
+            tagNo = choice.TagNo;
 
 			switch (choice.TagNo)
             {

@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
 	public class TimeStampTokenEvidence
@@ -14,18 +12,18 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 		public TimeStampTokenEvidence(TimeStampAndCrl timeStampAndCrl)
 		{
-			this.timeStampAndCrls = new TimeStampAndCrl[]{ timeStampAndCrl };
+			timeStampAndCrls = new TimeStampAndCrl[]{ timeStampAndCrl };
 		}
 
 		private TimeStampTokenEvidence(Asn1Sequence seq)
 		{
-			this.timeStampAndCrls = new TimeStampAndCrl[seq.Count];
+			timeStampAndCrls = new TimeStampAndCrl[seq.Count];
 
-			int count = 0;
+			var count = 0;
 
 			foreach (Asn1Encodable ae in seq)
 			{
-				this.timeStampAndCrls[count++] = TimeStampAndCrl.GetInstance(ae.ToAsn1Object());
+				timeStampAndCrls[count++] = TimeStampAndCrl.GetInstance(ae.ToAsn1Object());
 			}
 		}
 

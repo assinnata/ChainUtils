@@ -1,8 +1,6 @@
 using System;
 using System.IO;
 
-using ChainUtils.BouncyCastle.Utilities;
-
 namespace ChainUtils.BouncyCastle.Asn1
 {
 	public class BerTaggedObjectParser

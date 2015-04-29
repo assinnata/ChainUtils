@@ -1,9 +1,8 @@
-﻿using ChainUtils.Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ChainUtils.Protocol;
 
 namespace ChainUtils
 {
@@ -19,21 +18,21 @@ namespace ChainUtils
 			{
 				var str = new VarString();
 				str.FromBytes(data);
-				_Data = str.GetString(true);
+				_data = str.GetString(true);
 			}
-			private byte[] _Data = new byte[0];
+			private byte[] _data = new byte[0];
 			public byte[] Data
 			{
 				get
 				{
-					return _Data;
+					return _data;
 				}
 			}
 			#region IBitcoinSerializable Members
 
 			public void ReadWrite(BitcoinStream stream)
 			{
-				stream.ReadWriteAsVarString(ref _Data);
+				stream.ReadWriteAsVarString(ref _data);
 			}
 
 			#endregion
@@ -41,44 +40,44 @@ namespace ChainUtils
 
 		public CachedNoSqlRepository(NoSqlRepository inner)
 		{
-			_InnerRepository = inner;
+			_innerRepository = inner;
 		}
-		private readonly NoSqlRepository _InnerRepository;
+		private readonly NoSqlRepository _innerRepository;
 		public NoSqlRepository InnerRepository
 		{
 			get
 			{
-				return _InnerRepository;
+				return _innerRepository;
 			}
 		}
-		Dictionary<string, byte[]> _Table = new Dictionary<string, byte[]>();
-		HashSet<string> _Removed = new HashSet<string>();
-		HashSet<string> _Added = new HashSet<string>();
-		ReaderWriterLock @lock = new ReaderWriterLock();
+		Dictionary<string, byte[]> _table = new Dictionary<string, byte[]>();
+		HashSet<string> _removed = new HashSet<string>();
+		HashSet<string> _added = new HashSet<string>();
+		ReaderWriterLock _lock = new ReaderWriterLock();
 
 		public override async Task PutBatch(IEnumerable<Tuple<string, IBitcoinSerializable>> values)
 		{
 			await base.PutBatch(values).ConfigureAwait(false);
-			await _InnerRepository.PutBatch(values).ConfigureAwait(false);
+			await _innerRepository.PutBatch(values).ConfigureAwait(false);
 		}
 
 		protected override Task PutBytesBatch(IEnumerable<Tuple<string, byte[]>> enumerable)
 		{
-			using(@lock.LockWrite())
+			using(_lock.LockWrite())
 			{
 				foreach(var data in enumerable)
 				{
 					if(data.Item2 == null)
 					{
-						_Table.Remove(data.Item1);
-						_Removed.Add(data.Item1);
-						_Added.Remove(data.Item1);
+						_table.Remove(data.Item1);
+						_removed.Add(data.Item1);
+						_added.Remove(data.Item1);
 					}
 					else
 					{
-						_Table.AddOrReplace(data.Item1, data.Item2);
-						_Removed.Remove(data.Item1);
-						_Added.Add(data.Item1);
+						_table.AddOrReplace(data.Item1, data.Item2);
+						_removed.Remove(data.Item1);
+						_added.Add(data.Item1);
 					}
 				}
 			}
@@ -89,9 +88,9 @@ namespace ChainUtils
 		{
 			byte[] result = null;
 			bool found;
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
-				found = _Table.TryGetValue(key, out result);
+				found = _table.TryGetValue(key, out result);
 			}
 			if(!found)
 			{
@@ -99,9 +98,9 @@ namespace ChainUtils
 				if(raw != null)
 				{
 					result = raw.Data;
-					using(@lock.LockWrite())
+					using(_lock.LockWrite())
 					{
-						_Table.AddOrReplace(key, raw.Data);
+						_table.AddOrReplace(key, raw.Data);
 					}
 				}
 			}
@@ -110,14 +109,14 @@ namespace ChainUtils
 
 		public void Flush()
 		{
-			using(@lock.LockWrite())
+			using(_lock.LockWrite())
 			{
 				InnerRepository
-					.PutBatch(_Removed.Select(k => Tuple.Create<string, IBitcoinSerializable>(k, null))
-							  .Concat(_Added.Select(k => Tuple.Create<string, IBitcoinSerializable>(k, new Raw(_Table[k])))));
-				_Removed.Clear();
-				_Added.Clear();
-				_Table.Clear();
+					.PutBatch(_removed.Select(k => Tuple.Create<string, IBitcoinSerializable>(k, null))
+							  .Concat(_added.Select(k => Tuple.Create<string, IBitcoinSerializable>(k, new Raw(_table[k])))));
+				_removed.Clear();
+				_added.Clear();
+				_table.Clear();
 			}
 		}
 	}

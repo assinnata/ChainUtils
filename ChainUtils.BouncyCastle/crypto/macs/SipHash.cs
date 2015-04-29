@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -54,15 +53,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
         public virtual void Init(ICipherParameters parameters)
         {
-            KeyParameter keyParameter = parameters as KeyParameter;
+            var keyParameter = parameters as KeyParameter;
             if (keyParameter == null)
                 throw new ArgumentException("must be an instance of KeyParameter", "parameters");
-            byte[] key = keyParameter.GetKey();
+            var key = keyParameter.GetKey();
             if (key.Length != 16)
                 throw new ArgumentException("must be a 128-bit key", "parameters");
 
-            this.k0 = (long)Pack.LE_To_UInt64(key, 0);
-            this.k1 = (long)Pack.LE_To_UInt64(key, 8);
+            k0 = (long)Pack.LE_To_UInt64(key, 0);
+            k1 = (long)Pack.LE_To_UInt64(key, 8);
 
             Reset();
         }
@@ -96,10 +95,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             }
             else
             {
-                int bits = wordPos << 3;
+                var bits = wordPos << 3;
                 for (; i < fullWords; i += 8)
                 {
-                    ulong n = Pack.LE_To_UInt64(input, offset + i);
+                    var n = Pack.LE_To_UInt64(input, offset + i);
                     m = (long)((n << bits) | ((ulong)m >> -bits));
                     ProcessMessageWord();
                     m = (long)n;
@@ -130,7 +129,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
             ApplySipRounds(d);
 
-            long result = v0 ^ v1 ^ v2 ^ v3;
+            var result = v0 ^ v1 ^ v2 ^ v3;
 
             Reset();
 
@@ -139,7 +138,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
         public virtual int DoFinal(byte[] output, int outOff)
         {
-            long result = DoFinal();
+            var result = DoFinal();
             Pack.UInt64_To_LE((ulong)result, output, outOff);
             return 8;
         }
@@ -168,7 +167,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
         {
             long r0 = v0, r1 = v1, r2 = v2, r3 = v3;
 
-            for (int r = 0; r < n; ++r)
+            for (var r = 0; r < n; ++r)
             {
                 r0 += r1;
                 r2 += r3;
@@ -191,7 +190,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
         protected static long RotateLeft(long x, int n)
         {
-            ulong ux = (ulong)x;
+            var ux = (ulong)x;
             ux = (ux << n) | (ux >> -n);
             return (long)ux;
         }

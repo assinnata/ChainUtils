@@ -27,7 +27,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Prng
 				throw new ArgumentException("Window size must be at least 2", "windowSize");
 
 			this.generator = generator;
-			this.window = new byte[windowSize];
+			window = new byte[windowSize];
 		}
 
 		/// <summary>Add more seed material to the generator.</summary>
@@ -81,7 +81,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Prng
 		{
 			lock (this)
 			{
-				int done = 0;
+				var done = 0;
 				while (done < len)
 				{
 					if (windowCount < 1)

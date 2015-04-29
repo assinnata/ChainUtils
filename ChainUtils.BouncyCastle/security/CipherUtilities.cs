@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.CryptoPro;
 using ChainUtils.BouncyCastle.Asn1.Kisa;
@@ -221,7 +220,7 @@ namespace ChainUtils.BouncyCastle.Security
                 throw new ArgumentNullException("mechanism");
 
             mechanism = Platform.ToUpperInvariant(mechanism);
-            string aliased = (string) algorithms[mechanism];
+            var aliased = (string) algorithms[mechanism];
 
             if (aliased != null)
                 mechanism = aliased;
@@ -249,7 +248,7 @@ namespace ChainUtils.BouncyCastle.Security
             algorithm = Platform.ToUpperInvariant(algorithm);
 
             {
-                string aliased = (string) algorithms[algorithm];
+                var aliased = (string) algorithms[algorithm];
 
                 if (aliased != null)
                     algorithm = aliased;
@@ -326,16 +325,16 @@ namespace ChainUtils.BouncyCastle.Security
 
 
 
-            string[] parts = algorithm.Split('/');
+            var parts = algorithm.Split('/');
 
             IBlockCipher blockCipher = null;
             IAsymmetricBlockCipher asymBlockCipher = null;
             IStreamCipher streamCipher = null;
 
-            string algorithmName = parts[0];
+            var algorithmName = parts[0];
 
             {
-                string aliased = (string)algorithms[algorithmName];
+                var aliased = (string)algorithms[algorithmName];
 
                 if (aliased != null)
                     algorithmName = aliased;
@@ -457,8 +456,8 @@ namespace ChainUtils.BouncyCastle.Security
             }
 
 
-            bool cts = false;
-            bool padded = true;
+            var cts = false;
+            var padded = true;
             IBlockCipherPadding padding = null;
             IAeadBlockCipher aeadBlockCipher = null;
 
@@ -467,7 +466,7 @@ namespace ChainUtils.BouncyCastle.Security
                 if (streamCipher != null)
                     throw new ArgumentException("Paddings not used for stream ciphers");
 
-                string paddingName = parts[2];
+                var paddingName = parts[2];
 
                 CipherPadding cipherPadding;
                 if (paddingName == "")
@@ -564,17 +563,17 @@ namespace ChainUtils.BouncyCastle.Security
                 }
             }
 
-            string mode = "";
+            var mode = "";
             if (parts.Length > 1)
             {
                 mode = parts[1];
 
-                int di = GetDigitIndex(mode);
-                string modeName = di >= 0 ? mode.Substring(0, di) : mode;
+                var di = GetDigitIndex(mode);
+                var modeName = di >= 0 ? mode.Substring(0, di) : mode;
 
                 try
                 {
-                    CipherMode cipherMode = modeName == ""
+                    var cipherMode = modeName == ""
                         ? CipherMode.NONE
                         : (CipherMode)Enums.GetEnumValue(typeof(CipherMode), modeName);
 
@@ -588,7 +587,7 @@ namespace ChainUtils.BouncyCastle.Security
                             break;
                         case CipherMode.CFB:
                         {
-                            int bits = (di < 0)
+                            var bits = (di < 0)
                                 ?	8 * blockCipher.GetBlockSize()
                                 :	int.Parse(mode.Substring(di));
     
@@ -616,7 +615,7 @@ namespace ChainUtils.BouncyCastle.Security
                             break;
                         case CipherMode.OFB:
                         {
-                            int bits = (di < 0)
+                            var bits = (di < 0)
                                 ?	8 * blockCipher.GetBlockSize()
                                 :	int.Parse(mode.Substring(di));
     
@@ -690,7 +689,7 @@ namespace ChainUtils.BouncyCastle.Security
         private static int GetDigitIndex(
             string s)
         {
-            for (int i = 0; i < s.Length; ++i)
+            for (var i = 0; i < s.Length; ++i)
             {
                 if (char.IsDigit(s[i]))
                     return i;

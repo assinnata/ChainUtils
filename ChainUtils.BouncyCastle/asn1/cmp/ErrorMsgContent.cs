@@ -13,9 +13,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 		{
 			pkiStatusInfo = PkiStatusInfo.GetInstance(seq[0]);
 
-			for (int pos = 1; pos < seq.Count; ++pos)
+			for (var pos = 1; pos < seq.Count; ++pos)
 			{
-				Asn1Encodable ae = seq[pos];
+				var ae = seq[pos];
 				if (ae is DerInteger)
 				{
 					errorCode = DerInteger.GetInstance(ae);
@@ -85,7 +85,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(pkiStatusInfo);
+			var v = new Asn1EncodableVector(pkiStatusInfo);
 			v.AddOptional(errorCode);
 			v.AddOptional(errorDetails);
 			return new DerSequence(v);

@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Modes;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
@@ -108,15 +107,15 @@ namespace ChainUtils.BouncyCastle.Crypto
 		public override byte[] ProcessByte(
 			byte input)
 		{
-			int outLength = GetUpdateOutputSize(1);
+			var outLength = GetUpdateOutputSize(1);
 
-			byte[] outBytes = outLength > 0 ? new byte[outLength] : null;
+			var outBytes = outLength > 0 ? new byte[outLength] : null;
 
-			int pos = ProcessByte(input, outBytes, 0);
+			var pos = ProcessByte(input, outBytes, 0);
 
 			if (outLength > 0 && pos < outLength)
 			{
-				byte[] tmp = new byte[pos];
+				var tmp = new byte[pos];
 				Array.Copy(outBytes, 0, tmp, 0, pos);
 				outBytes = tmp;
 			}
@@ -134,15 +133,15 @@ namespace ChainUtils.BouncyCastle.Crypto
 			if (length < 1)
 				return null;
 
-			int outLength = GetUpdateOutputSize(length);
+			var outLength = GetUpdateOutputSize(length);
 
-			byte[] outBytes = outLength > 0 ? new byte[outLength] : null;
+			var outBytes = outLength > 0 ? new byte[outLength] : null;
 
-			int pos = ProcessBytes(input, inOff, length, outBytes, 0);
+			var pos = ProcessBytes(input, inOff, length, outBytes, 0);
 
 			if (outLength > 0 && pos < outLength)
 			{
-				byte[] tmp = new byte[pos];
+				var tmp = new byte[pos];
 				Array.Copy(outBytes, 0, tmp, 0, pos);
 				outBytes = tmp;
 			}
@@ -174,13 +173,13 @@ namespace ChainUtils.BouncyCastle.Crypto
 
 		public override byte[] DoFinal()
 		{
-            byte[] outBytes = new byte[GetOutputSize(0)];
+            var outBytes = new byte[GetOutputSize(0)];
 
-            int pos = DoFinal(outBytes, 0);
+            var pos = DoFinal(outBytes, 0);
 
             if (pos < outBytes.Length)
 			{
-				byte[] tmp = new byte[pos];
+				var tmp = new byte[pos];
 				Array.Copy(outBytes, 0, tmp, 0, pos);
 				outBytes = tmp;
 			}
@@ -196,9 +195,9 @@ namespace ChainUtils.BouncyCastle.Crypto
 			if (input == null)
 				throw new ArgumentNullException("input");
 
-            byte[] outBytes = new byte[GetOutputSize(inLen)];
+            var outBytes = new byte[GetOutputSize(inLen)];
 
-            int pos = (inLen > 0)
+            var pos = (inLen > 0)
 				?	ProcessBytes(input, inOff, inLen, outBytes, 0)
 				:	0;
 
@@ -206,7 +205,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 
             if (pos < outBytes.Length)
 			{
-				byte[] tmp = new byte[pos];
+				var tmp = new byte[pos];
 				Array.Copy(outBytes, 0, tmp, 0, pos);
 				outBytes = tmp;
 			}

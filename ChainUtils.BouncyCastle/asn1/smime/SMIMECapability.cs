@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.Pkcs;
 
 namespace ChainUtils.BouncyCastle.Asn1.Smime
@@ -88,7 +86,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Smime
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(capabilityID);
+            var v = new Asn1EncodableVector(capabilityID);
 
 			if (parameters != null)
             {

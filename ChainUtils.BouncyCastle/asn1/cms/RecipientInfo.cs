@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
     public class RecipientInfo
@@ -66,7 +64,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 			{
 				if (info is Asn1TaggedObject)
 				{
-					Asn1TaggedObject o = (Asn1TaggedObject) info;
+					var o = (Asn1TaggedObject) info;
 
 					switch (o.TagNo)
 					{
@@ -98,7 +96,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 			{
 				if (info is Asn1TaggedObject)
 				{
-					Asn1TaggedObject o = (Asn1TaggedObject) info;
+					var o = (Asn1TaggedObject) info;
 
 					switch (o.TagNo)
 					{

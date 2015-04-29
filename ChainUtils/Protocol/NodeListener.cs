@@ -2,50 +2,48 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Protocol
 {
 	public class NodeListener : PollMessageListener<IncomingMessage>, IDisposable
 	{
-		private readonly Node _Node;
+		private readonly Node _node;
 		public Node Node
 		{
 			get
 			{
-				return _Node;
+				return _node;
 			}
 		}
-		IDisposable _Subscription;
+		IDisposable _subscription;
 		public NodeListener(Node node)
 		{
-			_Subscription = node.MessageProducer.AddMessageListener(this);
-			_Node = node;
+			_subscription = node.MessageProducer.AddMessageListener(this);
+			_node = node;
 		}
 
 		public NodeListener Where(Func<IncomingMessage, bool> predicate)
 		{
-			_Predicates.Add(predicate);
+			_predicates.Add(predicate);
 			return this;
 		}
 		public NodeListener OfType<TPayload>() where TPayload : Payload
 		{
-			_Predicates.Add(i => i.Message.Payload is TPayload);
+			_predicates.Add(i => i.Message.Payload is TPayload);
 			return this;
 		}
 
 		public TPayload ReceivePayload<TPayload>(CancellationToken cancellationToken = default(CancellationToken))
 			where TPayload : Payload
 		{
-			Queue<IncomingMessage> pushedAside = new Queue<IncomingMessage>();
+			var pushedAside = new Queue<IncomingMessage>();
 			try
 			{
 				while(true)
 				{
-					var message = ReceiveMessage(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, Node._Connection.Cancel.Token).Token);
-					if(_Predicates.All(p => p(message)))
+					var message = ReceiveMessage(CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, Node.Connection.Cancel.Token).Token);
+					if(_predicates.All(p => p(message)))
 					{
 						if(message.Message.Payload is TPayload)
 							return (TPayload)message.Message.Payload;
@@ -58,7 +56,7 @@ namespace ChainUtils.Protocol
 			}
 			catch(OperationCanceledException)
 			{
-				if(Node._Connection.Cancel.IsCancellationRequested)
+				if(Node.Connection.Cancel.IsCancellationRequested)
 					throw new InvalidOperationException("Connection dropped");
 				throw;
 			}
@@ -70,14 +68,14 @@ namespace ChainUtils.Protocol
 			throw new InvalidProgramException("Bug in Node.RecieveMessage");
 		}
 
-		List<Func<IncomingMessage, bool>> _Predicates = new List<Func<IncomingMessage, bool>>();
+		List<Func<IncomingMessage, bool>> _predicates = new List<Func<IncomingMessage, bool>>();
 
 		#region IDisposable Members
 
 		public void Dispose()
 		{
-			if(_Subscription != null)
-				_Subscription.Dispose();
+			if(_subscription != null)
+				_subscription.Dispose();
 		}
 
 		#endregion

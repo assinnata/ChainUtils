@@ -1,6 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Paddings
@@ -43,7 +40,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Paddings
             byte[]  input,
             int     inOff)
         {
-            byte code = (byte)(input.Length - inOff);
+            var code = (byte)(input.Length - inOff);
 
             while (inOff < input.Length - 1)
             {
@@ -69,7 +66,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Paddings
         public int PadCount(
 			byte[] input)
         {
-            int count = input[input.Length - 1] & 0xff;
+            var count = input[input.Length - 1] & 0xff;
 
             if (count > input.Length)
             {

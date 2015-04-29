@@ -1,5 +1,4 @@
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X9;
 using ChainUtils.BouncyCastle.Crypto;
@@ -38,8 +37,8 @@ namespace ChainUtils.BouncyCastle.Security
 		public static IBasicAgreement GetBasicAgreement(
 			string algorithm)
 		{
-			string upper = Platform.ToUpperInvariant(algorithm);
-			string mechanism = (string) algorithms[upper];
+			var upper = Platform.ToUpperInvariant(algorithm);
+			var mechanism = (string) algorithms[upper];
 
 			if (mechanism == null)
 			{
@@ -72,8 +71,8 @@ namespace ChainUtils.BouncyCastle.Security
 			string agreeAlgorithm,
 			string wrapAlgorithm)
 		{
-			string upper = Platform.ToUpperInvariant(agreeAlgorithm);
-			string mechanism = (string) algorithms[upper];
+			var upper = Platform.ToUpperInvariant(agreeAlgorithm);
+			var mechanism = (string) algorithms[upper];
 
 			if (mechanism == null)
 			{

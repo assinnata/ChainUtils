@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -43,16 +41,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 		public override bool Equals(
 			object obj)
         {
-            RsaKeyParameters kp = obj as RsaKeyParameters;
+            var kp = obj as RsaKeyParameters;
 
 			if (kp == null)
 			{
 				return false;
 			}
 
-			return kp.IsPrivate == this.IsPrivate
-				&& kp.Modulus.Equals(this.modulus)
-				&& kp.Exponent.Equals(this.exponent);
+			return kp.IsPrivate == IsPrivate
+				&& kp.Modulus.Equals(modulus)
+				&& kp.Exponent.Equals(exponent);
         }
 
 		public override int GetHashCode()

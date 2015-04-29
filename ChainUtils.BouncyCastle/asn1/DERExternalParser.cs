@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 namespace ChainUtils.BouncyCastle.Asn1
 {
 	public class DerExternalParser
@@ -10,7 +7,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 		public DerExternalParser(Asn1StreamParser parser)
 		{
-			this._parser = parser;
+			_parser = parser;
 		}
 
 		public IAsn1Convertible ReadObject()

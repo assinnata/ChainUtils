@@ -1,7 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto;
-
 namespace ChainUtils.BouncyCastle.Crypto
 {
     public abstract class AsymmetricKeyParameter
@@ -23,7 +19,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 		public override bool Equals(
 			object obj)
 		{
-			AsymmetricKeyParameter other = obj as AsymmetricKeyParameter;
+			var other = obj as AsymmetricKeyParameter;
 
 			if (other == null)
 			{

@@ -1,6 +1,4 @@
-﻿using System;
-
-using ChainUtils.BouncyCastle.Utilities;
+﻿using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math.Field
 {
@@ -13,7 +11,7 @@ namespace ChainUtils.BouncyCastle.Math.Field
         internal GenericPolynomialExtensionField(IFiniteField subfield, IPolynomial polynomial)
         {
             this.subfield = subfield;
-            this.minimalPolynomial = polynomial;
+            minimalPolynomial = polynomial;
         }
 
         public virtual BigInteger Characteristic
@@ -47,7 +45,7 @@ namespace ChainUtils.BouncyCastle.Math.Field
             {
                 return true;
             }
-            GenericPolynomialExtensionField other = obj as GenericPolynomialExtensionField;
+            var other = obj as GenericPolynomialExtensionField;
             if (null == other)
             {
                 return false;

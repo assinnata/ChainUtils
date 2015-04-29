@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Digests
@@ -80,8 +78,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
         public int DoFinal(byte[] output, int outOff)
         {
             // add padding
-            byte paddingByte = (byte)(M.Length - mOff);
-            for (int i=mOff;i<M.Length;i++)
+            var paddingByte = (byte)(M.Length - mOff);
+            for (var i=mOff;i<M.Length;i++)
             {
                 M[i] = paddingByte;
             }
@@ -105,17 +103,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
         public void Reset()
         {
             xOff = 0;
-            for (int i = 0; i != X.Length; i++)
+            for (var i = 0; i != X.Length; i++)
             {
                 X[i] = 0;
             }
             mOff = 0;
-            for (int i = 0; i != M.Length; i++)
+            for (var i = 0; i != M.Length; i++)
             {
                 M[i] = 0;
             }
             COff = 0;
-            for (int i = 0; i != C.Length; i++)
+            for (var i = 0; i != C.Length; i++)
             {
                 C[i] = 0;
             }
@@ -182,7 +180,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
         internal void ProcessChecksum(byte[] m)
         {
             int L = C[15];
-            for (int i=0;i<16;i++)
+            for (var i=0;i<16;i++)
             {
                 C[i] ^= S[(m[i] ^ L) & 0xff];
                 L = C[i];
@@ -190,17 +188,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
         }
         internal void ProcessBlock(byte[] m)
         {
-            for (int i=0;i<16;i++)
+            for (var i=0;i<16;i++)
             {
                 X[i+16] = m[i];
                 X[i+32] = (byte)(m[i] ^ X[i]);
             }
             // encrypt block
-            int t = 0;
+            var t = 0;
 
-            for (int j=0;j<18;j++)
+            for (var j=0;j<18;j++)
             {
-                for (int k=0;k<48;k++)
+                for (var k=0;k<48;k++)
                 {
                     t = X[k] ^= S[t];
                     t = t & 0xff;
@@ -259,7 +257,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public void Reset(IMemoable other)
 		{
-			MD2Digest d = (MD2Digest)other;
+			var d = (MD2Digest)other;
 
 			CopyIn(d);
 		}

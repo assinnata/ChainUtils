@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -49,7 +48,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
             if (obj == this)
                 return true;
 
-            DsaValidationParameters other = obj as DsaValidationParameters;
+            var other = obj as DsaValidationParameters;
 
             if (other == null)
                 return false;

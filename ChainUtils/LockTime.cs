@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public struct LockTime : IBitcoinSerializable
 	{
-		const uint LOCKTIME_THRESHOLD = 500000000;
+		const uint LocktimeThreshold = 500000000;
 		uint _value;
 
 
@@ -59,7 +55,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return _value < LOCKTIME_THRESHOLD; // Tue Nov  5 00:53:20 1985 UTC
+				return _value < LocktimeThreshold; // Tue Nov  5 00:53:20 1985 UTC
 			}
 		}
 
@@ -117,14 +113,14 @@ namespace ChainUtils
 
 		public override bool Equals(object obj)
 		{
-			LockTime item = obj is LockTime ? (LockTime)obj : default(LockTime);
+			var item = obj is LockTime ? (LockTime)obj : default(LockTime);
 			if(item == null)
 				return false;
 			return _value.Equals(item._value);
 		}
 		public static bool operator ==(LockTime a, LockTime b)
 		{
-			if(System.Object.ReferenceEquals(a, b))
+			if(ReferenceEquals(a, b))
 				return true;
 			if(((object)a == null) || ((object)b == null))
 				return false;

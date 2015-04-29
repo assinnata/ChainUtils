@@ -1,9 +1,5 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Macs;
-using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
 {
@@ -34,8 +30,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 		protected override void engineInit(KeyGenerationParameters param)
 		{
 			// Poly1305 keys are always 256 bits
-			this.random = param.Random;
-			this.strength = 32;
+			random = param.Random;
+			strength = 32;
 		}
 
 		/// <summary>
@@ -45,7 +41,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 		/// </summary>
 		protected override byte[] engineGenerateKey()
 		{
-			byte[] key = base.engineGenerateKey();
+			var key = base.engineGenerateKey();
 			Clamp(key);
 			return key;
 		}

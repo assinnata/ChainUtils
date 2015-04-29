@@ -1,5 +1,4 @@
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -34,8 +33,8 @@ namespace ChainUtils.BouncyCastle.Asn1
         {
             if (length > 127)
             {
-                int size = 1;
-                int val = length;
+                var size = 1;
+                var val = length;
 
 				while ((val >>= 8) != 0)
                 {
@@ -44,7 +43,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 				outStr.WriteByte((byte)(size | 0x80));
 
-				for (int i = (size - 1) * 8; i >= 0; i -= 8)
+				for (var i = (size - 1) * 8; i >= 0; i -= 8)
                 {
                     outStr.WriteByte((byte)(length >> i));
                 }
@@ -71,12 +70,12 @@ namespace ChainUtils.BouncyCastle.Asn1
         {
             if (_tagged)
             {
-                int tagNum = _tagNo | Asn1Tags.Tagged;
+                var tagNum = _tagNo | Asn1Tags.Tagged;
 
                 if (_isExplicit)
                 {
-                    int newTag = _tagNo | Asn1Tags.Constructed | Asn1Tags.Tagged;
-					MemoryStream bOut = new MemoryStream();
+                    var newTag = _tagNo | Asn1Tags.Constructed | Asn1Tags.Tagged;
+					var bOut = new MemoryStream();
                     WriteDerEncoded(bOut, tag, bytes);
                     WriteDerEncoded(Out, newTag, bOut.ToArray());
                 }

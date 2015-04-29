@@ -1,12 +1,7 @@
 using System;
-using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
-using ChainUtils.BouncyCastle.Asn1.Nist;
-using ChainUtils.BouncyCastle.Asn1.Pkcs;
 using ChainUtils.BouncyCastle.Asn1.X9;
 using ChainUtils.BouncyCastle.Crypto.Agreement.Kdf;
-using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
 
@@ -37,18 +32,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
 			// Note that the ec.KeyAgreement class in JCE only uses kdf in one
 			// of the engineGenerateSecret methods.
 
-			BigInteger result = base.CalculateAgreement(pubKey);
+			var result = base.CalculateAgreement(pubKey);
 
-			int keySize = GeneratorUtilities.GetDefaultKeySize(algorithm);
+			var keySize = GeneratorUtilities.GetDefaultKeySize(algorithm);
 
-			DHKdfParameters dhKdfParams = new DHKdfParameters(
+			var dhKdfParams = new DHKdfParameters(
 				new DerObjectIdentifier(algorithm),
 				keySize,
 				BigIntToBytes(result));
 
 			kdf.Init(dhKdfParams);
 
-			byte[] keyBytes = new byte[keySize / 8];
+			var keyBytes = new byte[keySize / 8];
 			kdf.GenerateBytes(keyBytes, 0, keyBytes.Length);
 
 			return new BigInteger(1, keyBytes);
@@ -56,7 +51,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
 
 		private byte[] BigIntToBytes(BigInteger r)
 		{
-			int byteLength = X9IntegerConverter.GetByteLength(privParams.StaticPrivateKey.Parameters.Curve);
+			var byteLength = X9IntegerConverter.GetByteLength(privParams.StaticPrivateKey.Parameters.Curve);
 			return X9IntegerConverter.IntegerToBytes(r, byteLength);
 		}
 	}

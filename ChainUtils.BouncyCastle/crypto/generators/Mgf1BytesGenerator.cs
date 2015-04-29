@@ -1,8 +1,7 @@
 using System;
+using ChainUtils.BouncyCastle.Crypto.Parameters;
 //using ChainUtils.BouncyCastle.Math;
 //using ChainUtils.BouncyCastle.Security;
-using ChainUtils.BouncyCastle.Crypto;
-using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
 {
@@ -22,7 +21,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             IDigest  digest)
         {
             this.digest = digest;
-            this.hLen = digest.GetDigestSize();
+            hLen = digest.GetDigestSize();
         }
 
         public void Init(
@@ -33,7 +32,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                 throw new ArgumentException("MGF parameters required for MGF1Generator");
             }
 
-            MgfParameters   p = (MgfParameters)parameters;
+            var   p = (MgfParameters)parameters;
 
             seed = p.GetSeed();
         }
@@ -78,9 +77,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 				throw new DataLengthException("output buffer too small");
 			}
 
-			byte[]  hashBuf = new byte[hLen];
-            byte[]  C = new byte[4];
-            int     counter = 0;
+			var  hashBuf = new byte[hLen];
+            var  C = new byte[4];
+            var     counter = 0;
 
             digest.Reset();
 

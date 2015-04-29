@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC.Multiplier;
@@ -31,15 +29,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             // Note: If we start accepting instances of KeyGenerationParameters,
             // must apply constraint checking on strength (see DsaParametersGenerator.Init)
 
-            this.param = (DsaKeyGenerationParameters) parameters;
+            param = (DsaKeyGenerationParameters) parameters;
         }
 
         public AsymmetricCipherKeyPair GenerateKeyPair()
         {
-            DsaParameters dsaParams = param.Parameters;
+            var dsaParams = param.Parameters;
 
-            BigInteger x = GeneratePrivateKey(dsaParams.Q, param.Random);
-            BigInteger y = CalculatePublicKey(dsaParams.P, dsaParams.G, x);
+            var x = GeneratePrivateKey(dsaParams.Q, param.Random);
+            var y = CalculatePublicKey(dsaParams.P, dsaParams.G, x);
 
             return new AsymmetricCipherKeyPair(
                 new DsaPublicKeyParameters(y, dsaParams),
@@ -49,14 +47,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         private static BigInteger GeneratePrivateKey(BigInteger q, SecureRandom random)
         {
             // B.1.2 Key Pair Generation by Testing Candidates
-            int minWeight = q.BitLength >> 2;
+            var minWeight = q.BitLength >> 2;
             for (;;)
             {
                 // TODO Prefer this method? (change test cases that used fixed random)
                 // B.1.1 Key Pair Generation Using Extra Random Bits
                 //BigInteger x = new BigInteger(q.BitLength + 64, random).Mod(q.Subtract(One)).Add(One);
 
-                BigInteger x = BigIntegers.CreateRandomInRange(One, q.Subtract(One), random);
+                var x = BigIntegers.CreateRandomInRange(One, q.Subtract(One), random);
                 if (WNafUtilities.GetNafWeight(x) >= minWeight)
                 {
                     return x;

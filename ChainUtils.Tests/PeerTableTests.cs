@@ -16,7 +16,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanStorePeers()
 		{
-			PeerTable table = new PeerTable();
+			var table = new PeerTable();
 			table.Randomize = false;
 			AssertPeer(table, "1.0.0.0", p => Assert.Null(p));
 			AddPeer(table, "1.0.0.0", PeerOrigin.Addr, DateTimeOffset.Now);

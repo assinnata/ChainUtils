@@ -54,7 +54,7 @@ namespace Mono.Nat.Upnp
 			this.localAddress = localAddress;
 
 			// Split the string at the "location" section so i can extract the ipaddress and service description url
-			string locationDetails = deviceDetails.Substring(deviceDetails.IndexOf("Location", StringComparison.InvariantCultureIgnoreCase) + 9).Split('\r')[0];
+			var locationDetails = deviceDetails.Substring(deviceDetails.IndexOf("Location", StringComparison.InvariantCultureIgnoreCase) + 9).Split('\r')[0];
             this.serviceType = serviceType;
 
 			// Make sure we have no excess whitespace
@@ -69,7 +69,7 @@ namespace Mono.Nat.Upnp
 				locationDetails = locationDetails.Substring(7);
 
 				// We then split off the end of the string to get something like: 192.168.0.3:241 in our string
-				string hostAddressAndPort = locationDetails.Remove(locationDetails.IndexOf('/'));
+				var hostAddressAndPort = locationDetails.Remove(locationDetails.IndexOf('/'));
 
 				// From this we parse out the IP address and Port
                 if (hostAddressAndPort.IndexOf(':') > 0)
@@ -134,7 +134,7 @@ namespace Mono.Nat.Upnp
 		public override IAsyncResult BeginGetExternalIP(AsyncCallback callback, object asyncState)
 		{
 			// Create the port map message
-			GetExternalIPAddressMessage message = new GetExternalIPAddressMessage(this);
+			var message = new GetExternalIPAddressMessage(this);
 			return BeginMessageInternal(message, callback, asyncState, EndGetExternalIPInternal);
 		}
 
@@ -143,7 +143,7 @@ namespace Mono.Nat.Upnp
 		/// </summary>
         public override IAsyncResult BeginCreatePortMap(Mapping mapping, AsyncCallback callback, object asyncState)
 		{
-            CreatePortMappingMessage message = new CreatePortMappingMessage(mapping, localAddress, this);
+            var message = new CreatePortMappingMessage(mapping, localAddress, this);
             return BeginMessageInternal(message, callback, mapping, EndCreatePortMapInternal);
 		}
 
@@ -152,21 +152,21 @@ namespace Mono.Nat.Upnp
 		/// </summary>
 		public override IAsyncResult BeginDeletePortMap(Mapping mapping, AsyncCallback callback, object asyncState)
 		{
-			DeletePortMappingMessage message = new DeletePortMappingMessage(mapping, this);
+			var message = new DeletePortMappingMessage(mapping, this);
 			return BeginMessageInternal(message, callback, asyncState, EndDeletePortMapInternal);
 		}
 
 
 		public override IAsyncResult BeginGetAllMappings(AsyncCallback callback, object asyncState)
 		{
-			GetGenericPortMappingEntry message = new GetGenericPortMappingEntry(0, this);
+			var message = new GetGenericPortMappingEntry(0, this);
 			return BeginMessageInternal(message, callback, asyncState, EndGetAllMappingsInternal);
 		}
 
 
 		public override IAsyncResult BeginGetSpecificMapping (Protocol protocol, int port, AsyncCallback callback, object asyncState)
 		{
-			GetSpecificPortMappingEntryMessage message = new GetSpecificPortMappingEntryMessage(protocol, port, this);
+			var message = new GetSpecificPortMappingEntryMessage(protocol, port, this);
 			return this.BeginMessageInternal(message, callback, asyncState, new AsyncCallback(this.EndGetSpecificMappingInternal));
 		}
 
@@ -178,7 +178,7 @@ namespace Mono.Nat.Upnp
 		{
 			if (result == null) throw new ArgumentNullException("result");
 
-			PortMapAsyncResult mappingResult = result as PortMapAsyncResult;
+			var mappingResult = result as PortMapAsyncResult;
 			if (mappingResult == null)
 				throw new ArgumentException("Invalid AsyncResult", "result");
 
@@ -190,7 +190,7 @@ namespace Mono.Nat.Upnp
 			// so we just rethrow the exception and let the user figure out what they should do.
 			if (mappingResult.SavedMessage is ErrorMessage)
 			{
-				ErrorMessage msg = mappingResult.SavedMessage as ErrorMessage;
+				var msg = mappingResult.SavedMessage as ErrorMessage;
 				throw new MappingException(msg.ErrorCode, msg.Description);
 			}
 
@@ -207,7 +207,7 @@ namespace Mono.Nat.Upnp
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			PortMapAsyncResult mappingResult = result as PortMapAsyncResult;
+			var mappingResult = result as PortMapAsyncResult;
 			if (mappingResult == null)
 				throw new ArgumentException("Invalid AsyncResult", "result");
 
@@ -219,7 +219,7 @@ namespace Mono.Nat.Upnp
 			// so we just rethrow the exception and let the user figure out what they should do.
 			if (mappingResult.SavedMessage is ErrorMessage)
 			{
-				ErrorMessage msg = mappingResult.SavedMessage as ErrorMessage;
+				var msg = mappingResult.SavedMessage as ErrorMessage;
 				throw new MappingException(msg.ErrorCode, msg.Description);
 			}
 
@@ -233,7 +233,7 @@ namespace Mono.Nat.Upnp
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			GetAllMappingsAsyncResult mappingResult = result as GetAllMappingsAsyncResult;
+			var mappingResult = result as GetAllMappingsAsyncResult;
 			if (mappingResult == null)
 				throw new ArgumentException("Invalid AsyncResult", "result");
 
@@ -242,7 +242,7 @@ namespace Mono.Nat.Upnp
 
 			if (mappingResult.SavedMessage is ErrorMessage)
 			{
-				ErrorMessage msg = mappingResult.SavedMessage as ErrorMessage;
+				var msg = mappingResult.SavedMessage as ErrorMessage;
 				if (msg.ErrorCode != 713)
 					throw new MappingException(msg.ErrorCode, msg.Description);
 			}
@@ -258,7 +258,7 @@ namespace Mono.Nat.Upnp
 		{
 			if (result == null) throw new ArgumentNullException("result");
 
-			PortMapAsyncResult mappingResult = result as PortMapAsyncResult;
+			var mappingResult = result as PortMapAsyncResult;
 			if (mappingResult == null)
 				throw new ArgumentException("Invalid AsyncResult", "result");
 
@@ -267,7 +267,7 @@ namespace Mono.Nat.Upnp
 
 			if (mappingResult.SavedMessage is ErrorMessage)
 			{
-				ErrorMessage msg = mappingResult.SavedMessage as ErrorMessage;
+				var msg = mappingResult.SavedMessage as ErrorMessage;
 				throw new MappingException(msg.ErrorCode, msg.Description);
 			}
 
@@ -280,7 +280,7 @@ namespace Mono.Nat.Upnp
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			GetAllMappingsAsyncResult mappingResult = result as GetAllMappingsAsyncResult;
+			var mappingResult = result as GetAllMappingsAsyncResult;
 			if (mappingResult == null)
 				throw new ArgumentException("Invalid AsyncResult", "result");
 
@@ -289,7 +289,7 @@ namespace Mono.Nat.Upnp
 
 			if (mappingResult.SavedMessage is ErrorMessage)
 			{
-				ErrorMessage message = mappingResult.SavedMessage as ErrorMessage;
+				var message = mappingResult.SavedMessage as ErrorMessage;
 				if (message.ErrorCode != 0x2ca)
 				{
 					throw new MappingException(message.ErrorCode, message.Description);
@@ -304,7 +304,7 @@ namespace Mono.Nat.Upnp
 
 		public override bool Equals(object obj)
 		{
-			UpnpNatDevice device = obj as UpnpNatDevice;
+			var device = obj as UpnpNatDevice;
 			return (device == null) ? false : this.Equals((device));
 		}
 
@@ -324,8 +324,8 @@ namespace Mono.Nat.Upnp
 		private IAsyncResult BeginMessageInternal(MessageBase message, AsyncCallback storedCallback, object asyncState, AsyncCallback callback)
 		{
 			byte[] body;
-			WebRequest request = message.Encode(out body);
-			PortMapAsyncResult mappingResult = PortMapAsyncResult.Create(message, request, storedCallback, asyncState);
+			var request = message.Encode(out body);
+			var mappingResult = PortMapAsyncResult.Create(message, request, storedCallback, asyncState);
 
 			if (body.Length > 0)
 			{
@@ -333,7 +333,7 @@ namespace Mono.Nat.Upnp
 				request.BeginGetRequestStream(delegate(IAsyncResult result) {
 					try
 					{
-						Stream s = request.EndGetRequestStream(result);
+						var s = request.EndGetRequestStream(result);
 						s.Write(body, 0, body.Length);
 						request.BeginGetResponse(callback, mappingResult);
 					}
@@ -352,17 +352,17 @@ namespace Mono.Nat.Upnp
 
 		private void CompleteMessage(IAsyncResult result)
 		{
-			PortMapAsyncResult mappingResult = result.AsyncState as PortMapAsyncResult;
+			var mappingResult = result.AsyncState as PortMapAsyncResult;
 			mappingResult.CompletedSynchronously = result.CompletedSynchronously;
             mappingResult.Complete();
 		}
 
 		private MessageBase DecodeMessageFromResponse(Stream s, long length)
 		{
-			StringBuilder data = new StringBuilder();
-			int bytesRead = 0;
-			int totalBytesRead = 0;
-			byte[] buffer = new byte[10240];
+			var data = new StringBuilder();
+			var bytesRead = 0;
+			var totalBytesRead = 0;
+			var buffer = new byte[10240];
 
 			// Read out the content of the message, hopefully picking everything up in the case where we have no contentlength
 			if (length != -1)
@@ -394,7 +394,7 @@ namespace Mono.Nat.Upnp
 		private void EndMessageInternal(IAsyncResult result)
 		{
 			HttpWebResponse response = null;
-			PortMapAsyncResult mappingResult = result.AsyncState as PortMapAsyncResult;
+			var mappingResult = result.AsyncState as PortMapAsyncResult;
 
 			try
 			{
@@ -430,19 +430,19 @@ namespace Mono.Nat.Upnp
 		{
 			EndMessageInternal(result);
 
-			GetAllMappingsAsyncResult mappingResult = result.AsyncState as GetAllMappingsAsyncResult;
-			GetGenericPortMappingEntryResponseMessage message = mappingResult.SavedMessage as GetGenericPortMappingEntryResponseMessage;
+			var mappingResult = result.AsyncState as GetAllMappingsAsyncResult;
+			var message = mappingResult.SavedMessage as GetGenericPortMappingEntryResponseMessage;
 			if (message != null)
 			{
-				Mapping mapping = new Mapping (message.Protocol, message.InternalPort, message.ExternalPort, message.LeaseDuration);
+				var mapping = new Mapping (message.Protocol, message.InternalPort, message.ExternalPort, message.LeaseDuration);
 				mapping.Description = message.PortMappingDescription;
 				mappingResult.Mappings.Add(mapping);
-				GetGenericPortMappingEntry next = new GetGenericPortMappingEntry(mappingResult.Mappings.Count, this);
+				var next = new GetGenericPortMappingEntry(mappingResult.Mappings.Count, this);
 
 				// It's ok to do this synchronously because we should already be on anther thread
 				// and this won't block the user.
 				byte[] body;
-				WebRequest request = next.Encode(out body);
+				var request = next.Encode(out body);
 				if (body.Length > 0)
 				{
 					request.ContentLength = body.Length;
@@ -466,10 +466,10 @@ namespace Mono.Nat.Upnp
 		{
 			EndMessageInternal(result);
 
-			GetAllMappingsAsyncResult mappingResult = result.AsyncState as GetAllMappingsAsyncResult;
-			GetGenericPortMappingEntryResponseMessage message = mappingResult.SavedMessage as GetGenericPortMappingEntryResponseMessage;
+			var mappingResult = result.AsyncState as GetAllMappingsAsyncResult;
+			var message = mappingResult.SavedMessage as GetGenericPortMappingEntryResponseMessage;
 			if (message != null) {
-				Mapping mapping = new Mapping(mappingResult.SpecificMapping.Protocol, message.InternalPort, mappingResult.SpecificMapping.PublicPort, message.LeaseDuration);
+				var mapping = new Mapping(mappingResult.SpecificMapping.Protocol, message.InternalPort, mappingResult.SpecificMapping.PublicPort, message.LeaseDuration);
 				mapping.Description = mappingResult.SpecificMapping.Description;
 				mappingResult.Mappings.Add(mapping);
 			}
@@ -484,7 +484,7 @@ namespace Mono.Nat.Upnp
 
 			// Create a HTTPWebRequest to download the list of services the device offers
 			byte[] body;
-			WebRequest request = new GetServicesMessage(this.serviceDescriptionUrl, this.hostEndPoint).Encode(out body);
+			var request = new GetServicesMessage(this.serviceDescriptionUrl, this.hostEndPoint).Encode(out body);
 			if (body.Length > 0)
 				NatUtility.Log("Error: Services Message contained a body");
 			request.BeginGetResponse(this.ServicesReceived, request);
@@ -495,14 +495,14 @@ namespace Mono.Nat.Upnp
 			HttpWebResponse response = null;
 			try
 			{
-				int abortCount = 0;
-				int bytesRead = 0;
-				byte[] buffer = new byte[10240];
-				StringBuilder servicesXml = new StringBuilder();
-				XmlDocument xmldoc = new XmlDocument();
-				HttpWebRequest request = result.AsyncState as HttpWebRequest;
+				var abortCount = 0;
+				var bytesRead = 0;
+				var buffer = new byte[10240];
+				var servicesXml = new StringBuilder();
+				var xmldoc = new XmlDocument();
+				var request = result.AsyncState as HttpWebRequest;
 				response = request.EndGetResponse(result) as HttpWebResponse;
-				Stream s = response.GetResponseStream();
+				var s = response.GetResponseStream();
 
 				if (response.StatusCode != HttpStatusCode.OK) {
 					NatUtility.Log("{0}: Couldn't get services list: {1}", HostEndPoint, response.StatusCode);
@@ -536,9 +536,9 @@ namespace Mono.Nat.Upnp
 				}
 
 				NatUtility.Log("{0}: Parsed services list", HostEndPoint);
-				XmlNamespaceManager ns = new XmlNamespaceManager(xmldoc.NameTable);
+				var ns = new XmlNamespaceManager(xmldoc.NameTable);
 				ns.AddNamespace("ns", "urn:schemas-upnp-org:device-1-0");
-				XmlNodeList nodes = xmldoc.SelectNodes("//*/ns:serviceList", ns);
+				var nodes = xmldoc.SelectNodes("//*/ns:serviceList", ns);
 
 				foreach (XmlNode node in nodes)
 				{
@@ -546,19 +546,19 @@ namespace Mono.Nat.Upnp
 					foreach (XmlNode service in node.ChildNodes)
 					{
 						//If the service is a WANIPConnection, then we have what we want
-                        string type = service["serviceType"].InnerText;
+                        var type = service["serviceType"].InnerText;
 						NatUtility.Log("{0}: Found service: {1}", HostEndPoint, type);
-                        StringComparison c = StringComparison.OrdinalIgnoreCase;
+                        var c = StringComparison.OrdinalIgnoreCase;
                         if (type.Equals (this.serviceType, c))
 						{
 							this.controlUrl = service["controlURL"].InnerText;
 							NatUtility.Log("{0}: Found upnp service at: {1}", HostEndPoint, controlUrl);
 							try
 							{
-								Uri u = new Uri(controlUrl);
+								var u = new Uri(controlUrl);
 								if (u.IsAbsoluteUri)
 								{
-									EndPoint old = hostEndPoint;
+									var old = hostEndPoint;
 									this.hostEndPoint = new IPEndPoint(IPAddress.Parse(u.Host), u.Port);
 									NatUtility.Log("{0}: Absolute URI detected. Host address is now: {1}", old, HostEndPoint);
 									this.controlUrl = controlUrl.Substring(u.GetLeftPart(UriPartial.Authority).Length);

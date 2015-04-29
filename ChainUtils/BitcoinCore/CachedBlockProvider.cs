@@ -3,8 +3,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
@@ -12,15 +10,15 @@ namespace ChainUtils.BitcoinCore
 	{
 		public CachedBlockProvider(IBlockProvider inner)
 		{
-			_Inner = inner;
+			_inner = inner;
 			MaxCachedBlock = 50;
 		}
-		private readonly IBlockProvider _Inner;
+		private readonly IBlockProvider _inner;
 		public IBlockProvider Inner
 		{
 			get
 			{
-				return _Inner;
+				return _inner;
 			}
 		}
 
@@ -31,29 +29,29 @@ namespace ChainUtils.BitcoinCore
 		}
 		#region IBlockProvider Members
 
-		ConcurrentDictionary<uint256, Block> _Blocks = new ConcurrentDictionary<uint256, Block>();
+		ConcurrentDictionary<Uint256, Block> _blocks = new ConcurrentDictionary<Uint256, Block>();
 
-		public Block GetBlock(uint256 id, List<byte[]> searchedData)
+		public Block GetBlock(Uint256 id, List<byte[]> searchedData)
 		{
 			Block result = null;
-			if(_Blocks.TryGetValue(id, out result))
+			if(_blocks.TryGetValue(id, out result))
 				return result;
 			result = Inner.GetBlock(id, searchedData);
-			_Blocks.AddOrUpdate(id, result, (i, b) => b);
-			while(_Blocks.Count > MaxCachedBlock)
+			_blocks.AddOrUpdate(id, result, (i, b) => b);
+			while(_blocks.Count > MaxCachedBlock)
 			{
-				var removed = TakeRandom(_Blocks.Keys.ToList());
+				var removed = TakeRandom(_blocks.Keys.ToList());
 				Block ignored = null;
-				_Blocks.TryRemove(removed, out ignored);
+				_blocks.TryRemove(removed, out ignored);
 			}
 			return result;
 		}
 
-		private uint256 TakeRandom(List<uint256> id)
+		private Uint256 TakeRandom(List<Uint256> id)
 		{
 			if(id.Count == 0)
 				return null;
-			Random rand = new Random();
+			var rand = new Random();
 			return id[rand.Next(0, id.Count)];
 		}
 

@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Engines;
 using ChainUtils.BouncyCastle.Crypto.Modes;
 using ChainUtils.BouncyCastle.Crypto.Paddings;
@@ -99,7 +98,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
 			this.cipher = new CbcBlockCipher(cipher);
 			this.padding = padding;
-			this.macSize = macSizeInBits / 8;
+			macSize = macSizeInBits / 8;
 
 			mac = new byte[cipher.GetBlockSize()];
 			buf = new byte[cipher.GetBlockSize()];
@@ -134,19 +133,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			}
 
 			KeyParameter key1;
-			byte[] keyvalue = kp.GetKey();
+			var keyvalue = kp.GetKey();
 
 			if (keyvalue.Length == 16)
 			{ // Double length DES key
 				key1 = new KeyParameter(keyvalue, 0, 8);
-				this.lastKey2 = new KeyParameter(keyvalue, 8, 8);
-				this.lastKey3 = key1;
+				lastKey2 = new KeyParameter(keyvalue, 8, 8);
+				lastKey3 = key1;
 			}
 			else if (keyvalue.Length == 24)
 			{ // Triple length DES key
 				key1 = new KeyParameter(keyvalue, 0, 8);
-				this.lastKey2 = new KeyParameter(keyvalue, 8, 8);
-				this.lastKey3 = new KeyParameter(keyvalue, 16, 8);
+				lastKey2 = new KeyParameter(keyvalue, 8, 8);
+				lastKey3 = new KeyParameter(keyvalue, 16, 8);
 			}
 			else
 			{
@@ -188,9 +187,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			if (len < 0)
 				throw new ArgumentException("Can't have a negative input length!");
 
-			int blockSize = cipher.GetBlockSize();
-			int resultLen = 0;
-			int gapLen = blockSize - bufOff;
+			var blockSize = cipher.GetBlockSize();
+			var resultLen = 0;
+			var gapLen = blockSize - bufOff;
 
 			if (len > gapLen)
 			{
@@ -220,7 +219,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			byte[]	output,
 			int		outOff)
 		{
-			int blockSize = cipher.GetBlockSize();
+			var blockSize = cipher.GetBlockSize();
 
 			if (padding == null)
 			{
@@ -244,12 +243,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			cipher.ProcessBlock(buf, 0, mac, 0);
 
 			// Added to code from base class
-			DesEngine deseng = new DesEngine();
+			var deseng = new DesEngine();
 
-			deseng.Init(false, this.lastKey2);
+			deseng.Init(false, lastKey2);
 			deseng.ProcessBlock(mac, 0, mac, 0);
 
-			deseng.Init(true, this.lastKey3);
+			deseng.Init(true, lastKey3);
 			deseng.ProcessBlock(mac, 0, mac, 0);
 			// ****
 

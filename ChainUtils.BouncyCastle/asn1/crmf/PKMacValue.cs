@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Asn1.Cmp;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
@@ -16,8 +15,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Crmf
 
         private PKMacValue(Asn1Sequence seq)
         {
-            this.algID = AlgorithmIdentifier.GetInstance(seq[0]);
-            this.macValue = DerBitString.GetInstance(seq[1]);
+            algID = AlgorithmIdentifier.GetInstance(seq[0]);
+            macValue = DerBitString.GetInstance(seq[1]);
         }
 
         public static PKMacValue GetInstance(object obj)

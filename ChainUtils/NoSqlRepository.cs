@@ -1,12 +1,11 @@
-﻿using ChainUtils.DataEncoders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.ExceptionServices;
-
+using ChainUtils.DataEncoders;
 #if !NOSQLITE
 using System.Data;
 using System.Data.SQLite;
@@ -39,7 +38,7 @@ namespace ChainUtils
 			var data = await GetBytes(key).ConfigureAwait(false);
 			if(data == null)
 				return default(T);
-			T obj = new T();
+			var obj = new T();
 			obj.ReadWrite(data);
 			return obj;
 		}
@@ -71,16 +70,16 @@ namespace ChainUtils
 		}
 	}
 #if !NOSQLITE
-	public class SQLiteNoSqlRepository : NoSqlRepository
+	public class SqLiteNoSqlRepository : NoSqlRepository
 	{
-		private readonly SQLiteConnection _Connection;
-		public SQLiteNoSqlRepository(string fileName, bool? createNew = null)
+		private readonly SQLiteConnection _connection;
+		public SqLiteNoSqlRepository(string fileName, bool? createNew = null)
 		{
 			if(createNew.HasValue && createNew.Value)
 				if(File.Exists(fileName))
 					File.Delete(fileName);
 
-			SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
+			var builder = new SQLiteConnectionStringBuilder();
 			builder.DataSource = fileName;
 			builder.BaseSchemaName = "";
 
@@ -89,22 +88,22 @@ namespace ChainUtils
 				if(createNew.HasValue && !createNew.Value)
 					throw new FileNotFoundException(fileName);
 				SQLiteConnection.CreateFile(fileName);
-				_Connection = new SQLiteConnection(builder.ToString());
-				_Connection.Open();
+				_connection = new SQLiteConnection(builder.ToString());
+				_connection.Open();
 
-				var command = _Connection.CreateCommand();
+				var command = _connection.CreateCommand();
 				command.CommandText = "Create Table Store(Key TEXT UNIQUE, Data BLOB)";
 				command.ExecuteNonQuery();
 			}
 			else
 			{
-				_Connection = new SQLiteConnection(builder.ToString());
-				_Connection.Open();
+				_connection = new SQLiteConnection(builder.ToString());
+				_connection.Open();
 			}
 		}
 		protected override async Task<byte[]> GetBytes(string key)
 		{
-			var command = _Connection.CreateCommand();
+			var command = _connection.CreateCommand();
 			command.CommandText = "SELECT Data FROM Store WHERE Key = @key";
 			command.Parameters.Add("@key", DbType.String).Value = key;
 			using(var reader = await command.ExecuteReaderAsync().ConfigureAwait(false))
@@ -116,11 +115,11 @@ namespace ChainUtils
 		}
 		static byte[] GetBytes(SQLiteDataReader reader)
 		{
-			const int CHUNK_SIZE = 2 * 1024;
-			byte[] buffer = new byte[CHUNK_SIZE];
+			const int chunkSize = 2 * 1024;
+			var buffer = new byte[chunkSize];
 			long bytesRead;
 			long fieldOffset = 0;
-			using(MemoryStream stream = new MemoryStream())
+			using(var stream = new MemoryStream())
 			{
 				while((bytesRead = reader.GetBytes(0, fieldOffset, buffer, 0, buffer.Length)) > 0)
 				{
@@ -147,9 +146,9 @@ namespace ChainUtils
 
 		protected override Task PutBytesBatch(IEnumerable<Tuple<string, byte[]>> enumerable)
 		{
-			var command = _Connection.CreateCommand();
-			StringBuilder commandString = new StringBuilder();
-			int i = 0;
+			var command = _connection.CreateCommand();
+			var commandString = new StringBuilder();
+			var i = 0;
 			commandString.AppendLine("BEGIN TRANSACTION;");
 			foreach(var kv in enumerable)
 			{

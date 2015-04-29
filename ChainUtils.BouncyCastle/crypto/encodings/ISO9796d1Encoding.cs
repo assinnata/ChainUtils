@@ -1,5 +1,4 @@
 using System;
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 
@@ -32,7 +31,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 		public ISO9796d1Encoding(
 			IAsymmetricBlockCipher   cipher)
 		{
-			this.engine = cipher;
+			engine = cipher;
 		}
 
 		public string AlgorithmName
@@ -52,7 +51,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 			RsaKeyParameters kParam;
 			if (parameters is ParametersWithRandom)
 			{
-				ParametersWithRandom rParam = (ParametersWithRandom)parameters;
+				var rParam = (ParametersWithRandom)parameters;
 				kParam = (RsaKeyParameters)rParam.Parameters;
 			}
 			else
@@ -75,7 +74,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 		*/
 		public int GetInputBlockSize()
 		{
-			int baseBlockSize = engine.GetInputBlockSize();
+			var baseBlockSize = engine.GetInputBlockSize();
 
 			if (forEncryption)
 			{
@@ -92,7 +91,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 		*/
 		public int GetOutputBlockSize()
 		{
-			int baseBlockSize = engine.GetOutputBlockSize();
+			var baseBlockSize = engine.GetOutputBlockSize();
 
 			if (forEncryption)
 			{
@@ -147,12 +146,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 			int		inOff,
 			int		inLen)
 		{
-			byte[]  block = new byte[(bitSize + 7) / 8];
-			int     r = padBits + 1;
-			int     z = inLen;
-			int     t = (bitSize + 13) / 16;
+			var  block = new byte[(bitSize + 7) / 8];
+			var     r = padBits + 1;
+			var     z = inLen;
+			var     t = (bitSize + 13) / 16;
 
-			for (int i = 0; i < t; i += z)
+			for (var i = 0; i < t; i += z)
 			{
 				if (i > t - z)
 				{
@@ -165,9 +164,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 				}
 			}
 
-			for (int i = block.Length - 2 * t; i != block.Length; i += 2)
+			for (var i = block.Length - 2 * t; i != block.Length; i += 2)
 			{
-				byte val = block[block.Length - t + i / 2];
+				var val = block[block.Length - t + i / 2];
 
 				block[i] = (byte)((shadows[(uint) (val & 0xff) >> 4] << 4)
 					| shadows[val & 0x0f]);
@@ -177,8 +176,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 			block[block.Length - 2 * z] ^= (byte) r;
 			block[block.Length - 1] = (byte)((block[block.Length - 1] << 4) | 0x06);
 
-			int maxBit = (8 - (bitSize - 1) % 8);
-			int offSet = 0;
+			var maxBit = (8 - (bitSize - 1) % 8);
+			var offSet = 0;
 
 			if (maxBit != 8)
 			{
@@ -203,11 +202,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 			int		inOff,
 			int		inLen)
 		{
-			byte[]  block = engine.ProcessBlock(input, inOff, inLen);
-			int     r = 1;
-			int     t = (bitSize + 13) / 16;
+			var  block = engine.ProcessBlock(input, inOff, inLen);
+			var     r = 1;
+			var     t = (bitSize + 13) / 16;
 
-			BigInteger iS = new BigInteger(1, block);
+			var iS = new BigInteger(1, block);
 			BigInteger iR;
 			if (iS.Mod(Sixteen).Equals(Six))
 			{
@@ -233,12 +232,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 			block[0] = (byte)((shadows[(uint) (block[1] & 0xff) >> 4] << 4)
 				| shadows[block[1] & 0x0f]);
 
-			bool boundaryFound = false;
-			int boundary = 0;
+			var boundaryFound = false;
+			var boundary = 0;
 
-			for (int i = block.Length - 1; i >= block.Length - 2 * t; i -= 2)
+			for (var i = block.Length - 1; i >= block.Length - 2 * t; i -= 2)
 			{
-				int val = ((shadows[(uint) (block[i] & 0xff) >> 4] << 4)
+				var val = ((shadows[(uint) (block[i] & 0xff) >> 4] << 4)
 					| shadows[block[i] & 0x0f]);
 
 				if (((block[i - 1] ^ val) & 0xff) != 0)
@@ -258,9 +257,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Encodings
 
 			block[boundary] = 0;
 
-			byte[] nblock = new byte[(block.Length - boundary) / 2];
+			var nblock = new byte[(block.Length - boundary) / 2];
 
-			for (int i = 0; i < nblock.Length; i++)
+			for (var i = 0; i < nblock.Length; i++)
 			{
 				nblock[i] = block[2 * i + boundary + 1];
 			}

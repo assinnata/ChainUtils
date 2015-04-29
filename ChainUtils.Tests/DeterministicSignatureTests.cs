@@ -91,7 +91,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void IETFDetailedExample()
 		{
-			ECPrivateKeyParameters key = ParseKey(
+			var key = ParseKey(
    @"
 	curve: NIST K-163
 	q = 4000000000000000000020108A2E0CC0D99F8A5EF
@@ -99,7 +99,7 @@ namespace ChainUtils.Tests
    Ux = 79AEE090DB05EC252D5CB4452F356BE198A4FF96F
    Uy = 782E29634DDC9A31EF40386E896BAA18B53AFA5A3");
 
-			DeterministicSigTest test = ParseTest(@"
+			var test = ParseTest(@"
    With SHA-256, message = sample:
    k = 23AF4074C90A02B3FE61D286D5C87F425E6BDD81B
    r = 113A63990598A3828C407C0F4D2438D990DF99A7F
@@ -110,7 +110,7 @@ namespace ChainUtils.Tests
 
 		private void TestSig(ECPrivateKeyParameters key, DeterministicSigTest test)
 		{
-			DeterministicECDSA dsa = new DeterministicECDSA(test.Hash);
+			var dsa = new DeterministicECDSA(test.Hash);
 			dsa.setPrivateKey(key);
 			dsa.update(Encoding.UTF8.GetBytes(test.Message));
 			var result = dsa.sign();
@@ -175,7 +175,7 @@ namespace ChainUtils.Tests
 				return null;
 			data = data.Replace(match.Value, "");
 
-			Dictionary<string, string> values = ToDictionnary(data);
+			var values = ToDictionnary(data);
 
 			return new DeterministicSigTest()
 				{
@@ -189,7 +189,7 @@ namespace ChainUtils.Tests
 
 		private static Dictionary<string, string> ToDictionnary(string data)
 		{
-			Dictionary<string, string> values = new Dictionary<string, string>();
+			var values = new Dictionary<string, string>();
 
 			var lines = data.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 			string previous = null;
@@ -214,7 +214,7 @@ namespace ChainUtils.Tests
 
 		private ECPrivateKeyParameters ParseKey(string data)
 		{
-			Dictionary<string, string> values = ToDictionnary(data);
+			var values = ToDictionnary(data);
 
 			var curveName = values["curve"].Replace("NIST", "");
 			var curve = SecNamedCurves.GetByOid(curves[curveName]);
@@ -223,7 +223,7 @@ namespace ChainUtils.Tests
 
 			var key = new ECPrivateKeyParameters(new BigInteger(values["x"], 16), domain);
 
-			ECPoint pub = curve.G.Multiply(key.D);
+			var pub = curve.G.Multiply(key.D);
 
 			Assert.Equal(pub.X.ToBigInteger(), new BigInteger(values["Ux"], 16));
 			Assert.Equal(pub.Y.ToBigInteger(), new BigInteger(values["Uy"], 16));

@@ -1,58 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChainUtils.Protocol
+﻿namespace ChainUtils.Protocol
 {
 	[Payload("getblocks")]
 	public class GetBlocksPayload : Payload
 	{
-		uint version = (uint)ProtocolVersion.PROTOCOL_VERSION;
+		uint _version = (uint)ProtocolVersion.PROTOCOL_VERSION;
 		public ProtocolVersion Version
 		{
 			get
 			{
-				return (ProtocolVersion)version;
+				return (ProtocolVersion)_version;
 			}
 			set
 			{
-				version = (uint)value;
+				_version = (uint)value;
 			}
 		}
 
-		BlockLocator blockLocators;
+		BlockLocator _blockLocators;
 
 		public BlockLocator BlockLocators
 		{
 			get
 			{
-				return blockLocators;
+				return _blockLocators;
 			}
 			set
 			{
-				blockLocators = value;
+				_blockLocators = value;
 			}
 		}
-		uint256 _HashStop = new uint256(0);
-		public uint256 HashStop
+		Uint256 _hashStop = new Uint256(0);
+		public Uint256 HashStop
 		{
 			get
 			{
-				return _HashStop;
+				return _hashStop;
 			}
 			set
 			{
-				_HashStop = value;
+				_hashStop = value;
 			}
 		}
 
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref version);
-			stream.ReadWrite(ref blockLocators);
-			stream.ReadWrite(ref _HashStop);
+			stream.ReadWrite(ref _version);
+			stream.ReadWrite(ref _blockLocators);
+			stream.ReadWrite(ref _hashStop);
 		}
 	}
 }

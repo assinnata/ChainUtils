@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -9,21 +8,21 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
     {
         internal static byte[] OneAsBytes()
         {
-            byte[] tmp = new byte[16];
+            var tmp = new byte[16];
             tmp[0] = 0x80;
             return tmp;
         }
 
         internal static uint[] OneAsUints()
         {
-            uint[] tmp = new uint[4];
+            var tmp = new uint[4];
             tmp[0] = 0x80000000;
             return tmp;
         }
 
         internal static uint[] AsUints(byte[] bs)
         {
-            uint[] output = new uint[4];
+            var output = new uint[4];
             Pack.BE_To_UInt32(bs, 0, output);
             return output;
         }
@@ -35,20 +34,20 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void Multiply(byte[] block, byte[] val)
         {
-            byte[] tmp = Arrays.Clone(block);
-            byte[] c = new byte[16];
+            var tmp = Arrays.Clone(block);
+            var c = new byte[16];
 
-            for (int i = 0; i < 16; ++i)
+            for (var i = 0; i < 16; ++i)
             {
-                byte bits = val[i];
-                for (int j = 7; j >= 0; --j)
+                var bits = val[i];
+                for (var j = 7; j >= 0; --j)
                 {
                     if ((bits & (1 << j)) != 0)
                     {
                         Xor(c, tmp);
                     }
 
-                    bool lsb = (tmp[15] & 1) != 0;
+                    var lsb = (tmp[15] & 1) != 0;
                     ShiftRight(tmp);
                     if (lsb)
                     {
@@ -65,7 +64,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
         // P is the value with only bit i=1 set
         internal static void MultiplyP(uint[] x)
         {
-            bool lsb = (x[3] & 1) != 0;
+            var lsb = (x[3] & 1) != 0;
             ShiftRight(x);
             if (lsb)
             {
@@ -77,7 +76,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void MultiplyP(uint[] x, uint[] output)
         {
-            bool lsb = (x[3] & 1) != 0;
+            var lsb = (x[3] & 1) != 0;
             ShiftRight(x, output);
             if (lsb)
             {
@@ -92,9 +91,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 //				MultiplyP(x);
 //			}
 
-            uint lsw = x[3];
+            var lsw = x[3];
             ShiftRightN(x, 8);
-            for (int i = 7; i >= 0; --i)
+            for (var i = 7; i >= 0; --i)
             {
                 if ((lsw & (1 << i)) != 0)
                 {
@@ -105,9 +104,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void MultiplyP8(uint[] x, uint[] output)
         {
-            uint lsw = x[3];
+            var lsw = x[3];
             ShiftRightN(x, 8, output);
-            for (int i = 7; i >= 0; --i)
+            for (var i = 7; i >= 0; --i)
             {
                 if ((lsw & (1 << i)) != 0)
                 {
@@ -118,11 +117,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void ShiftRight(byte[] block)
         {
-            int i = 0;
+            var i = 0;
             byte bit = 0;
             for (; ; )
             {
-                byte b = block[i];
+                var b = block[i];
                 block[i] = (byte)((b >> 1) | bit);
                 if (++i == 16) break;
                 bit = (byte)(b << 7);
@@ -131,11 +130,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         static void ShiftRight(byte[] block, byte[] output)
         {
-            int i = 0;
+            var i = 0;
             byte bit = 0;
             for (;;)
             {
-                byte b = block[i];
+                var b = block[i];
                 output[i] = (byte)((b >> 1) | bit);
                 if (++i == 16) break;
                 bit = (byte)(b << 7);
@@ -144,11 +143,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void ShiftRight(uint[] block)
         {
-            int i = 0;
+            var i = 0;
             uint bit = 0;
             for (; ; )
             {
-                uint b = block[i];
+                var b = block[i];
                 block[i] = (b >> 1) | bit;
                 if (++i == 4) break;
                 bit = b << 31;
@@ -157,11 +156,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void ShiftRight(uint[] block, uint[] output)
         {
-            int i = 0;
+            var i = 0;
             uint bit = 0;
             for (; ; )
             {
-                uint b = block[i];
+                var b = block[i];
                 output[i] = (b >> 1) | bit;
                 if (++i == 4) break;
                 bit = b << 31;
@@ -170,11 +169,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void ShiftRightN(uint[] block, int n)
         {
-            int i = 0;
+            var i = 0;
             uint bit = 0;
             for (; ; )
             {
-                uint b = block[i];
+                var b = block[i];
                 block[i] = (b >> n) | bit;
                 if (++i == 4) break;
                 bit = b << (32 - n);
@@ -183,11 +182,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void ShiftRightN(uint[] block, int n, uint[] output)
         {
-            int i = 0;
+            var i = 0;
             uint bit = 0;
             for (; ; )
             {
-                uint b = block[i];
+                var b = block[i];
                 output[i] = (b >> n) | bit;
                 if (++i == 4) break;
                 bit = b << (32 - n);
@@ -196,7 +195,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void Xor(byte[] block, byte[] val)
         {
-            for (int i = 15; i >= 0; --i)
+            for (var i = 15; i >= 0; --i)
             {
                 block[i] ^= val[i];
             }
@@ -212,7 +211,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void Xor(byte[] block, byte[] val, byte[] output)
         {
-            for (int i = 15; i >= 0; --i)
+            for (var i = 15; i >= 0; --i)
             {
                 output[i] = (byte)(block[i] ^ val[i]);
             }
@@ -220,7 +219,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void Xor(uint[] block, uint[] val)
         {
-            for (int i = 3; i >= 0; --i)
+            for (var i = 3; i >= 0; --i)
             {
                 block[i] ^= val[i];
             }
@@ -228,7 +227,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 
         internal static void Xor(uint[] block, uint[] val, uint[] output)
         {
-            for (int i = 3; i >= 0; --i)
+            for (var i = 3; i >= 0; --i)
             {
                 output[i] = block[i] ^ val[i];
             }

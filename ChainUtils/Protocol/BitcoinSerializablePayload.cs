@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChainUtils.Protocol
+﻿namespace ChainUtils.Protocol
 {
 	public class BitcoinSerializablePayload<T> : Payload where T : IBitcoinSerializable, new()
 	{
@@ -14,23 +8,23 @@ namespace ChainUtils.Protocol
 		}
 		public BitcoinSerializablePayload(T obj)
 		{
-			_Object = obj;
+			_object = obj;
 		}
-		T _Object = new T();
+		T _object = new T();
 		public T Object
 		{
 			get
 			{
-				return _Object;
+				return _object;
 			}
 			set
 			{
-				_Object = value;
+				_object = value;
 			}
 		}
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref _Object);
+			stream.ReadWrite(ref _object);
 		}
 	}
 }

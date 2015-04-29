@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Tsp
@@ -34,8 +33,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 		private TimeStampReq(
 			Asn1Sequence seq)
 		{
-			int nbObjects = seq.Count;
-			int seqStart = 0;
+			var nbObjects = seq.Count;
+			var seqStart = 0;
 
 			// version
 			version = DerInteger.GetInstance(seq[seqStart++]);
@@ -43,7 +42,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 			// messageImprint
 			messageImprint = MessageImprint.GetInstance(seq[seqStart++]);
 
-			for (int opt = seqStart; opt < nbObjects; opt++)
+			for (var opt = seqStart; opt < nbObjects; opt++)
 			{
 				// tsaPolicy
 				if (seq[opt] is DerObjectIdentifier)
@@ -63,7 +62,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 				// extensions
 				else if (seq[opt] is Asn1TaggedObject)
 				{
-					Asn1TaggedObject tagged = (Asn1TaggedObject) seq[opt];
+					var tagged = (Asn1TaggedObject) seq[opt];
 					if (tagged.TagNo == 0)
 					{
 						extensions = X509Extensions.GetInstance(tagged, false);
@@ -80,7 +79,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 			X509Extensions		extensions)
 		{
 			// default
-			this.version = new DerInteger(1);
+			version = new DerInteger(1);
 
 			this.messageImprint = messageImprint;
 			this.tsaPolicy = tsaPolicy;
@@ -135,7 +134,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(
+			var v = new Asn1EncodableVector(
 				version, messageImprint);
 
 			if (tsaPolicy != null)

@@ -42,7 +42,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 		public override int GetHashCode()
         {
-			int vh = this.Value.GetHashCode();
+			var vh = Value.GetHashCode();
 
 			return IsCritical ? vh : ~vh;
         }
@@ -50,7 +50,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public override bool Equals(
             object obj)
         {
-            X509Extension other = obj as X509Extension;
+            var other = obj as X509Extension;
             if (other == null)
             {
                 return false;

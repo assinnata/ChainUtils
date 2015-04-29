@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Crypto.Parameters;
-
 namespace ChainUtils.BouncyCastle.Crypto
 {
 	/**
@@ -91,7 +89,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 			if (outOff + length > output.Length)
 				throw new DataLengthException("output buffer too small in ProcessBytes()");
 
-			for (int i = 0; i != length; i++)
+			for (var i = 0; i != length; i++)
 			{
 				cipher.ProcessBlock(input, inOff + i, output, outOff + i);
 			}

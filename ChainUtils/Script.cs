@@ -1,10 +1,10 @@
-﻿using ChainUtils.Crypto;
-using ChainUtils.DataEncoders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ChainUtils.Crypto;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils
 {
@@ -15,7 +15,7 @@ namespace ChainUtils
 		None = 0,
 
 		// Evaluate P2SH subscripts (softfork safe, BIP16).
-		P2SH = (1U << 0),
+		P2Sh = (1U << 0),
 
 		// Passing a non-strict-DER signature or one with undefined hashtype to a checksig operation causes script failure.
 		// Passing a pubkey that is not (0x04 + 64 bytes) or (0x02 or 0x03 + 32 bytes) to checksig causes that pubkey to be
@@ -68,7 +68,7 @@ namespace ChainUtils
  * Failing one of these tests may trigger a DoS ban - see CheckInputs() for
  * details.
  */
-		Mandatory = P2SH,
+		Mandatory = P2Sh,
 		/**
  * Standard script verification flags that standard transactions will comply
  * with. However scripts violating these flags may still be present in valid
@@ -98,147 +98,147 @@ namespace ChainUtils
 	public enum OpcodeType : byte
 	{
 		// push value
-		OP_0 = 0x00,
-		OP_FALSE = OP_0,
-		OP_PUSHDATA1 = 0x4c,
-		OP_PUSHDATA2 = 0x4d,
-		OP_PUSHDATA4 = 0x4e,
-		OP_1NEGATE = 0x4f,
-		OP_RESERVED = 0x50,
-		OP_1 = 0x51,
-		OP_TRUE = OP_1,
-		OP_2 = 0x52,
-		OP_3 = 0x53,
-		OP_4 = 0x54,
-		OP_5 = 0x55,
-		OP_6 = 0x56,
-		OP_7 = 0x57,
-		OP_8 = 0x58,
-		OP_9 = 0x59,
-		OP_10 = 0x5a,
-		OP_11 = 0x5b,
-		OP_12 = 0x5c,
-		OP_13 = 0x5d,
-		OP_14 = 0x5e,
-		OP_15 = 0x5f,
-		OP_16 = 0x60,
+		Op0 = 0x00,
+		OpFalse = Op0,
+		OpPushdata1 = 0x4c,
+		OpPushdata2 = 0x4d,
+		OpPushdata4 = 0x4e,
+		Op_1Negate = 0x4f,
+		OpReserved = 0x50,
+		Op1 = 0x51,
+		OpTrue = Op1,
+		Op2 = 0x52,
+		Op3 = 0x53,
+		Op4 = 0x54,
+		Op5 = 0x55,
+		Op6 = 0x56,
+		Op7 = 0x57,
+		Op8 = 0x58,
+		Op9 = 0x59,
+		Op10 = 0x5a,
+		Op11 = 0x5b,
+		Op12 = 0x5c,
+		Op13 = 0x5d,
+		Op14 = 0x5e,
+		Op15 = 0x5f,
+		Op16 = 0x60,
 
 		// control
-		OP_NOP = 0x61,
-		OP_VER = 0x62,
-		OP_IF = 0x63,
-		OP_NOTIF = 0x64,
-		OP_VERIF = 0x65,
-		OP_VERNOTIF = 0x66,
-		OP_ELSE = 0x67,
-		OP_ENDIF = 0x68,
-		OP_VERIFY = 0x69,
-		OP_RETURN = 0x6a,
+		OpNop = 0x61,
+		OpVer = 0x62,
+		OpIf = 0x63,
+		OpNotif = 0x64,
+		OpVerif = 0x65,
+		OpVernotif = 0x66,
+		OpElse = 0x67,
+		OpEndif = 0x68,
+		OpVerify = 0x69,
+		OpReturn = 0x6a,
 
 		// stack ops
-		OP_TOALTSTACK = 0x6b,
-		OP_FROMALTSTACK = 0x6c,
-		OP_2DROP = 0x6d,
-		OP_2DUP = 0x6e,
-		OP_3DUP = 0x6f,
-		OP_2OVER = 0x70,
-		OP_2ROT = 0x71,
-		OP_2SWAP = 0x72,
-		OP_IFDUP = 0x73,
-		OP_DEPTH = 0x74,
-		OP_DROP = 0x75,
-		OP_DUP = 0x76,
-		OP_NIP = 0x77,
-		OP_OVER = 0x78,
-		OP_PICK = 0x79,
-		OP_ROLL = 0x7a,
-		OP_ROT = 0x7b,
-		OP_SWAP = 0x7c,
-		OP_TUCK = 0x7d,
+		OpToaltstack = 0x6b,
+		OpFromaltstack = 0x6c,
+		Op_2Drop = 0x6d,
+		Op_2Dup = 0x6e,
+		Op_3Dup = 0x6f,
+		Op_2Over = 0x70,
+		Op_2Rot = 0x71,
+		Op_2Swap = 0x72,
+		OpIfdup = 0x73,
+		OpDepth = 0x74,
+		OpDrop = 0x75,
+		OpDup = 0x76,
+		OpNip = 0x77,
+		OpOver = 0x78,
+		OpPick = 0x79,
+		OpRoll = 0x7a,
+		OpRot = 0x7b,
+		OpSwap = 0x7c,
+		OpTuck = 0x7d,
 
 		// splice ops
-		OP_CAT = 0x7e,
-		OP_SUBSTR = 0x7f,
-		OP_LEFT = 0x80,
-		OP_RIGHT = 0x81,
-		OP_SIZE = 0x82,
+		OpCat = 0x7e,
+		OpSubstr = 0x7f,
+		OpLeft = 0x80,
+		OpRight = 0x81,
+		OpSize = 0x82,
 
 		// bit logic
-		OP_INVERT = 0x83,
-		OP_AND = 0x84,
-		OP_OR = 0x85,
-		OP_XOR = 0x86,
-		OP_EQUAL = 0x87,
-		OP_EQUALVERIFY = 0x88,
-		OP_RESERVED1 = 0x89,
-		OP_RESERVED2 = 0x8a,
+		OpInvert = 0x83,
+		OpAnd = 0x84,
+		OpOr = 0x85,
+		OpXor = 0x86,
+		OpEqual = 0x87,
+		OpEqualverify = 0x88,
+		OpReserved1 = 0x89,
+		OpReserved2 = 0x8a,
 
 		// numeric
-		OP_1ADD = 0x8b,
-		OP_1SUB = 0x8c,
-		OP_2MUL = 0x8d,
-		OP_2DIV = 0x8e,
-		OP_NEGATE = 0x8f,
-		OP_ABS = 0x90,
-		OP_NOT = 0x91,
-		OP_0NOTEQUAL = 0x92,
+		Op_1Add = 0x8b,
+		Op_1Sub = 0x8c,
+		Op_2Mul = 0x8d,
+		Op_2Div = 0x8e,
+		OpNegate = 0x8f,
+		OpAbs = 0x90,
+		OpNot = 0x91,
+		Op_0Notequal = 0x92,
 
-		OP_ADD = 0x93,
-		OP_SUB = 0x94,
-		OP_MUL = 0x95,
-		OP_DIV = 0x96,
-		OP_MOD = 0x97,
-		OP_LSHIFT = 0x98,
-		OP_RSHIFT = 0x99,
+		OpAdd = 0x93,
+		OpSub = 0x94,
+		OpMul = 0x95,
+		OpDiv = 0x96,
+		OpMod = 0x97,
+		OpLshift = 0x98,
+		OpRshift = 0x99,
 
-		OP_BOOLAND = 0x9a,
-		OP_BOOLOR = 0x9b,
-		OP_NUMEQUAL = 0x9c,
-		OP_NUMEQUALVERIFY = 0x9d,
-		OP_NUMNOTEQUAL = 0x9e,
-		OP_LESSTHAN = 0x9f,
-		OP_GREATERTHAN = 0xa0,
-		OP_LESSTHANOREQUAL = 0xa1,
-		OP_GREATERTHANOREQUAL = 0xa2,
-		OP_MIN = 0xa3,
-		OP_MAX = 0xa4,
+		OpBooland = 0x9a,
+		OpBoolor = 0x9b,
+		OpNumequal = 0x9c,
+		OpNumequalverify = 0x9d,
+		OpNumnotequal = 0x9e,
+		OpLessthan = 0x9f,
+		OpGreaterthan = 0xa0,
+		OpLessthanorequal = 0xa1,
+		OpGreaterthanorequal = 0xa2,
+		OpMin = 0xa3,
+		OpMax = 0xa4,
 
-		OP_WITHIN = 0xa5,
+		OpWithin = 0xa5,
 
 		// crypto
-		OP_RIPEMD160 = 0xa6,
-		OP_SHA1 = 0xa7,
-		OP_SHA256 = 0xa8,
-		OP_HASH160 = 0xa9,
-		OP_HASH256 = 0xaa,
-		OP_CODESEPARATOR = 0xab,
-		OP_CHECKSIG = 0xac,
-		OP_CHECKSIGVERIFY = 0xad,
-		OP_CHECKMULTISIG = 0xae,
-		OP_CHECKMULTISIGVERIFY = 0xaf,
+		OpRipemd160 = 0xa6,
+		OpSha1 = 0xa7,
+		OpSha256 = 0xa8,
+		OpHash160 = 0xa9,
+		OpHash256 = 0xaa,
+		OpCodeseparator = 0xab,
+		OpChecksig = 0xac,
+		OpChecksigverify = 0xad,
+		OpCheckmultisig = 0xae,
+		OpCheckmultisigverify = 0xaf,
 
 		// expansion
-		OP_NOP1 = 0xb0,
-		OP_NOP2 = 0xb1,
-		OP_NOP3 = 0xb2,
-		OP_NOP4 = 0xb3,
-		OP_NOP5 = 0xb4,
-		OP_NOP6 = 0xb5,
-		OP_NOP7 = 0xb6,
-		OP_NOP8 = 0xb7,
-		OP_NOP9 = 0xb8,
-		OP_NOP10 = 0xb9,
+		OpNop1 = 0xb0,
+		OpNop2 = 0xb1,
+		OpNop3 = 0xb2,
+		OpNop4 = 0xb3,
+		OpNop5 = 0xb4,
+		OpNop6 = 0xb5,
+		OpNop7 = 0xb6,
+		OpNop8 = 0xb7,
+		OpNop9 = 0xb8,
+		OpNop10 = 0xb9,
 
 
 
 		// template matching params
-		OP_SMALLDATA = 0xf9,
-		OP_SMALLINTEGER = 0xfa,
-		OP_PUBKEYS = 0xfb,
-		OP_PUBKEYHASH = 0xfd,
-		OP_PUBKEY = 0xfe,
+		OpSmalldata = 0xf9,
+		OpSmallinteger = 0xfa,
+		OpPubkeys = 0xfb,
+		OpPubkeyhash = 0xfd,
+		OpPubkey = 0xfe,
 
-		OP_INVALIDOPCODE = 0xff,
+		OpInvalidopcode = 0xff,
 	};
 
 	public class Script
@@ -264,7 +264,7 @@ namespace ChainUtils
 
 		public Script(IEnumerable<Op> ops)
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			foreach(var op in ops)
 			{
 				op.WriteTo(ms);
@@ -280,7 +280,7 @@ namespace ChainUtils
 		private static byte[] Parse(string script)
 		{
 			var reader = new StringReader(script);
-			MemoryStream result = new MemoryStream();
+			var result = new MemoryStream();
 			while(reader.Peek() != -1)
 			{
 				Op.Read(reader).WriteTo(result);
@@ -315,7 +315,7 @@ namespace ChainUtils
 				_Script = data.ToArray();
 			else
 			{
-				ScriptCompressor compressor = new ScriptCompressor();
+				var compressor = new ScriptCompressor();
 				compressor.ReadWrite(data);
 				_Script = compressor.GetScript()._Script;
 			}
@@ -364,8 +364,8 @@ namespace ChainUtils
 		}
 		internal int FindAndDelete(Func<Op, bool> predicate)
 		{
-			int nFound = 0;
-			List<Op> operations = new List<Op>();
+			var nFound = 0;
+			var operations = new List<Op>();
 			foreach(var op in ToOps())
 			{
 				var shouldDelete = predicate(op);
@@ -387,19 +387,19 @@ namespace ChainUtils
 			return Encoders.Hex.EncodeData(_Script);
 		}
 
-		Script _PaymentScript;
+		Script _paymentScript;
 		public Script PaymentScript
 		{
 			get
 			{
-				return _PaymentScript ?? (_PaymentScript = PayToScriptHashTemplate.Instance.GenerateScriptPubKey(Hash));
+				return _paymentScript ?? (_paymentScript = PayToScriptHashTemplate.Instance.GenerateScriptPubKey(Hash));
 			}
 		}
 
 		public override string ToString()
 		{
-			StringBuilder builder = new StringBuilder();
-			ScriptReader reader = new ScriptReader(_Script)
+			var builder = new StringBuilder();
+			var reader = new ScriptReader(_Script)
 			{
 				IgnoreIncoherentPushData = true
 			};
@@ -435,18 +435,18 @@ namespace ChainUtils
 				{
 					if(op.IncompleteData)
 						return false;
-					if(op.Code > OpcodeType.OP_16)
+					if(op.Code > OpcodeType.Op16)
 						continue;
-					if(op.Code < OpcodeType.OP_PUSHDATA1 && op.Code > OpcodeType.OP_0 && (op.PushData.Length == 1 && op.PushData[0] <= 16))
+					if(op.Code < OpcodeType.OpPushdata1 && op.Code > OpcodeType.Op0 && (op.PushData.Length == 1 && op.PushData[0] <= 16))
 						// Could have used an OP_n code, rather than a 1-byte push.
 						return false;
-					if(op.Code == OpcodeType.OP_PUSHDATA1 && op.PushData.Length < (byte)OpcodeType.OP_PUSHDATA1)
+					if(op.Code == OpcodeType.OpPushdata1 && op.PushData.Length < (byte)OpcodeType.OpPushdata1)
 						// Could have used a normal n-byte push, rather than OP_PUSHDATA1.
 						return false;
-					if(op.Code == OpcodeType.OP_PUSHDATA2 && op.PushData.Length <= 0xFF)
+					if(op.Code == OpcodeType.OpPushdata2 && op.PushData.Length <= 0xFF)
 						// Could have used an OP_PUSHDATA1.
 						return false;
-					if(op.Code == OpcodeType.OP_PUSHDATA4 && op.PushData.Length <= 0xFFFF)
+					if(op.Code == OpcodeType.OpPushdata4 && op.PushData.Length <= 0xFFFF)
 						// Could have used an OP_PUSHDATA2.
 						return false;
 				}
@@ -456,11 +456,11 @@ namespace ChainUtils
 
 
 		//https://en.bitcoin.it/wiki/OP_CHECKSIG
-		public uint256 SignatureHash(Transaction txTo, int nIn, SigHash nHashType)
+		public Uint256 SignatureHash(Transaction txTo, int nIn, SigHash nHashType)
 		{
 			if(nIn >= txTo.Inputs.Count)
 			{
-				Utils.log("ERROR: SignatureHash() : nIn=" + nIn + " out of range\n");
+				Utils.Log("ERROR: SignatureHash() : nIn=" + nIn + " out of range\n");
 				return 1;
 			}
 
@@ -469,13 +469,13 @@ namespace ChainUtils
 			{
 				if(nIn >= txTo.Outputs.Count)
 				{
-					Utils.log("ERROR: SignatureHash() : nOut=" + nIn + " out of range\n");
+					Utils.Log("ERROR: SignatureHash() : nOut=" + nIn + " out of range\n");
 					return 1;
 				}
 			}
 
 			var scriptCopy = new Script(_Script);
-			scriptCopy.FindAndDelete(OpcodeType.OP_CODESEPARATOR);
+			scriptCopy.FindAndDelete(OpcodeType.OpCodeseparator);
 
 			var txCopy = new Transaction(txTo.ToBytes());
 			//Set all TxIn script to empty string
@@ -491,7 +491,7 @@ namespace ChainUtils
 				//The output of txCopy is set to a vector of zero size.
 				txCopy.Outputs.Clear();
 				//All other inputs aside from the current input in txCopy have their nSequence index set to zero
-				for(int i = 0 ; i < txCopy.Inputs.Count ; i++)
+				for(var i = 0 ; i < txCopy.Inputs.Count ; i++)
 				{
 					if(i == nIn)
 						continue;
@@ -506,13 +506,13 @@ namespace ChainUtils
 				txCopy.Outputs.Clear();
 				txCopy.Outputs.AddRange(remainingOut);
 				//All other txCopy outputs aside from the output that is the same as the current input index are set to a blank script and a value of (long) -1.
-				for(int i = 0 ; i < txCopy.Outputs.Count ; i++)
+				for(var i = 0 ; i < txCopy.Outputs.Count ; i++)
 				{
 					if(i == nIn)
 						continue;
 					txCopy.Outputs[i] = new TxOut();
 				}
-				for(int i = 0 ; i < txCopy.Inputs.Count ; i++)
+				for(var i = 0 ; i < txCopy.Inputs.Count ; i++)
 				{
 					//All other txCopy inputs aside from the current input are set to have an nSequence index of zero.
 					if(i == nIn)
@@ -533,8 +533,8 @@ namespace ChainUtils
 
 
 			//Serialize TxCopy, append 4 byte hashtypecode
-			MemoryStream ms = new MemoryStream();
-			BitcoinStream bitcoinStream = new BitcoinStream(ms, true);
+			var ms = new MemoryStream();
+			var bitcoinStream = new BitcoinStream(ms, true);
 			txCopy.ReadWrite(bitcoinStream);
 			bitcoinStream.ReadWrite((uint)nHashType);
 
@@ -565,7 +565,7 @@ namespace ChainUtils
 
 		public IEnumerable<Op> ToOps()
 		{
-			ScriptReader reader = new ScriptReader(_Script)
+			var reader = new ScriptReader(_Script)
 			{
 				IgnoreIncoherentPushData = true
 			};
@@ -578,11 +578,11 @@ namespace ChainUtils
 			Op lastOpcode = null;
 			foreach(var op in ToOps())
 			{
-				if(op.Code == OpcodeType.OP_CHECKSIG || op.Code == OpcodeType.OP_CHECKSIGVERIFY)
+				if(op.Code == OpcodeType.OpChecksig || op.Code == OpcodeType.OpChecksigverify)
 					n++;
-				else if(op.Code == OpcodeType.OP_CHECKMULTISIG || op.Code == OpcodeType.OP_CHECKMULTISIGVERIFY)
+				else if(op.Code == OpcodeType.OpCheckmultisig || op.Code == OpcodeType.OpCheckmultisigverify)
 				{
-					if(fAccurate && lastOpcode != null && lastOpcode.Code >= OpcodeType.OP_1 && lastOpcode.Code <= OpcodeType.OP_16)
+					if(fAccurate && lastOpcode != null && lastOpcode.Code >= OpcodeType.Op1 && lastOpcode.Code <= OpcodeType.Op16)
 						n += (lastOpcode.PushData == null || lastOpcode.PushData.Length == 0) ? 0U : (uint)lastOpcode.PushData[0];
 					else
 						n += 20;
@@ -592,14 +592,14 @@ namespace ChainUtils
 			return n;
 		}
 
-		ScriptId _ID;
+		ScriptId _id;
 
 		[Obsolete("Use Hash instead")]
-		public ScriptId ID
+		public ScriptId Id
 		{
 			get
 			{
-				return _ID ?? (_ID = new ScriptId(Hashes.Hash160(_Script)));
+				return _id ?? (_id = new ScriptId(Hashes.Hash160(_Script)));
 			}
 		}
 
@@ -607,7 +607,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return _ID ?? (_ID = new ScriptId(this));
+				return _id ?? (_id = new ScriptId(this));
 			}
 		}
 
@@ -662,8 +662,8 @@ namespace ChainUtils
 			{
 				return pubKey.PublicKey.Hash;
 			}
-			var p2sh = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(this);
-			return p2sh != null ? p2sh.RedeemScript.Hash : null;
+			var p2Sh = PayToScriptHashTemplate.Instance.ExtractScriptSigParameters(this);
+			return p2Sh != null ? p2Sh.RedeemScript.Hash : null;
 		}
 
 		/// <summary>
@@ -698,7 +698,7 @@ namespace ChainUtils
 		/// <returns></returns>
 		public PubKey[] GetDestinationPublicKeys()
 		{
-			List<PubKey> result = new List<PubKey>();
+			var result = new List<PubKey>();
 			var single = PayToPubkeyTemplate.Instance.ExtractScriptPubKeyParameters(this);
 			if(single != null)
 			{
@@ -757,7 +757,7 @@ namespace ChainUtils
 
 		public byte[] ToCompressedBytes()
 		{
-			ScriptCompressor compressor = new ScriptCompressor(this);
+			var compressor = new ScriptCompressor(this);
 			return compressor.ToBytes();
 		}
 
@@ -773,7 +773,7 @@ namespace ChainUtils
 
 		public static bool VerifyScript(Script scriptSig, Script scriptPubKey, Transaction tx, int i, ScriptVerify scriptVerify, SigHash sigHash, out ScriptError error)
 		{
-			ScriptEvaluationContext eval = new ScriptEvaluationContext
+			var eval = new ScriptEvaluationContext
 			{
 				SigHash = sigHash,
 				ScriptVerify = scriptVerify
@@ -787,7 +787,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return _Script.Length > 0 && _Script[0] == (byte)OpcodeType.OP_RETURN;
+				return _Script.Length > 0 && _Script[0] == (byte)OpcodeType.OpReturn;
 			}
 		}
 
@@ -822,7 +822,7 @@ namespace ChainUtils
 
 		public override bool Equals(object obj)
 		{
-			Script item = obj as Script;
+			var item = obj as Script;
 			return item != null && Utils.ArrayEqual(item._Script, _Script);
 		}
 		public static bool operator ==(Script a, Script b)
@@ -853,7 +853,7 @@ namespace ChainUtils
 		{
 			if(scriptPubKey == null)
 				scriptPubKey = new Script();
-			ScriptEvaluationContext context = new ScriptEvaluationContext();
+			var context = new ScriptEvaluationContext();
 			context.ScriptVerify = ScriptVerify.StrictEnc;
 			context.EvalScript(scriptSig1, transaction, n);
 
@@ -891,7 +891,7 @@ namespace ChainUtils
 				var redeem = new Script(redeemBytes);
 				sigs1 = sigs1.Take(sigs1.Length - 1).ToArray();
 				sigs2 = sigs2.Take(sigs2.Length - 1).ToArray();
-				Script result = CombineSignatures(redeem, transaction, n, sigs1, sigs2);
+				var result = CombineSignatures(redeem, transaction, n, sigs1, sigs2);
 				result += Op.GetPushOp(redeemBytes);
 				return result;
 			}
@@ -907,7 +907,7 @@ namespace ChainUtils
 		private static Script CombineMultisig(Script scriptPubKey, Transaction transaction, int n, byte[][] sigs1, byte[][] sigs2)
 		{
 			// Combine all the signatures we've got:
-			List<TransactionSignature> allsigs = new List<TransactionSignature>();
+			var allsigs = new List<TransactionSignature>();
 			foreach(var v in sigs1)
 			{
 				try
@@ -935,7 +935,7 @@ namespace ChainUtils
 			if(multiSigParams == null)
 				throw new InvalidOperationException("The scriptPubKey is not a valid multi sig");
 
-			Dictionary<PubKey, TransactionSignature> sigs = new Dictionary<PubKey, TransactionSignature>();
+			var sigs = new Dictionary<PubKey, TransactionSignature>();
 
 			foreach(var sig in allsigs)
 			{
@@ -944,7 +944,7 @@ namespace ChainUtils
 					if(sigs.ContainsKey(pubkey))
 						continue; // Already got a sig for this pubkey
 
-					ScriptEvaluationContext eval = new ScriptEvaluationContext();
+					var eval = new ScriptEvaluationContext();
 					if(eval.CheckSig(sig.ToBytes(), pubkey.ToBytes(), scriptPubKey, transaction, n))
 					{
 						sigs.AddOrReplace(pubkey, sig);
@@ -954,8 +954,8 @@ namespace ChainUtils
 
 
 			// Now build a merged CScript:
-			int nSigsHave = 0;
-			Script result = new Script(OpcodeType.OP_0); // pop-one-too-many workaround
+			var nSigsHave = 0;
+			var result = new Script(OpcodeType.Op0); // pop-one-too-many workaround
 			foreach(var pubkey in multiSigParams.PubKeys)
 			{
 				if(sigs.ContainsKey(pubkey))
@@ -968,15 +968,15 @@ namespace ChainUtils
 			}
 
 			// Fill any missing with OP_0:
-			for(int i = nSigsHave ; i < multiSigParams.SignatureCount ; i++)
-				result += OpcodeType.OP_0;
+			for(var i = nSigsHave ; i < multiSigParams.SignatureCount ; i++)
+				result += OpcodeType.Op0;
 
 			return result;
 		}
 
 		private static Script PushAll(byte[][] stack)
 		{
-			Script s = new Script();
+			var s = new Script();
 			foreach(var push in stack)
 			{
 				s += Op.GetPushOp(push);

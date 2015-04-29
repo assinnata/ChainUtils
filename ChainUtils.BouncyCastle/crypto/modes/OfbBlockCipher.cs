@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Modes
@@ -31,9 +30,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             this.cipher = cipher;
             this.blockSize = blockSize / 8;
 
-            this.IV = new byte[cipher.GetBlockSize()];
-            this.ofbV = new byte[cipher.GetBlockSize()];
-            this.ofbOutV = new byte[cipher.GetBlockSize()];
+            IV = new byte[cipher.GetBlockSize()];
+            ofbV = new byte[cipher.GetBlockSize()];
+            ofbOutV = new byte[cipher.GetBlockSize()];
         }
 
         /**
@@ -63,14 +62,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
         {
 			if (parameters is ParametersWithIV)
             {
-                ParametersWithIV ivParam = (ParametersWithIV)parameters;
-                byte[] iv = ivParam.GetIV();
+                var ivParam = (ParametersWithIV)parameters;
+                var iv = ivParam.GetIV();
 
                 if (iv.Length < IV.Length)
                 {
                     // prepend the supplied IV with zeros (per FIPS PUB 81)
                     Array.Copy(iv, 0, IV, IV.Length - iv.Length, iv.Length);
-                    for (int i = 0; i < IV.Length - iv.Length; i++)
+                    for (var i = 0; i < IV.Length - iv.Length; i++)
                     {
                         IV[i] = 0;
                     }
@@ -153,7 +152,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             // XOR the ofbV with the plaintext producing the cipher text (and
             // the next input block).
             //
-            for (int i = 0; i < blockSize; i++)
+            for (var i = 0; i < blockSize; i++)
             {
                 output[outOff + i] = (byte)(ofbOutV[i] ^ input[inOff + i]);
             }

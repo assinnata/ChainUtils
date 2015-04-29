@@ -18,15 +18,15 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
             if (k.SignValue == 0)
                 return EMPTY_INTS;
 
-            BigInteger _3k = k.ShiftLeft(1).Add(k);
+            var _3k = k.ShiftLeft(1).Add(k);
 
-            int bits = _3k.BitLength;
-            int[] naf = new int[bits >> 1];
+            var bits = _3k.BitLength;
+            var naf = new int[bits >> 1];
 
-            BigInteger diff = _3k.Xor(k);
+            var diff = _3k.Xor(k);
 
             int highBit = bits - 1, length = 0, zeroes = 0;
-            for (int i = 1; i < highBit; ++i)
+            for (var i = 1; i < highBit; ++i)
             {
                 if (!diff.TestBit(i))
                 {
@@ -34,7 +34,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
                     continue;
                 }
 
-                int digit = k.TestBit(i) ? -1 : 1;
+                var digit = k.TestBit(i) ? -1 : 1;
                 naf[length++] = (digit << 16) | zeroes;
                 zeroes = 1;
                 ++i;
@@ -64,14 +64,14 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
             if (k.SignValue == 0)
                 return EMPTY_INTS;
 
-            int[] wnaf = new int[k.BitLength / width + 1];
+            var wnaf = new int[k.BitLength / width + 1];
 
             // 2^width and a mask and sign bit set accordingly
-            int pow2 = 1 << width;
-            int mask = pow2 - 1;
-            int sign = pow2 >> 1;
+            var pow2 = 1 << width;
+            var mask = pow2 - 1;
+            var sign = pow2 >> 1;
 
-            bool carry = false;
+            var carry = false;
             int length = 0, pos = 0;
 
             while (pos <= k.BitLength)
@@ -84,7 +84,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
                 k = k.ShiftRight(pos);
 
-                int digit = k.IntValue & mask;
+                var digit = k.IntValue & mask;
                 if (carry)
                 {
                     ++digit;
@@ -96,7 +96,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
                     digit -= pow2;
                 }
 
-                int zeroes = length > 0 ? pos - 1 : pos;
+                var zeroes = length > 0 ? pos - 1 : pos;
                 wnaf[length++] = (digit << 16) | zeroes;
                 pos = width;
             }
@@ -112,19 +112,19 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
         public static byte[] GenerateJsf(BigInteger g, BigInteger h)
         {
-            int digits = System.Math.Max(g.BitLength, h.BitLength) + 1;
-            byte[] jsf = new byte[digits];
+            var digits = System.Math.Max(g.BitLength, h.BitLength) + 1;
+            var jsf = new byte[digits];
 
             BigInteger k0 = g, k1 = h;
             int j = 0, d0 = 0, d1 = 0;
 
-            int offset = 0;
+            var offset = 0;
             while ((d0 | d1) != 0 || k0.BitLength > offset || k1.BitLength > offset)
             {
-                int n0 = ((int)((uint)k0.IntValue >> offset) + d0) & 7;
-                int n1 = ((int)((uint)k1.IntValue >> offset) + d1) & 7;
+                var n0 = ((int)((uint)k0.IntValue >> offset) + d0) & 7;
+                var n1 = ((int)((uint)k1.IntValue >> offset) + d1) & 7;
 
-                int u0 = n0 & 1;
+                var u0 = n0 & 1;
                 if (u0 != 0)
                 {
                     u0 -= (n0 & 2);
@@ -134,7 +134,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
                     }
                 }
 
-                int u1 = n1 & 1;
+                var u1 = n1 & 1;
                 if (u1 != 0)
                 {
                     u1 -= (n1 & 2);
@@ -177,14 +177,14 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
             if (k.SignValue == 0)
                 return EMPTY_BYTES;
 
-            BigInteger _3k = k.ShiftLeft(1).Add(k);
+            var _3k = k.ShiftLeft(1).Add(k);
 
-            int digits = _3k.BitLength - 1;
-            byte[] naf = new byte[digits];
+            var digits = _3k.BitLength - 1;
+            var naf = new byte[digits];
 
-            BigInteger diff = _3k.Xor(k);
+            var diff = _3k.Xor(k);
 
-            for (int i = 1; i < digits; ++i)
+            for (var i = 1; i < digits; ++i)
             {
                 if (diff.TestBit(i))
                 {
@@ -222,14 +222,14 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
             if (k.SignValue == 0)
                 return EMPTY_BYTES;
 
-            byte[] wnaf = new byte[k.BitLength + 1];
+            var wnaf = new byte[k.BitLength + 1];
 
             // 2^width and a mask and sign bit set accordingly
-            int pow2 = 1 << width;
-            int mask = pow2 - 1;
-            int sign = pow2 >> 1;
+            var pow2 = 1 << width;
+            var mask = pow2 - 1;
+            var sign = pow2 >> 1;
 
-            bool carry = false;
+            var carry = false;
             int length = 0, pos = 0;
 
             while (pos <= k.BitLength)
@@ -242,7 +242,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
                 k = k.ShiftRight(pos);
 
-                int digit = k.IntValue & mask;
+                var digit = k.IntValue & mask;
                 if (carry)
                 {
                     ++digit;
@@ -273,8 +273,8 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
             if (k.SignValue == 0)
                 return 0;
 
-            BigInteger _3k = k.ShiftLeft(1).Add(k);
-            BigInteger diff = _3k.Xor(k);
+            var _3k = k.ShiftLeft(1).Add(k);
+            var diff = _3k.Xor(k);
 
             return diff.BitCount;
         }
@@ -314,7 +314,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
          */
         public static int GetWindowSize(int bits, int[] windowSizeCutoffs)
         {
-            int w = 0;
+            var w = 0;
             for (; w < windowSizeCutoffs.Length; ++w)
             {
                 if (bits < windowSizeCutoffs[w])
@@ -328,22 +328,22 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
         public static ECPoint MapPointWithPrecomp(ECPoint p, int width, bool includeNegated,
             ECPointMap pointMap)
         {
-            ECCurve c = p.Curve;
-            WNafPreCompInfo wnafPreCompP = Precompute(p, width, includeNegated);
+            var c = p.Curve;
+            var wnafPreCompP = Precompute(p, width, includeNegated);
 
-            ECPoint q = pointMap.Map(p);
-            WNafPreCompInfo wnafPreCompQ = GetWNafPreCompInfo(c.GetPreCompInfo(q, PRECOMP_NAME));
+            var q = pointMap.Map(p);
+            var wnafPreCompQ = GetWNafPreCompInfo(c.GetPreCompInfo(q, PRECOMP_NAME));
 
-            ECPoint twiceP = wnafPreCompP.Twice;
+            var twiceP = wnafPreCompP.Twice;
             if (twiceP != null)
             {
-                ECPoint twiceQ = pointMap.Map(twiceP);
+                var twiceQ = pointMap.Map(twiceP);
                 wnafPreCompQ.Twice = twiceQ;
             }
 
-            ECPoint[] preCompP = wnafPreCompP.PreComp;
-            ECPoint[] preCompQ = new ECPoint[preCompP.Length];
-            for (int i = 0; i < preCompP.Length; ++i)
+            var preCompP = wnafPreCompP.PreComp;
+            var preCompQ = new ECPoint[preCompP.Length];
+            for (var i = 0; i < preCompP.Length; ++i)
             {
                 preCompQ[i] = pointMap.Map(preCompP[i]);
             }
@@ -351,8 +351,8 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
             if (includeNegated)
             {
-                ECPoint[] preCompNegQ = new ECPoint[preCompQ.Length];
-                for (int i = 0; i < preCompNegQ.Length; ++i)
+                var preCompNegQ = new ECPoint[preCompQ.Length];
+                for (var i = 0; i < preCompNegQ.Length; ++i)
                 {
                     preCompNegQ[i] = preCompQ[i].Negate();
                 }
@@ -366,17 +366,17 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
         public static WNafPreCompInfo Precompute(ECPoint p, int width, bool includeNegated)
         {
-            ECCurve c = p.Curve;
-            WNafPreCompInfo wnafPreCompInfo = GetWNafPreCompInfo(c.GetPreCompInfo(p, PRECOMP_NAME));
+            var c = p.Curve;
+            var wnafPreCompInfo = GetWNafPreCompInfo(c.GetPreCompInfo(p, PRECOMP_NAME));
             
-            ECPoint[] preComp = wnafPreCompInfo.PreComp;
+            var preComp = wnafPreCompInfo.PreComp;
             if (preComp == null)
             {
                 preComp = new ECPoint[]{ p };
             }
 
-            int preCompLen = preComp.Length;
-            int reqPreCompLen = 1 << System.Math.Max(0, width - 2);
+            var preCompLen = preComp.Length;
+            var reqPreCompLen = 1 << System.Math.Max(0, width - 2);
 
             if (preCompLen < reqPreCompLen)
             {
@@ -387,14 +387,14 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
                 }
                 else
                 {
-                    ECPoint twiceP = wnafPreCompInfo.Twice;
+                    var twiceP = wnafPreCompInfo.Twice;
                     if (twiceP == null)
                     {
                         twiceP = preComp[0].Twice();
                         wnafPreCompInfo.Twice = twiceP;
                     }
 
-                    for (int i = preCompLen; i < reqPreCompLen; i++)
+                    for (var i = preCompLen; i < reqPreCompLen; i++)
                     {
                         /*
                          * Compute the new ECPoints for the precomputation array. The values 1, 3, 5, ...,
@@ -414,7 +414,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
             if (includeNegated)
             {
-                ECPoint[] preCompNeg = wnafPreCompInfo.PreCompNeg;
+                var preCompNeg = wnafPreCompInfo.PreCompNeg;
 
                 int pos;
                 if (preCompNeg == null)
@@ -447,21 +447,21 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
         private static byte[] Trim(byte[] a, int length)
         {
-            byte[] result = new byte[length];
+            var result = new byte[length];
             Array.Copy(a, 0, result, 0, result.Length);
             return result;
         }
 
         private static int[] Trim(int[] a, int length)
         {
-            int[] result = new int[length];
+            var result = new int[length];
             Array.Copy(a, 0, result, 0, result.Length);
             return result;
         }
 
         private static ECPoint[] ResizeTable(ECPoint[] a, int length)
         {
-            ECPoint[] result = new ECPoint[length];
+            var result = new ECPoint[length];
             Array.Copy(a, 0, result, 0, a.Length);
             return result;
         }

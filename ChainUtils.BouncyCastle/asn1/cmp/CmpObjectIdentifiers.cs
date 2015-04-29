@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cmp
 {
 	public abstract class CmpObjectIdentifiers

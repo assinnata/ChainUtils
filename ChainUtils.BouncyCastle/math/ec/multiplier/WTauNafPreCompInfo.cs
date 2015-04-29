@@ -18,7 +18,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
         public virtual F2mPoint[] PreComp
         {
             get { return m_preComp; }
-            set { this.m_preComp = value; }
+            set { m_preComp = value; }
         }
     }
 }

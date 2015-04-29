@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 {
@@ -22,7 +19,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
         {
             if (obj == null)
                 return null;
-            SignedData existing = obj as SignedData;
+            var existing = obj as SignedData;
             if (existing != null)
                 return existing;
             return new SignedData(Asn1Sequence.GetInstance(obj));
@@ -47,7 +44,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
         private SignedData(
             Asn1Sequence seq)
         {
-            IEnumerator e = seq.GetEnumerator();
+            var e = seq.GetEnumerator();
 
             e.MoveNext();
             version = (DerInteger) e.Current;
@@ -60,7 +57,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 
             while (e.MoveNext())
             {
-                Asn1Object o = (Asn1Object) e.Current;
+                var o = (Asn1Object) e.Current;
 
                 //
                 // an interesting feature of SignedData is that there appear to be varying implementations...
@@ -68,7 +65,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
                 //
                 if (o is DerTaggedObject)
                 {
-                    DerTaggedObject tagged = (DerTaggedObject) o;
+                    var tagged = (DerTaggedObject) o;
 
                     switch (tagged.TagNo)
                     {
@@ -136,7 +133,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
                 version, digestAlgorithms, contentInfo);
 
             if (certificates != null)

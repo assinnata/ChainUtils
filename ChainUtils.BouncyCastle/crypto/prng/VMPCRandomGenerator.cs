@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Prng
@@ -74,10 +72,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Prng
 
         public virtual void AddSeedMaterial(byte[] seed) 
         {
-            for (int m = 0; m < seed.Length; m++) 
+            for (var m = 0; m < seed.Length; m++) 
             {
                 s = P[(s + P[n & 0xff] + seed[m]) & 0xff];
-                byte temp = P[n & 0xff];
+                var temp = P[n & 0xff];
                 P[n & 0xff] = P[s & 0xff];
                 P[s & 0xff] = temp;
                 n = (byte) ((n + 1) & 0xff);
@@ -98,12 +96,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Prng
         {
             lock (P) 
             {
-                int end = start + len;
-                for (int i = start; i != end; i++) 
+                var end = start + len;
+                for (var i = start; i != end; i++) 
                 {
                     s = P[(s + P[n & 0xff]) & 0xff];
                     bytes[i] = P[(P[(P[s & 0xff]) & 0xff] + 1) & 0xff];
-                    byte temp = P[n & 0xff];
+                    var temp = P[n & 0xff];
                     P[n & 0xff] = P[s & 0xff];
                     P[s & 0xff] = temp;
                     n = (byte) ((n + 1) & 0xff);

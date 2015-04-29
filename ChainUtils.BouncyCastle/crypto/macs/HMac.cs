@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -30,10 +27,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
         public HMac(IDigest digest)
         {
             this.digest = digest;
-            this.digestSize = digest.GetDigestSize();
-            this.blockLength = digest.GetByteLength();
-            this.inputPad = new byte[blockLength];
-            this.outputBuf = new byte[blockLength + digestSize];
+            digestSize = digest.GetDigestSize();
+            blockLength = digest.GetByteLength();
+            inputPad = new byte[blockLength];
+            outputBuf = new byte[blockLength + digestSize];
         }
 
         public virtual string AlgorithmName
@@ -50,8 +47,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
         {
             digest.Reset();
 
-            byte[] key = ((KeyParameter)parameters).GetKey();
-			int keyLength = key.Length;
+            var key = ((KeyParameter)parameters).GetKey();
+			var keyLength = key.Length;
 
             if (keyLength > blockLength)
             {
@@ -115,7 +112,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 				digest.BlockUpdate(outputBuf, 0, outputBuf.Length);
 			}
 
-			int len = digest.DoFinal(output, outOff);
+			var len = digest.DoFinal(output, outOff);
 
 			Array.Clear(outputBuf, blockLength, digestSize);
 
@@ -145,7 +142,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
         private static void XorPad(byte[] pad, int len, byte n)
 		{
-			for (int i = 0; i < len; ++i)
+			for (var i = 0; i < len; ++i)
             {
                 pad[i] ^= n;
             }

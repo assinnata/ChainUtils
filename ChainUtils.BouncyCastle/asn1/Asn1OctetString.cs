@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities;
 using ChainUtils.BouncyCastle.Utilities.Encoders;
 
@@ -25,7 +23,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			Asn1TaggedObject	obj,
 			bool				isExplicit)
 		{
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is Asn1OctetString)
 			{
@@ -72,7 +70,7 @@ namespace ChainUtils.BouncyCastle.Asn1
         {
             try
             {
-				this.str = obj.GetEncoded(Asn1Encodable.Der);
+				str = obj.GetEncoded(Der);
             }
             catch (IOException e)
             {
@@ -103,7 +101,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
 		{
-			DerOctetString other = asn1Object as DerOctetString;
+			var other = asn1Object as DerOctetString;
 
 			if (other == null)
 				return false;

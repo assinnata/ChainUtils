@@ -1,6 +1,4 @@
-﻿using System;
-
-using ChainUtils.BouncyCastle.Utilities.Encoders;
+﻿using ChainUtils.BouncyCastle.Utilities.Encoders;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 {
@@ -17,15 +15,15 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public SecP384R1Curve()
             : base(q)
         {
-            this.m_infinity = new SecP384R1Point(this, null, null);
+            m_infinity = new SecP384R1Point(this, null, null);
 
-            this.m_a = FromBigInteger(new BigInteger(1,
+            m_a = FromBigInteger(new BigInteger(1,
                 Hex.Decode("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFC")));
-            this.m_b = FromBigInteger(new BigInteger(1,
+            m_b = FromBigInteger(new BigInteger(1,
                 Hex.Decode("B3312FA7E23EE7E4988E056BE3F82D19181D9C6EFE8141120314088F5013875AC656398D8A2ED19D2A85C8EDD3EC2AEF")));
-            this.m_order = new BigInteger(1, Hex.Decode("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC7634D81F4372DDF581A0DB248B0A77AECEC196ACCC52973"));
-            this.m_cofactor = BigInteger.One;
-            this.m_coord = SecP384R1_DEFAULT_COORDS;
+            m_order = new BigInteger(1, Hex.Decode("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC7634D81F4372DDF581A0DB248B0A77AECEC196ACCC52973"));
+            m_cofactor = BigInteger.One;
+            m_coord = SecP384R1_DEFAULT_COORDS;
         }
 
         protected override ECCurve CloneCurve()

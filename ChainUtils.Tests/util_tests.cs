@@ -19,7 +19,7 @@ namespace ChainUtils.Tests
 		[Trait("Core", "Core")]
 		public void util_MedianFilter()
 		{
-			MedianFilterInt32 filter = new MedianFilterInt32(5, 15);
+			var filter = new MedianFilterInt32(5, 15);
 
 			AssertEx.Equal(filter.Median, 15);
 
@@ -69,7 +69,7 @@ namespace ChainUtils.Tests
 		public void CanAddEntropyToRandom()
 		{
 			RandomUtils.AddEntropy(new byte[] { 1, 2, 3 });
-			for(int i = 0 ; i < 100 ; i++)
+			for(var i = 0 ; i < 100 ; i++)
 			{
 				Assert.Equal(50, RandomUtils.GetBytes(50).Length);
 			}
@@ -223,8 +223,8 @@ namespace ChainUtils.Tests
 		{
 			foreach(var prefix in new string[] { "", "+", "-" })
 			{
-				int multiplier = prefix == "-" ? -1 : 1;
-				Money ret = new Money(0);
+				var multiplier = prefix == "-" ? -1 : 1;
+				var ret = new Money(0);
 				Assert.True(Money.TryParse(prefix + "0.0", out ret));
 				AssertEx.Equal(ret, multiplier * new Money(0));
 
@@ -334,7 +334,7 @@ namespace ChainUtils.Tests
 			Assert.Equal("OP_DUP OP_HASH160 4d29186f76581c7375d70499afd1d585149d42cd OP_EQUALVERIFY OP_CHECKSIG", pubKey.Hash.ScriptPubKey.ToString());
 			Assert.Equal("0359d3092e4a8d5f3b3948235b5dec7395259273ccf3c4e9d5e16695a3fc9588d6 OP_CHECKSIG", pubKey.ScriptPubKey.ToString());
 
-			Script script = new Script("0359d3092e4a8d5f3b3948235b5dec7395259273ccf3c4e9d5e16695a3fc9588d6 OP_CHECKSIG");
+			var script = new Script("0359d3092e4a8d5f3b3948235b5dec7395259273ccf3c4e9d5e16695a3fc9588d6 OP_CHECKSIG");
 			Assert.Equal("OP_HASH160 a216e3bce8c1b3adf376731b6cd0b6936c4e053f OP_EQUAL", script.PaymentScript.ToString());
 		}
 
@@ -343,7 +343,7 @@ namespace ChainUtils.Tests
 		//https://en.bitcoin.it/wiki/List_of_address_prefixes
 		public void CanDeduceNetworkInBase58Constructor()
 		{
-			BitcoinAddress addr = new BitcoinAddress("17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem");
+			var addr = new BitcoinAddress("17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem");
 			Assert.Equal(addr.Network, Network.Main);
 		}
 

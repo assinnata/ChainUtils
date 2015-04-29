@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Macs
@@ -23,7 +22,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 		public virtual int DoFinal(byte[] output, int outOff)
 		{
 			// Execute the Post-Processing Phase
-			for (int r = 1; r < 25; r++)
+			for (var r = 1; r < 25; r++)
 			{
 				s = P[(s + P[n & 0xff]) & 0xff];
 
@@ -37,29 +36,29 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 				T[(g + 3) & 0x1f] = (byte) (T[(g + 3) & 0x1f] ^ x4);
 				g = (byte) ((g + 4) & 0x1f);
 
-				byte temp = P[n & 0xff];
+				var temp = P[n & 0xff];
 				P[n & 0xff] = P[s & 0xff];
 				P[s & 0xff] = temp;
 				n = (byte) ((n + 1) & 0xff);
 			}
 
 			// Input T to the IV-phase of the VMPC KSA
-			for (int m = 0; m < 768; m++)
+			for (var m = 0; m < 768; m++)
 			{
 				s = P[(s + P[m & 0xff] + T[m & 0x1f]) & 0xff];
-				byte temp = P[m & 0xff];
+				var temp = P[m & 0xff];
 				P[m & 0xff] = P[s & 0xff];
 				P[s & 0xff] = temp;
 			}
 
 			// Store 20 new outputs of the VMPC Stream Cipher input table M
-			byte[] M = new byte[20];
-			for (int i = 0; i < 20; i++)
+			var M = new byte[20];
+			for (var i = 0; i < 20; i++)
 			{
 				s = P[(s + P[i & 0xff]) & 0xff];
 				M[i] = P[(P[(P[s & 0xff]) & 0xff] + 1) & 0xff];
 
-				byte temp = P[i & 0xff];
+				var temp = P[i & 0xff];
 				P[i & 0xff] = P[s & 0xff];
 				P[s & 0xff] = temp;
 			}
@@ -85,18 +84,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			if (!(parameters is ParametersWithIV))
 				throw new ArgumentException("VMPC-MAC Init parameters must include an IV", "parameters");
 
-			ParametersWithIV ivParams = (ParametersWithIV) parameters;
-			KeyParameter key = (KeyParameter) ivParams.Parameters;
+			var ivParams = (ParametersWithIV) parameters;
+			var key = (KeyParameter) ivParams.Parameters;
 
 			if (!(ivParams.Parameters is KeyParameter))
 				throw new ArgumentException("VMPC-MAC Init parameters must include a key", "parameters");
 
-			this.workingIV = ivParams.GetIV();
+			workingIV = ivParams.GetIV();
 
 			if (workingIV == null || workingIV.Length < 1 || workingIV.Length > 768)
 				throw new ArgumentException("VMPC-MAC requires 1 to 768 bytes of IV", "parameters");
 
-			this.workingKey = key.GetKey();
+			workingKey = key.GetKey();
 
 			Reset();
 
@@ -106,21 +105,21 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 		{
 			s = 0;
 			P = new byte[256];
-			for (int i = 0; i < 256; i++)
+			for (var i = 0; i < 256; i++)
 			{
 				P[i] = (byte) i;
 			}
-			for (int m = 0; m < 768; m++)
+			for (var m = 0; m < 768; m++)
 			{
 				s = P[(s + P[m & 0xff] + keyBytes[m % keyBytes.Length]) & 0xff];
-				byte temp = P[m & 0xff];
+				var temp = P[m & 0xff];
 				P[m & 0xff] = P[s & 0xff];
 				P[s & 0xff] = temp;
 			}
-			for (int m = 0; m < 768; m++)
+			for (var m = 0; m < 768; m++)
 			{
 				s = P[(s + P[m & 0xff] + ivBytes[m % ivBytes.Length]) & 0xff];
-				byte temp = P[m & 0xff];
+				var temp = P[m & 0xff];
 				P[m & 0xff] = P[s & 0xff];
 				P[s & 0xff] = temp;
 			}
@@ -129,10 +128,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
 		public virtual void Reset()
 		{
-			initKey(this.workingKey, this.workingIV);
+			initKey(workingKey, workingIV);
 			g = x1 = x2 = x3 = x4 = n = 0;
 			T = new byte[32];
-			for (int i = 0; i < 32; i++)
+			for (var i = 0; i < 32; i++)
 			{
 				T[i] = 0;
 			}
@@ -141,7 +140,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 		public virtual void Update(byte input)
 		{
 			s = P[(s + P[n & 0xff]) & 0xff];
-			byte c = (byte) (input ^ P[(P[(P[s & 0xff]) & 0xff] + 1) & 0xff]);
+			var c = (byte) (input ^ P[(P[(P[s & 0xff]) & 0xff] + 1) & 0xff]);
 
 			x4 = P[(x4 + x3) & 0xff];
 			x3 = P[(x3 + x2) & 0xff];
@@ -153,7 +152,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			T[(g + 3) & 0x1f] = (byte) (T[(g + 3) & 0x1f] ^ x4);
 			g = (byte) ((g + 4) & 0x1f);
 
-			byte temp = P[n & 0xff];
+			var temp = P[n & 0xff];
 			P[n & 0xff] = P[s & 0xff];
 			P[s & 0xff] = temp;
 			n = (byte) ((n + 1) & 0xff);
@@ -164,7 +163,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			if ((inOff + len) > input.Length)
 				throw new DataLengthException("input buffer too short");
 
-			for (int i = 0; i < len; i++)
+			for (var i = 0; i < len; i++)
 			{
 				Update(input[i]);
 			}

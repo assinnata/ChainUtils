@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto.Macs;
 using ChainUtils.BouncyCastle.Crypto.Modes.Gcm;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
@@ -60,8 +58,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 m = new Tables8kGcmMultiplier();
             }
 
-            this.cipher = c;
-            this.multiplier = m;
+            cipher = c;
+            multiplier = m;
         }
 
         public virtual string AlgorithmName
@@ -88,18 +86,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             ICipherParameters	parameters)
         {
             this.forEncryption = forEncryption;
-            this.macBlock = null;
+            macBlock = null;
 
             KeyParameter keyParam;
 
             if (parameters is AeadParameters)
             {
-                AeadParameters param = (AeadParameters)parameters;
+                var param = (AeadParameters)parameters;
 
                 nonce = param.GetNonce();
                 initialAssociatedText = param.GetAssociatedText();
 
-                int macSizeBits = param.MacSize;
+                var macSizeBits = param.MacSize;
                 if (macSizeBits < 32 || macSizeBits > 128 || macSizeBits % 8 != 0)
                 {
                     throw new ArgumentException("Invalid value for MAC size: " + macSizeBits);
@@ -110,7 +108,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             }
             else if (parameters is ParametersWithIV)
             {
-                ParametersWithIV param = (ParametersWithIV)parameters;
+                var param = (ParametersWithIV)parameters;
 
                 nonce = param.GetIV();
                 initialAssociatedText = null;
@@ -122,8 +120,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 throw new ArgumentException("invalid parameters passed to GCM");
             }
 
-            int bufLength = forEncryption ? BlockSize : (BlockSize + macSize);
-            this.bufBlock = new byte[bufLength];
+            var bufLength = forEncryption ? BlockSize : (BlockSize + macSize);
+            bufBlock = new byte[bufLength];
 
             if (nonce == null || nonce.Length < 1)
             {
@@ -138,43 +136,43 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             {
                 cipher.Init(true, keyParam);
 
-                this.H = new byte[BlockSize];
+                H = new byte[BlockSize];
                 cipher.ProcessBlock(H, 0, H, 0);
 
                 // if keyParam is null we're reusing the last key and the multiplier doesn't need re-init
                 multiplier.Init(H);
                 exp = null;
             }
-            else if (this.H == null)
+            else if (H == null)
             {
                 throw new ArgumentException("Key must be specified in initial init");
             }
 
-            this.J0 = new byte[BlockSize];
+            J0 = new byte[BlockSize];
 
             if (nonce.Length == 12)
             {
                 Array.Copy(nonce, 0, J0, 0, nonce.Length);
-                this.J0[BlockSize - 1] = 0x01;
+                J0[BlockSize - 1] = 0x01;
             }
             else
             {
                 gHASH(J0, nonce, nonce.Length);
-                byte[] X = new byte[BlockSize];
+                var X = new byte[BlockSize];
                 Pack.UInt64_To_BE((ulong)nonce.Length * 8UL, X, 8);
                 gHASHBlock(J0, X);
             }
 
-            this.S = new byte[BlockSize];
-            this.S_at = new byte[BlockSize];
-            this.S_atPre = new byte[BlockSize];
-            this.atBlock = new byte[BlockSize];
-            this.atBlockPos = 0;
-            this.atLength = 0;
-            this.atLengthPre = 0;
-            this.counter = Arrays.Clone(J0);
-            this.bufOff = 0;
-            this.totalLength = 0;
+            S = new byte[BlockSize];
+            S_at = new byte[BlockSize];
+            S_atPre = new byte[BlockSize];
+            atBlock = new byte[BlockSize];
+            atBlockPos = 0;
+            atLength = 0;
+            atLengthPre = 0;
+            counter = Arrays.Clone(J0);
+            bufOff = 0;
+            totalLength = 0;
 
             if (initialAssociatedText != null)
             {
@@ -190,7 +188,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
         public virtual int GetOutputSize(
             int len)
         {
-            int totalData = len + bufOff;
+            var totalData = len + bufOff;
 
             if (forEncryption)
             {
@@ -203,7 +201,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
         public virtual int GetUpdateOutputSize(
             int len)
         {
-            int totalData = len + bufOff;
+            var totalData = len + bufOff;
             if (!forEncryption)
             {
                 if (totalData < macSize)
@@ -229,7 +227,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         public virtual void ProcessAadBytes(byte[] inBytes, int inOff, int len)
         {
-            for (int i = 0; i < len; ++i)
+            for (var i = 0; i < len; ++i)
             {
                 atBlock[atBlockPos] = inBytes[inOff + i];
                 if (++atBlockPos == BlockSize)
@@ -284,9 +282,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             byte[]	output,
             int		outOff)
         {
-            int resultLen = 0;
+            var resultLen = 0;
 
-            for (int i = 0; i < len; ++i)
+            for (var i = 0; i < len; ++i)
             {
                 bufBlock[bufOff] = input[inOff + i];
                 if (++bufOff == bufBlock.Length)
@@ -324,7 +322,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 InitCipher();
             }
 
-            int extra = bufOff;
+            var extra = bufOff;
             if (!forEncryption)
             {
                 if (extra < macSize)
@@ -362,10 +360,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
                 }
 
                 // Number of cipher-text blocks produced
-                long c = (long)(((totalLength * 8) + 127) >> 7);
+                var c = (long)(((totalLength * 8) + 127) >> 7);
 
                 // Calculate the adjustment factor
-                byte[] H_c = new byte[16];
+                var H_c = new byte[16];
                 if (exp == null)
                 {
                     exp = new Tables1kGcmExponentiator();
@@ -381,21 +379,21 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             }
 
             // Final gHASH
-            byte[] X = new byte[BlockSize];
+            var X = new byte[BlockSize];
             Pack.UInt64_To_BE(atLength * 8UL, X, 0);
             Pack.UInt64_To_BE(totalLength * 8UL, X, 8);
 
             gHASHBlock(S, X);
 
             // T = MSBt(GCTRk(J0,S))
-            byte[] tag = new byte[BlockSize];
+            var tag = new byte[BlockSize];
             cipher.ProcessBlock(J0, 0, tag, 0);
             GcmUtilities.Xor(tag, S);
 
-            int resultLen = extra;
+            var resultLen = extra;
 
             // We place into macBlock our calculated value for T
-            this.macBlock = new byte[macSize];
+            macBlock = new byte[macSize];
             Array.Copy(tag, 0, macBlock, 0, macSize);
 
             if (forEncryption)
@@ -407,9 +405,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             else
             {
                 // Retrieve the T value from the message and compare to calculated one
-                byte[] msgMac = new byte[macSize];
+                var msgMac = new byte[macSize];
                 Array.Copy(bufBlock, extra, msgMac, 0, macSize);
-                if (!Arrays.ConstantTimeAreEqual(this.macBlock, msgMac))
+                if (!Arrays.ConstantTimeAreEqual(macBlock, msgMac))
                     throw new InvalidCipherTextException("mac check in GCM failed");
             }
 
@@ -457,7 +455,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         private void gCTRBlock(byte[] block, byte[] output, int outOff)
         {
-            byte[] tmp = GetNextCounterBlock();
+            var tmp = GetNextCounterBlock();
 
             GcmUtilities.Xor(tmp, block);
             Array.Copy(tmp, 0, output, outOff, BlockSize);
@@ -469,7 +467,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         private void gCTRPartial(byte[] buf, int off, int len, byte[] output, int outOff)
         {
-            byte[] tmp = GetNextCounterBlock();
+            var tmp = GetNextCounterBlock();
 
             GcmUtilities.Xor(tmp, buf, off, len);
             Array.Copy(tmp, 0, output, outOff, len);
@@ -481,9 +479,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         private void gHASH(byte[] Y, byte[] b, int len)
         {
-            for (int pos = 0; pos < len; pos += BlockSize)
+            for (var pos = 0; pos < len; pos += BlockSize)
             {
-                int num = System.Math.Min(len - pos, BlockSize);
+                var num = System.Math.Min(len - pos, BlockSize);
                 gHASHPartial(Y, b, pos, num);
             }
         }
@@ -502,12 +500,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
         private byte[] GetNextCounterBlock()
         {
-            for (int i = 15; i >= 12; --i)
+            for (var i = 15; i >= 12; --i)
             {
                 if (++counter[i] != 0) break;
             }
 
-            byte[] tmp = new byte[BlockSize];
+            var tmp = new byte[BlockSize];
             // TODO Sure would be nice if ciphers could operate on int[]
             cipher.ProcessBlock(counter, 0, tmp, 0);
             return tmp;

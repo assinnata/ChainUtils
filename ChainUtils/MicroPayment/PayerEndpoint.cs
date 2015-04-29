@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.MicroPayment
 {
@@ -45,14 +42,14 @@ namespace ChainUtils.MicroPayment
 		{
 			if(payerKey.PubKey != Arguments.Payer.PaymentPubKey)
 				throw new ArgumentException("Invalid payerKey", "payerKey");
-			var p2sh = Arguments.Redeem.Hash.ScriptPubKey;
+			var p2Sh = Arguments.Redeem.Hash.ScriptPubKey;
 
 			var builder = new TransactionBuilder();
 			Fund =
 				builder
 				.AddCoins(fundingCoins)
 				.AddKeys(fundingKeys)
-				.Send(p2sh, Arguments.GetFundAmount())
+				.Send(p2Sh, Arguments.GetFundAmount())
 				.SetChange(Arguments.Payer.ScriptPubkey)
 				.SendFees(Arguments.Fees)
 				.Shuffle()
@@ -61,7 +58,7 @@ namespace ChainUtils.MicroPayment
 			if(!builder.Verify(Fund, Arguments.Fees))
 				throw new MicroPaymentException("Funding transaction incorreclty signed");
 
-			var fundCoin = Fund.Outputs.AsCoins().First(c => c.ScriptPubKey == p2sh).ToScriptCoin(Arguments.Redeem);
+			var fundCoin = Fund.Outputs.AsCoins().First(c => c.ScriptPubKey == p2Sh).ToScriptCoin(Arguments.Redeem);
 
 			var unsignedRefund = Arguments.CreatePayment(Arguments.Fees, fundCoin);
 			unsignedRefund.LockTime = Arguments.Expiration;

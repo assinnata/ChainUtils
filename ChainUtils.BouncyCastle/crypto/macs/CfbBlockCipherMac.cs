@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto.Modes;
 using ChainUtils.BouncyCastle.Crypto.Paddings;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
@@ -31,11 +29,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             int				bitBlockSize)
         {
             this.cipher = cipher;
-            this.blockSize = bitBlockSize / 8;
+            blockSize = bitBlockSize / 8;
 
-            this.IV = new byte[cipher.GetBlockSize()];
-            this.cfbV = new byte[cipher.GetBlockSize()];
-            this.cfbOutV = new byte[cipher.GetBlockSize()];
+            IV = new byte[cipher.GetBlockSize()];
+            cfbV = new byte[cipher.GetBlockSize()];
+            cfbOutV = new byte[cipher.GetBlockSize()];
         }
 
 		/**
@@ -53,8 +51,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
         {
 			if (parameters is ParametersWithIV)
             {
-                ParametersWithIV ivParam = (ParametersWithIV)parameters;
-                byte[] iv = ivParam.GetIV();
+                var ivParam = (ParametersWithIV)parameters;
+                var iv = ivParam.GetIV();
 
                 if (iv.Length < IV.Length)
                 {
@@ -129,7 +127,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             //
             // XOR the cfbV with the plaintext producing the cipher text
             //
-            for (int i = 0; i < blockSize; i++)
+            for (var i = 0; i < blockSize; i++)
             {
                 outBytes[outOff + i] = (byte)(cfbOutV[i] ^ input[inOff + i]);
             }
@@ -249,7 +247,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
 			this.cipher = new MacCFBBlockCipher(cipher, cfbBitSize);
             this.padding = padding;
-            this.macSize = macSizeInBits / 8;
+            macSize = macSizeInBits / 8;
 
 			Buffer = new byte[this.cipher.GetBlockSize()];
             bufOff = 0;
@@ -293,9 +291,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             if (len < 0)
                 throw new ArgumentException("Can't have a negative input length!");
 
-			int blockSize = cipher.GetBlockSize();
-            int resultLen = 0;
-            int gapLen = blockSize - bufOff;
+			var blockSize = cipher.GetBlockSize();
+            var resultLen = 0;
+            var gapLen = blockSize - bufOff;
 
 			if (len > gapLen)
             {
@@ -325,10 +323,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             byte[]	output,
             int		outOff)
         {
-            int blockSize = cipher.GetBlockSize();
+            var blockSize = cipher.GetBlockSize();
 
             // pad with zeroes
-            if (this.padding == null)
+            if (padding == null)
             {
                 while (bufOff < blockSize)
                 {

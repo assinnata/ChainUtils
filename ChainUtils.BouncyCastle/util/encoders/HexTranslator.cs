@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Utilities.Encoders
 {
     /// <summary>
@@ -74,9 +72,9 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             byte[]  outBytes,
             int     outOff)
         {
-            int halfLength = length / 2;
+            var halfLength = length / 2;
             byte left, right;
-            for (int i = 0; i < halfLength; i++)
+            for (var i = 0; i < halfLength; i++)
             {
                 left  = input[inOff + i * 2];
                 right = input[inOff + i * 2 + 1];

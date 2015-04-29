@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChainUtils.BouncyCastle.Asn1.Crmf
+﻿namespace ChainUtils.BouncyCastle.Asn1.Crmf
 {
     public class CertRequest
         : Asn1Encodable
@@ -74,7 +72,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Crmf
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(certReqId, certTemplate);
+            var v = new Asn1EncodableVector(certReqId, certTemplate);
             v.AddOptional(controls);
             return new DerSequence(v);
         }

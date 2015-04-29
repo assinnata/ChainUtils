@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
@@ -26,7 +24,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             byte[]				encoding)
         {
             this.algId = algId;
-            this.data = new DerOctetString(encoding);
+            data = new DerOctetString(encoding);
         }
 
 		public static EncryptedPrivateKeyInfo GetInstance(

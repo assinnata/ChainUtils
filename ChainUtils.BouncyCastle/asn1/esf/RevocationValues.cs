@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1.Ocsp;
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Utilities.Collections;
@@ -43,27 +42,27 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 			foreach (Asn1TaggedObject taggedObj in seq)
 			{
-				Asn1Object asn1Obj = taggedObj.GetObject();
+				var asn1Obj = taggedObj.GetObject();
 				switch (taggedObj.TagNo)
 				{
 					case 0:
-						Asn1Sequence crlValsSeq = (Asn1Sequence) asn1Obj;
+						var crlValsSeq = (Asn1Sequence) asn1Obj;
 						foreach (Asn1Encodable ae in crlValsSeq)
 						{
 							CertificateList.GetInstance(ae.ToAsn1Object());
 						}
-						this.crlVals = crlValsSeq;
+						crlVals = crlValsSeq;
 						break;
 					case 1:
-						Asn1Sequence ocspValsSeq = (Asn1Sequence) asn1Obj;
+						var ocspValsSeq = (Asn1Sequence) asn1Obj;
 						foreach (Asn1Encodable ae in ocspValsSeq)
 						{
 							BasicOcspResponse.GetInstance(ae.ToAsn1Object());
 						}
-						this.ocspVals = ocspValsSeq;
+						ocspVals = ocspValsSeq;
 						break;
 					case 2:
-						this.otherRevVals = OtherRevVals.GetInstance(asn1Obj);
+						otherRevVals = OtherRevVals.GetInstance(asn1Obj);
 						break;
 					default:
 						throw new ArgumentException("Illegal tag in RevocationValues", "seq");
@@ -117,8 +116,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public CertificateList[] GetCrlVals()
 		{
-			CertificateList[] result = new CertificateList[crlVals.Count];
-			for (int i = 0; i < crlVals.Count; ++i)
+			var result = new CertificateList[crlVals.Count];
+			for (var i = 0; i < crlVals.Count; ++i)
 			{
 				result[i] = CertificateList.GetInstance(crlVals[i].ToAsn1Object());
 			}
@@ -127,8 +126,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public BasicOcspResponse[] GetOcspVals()
 		{
-			BasicOcspResponse[] result = new BasicOcspResponse[ocspVals.Count];
-			for (int i = 0; i < ocspVals.Count; ++i)
+			var result = new BasicOcspResponse[ocspVals.Count];
+			for (var i = 0; i < ocspVals.Count; ++i)
 			{
 				result[i] = BasicOcspResponse.GetInstance(ocspVals[i].ToAsn1Object());
 			}
@@ -142,7 +141,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 
 			if (crlVals != null)
 			{

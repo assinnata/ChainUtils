@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -11,7 +10,7 @@ namespace ChainUtils.BouncyCastle.Asn1
     {
 		public static BerOctetString FromSequence(Asn1Sequence seq)
 		{
-			IList v = Platform.CreateArrayList();
+			var v = Platform.CreateArrayList();
 
 			foreach (Asn1Encodable obj in seq)
 			{
@@ -29,10 +28,10 @@ namespace ChainUtils.BouncyCastle.Asn1
         private static byte[] ToBytes(
             IEnumerable octs)
         {
-            MemoryStream bOut = new MemoryStream();
+            var bOut = new MemoryStream();
 			foreach (DerOctetString o in octs)
 			{
-                byte[] octets = o.GetOctets();
+                var octets = o.GetOctets();
                 bOut.Write(octets, 0, octets.Length);
             }
 			return bOut.ToArray();
@@ -51,7 +50,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			IEnumerable octets)
 			: base(ToBytes(octets))
         {
-            this.octs = octets;
+            octs = octets;
         }
 
         public BerOctetString(
@@ -92,12 +91,12 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 		private IList GenerateOcts()
         {
-            IList vec = Platform.CreateArrayList();
-			for (int i = 0; i < str.Length; i += MaxLength)
+            var vec = Platform.CreateArrayList();
+			for (var i = 0; i < str.Length; i += MaxLength)
 			{
-				int end = System.Math.Min(str.Length, i + MaxLength);
+				var end = System.Math.Min(str.Length, i + MaxLength);
 
-				byte[] nStr = new byte[end - i];
+				var nStr = new byte[end - i];
 
 				Array.Copy(str, i, nStr, 0, nStr.Length);
 

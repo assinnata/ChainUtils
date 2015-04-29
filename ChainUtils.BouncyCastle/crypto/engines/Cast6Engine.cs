@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -69,8 +67,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         {
             uint Cm = 0x5a827999;
             uint Mm = 0x6ed9eba1;
-            int Cr = 19;
-            int Mr = 17;
+            var Cr = 19;
+            var Mr = 17;
             /*
             * Determine the key size here, if required
             *
@@ -78,9 +76,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             *
             * Typical key sizes => 128, 160, 192, 224, 256
             */
-            for (int i=0; i< 24; i++)
+            for (var i=0; i< 24; i++)
             {
-                for (int j=0; j< 8; j++)
+                for (var j=0; j< 8; j++)
                 {
                     _Tm[i*8 + j] = Cm;
                     Cm += Mm; //mod 2^32;
@@ -89,20 +87,20 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                 }
             }
 
-			byte[] tmpKey = new byte[64];
+			var tmpKey = new byte[64];
 			key.CopyTo(tmpKey, 0);
 
 			// now create ABCDEFGH
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
                 _workingKey[i] = Pack.BE_To_UInt32(tmpKey, i*4);
             }
 
 			// Generate the key schedule
-            for (int i = 0; i < 12; i++)
+            for (var i = 0; i < 12; i++)
             {
                 // KAPPA <- W2i(KAPPA)
-                int i2 = i*2 *8;
+                var i2 = i*2 *8;
                 _workingKey[6] ^= F1(_workingKey[7], _Tm[i2], _Tr[i2]);
                 _workingKey[5] ^= F2(_workingKey[6], _Tm[i2+1], _Tr[i2+1]);
                 _workingKey[4] ^= F3(_workingKey[5], _Tm[i2+2], _Tr[i2+2]);
@@ -151,11 +149,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         {
             // process the input block
             // batch the units up into 4x32 bit chunks and go for it
-            uint A = Pack.BE_To_UInt32(src, srcIndex);
-            uint B = Pack.BE_To_UInt32(src, srcIndex + 4);
-            uint C = Pack.BE_To_UInt32(src, srcIndex + 8);
-            uint D = Pack.BE_To_UInt32(src, srcIndex + 12);
-            uint[] result = new uint[4];
+            var A = Pack.BE_To_UInt32(src, srcIndex);
+            var B = Pack.BE_To_UInt32(src, srcIndex + 4);
+            var C = Pack.BE_To_UInt32(src, srcIndex + 8);
+            var D = Pack.BE_To_UInt32(src, srcIndex + 12);
+            var result = new uint[4];
             CAST_Encipher(A, B, C, D, result);
             // now stuff them into the destination block
             Pack.UInt32_To_BE(result[0], dst, dstIndex);
@@ -182,11 +180,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         {
             // process the input block
             // batch the units up into 4x32 bit chunks and go for it
-            uint A = Pack.BE_To_UInt32(src, srcIndex);
-            uint B = Pack.BE_To_UInt32(src, srcIndex + 4);
-            uint C = Pack.BE_To_UInt32(src, srcIndex + 8);
-            uint D = Pack.BE_To_UInt32(src, srcIndex + 12);
-            uint[] result = new uint[4];
+            var A = Pack.BE_To_UInt32(src, srcIndex);
+            var B = Pack.BE_To_UInt32(src, srcIndex + 4);
+            var C = Pack.BE_To_UInt32(src, srcIndex + 8);
+            var D = Pack.BE_To_UInt32(src, srcIndex + 12);
+            var result = new uint[4];
             CAST_Decipher(A, B, C, D, result);
             // now stuff them into the destination block
             Pack.UInt32_To_BE(result[0], dst, dstIndex);
@@ -212,18 +210,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			uint	D,
 			uint[]	result)
         {
-            for (int i = 0; i < 6; i++)
+            for (var i = 0; i < 6; i++)
             {
-                int x = i*4;
+                var x = i*4;
                 // BETA <- Qi(BETA)
                 C ^= F1(D, _Km[x], _Kr[x]);
                 B ^= F2(C, _Km[x + 1], _Kr[x + 1]);
                 A ^= F3(B, _Km[x + 2], _Kr[x + 2]);
                 D ^= F1(A, _Km[x + 3], _Kr[x + 3]);
             }
-            for (int i = 6; i < 12; i++)
+            for (var i = 6; i < 12; i++)
             {
-                int x = i*4;
+                var x = i*4;
                 // BETA <- QBARi(BETA)
                 D ^= F1(A, _Km[x + 3], _Kr[x + 3]);
                 A ^= F3(B, _Km[x + 2], _Kr[x + 2]);
@@ -252,18 +250,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			uint	D,
 			uint[]	result)
         {
-            for (int i = 0; i < 6; i++)
+            for (var i = 0; i < 6; i++)
             {
-                int x = (11-i)*4;
+                var x = (11-i)*4;
                 // BETA <- Qi(BETA)
                 C ^= F1(D, _Km[x], _Kr[x]);
                 B ^= F2(C, _Km[x + 1], _Kr[x + 1]);
                 A ^= F3(B, _Km[x + 2], _Kr[x + 2]);
                 D ^= F1(A, _Km[x + 3], _Kr[x + 3]);
             }
-            for (int i=6; i<12; i++)
+            for (var i=6; i<12; i++)
             {
-                int x = (11-i)*4;
+                var x = (11-i)*4;
                 // BETA <- QBARi(BETA)
                 D ^= F1(A, _Km[x + 3], _Kr[x + 3]);
                 A ^= F3(B, _Km[x + 2], _Kr[x + 2]);

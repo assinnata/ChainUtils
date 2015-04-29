@@ -1,10 +1,7 @@
-﻿using ChainUtils.DataEncoders;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils
 {
@@ -12,7 +9,7 @@ namespace ChainUtils
 	{
 		public static Money Sum(this IEnumerable<Money> moneys)
 		{
-			BigInteger result = BigInteger.Zero;
+			var result = BigInteger.Zero;
 			foreach(var money in moneys)
 			{
 				result += money.Satoshi;
@@ -23,16 +20,16 @@ namespace ChainUtils
 
 	public enum MoneyUnit : int
 	{
-		BTC = 100000000,
-		MilliBTC = 100000,
+		Btc = 100000000,
+		MilliBtc = 100000,
 		Bit = 100,
 		Satoshi = 1
 	}
 	public class Money : IComparable, IComparable<Money>, IEquatable<Money>
 	{
-		public const long COIN = 100000000;
-		public const long CENT = 1000000;
-		public const long NANO = CENT / 100;
+		public const long Coin = 100000000;
+		public const long Cent = 1000000;
+		public const long Nano = Cent / 100;
 
 		public static bool TryParse(string bitcoin, out Money nRet)
 		{
@@ -40,10 +37,10 @@ namespace ChainUtils
             if (string.IsNullOrEmpty(bitcoin))
 				return false;
 
-			string strWhole = "";
+			var strWhole = "";
 			long nUnits = 0;
 
-			int i = 0;
+			var i = 0;
 
 			while(DataEncoder.IsSpace(bitcoin[i]))
 			{
@@ -53,7 +50,7 @@ namespace ChainUtils
 			}
 			if(i >= bitcoin.Length)
 				return false;
-			bool minus = bitcoin[i] == '-';
+			var minus = bitcoin[i] == '-';
 			if(minus || bitcoin[i] == '+')
 				i++;
 
@@ -64,8 +61,8 @@ namespace ChainUtils
 					i++;
 					if(i >= bitcoin.Length)
 						break;
-					long nMult = CENT * 10;
-					while(isdigit(bitcoin[i]) && (nMult > 0))
+					var nMult = Cent * 10;
+					while(Isdigit(bitcoin[i]) && (nMult > 0))
 					{
 						nUnits += nMult * (bitcoin[i] - '0');
 						i++;
@@ -77,7 +74,7 @@ namespace ChainUtils
 				}
 				if(DataEncoder.IsSpace(bitcoin[i]))
 					break;
-				if(!isdigit(bitcoin[i]))
+				if(!Isdigit(bitcoin[i]))
 					return false;
 				strWhole += bitcoin[i];
 			}
@@ -86,11 +83,11 @@ namespace ChainUtils
 					return false;
 			if(strWhole.Length > 10) // guard against 63 bit overflow
 				return false;
-			if(nUnits < 0 || nUnits > COIN)
+			if(nUnits < 0 || nUnits > Coin)
 				return false;
 
 			var nWhole = BigInteger.Parse(strWhole);
-			var nValue = nWhole * COIN + nUnits;
+			var nValue = nWhole * Coin + nUnits;
 
 			nRet = new Money(minus ? -nValue : nValue);
 			return true;
@@ -104,12 +101,12 @@ namespace ChainUtils
 			}
 			throw new FormatException("Impossible to parse the string in a bitcoin amount");
 		}
-		long _Satoshis;
+		long _satoshis;
 		public long Satoshi
 		{
 			get
 			{
-				return _Satoshis;
+				return _satoshis;
 			}
 		}
 
@@ -122,7 +119,7 @@ namespace ChainUtils
 		public Money Abs()
 		{
 			var a = this;
-			if(a < Money.Zero)
+			if(a < Zero)
 				a = -a;
 			return a;
 		}
@@ -133,31 +130,31 @@ namespace ChainUtils
 		internal Money(BigInteger satoshis)
 #endif
 		{
-			_Satoshis = (long)satoshis;
+			_satoshis = (long)satoshis;
 		}
 
 		public Money(int satoshis)
 		{
-			_Satoshis = satoshis;
+			_satoshis = satoshis;
 		}
 
         public Money(uint satoshis)
         {
-			_Satoshis = satoshis;
+			_satoshis = satoshis;
         }
 
         public Money(long satoshis)
 		{
-			_Satoshis = satoshis;
+			_satoshis = satoshis;
 		}
 		public Money(ulong satoshis)
 		{
-			_Satoshis = (long)satoshis;
+			_satoshis = (long)satoshis;
 		}
 
 		public Money(decimal amount, MoneyUnit unit)
 		{
-			_Satoshis = (long)(amount * (int)unit);
+			_satoshis = (long)(amount * (int)unit);
 		}
 
 		public static Money FromUnit(decimal amount, MoneyUnit unit)
@@ -172,17 +169,17 @@ namespace ChainUtils
 
         public static Money Coins(decimal coins)
         {
-            return new Money((long)(coins * COIN));
+            return new Money((long)(coins * Coin));
         }
 
         public static Money Bits(decimal bits)
         {
-            return new Money((long)(bits * CENT));
+            return new Money((long)(bits * Cent));
         }
 
         public static Money Cents(decimal cents)
         {
-            return new Money((long)(cents * CENT));
+            return new Money((long)(cents * Cent));
         }
 
         public static Money Satoshis(decimal sats)
@@ -204,12 +201,12 @@ namespace ChainUtils
 
 		public bool Equals(Money other)
 		{
-			return _Satoshis.Equals(other._Satoshis);
+			return _satoshis.Equals(other._satoshis);
 		}
 
 		public int CompareTo(Money other)
 		{
-			return _Satoshis.CompareTo(other._Satoshis);
+			return _satoshis.CompareTo(other._satoshis);
 		}
 
 		#endregion
@@ -218,11 +215,11 @@ namespace ChainUtils
 
 		public int CompareTo(object obj)
 		{
-			Money m = obj as Money;
+			var m = obj as Money;
 			if(m != null)
-				return _Satoshis.CompareTo(m._Satoshis);
+				return _satoshis.CompareTo(m._satoshis);
 #if !PORTABLE
-			return _Satoshis.CompareTo(obj);
+			return _satoshis.CompareTo(obj);
 #else
 			return _Satoshis.CompareTo((long)obj);
 #endif
@@ -232,73 +229,73 @@ namespace ChainUtils
 
 		public static Money operator -(Money left, Money right)
 		{
-			return new Money(left._Satoshis - right._Satoshis);
+			return new Money(left._satoshis - right._satoshis);
 		}
 		public static Money operator -(Money left)
 		{
-			return new Money(-left._Satoshis);
+			return new Money(-left._satoshis);
 		}
 		public static Money operator +(Money left, Money right)
 		{
-			return new Money(left._Satoshis + right._Satoshis);
+			return new Money(left._satoshis + right._satoshis);
 		}
 		public static Money operator *(decimal left, Money right)
 		{
-			return Money.Satoshis(left * right._Satoshis);
+			return Satoshis(left * right._satoshis);
 		}
 		public static Money operator /(decimal left, Money right)
 		{
-			return Money.Satoshis(left / right._Satoshis);
+			return Satoshis(left / right._satoshis);
 		}
 		public static Money operator *(double left, Money right)
 		{
-			return Money.Satoshis((decimal)(left * right._Satoshis));
+			return Satoshis((decimal)(left * right._satoshis));
 		}
 		public static Money operator /(double left, Money right)
 		{
-			return Money.Satoshis((decimal)(left / right._Satoshis));
+			return Satoshis((decimal)(left / right._satoshis));
 		}
 		public static Money operator *(int left, Money right)
 		{
-			return Money.Satoshis(left * right._Satoshis);
+			return Satoshis(left * right._satoshis);
 		}
 		public static Money operator /(int left, Money right)
 		{
-			return Money.Satoshis(left / right._Satoshis);
+			return Satoshis(left / right._satoshis);
 		}
 		public static Money operator *(long left, Money right)
 		{
-			return Money.Satoshis(left * right._Satoshis);
+			return Satoshis(left * right._satoshis);
 		}
 		public static Money operator /(long left, Money right)
 		{
-			return Money.Satoshis(left / right._Satoshis);
+			return Satoshis(left / right._satoshis);
 		}
 
 		public static bool operator <(Money left, Money right)
 		{
-			return left._Satoshis < right._Satoshis;
+			return left._satoshis < right._satoshis;
 		}
 		public static bool operator >(Money left, Money right)
 		{
-			return left._Satoshis > right._Satoshis;
+			return left._satoshis > right._satoshis;
 		}
 		public static bool operator <=(Money left, Money right)
 		{
-			return left._Satoshis <= right._Satoshis;
+			return left._satoshis <= right._satoshis;
 		}
 		public static bool operator >=(Money left, Money right)
 		{
-			return left._Satoshis >= right._Satoshis;
+			return left._satoshis >= right._satoshis;
 		}
 
 		public static Money operator ++(Money left)
 		{
-			return new Money(left._Satoshis++);
+			return new Money(left._satoshis++);
 		}
 		public static Money operator --(Money left)
 		{
-			return new Money(left._Satoshis--);
+			return new Money(left._satoshis--);
 		}
 		public static implicit operator Money(long value)
 		{
@@ -331,23 +328,23 @@ namespace ChainUtils
 
 		public static implicit operator Money(string value)
 		{
-			return Money.Parse(value);
+			return Parse(value);
         }
 
 		public override bool Equals(object obj)
 		{
-			Money item = obj as Money;
+			var item = obj as Money;
 			if(item == null)
 				return false;
-			return _Satoshis.Equals(item._Satoshis);
+			return _satoshis.Equals(item._satoshis);
 		}
 		public static bool operator ==(Money a, Money b)
 		{
-			if(System.Object.ReferenceEquals(a, b))
+			if(ReferenceEquals(a, b))
 				return true;
 			if(((object)a == null) || ((object)b == null))
 				return false;
-			return a._Satoshis == b._Satoshis;
+			return a._satoshis == b._satoshis;
 		}
 
 		public static bool operator !=(Money a, Money b)
@@ -357,7 +354,7 @@ namespace ChainUtils
 
 		public override int GetHashCode()
 		{
-			return _Satoshis.GetHashCode();
+			return _satoshis.GetHashCode();
 		}
 
 		
@@ -370,49 +367,49 @@ namespace ChainUtils
 		{
 			// Note: not using straight sprintf here because we do NOT want
 			// localized number formatting.
-			var n_abs = (_Satoshis > 0 ? _Satoshis : -_Satoshis);
-			var quotient = n_abs / COIN;
-			var remainder = n_abs % COIN;
+			var nAbs = (_satoshis > 0 ? _satoshis : -_satoshis);
+			var quotient = nAbs / Coin;
+			var remainder = nAbs % Coin;
 
-			string str = String.Format("{0}.{1:D8}", quotient, remainder);
+			var str = String.Format("{0}.{1:D8}", quotient, remainder);
 
 			if(trimExcessZero)
 			{
 				// Right-trim excess zeros before the decimal point:
-				int nTrim = 0;
-				for(int i = str.Length - 1 ; (str[i] == '0' && isdigit(str[i - 2])) ; --i)
+				var nTrim = 0;
+				for(var i = str.Length - 1 ; (str[i] == '0' && Isdigit(str[i - 2])) ; --i)
 					++nTrim;
 				if(nTrim != 0)
 					str = str.Remove(str.Length - nTrim, nTrim);
 			}
-			if(_Satoshis < 0)
+			if(_satoshis < 0)
 				str = "-" + str;
-			else if(fplus && _Satoshis > 0)
+			else if(fplus && _satoshis > 0)
 				str = "+" + str;
 			return str;
 		}
-		public static bool isdigit(char c)
+		public static bool Isdigit(char c)
 		{
 			return c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' || c == '9';
 		}
 
 
 
-		static Money _Zero = new Money(0);
+		static Money _zero = new Money(0);
 		public static Money Zero
 		{
 			get
 			{
-				return _Zero;
+				return _zero;
 			}
 		}
 
-		static Money _Dust = new Money(600);
+		static Money _dust = new Money(600);
 		public static Money Dust
 		{
 			get
 			{
-				return _Dust;
+				return _dust;
 			}
 		}
 
@@ -439,7 +436,7 @@ namespace ChainUtils
 		{
 			if(margin < 0.0m || margin > 1.0m)
 				throw new ArgumentOutOfRangeException("margin", "margin should be between 0 and 1");
-			 var dust = Money.Satoshis((decimal)amount.Satoshi * margin);
+			 var dust = Satoshis((decimal)amount.Satoshi * margin);
 			 return Almost(amount, dust);
 		}
 

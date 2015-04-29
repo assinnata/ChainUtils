@@ -35,12 +35,12 @@ namespace Mono.Nat
 
 		static List<UdpClient> CreateSockets()
 		{
-			List<UdpClient> clients = new List<UdpClient>();
+			var clients = new List<UdpClient>();
 			try
 			{
-				foreach(NetworkInterface n in NetworkInterface.GetAllNetworkInterfaces())
+				foreach(var n in NetworkInterface.GetAllNetworkInterfaces())
 				{
-					foreach(UnicastIPAddressInformation address in n.GetIPProperties().UnicastAddresses)
+					foreach(var address in n.GetIPProperties().UnicastAddresses)
 					{
 						if(address.Address.AddressFamily == AddressFamily.InterNetwork)
 						{
@@ -65,7 +65,7 @@ namespace Mono.Nat
 
 		public void Search()
 		{
-			foreach(UdpClient s in sockets)
+			foreach(var s in sockets)
 			{
 				try
 				{
@@ -81,10 +81,10 @@ namespace Mono.Nat
 		void Search(UdpClient client)
 		{
 			nextSearch = DateTime.Now.AddSeconds(SearchPeriod);
-			byte[] data = DiscoverDeviceMessage.Encode();
+			var data = DiscoverDeviceMessage.Encode();
 
 			// UDP is unreliable, so send 3 requests at a time (per Upnp spec, sec 1.1.2)
-			for(int i = 0 ; i < 3 ; i++)
+			for(var i = 0 ; i < 3 ; i++)
 				client.Send(data, data.Length, searchEndpoint);
 		}
 
@@ -112,9 +112,9 @@ namespace Mono.Nat
 				// If this device does not have a WANIPConnection service, then ignore it
 				// Technically i should be checking for WANIPConnection:1 and InternetGatewayDevice:1
 				// but there are some routers missing the '1'.
-				string log = "UPnP Response: Router advertised a '{0}' service";
-				StringComparison c = StringComparison.OrdinalIgnoreCase;
-			    string st = "";
+				var log = "UPnP Response: Router advertised a '{0}' service";
+				var c = StringComparison.OrdinalIgnoreCase;
+			    var st = "";
                 if(dataString.IndexOf("urn:schemas-upnp-org:service:WANIPConnection:", c) != -1)
                 {
                     NatUtility.Log(log, "urn:schemas-upnp-org:service:WANIPConnection:");
@@ -132,7 +132,7 @@ namespace Mono.Nat
 					return;
 
 				// We have an internet gateway device now
-				UpnpNatDevice d = new UpnpNatDevice(localAddress, dataString, st);
+				var d = new UpnpNatDevice(localAddress, dataString, st);
 
 				if(this.devices.Contains(d))
 				{
@@ -147,7 +147,7 @@ namespace Mono.Nat
 					// even if three responses are received
 					if(lastFetched.ContainsKey(endpoint.Address))
 					{
-						DateTime last = lastFetched[endpoint.Address];
+						var last = lastFetched[endpoint.Address];
 						if((DateTime.Now - last) < TimeSpan.FromSeconds(20))
 							return;
 					}
@@ -208,9 +208,9 @@ namespace Mono.Nat
 			var maxSearchTime = new CancellationTokenSource();
 			maxSearchTime.CancelAfter(TimeSpan.FromSeconds(35));
 
-			IPEndPoint received = new IPEndPoint(IPAddress.Parse("192.168.0.1"), 5351);
+			var received = new IPEndPoint(IPAddress.Parse("192.168.0.1"), 5351);
 
-			CancellationTokenSource resendSearch = new CancellationTokenSource();
+			var resendSearch = new CancellationTokenSource();
 			resendSearch.CancelAfter(TimeSpan.FromSeconds(10));
 			while(devices.Count == 0)
 			{
@@ -223,12 +223,12 @@ namespace Mono.Nat
 				}
 				if(maxSearchTime.IsCancellationRequested)
 					return null;
-				foreach(UdpClient client in sockets)
+				foreach(var client in sockets)
 				{
 					if(client.Available > 0)
 					{
-						IPAddress localAddress = ((IPEndPoint)client.Client.LocalEndPoint).Address;
-						byte[] data = client.Receive(ref received);
+						var localAddress = ((IPEndPoint)client.Client.LocalEndPoint).Address;
+						var data = client.Receive(ref received);
 						Handle(localAddress, data, received);
 						Thread.Sleep(10);
 					}

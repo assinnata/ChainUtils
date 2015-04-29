@@ -1,7 +1,6 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto.Parameters;
+﻿using System;
 using ChainUtils.BouncyCastle.Crypto.Digests;
+using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
 using ChainUtils.BouncyCastle.Utilities;
@@ -46,9 +45,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             if (!IsValidDsaStrength(size))
                 throw new ArgumentException("size must be from 512 - 1024 and a multiple of 64", "size");
 
-            this.use186_3 = false;
-            this.L = size;
-            this.N = GetDefaultN(size);
+            use186_3 = false;
+            L = size;
+            N = GetDefaultN(size);
             this.certainty = certainty;
             this.random = random;
         }
@@ -64,12 +63,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         public virtual void Init(DsaParameterGenerationParameters parameters)
         {
             // TODO Should we enforce the minimum 'certainty' values as per C.3 Table C.1?
-            this.use186_3 = true;
-            this.L = parameters.L;
-            this.N = parameters.N;
-            this.certainty = parameters.Certainty;
-            this.random = parameters.Random;
-            this.usageIndex = parameters.UsageIndex;
+            use186_3 = true;
+            L = parameters.L;
+            N = parameters.N;
+            certainty = parameters.Certainty;
+            random = parameters.Random;
+            usageIndex = parameters.UsageIndex;
 
             if ((L < 1024 || L > 3072) || L % 1024 != 0)
                 throw new ArgumentException("Values must be between 1024 and 3072 and a multiple of 1024", "L");
@@ -122,12 +121,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
         protected virtual DsaParameters GenerateParameters_FIPS186_2()
         {
-            byte[] seed = new byte[20];
-            byte[] part1 = new byte[20];
-            byte[] part2 = new byte[20];
-            byte[] u = new byte[20];
-            int n = (L - 1) / 160;
-            byte[] w = new byte[L / 8];
+            var seed = new byte[20];
+            var part1 = new byte[20];
+            var part2 = new byte[20];
+            var u = new byte[20];
+            var n = (L - 1) / 160;
+            var w = new byte[L / 8];
 
             if (!(digest is Sha1Digest))
                 throw new InvalidOperationException("can only use SHA-1 for generating FIPS 186-2 parameters");
@@ -141,7 +140,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                 Inc(part2);
                 Hash(digest, part2, part2);
 
-                for (int i = 0; i != u.Length; i++)
+                for (var i = 0; i != u.Length; i++)
                 {
                     u[i] = (byte)(part1[i] ^ part2[i]);
                 }
@@ -149,17 +148,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                 u[0] |= (byte)0x80;
                 u[19] |= (byte)0x01;
 
-                BigInteger q = new BigInteger(1, u);
+                var q = new BigInteger(1, u);
 
                 if (!q.IsProbablePrime(certainty))
                     continue;
 
-                byte[] offset = Arrays.Clone(seed);
+                var offset = Arrays.Clone(seed);
                 Inc(offset);
 
-                for (int counter = 0; counter < 4096; ++counter)
+                for (var counter = 0; counter < 4096; ++counter)
                 {
-                    for (int k = 0; k < n; k++)
+                    for (var k = 0; k < n; k++)
                     {
                         Inc(offset);
                         Hash(digest, offset, part1);
@@ -172,18 +171,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
                     w[0] |= (byte)0x80;
 
-                    BigInteger x = new BigInteger(1, w);
+                    var x = new BigInteger(1, w);
 
-                    BigInteger c = x.Mod(q.ShiftLeft(1));
+                    var c = x.Mod(q.ShiftLeft(1));
 
-                    BigInteger p = x.Subtract(c.Subtract(BigInteger.One));
+                    var p = x.Subtract(c.Subtract(BigInteger.One));
 
                     if (p.BitLength != L)
                         continue;
 
                     if (p.IsProbablePrime(certainty))
                     {
-                        BigInteger g = CalculateGenerator_FIPS186_2(p, q, random);
+                        var g = CalculateGenerator_FIPS186_2(p, q, random);
 
                         return new DsaParameters(p, q, g, new DsaValidationParameters(seed, counter));
                     }
@@ -193,13 +192,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
         protected virtual BigInteger CalculateGenerator_FIPS186_2(BigInteger p, BigInteger q, SecureRandom r)
         {
-            BigInteger e = p.Subtract(BigInteger.One).Divide(q);
-            BigInteger pSub2 = p.Subtract(BigInteger.Two);
+            var e = p.Subtract(BigInteger.One).Divide(q);
+            var pSub2 = p.Subtract(BigInteger.Two);
 
             for (;;)
             {
-                BigInteger h = BigIntegers.CreateRandomInRange(BigInteger.Two, pSub2, r);
-                BigInteger g = h.ModPow(e, p);
+                var h = BigIntegers.CreateRandomInRange(BigInteger.Two, pSub2, r);
+                var g = h.ModPow(e, p);
 
                 if (g.BitLength > 1)
                     return g;
@@ -213,8 +212,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         protected virtual DsaParameters GenerateParameters_FIPS186_3()
         {
 // A.1.1.2 Generation of the Probable Primes p and q Using an Approved Hash Function
-            IDigest d = digest;
-            int outlen = d.GetDigestSize() * 8;
+            var d = digest;
+            var outlen = d.GetDigestSize() * 8;
 
 // 1. Check that the (L, N) pair is in the list of acceptable (L, N pairs) (see Section 4.2). If
 //    the pair is not in the list, then return INVALID.
@@ -222,16 +221,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             
 // 2. If (seedlen < N), then return INVALID.
             // FIXME This should be configurable (must be >= N)
-            int seedlen = N;
-            byte[] seed = new byte[seedlen / 8];
+            var seedlen = N;
+            var seed = new byte[seedlen / 8];
 
 // 3. n = ceiling(L ⁄ outlen) – 1.
-            int n = (L - 1) / outlen;
+            var n = (L - 1) / outlen;
 
 // 4. b = L – 1 – (n ∗ outlen).
-            int b = (L - 1) % outlen;
+            var b = (L - 1) % outlen;
 
-            byte[] output = new byte[d.GetDigestSize()];
+            var output = new byte[d.GetDigestSize()];
             for (;;)
             {
 // 5. Get an arbitrary sequence of seedlen bits as the domain_parameter_seed.
@@ -239,10 +238,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
 // 6. U = Hash (domain_parameter_seed) mod 2^(N–1).
                 Hash(d, seed, output);
-                BigInteger U = new BigInteger(1, output).Mod(BigInteger.One.ShiftLeft(N - 1));
+                var U = new BigInteger(1, output).Mod(BigInteger.One.ShiftLeft(N - 1));
 
 // 7. q = 2^(N–1) + U + 1 – ( U mod 2).
-                BigInteger q = BigInteger.One.ShiftLeft(N - 1).Add(U).Add(BigInteger.One).Subtract(
+                var q = BigInteger.One.ShiftLeft(N - 1).Add(U).Add(BigInteger.One).Subtract(
                     U.Mod(BigInteger.Two));
 
 // 8. Test whether or not q is prime as specified in Appendix C.3.
@@ -255,23 +254,23 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
 // 10. offset = 1.
                 // Note: 'offset' value managed incrementally
-                byte[] offset = Arrays.Clone(seed);
+                var offset = Arrays.Clone(seed);
 
 // 11. For counter = 0 to (4L – 1) do
-                int counterLimit = 4 * L;
-                for (int counter = 0; counter < counterLimit; ++counter)
+                var counterLimit = 4 * L;
+                for (var counter = 0; counter < counterLimit; ++counter)
                 {
 // 11.1 For j = 0 to n do
 //      Vj = Hash ((domain_parameter_seed + offset + j) mod 2^seedlen).
 // 11.2 W = V0 + (V1 ∗ 2^outlen) + ... + (V^(n–1) ∗ 2^((n–1) ∗ outlen)) + ((Vn mod 2^b) ∗ 2^(n ∗ outlen)).
                     // TODO Assemble w as a byte array
-                    BigInteger W = BigInteger.Zero;
+                    var W = BigInteger.Zero;
                     for (int j = 0, exp = 0; j <= n; ++j, exp += outlen)
                     {
                         Inc(offset);
                         Hash(d, offset, output);
 
-                        BigInteger Vj = new BigInteger(1, output);
+                        var Vj = new BigInteger(1, output);
                         if (j == n)
                         {
                             Vj = Vj.Mod(BigInteger.One.ShiftLeft(b));
@@ -281,13 +280,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                     }
 
 // 11.3 X = W + 2^(L–1). Comment: 0 ≤ W < 2L–1; hence, 2L–1 ≤ X < 2L.
-                    BigInteger X = W.Add(BigInteger.One.ShiftLeft(L - 1));
+                    var X = W.Add(BigInteger.One.ShiftLeft(L - 1));
 
 // 11.4 c = X mod 2q.
-                    BigInteger c = X.Mod(q.ShiftLeft(1));
+                    var c = X.Mod(q.ShiftLeft(1));
 
 // 11.5 p = X - (c - 1). Comment: p ≡ 1 (mod 2q).
-                    BigInteger p = X.Subtract(c.Subtract(BigInteger.One));
+                    var p = X.Subtract(c.Subtract(BigInteger.One));
 
                     // 11.6 If (p < 2^(L - 1)), then go to step 11.9
                     if (p.BitLength != L)
@@ -303,13 +302,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
                         if (usageIndex >= 0)
                         {
-                            BigInteger g = CalculateGenerator_FIPS186_3_Verifiable(d, p, q, seed, usageIndex);
+                            var g = CalculateGenerator_FIPS186_3_Verifiable(d, p, q, seed, usageIndex);
                             if (g != null)
                                 return new DsaParameters(p, q, g, new DsaValidationParameters(seed, counter, usageIndex));
                         }
 
                         {
-                            BigInteger g = CalculateGenerator_FIPS186_3_Unverifiable(p, q, random);
+                            var g = CalculateGenerator_FIPS186_3_Unverifiable(p, q, random);
 
                             return new DsaParameters(p, q, g, new DsaValidationParameters(seed, counter));
                         }
@@ -334,22 +333,22 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             byte[] seed, int index)
         {
             // A.2.3 Verifiable Canonical Generation of the Generator g
-            BigInteger e = p.Subtract(BigInteger.One).Divide(q);
-            byte[] ggen = Hex.Decode("6767656E");
+            var e = p.Subtract(BigInteger.One).Divide(q);
+            var ggen = Hex.Decode("6767656E");
 
             // 7. U = domain_parameter_seed || "ggen" || index || count.
-            byte[] U = new byte[seed.Length + ggen.Length + 1 + 2];
+            var U = new byte[seed.Length + ggen.Length + 1 + 2];
             Array.Copy(seed, 0, U, 0, seed.Length);
             Array.Copy(ggen, 0, U, seed.Length, ggen.Length);
             U[U.Length - 3] = (byte)index; 
 
-            byte[] w = new byte[d.GetDigestSize()];
-            for (int count = 1; count < (1 << 16); ++count)
+            var w = new byte[d.GetDigestSize()];
+            for (var count = 1; count < (1 << 16); ++count)
             {
                 Inc(U);
                 Hash(d, U, w);
-                BigInteger W = new BigInteger(1, w);
-                BigInteger g = W.ModPow(e, p);
+                var W = new BigInteger(1, w);
+                var g = W.ModPow(e, p);
 
                 if (g.CompareTo(BigInteger.Two) >= 0)
                     return g;
@@ -377,9 +376,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
         protected static void Inc(byte[] buf)
         {
-            for (int i = buf.Length - 1; i >= 0; --i)
+            for (var i = buf.Length - 1; i >= 0; --i)
             {
-                byte b = (byte)(buf[i] + 1);
+                var b = (byte)(buf[i] + 1);
                 buf[i] = b;
 
                 if (b != 0)

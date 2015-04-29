@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -22,17 +20,17 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         public AttributeTable(
             IDictionary attrs)
         {
-            this.attributes = Platform.CreateHashtable(attrs);
+            attributes = Platform.CreateHashtable(attrs);
         }
 
         public AttributeTable(
             Asn1EncodableVector v)
         {
-            this.attributes = Platform.CreateHashtable(v.Count);
+            attributes = Platform.CreateHashtable(v.Count);
 
 			foreach (Asn1Encodable o in v)
             {
-                Attribute a = Attribute.GetInstance(o);
+                var a = Attribute.GetInstance(o);
 
 				AddAttribute(a);
             }
@@ -41,11 +39,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         public AttributeTable(
             Asn1Set s)
         {
-            this.attributes = Platform.CreateHashtable(s.Count);
+            attributes = Platform.CreateHashtable(s.Count);
 
-			for (int i = 0; i != s.Count; i++)
+			for (var i = 0; i != s.Count; i++)
             {
-                Attribute a = Attribute.GetInstance(s[i]);
+                var a = Attribute.GetInstance(s[i]);
 
                 AddAttribute(a);
             }
@@ -60,8 +58,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		private void AddAttribute(
             Attribute a)
         {
-			DerObjectIdentifier oid = a.AttrType;
-            object obj = attributes[oid];
+			var oid = a.AttrType;
+            var obj = attributes[oid];
 
             if (obj == null)
             {
@@ -94,7 +92,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		{
 			get
 			{
-				object obj = attributes[oid];
+				var obj = attributes[oid];
 
 				if (obj is IList)
 				{
@@ -122,9 +120,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         public Asn1EncodableVector GetAll(
             DerObjectIdentifier oid)
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
-            object obj = attributes[oid];
+            var obj = attributes[oid];
 
 			if (obj is IList)
             {
@@ -145,9 +143,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		{
 			get
 			{
-				int total = 0;
+				var total = 0;
 
-				foreach (object o in attributes.Values)
+				foreach (var o in attributes.Values)
 				{
 					if (o is IList)
 					{
@@ -178,13 +176,13 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 		public Asn1EncodableVector ToAsn1EncodableVector()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
-			foreach (object obj in attributes.Values)
+			foreach (var obj in attributes.Values)
             {
                 if (obj is IList)
                 {
-                    foreach (object el in (IList)obj)
+                    foreach (var el in (IList)obj)
                     {
                         v.Add(Attribute.GetInstance(el));
                     }
@@ -200,7 +198,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 		public Attributes ToAttributes()
 		{
-			return new Attributes(this.ToAsn1EncodableVector());
+			return new Attributes(ToAsn1EncodableVector());
 		}
 
 		/**
@@ -212,7 +210,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		 */
 		public AttributeTable Add(DerObjectIdentifier attrType, Asn1Encodable attrValue)
 		{
-			AttributeTable newTable = new AttributeTable(attributes);
+			var newTable = new AttributeTable(attributes);
 
 			newTable.AddAttribute(new Attribute(attrType, new DerSet(attrValue)));
 
@@ -221,7 +219,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 		public AttributeTable Remove(DerObjectIdentifier attrType)
 		{
-			AttributeTable newTable = new AttributeTable(attributes);
+			var newTable = new AttributeTable(attributes);
 
 			newTable.attributes.Remove(attrType);
 

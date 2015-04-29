@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
@@ -15,41 +9,41 @@ namespace ChainUtils.BitcoinCore
 		{
 
 		}
-		private readonly Network _ExpectedNetwork;
+		private readonly Network _expectedNetwork;
 		public Network ExpectedNetwork
 		{
 			get
 			{
-				return _ExpectedNetwork;
+				return _expectedNetwork;
 			}
 		}
 		public StoredHeader(Network expectedNetwork)
 		{
-			_ExpectedNetwork = expectedNetwork;
+			_expectedNetwork = expectedNetwork;
 		}
-		uint magic;
+		uint _magic;
 		public uint Magic
 		{
 			get
 			{
-				return magic;
+				return _magic;
 			}
 			set
 			{
-				magic = value;
+				_magic = value;
 			}
 		}
 
-		uint size;
+		uint _size;
 		public uint ItemSize
 		{
 			get
 			{
-				return size;
+				return _size;
 			}
 			set
 			{
-				size = value;
+				_size = value;
 			}
 		}
 
@@ -57,19 +51,19 @@ namespace ChainUtils.BitcoinCore
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			if(_ExpectedNetwork == null || stream.Serializing)
+			if(_expectedNetwork == null || stream.Serializing)
 			{
-				stream.ReadWrite(ref magic);
+				stream.ReadWrite(ref _magic);
 			}
 			else
 			{
-				if(!_ExpectedNetwork.ReadMagic(stream.Inner, default(CancellationToken)))
+				if(!_expectedNetwork.ReadMagic(stream.Inner, default(CancellationToken)))
 					return;
-				magic = ExpectedNetwork.Magic;
+				_magic = ExpectedNetwork.Magic;
 			}
-			if(magic == 0)
+			if(_magic == 0)
 				return;
-			stream.ReadWrite(ref size);
+			stream.ReadWrite(ref _size);
 		}
 
 
@@ -79,15 +73,15 @@ namespace ChainUtils.BitcoinCore
 	{
 		public StoredItem(Network expectedNetwork, DiskBlockPos position)
 		{
-			_Header = new StoredHeader(expectedNetwork);
-			_BlockPosition = position;
+			_header = new StoredHeader(expectedNetwork);
+			_blockPosition = position;
 		}
 		public StoredItem(uint magic, T item, DiskBlockPos position)
 		{
-			_BlockPosition = position;
-			_Item = item;
-			_Header.Magic = magic;
-			_Header.ItemSize = (uint)item.GetSerializedSize();
+			_blockPosition = position;
+			_item = item;
+			_header.Magic = magic;
+			_header.ItemSize = (uint)item.GetSerializedSize();
 		}
 		public bool ParseSkipItem
 		{
@@ -95,32 +89,32 @@ namespace ChainUtils.BitcoinCore
 			set;
 		}
 
-		private readonly DiskBlockPos _BlockPosition;
+		private readonly DiskBlockPos _blockPosition;
 		public DiskBlockPos BlockPosition
 		{
 			get
 			{
-				return _BlockPosition;
+				return _blockPosition;
 			}
 		}
 
 
 
-		private StoredHeader _Header = new StoredHeader();
+		private StoredHeader _header = new StoredHeader();
 		public StoredHeader Header
 		{
 			get
 			{
-				return _Header;
+				return _header;
 			}
 		}
 
-		private T _Item = new T();
+		private T _item = new T();
 		public T Item
 		{
 			get
 			{
-				return _Item;
+				return _item;
 			}
 		}
 
@@ -130,39 +124,39 @@ namespace ChainUtils.BitcoinCore
 			set;
 		}
 
-		private uint256 _Checksum = new uint256(0);
-		public uint256 Checksum
+		private Uint256 _checksum = new Uint256(0);
+		public Uint256 Checksum
 		{
 			get
 			{
-				return _Checksum;
+				return _checksum;
 			}
 			set
 			{
-				_Checksum = value;
+				_checksum = value;
 			}
 		}
 
 		public uint GetStorageSize()
 		{
 			var ms = new MemoryStream();
-			BitcoinStream stream = new BitcoinStream(ms, true);
-			stream.ReadWrite(ref _Header);
-			return _Header.ItemSize + (uint)stream.Inner.Length + (HasChecksum ? (uint)(256 / 8) : 0);
+			var stream = new BitcoinStream(ms, true);
+			stream.ReadWrite(ref _header);
+			return _header.ItemSize + (uint)stream.Inner.Length + (HasChecksum ? (uint)(256 / 8) : 0);
 		}
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref _Header);
-			if(_Header.Magic == 0)
+			stream.ReadWrite(ref _header);
+			if(_header.Magic == 0)
 				return;
 
 			if(ParseSkipItem)
-				stream.Inner.Position += _Header.ItemSize;
+				stream.Inner.Position += _header.ItemSize;
 			else
-				ReadWriteItem(stream, ref _Item);
+				ReadWriteItem(stream, ref _item);
 			if(HasChecksum)
-				stream.ReadWrite(ref _Checksum);
+				stream.ReadWrite(ref _checksum);
 		}
 
 		protected virtual void ReadWriteItem(BitcoinStream stream, ref T item)

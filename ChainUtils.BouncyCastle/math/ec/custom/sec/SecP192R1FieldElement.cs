@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
@@ -21,7 +20,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public SecP192R1FieldElement()
         {
-            this.x = Nat192.Create();
+            x = Nat192.Create();
         }
 
         protected internal SecP192R1FieldElement(uint[] x)
@@ -61,28 +60,28 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECFieldElement Add(ECFieldElement b)
         {
-            uint[] z = Nat192.Create();
+            var z = Nat192.Create();
             SecP192R1Field.Add(x, ((SecP192R1FieldElement)b).x, z);
             return new SecP192R1FieldElement(z);
         }
 
         public override ECFieldElement AddOne()
         {
-            uint[] z = Nat192.Create();
+            var z = Nat192.Create();
             SecP192R1Field.AddOne(x, z);
             return new SecP192R1FieldElement(z);
         }
 
         public override ECFieldElement Subtract(ECFieldElement b)
         {
-            uint[] z = Nat192.Create();
+            var z = Nat192.Create();
             SecP192R1Field.Subtract(x, ((SecP192R1FieldElement)b).x, z);
             return new SecP192R1FieldElement(z);
         }
 
         public override ECFieldElement Multiply(ECFieldElement b)
         {
-            uint[] z = Nat192.Create();
+            var z = Nat192.Create();
             SecP192R1Field.Multiply(x, ((SecP192R1FieldElement)b).x, z);
             return new SecP192R1FieldElement(z);
         }
@@ -90,7 +89,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public override ECFieldElement Divide(ECFieldElement b)
         {
             //return Multiply(b.Invert());
-            uint[] z = Nat192.Create();
+            var z = Nat192.Create();
             Mod.Invert(SecP192R1Field.P, ((SecP192R1FieldElement)b).x, z);
             SecP192R1Field.Multiply(z, x, z);
             return new SecP192R1FieldElement(z);
@@ -98,14 +97,14 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECFieldElement Negate()
         {
-            uint[] z = Nat192.Create();
+            var z = Nat192.Create();
             SecP192R1Field.Negate(x, z);
             return new SecP192R1FieldElement(z);
         }
 
         public override ECFieldElement Square()
         {
-            uint[] z = Nat192.Create();
+            var z = Nat192.Create();
             SecP192R1Field.Square(x, z);
             return new SecP192R1FieldElement(z);
         }
@@ -113,7 +112,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public override ECFieldElement Invert()
         {
             //return new SecP192R1FieldElement(ToBigInteger().ModInverse(Q));
-            uint[] z = Nat192.Create();
+            var z = Nat192.Create();
             Mod.Invert(SecP192R1Field.P, x, z);
             return new SecP192R1FieldElement(z);
         }
@@ -126,12 +125,12 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         {
             // Raise this element to the exponent 2^190 - 2^62
 
-            uint[] x1 = this.x;
+            var x1 = x;
             if (Nat192.IsZero(x1) || Nat192.IsOne(x1))
                 return this;
 
-            uint[] t1 = Nat192.Create();
-            uint[] t2 = Nat192.Create();
+            var t1 = Nat192.Create();
+            var t2 = Nat192.Create();
 
             SecP192R1Field.Square(x1, t1);
             SecP192R1Field.Multiply(t1, x1, t1);

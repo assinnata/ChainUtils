@@ -1,9 +1,9 @@
-﻿using ChainUtils.Crypto;
-using ChainUtils.DataEncoders;
+﻿using System;
+using System.Linq;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
-using System;
-using System.Linq;
+using ChainUtils.Crypto;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils
 {
@@ -19,50 +19,50 @@ namespace ChainUtils
 		{
 		}
 
-		byte[] _AddressHash;
+		byte[] _addressHash;
 		public byte[] AddressHash
 		{
-			get { return _AddressHash ?? (_AddressHash = vchData.Skip(1).Take(4).ToArray()); }
+			get { return _addressHash ?? (_addressHash = VchData.Skip(1).Take(4).ToArray()); }
 		}
 		public bool IsCompressed
 		{
 			get
 			{
-				return (vchData[0] & 0x20) != 0;
+				return (VchData[0] & 0x20) != 0;
 			}
 		}
-		byte[] _OwnerEntropy;
+		byte[] _ownerEntropy;
 		public byte[] OwnerEntropy
 		{
-			get { return _OwnerEntropy ?? (_OwnerEntropy = vchData.Skip(1).Skip(4).Take(8).ToArray()); }
+			get { return _ownerEntropy ?? (_ownerEntropy = VchData.Skip(1).Skip(4).Take(8).ToArray()); }
 		}
-		LotSequence _LotSequence;
+		LotSequence _lotSequence;
 		public LotSequence LotSequence
 		{
 			get
 			{
-				var hasLotSequence = (vchData[0] & 0x04) != 0;
+				var hasLotSequence = (VchData[0] & 0x04) != 0;
 				if(!hasLotSequence)
 					return null;
-				if(_LotSequence == null)
+				if(_lotSequence == null)
 				{
-					_LotSequence = new LotSequence(OwnerEntropy.Skip(4).Take(4).ToArray());
+					_lotSequence = new LotSequence(OwnerEntropy.Skip(4).Take(4).ToArray());
 				}
-				return _LotSequence;
+				return _lotSequence;
 			}
 		}
 
-		byte[] _EncryptedPointB;
+		byte[] _encryptedPointB;
 		byte[] EncryptedPointB
 		{
-			get { return _EncryptedPointB ?? (_EncryptedPointB = vchData.Skip(1).Skip(4).Skip(8).ToArray()); }
+			get { return _encryptedPointB ?? (_encryptedPointB = VchData.Skip(1).Skip(4).Skip(8).ToArray()); }
 		}
 
 		public override Base58Type Type
 		{
 			get
 			{
-				return Base58Type.CONFIRMATION_CODE;
+				return Base58Type.ConfirmationCode;
 			}
 		}
 
@@ -70,7 +70,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return vchData.Length == 1 + 4 + 8 + 33;
+				return VchData.Length == 1 + 4 + 8 + 33;
 			}
 		}
 
@@ -78,10 +78,10 @@ namespace ChainUtils
 		public bool Check(string passphrase, BitcoinAddress expectedAddress)
 		{
 			//Derive passfactor using scrypt with ownerentropy and the user's passphrase and use it to recompute passpoint 
-			byte[] passfactor = BitcoinEncryptedSecretEC.CalculatePassFactor(passphrase, LotSequence, OwnerEntropy);
+			var passfactor = BitcoinEncryptedSecretEc.CalculatePassFactor(passphrase, LotSequence, OwnerEntropy);
 			//Derive decryption key for pointb using scrypt with passpoint, addresshash, and ownerentropy
-			byte[] passpoint = BitcoinEncryptedSecretEC.CalculatePassPoint(passfactor);
-			byte[] derived = BitcoinEncryptedSecretEC.CalculateDecryptionKey(passpoint, AddressHash, OwnerEntropy);
+			var passpoint = BitcoinEncryptedSecretEc.CalculatePassPoint(passfactor);
+			var derived = BitcoinEncryptedSecretEc.CalculateDecryptionKey(passpoint, AddressHash, OwnerEntropy);
 
 			//Decrypt encryptedpointb to yield pointb
 			var pointbprefix = EncryptedPointB[0];
@@ -91,13 +91,13 @@ namespace ChainUtils
 			if(pointbprefix != 0x02 && pointbprefix != 0x03)
 				return false;
 			var pointb = BitcoinEncryptedSecret.DecryptKey(EncryptedPointB.Skip(1).ToArray(), derived);
-			pointb = new byte[] { pointbprefix }.Concat(pointb).ToArray();
+			pointb = new[] { pointbprefix }.Concat(pointb).ToArray();
 
 			var param1 = Encoders.Hex.EncodeData(EncryptedPointB.Skip(1).ToArray());
 			var param2 = Encoders.Hex.EncodeData(derived);
 
 			//4.ECMultiply pointb by passfactor. Use the resulting EC point as a public key
-			var curve = ECKey.CreateCurve();
+			var curve = EcKey.CreateCurve();
 			ECPoint pointbec;
 			try
 			{
@@ -111,13 +111,13 @@ namespace ChainUtils
 			{
 				return false;
 			}
-			PubKey pubkey = new PubKey(pointbec.Multiply(new BigInteger(1, passfactor)).GetEncoded());
+			var pubkey = new PubKey(pointbec.Multiply(new BigInteger(1, passfactor)).GetEncoded());
 
 			//and hash it into address using either compressed or uncompressed public key methodology as specifid in flagbyte.
 			pubkey = IsCompressed ? pubkey.Compress() : pubkey.Decompress();
 
-			var actualhash = BitcoinEncryptedSecretEC.HashAddress(pubkey.GetAddress(Network));
-			var expectedhash = BitcoinEncryptedSecretEC.HashAddress(expectedAddress);
+			var actualhash = BitcoinEncryptedSecretEc.HashAddress(pubkey.GetAddress(Network));
+			var expectedhash = BitcoinEncryptedSecretEc.HashAddress(expectedAddress);
 
 			return Utils.ArrayEqual(actualhash, expectedhash);
 		}

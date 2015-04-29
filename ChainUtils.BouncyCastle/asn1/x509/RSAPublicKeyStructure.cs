@@ -1,8 +1,5 @@
-using ChainUtils.BouncyCastle.Asn1;
-using ChainUtils.BouncyCastle.Math;
-
 using System;
-using System.Collections;
+using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
 {

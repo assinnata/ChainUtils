@@ -10,12 +10,12 @@
         {
             ECPoint addP = p.Normalize(), subP = addP.Negate();
 
-            ECPoint R0 = addP;
+            var R0 = addP;
 
-            int n = k.BitLength;
-            int s = k.GetLowestSetBit();
+            var n = k.BitLength;
+            var s = k.GetLowestSetBit();
 
-            int i = n;
+            var i = n;
             while (--i > s)
             {
                 R0 = R0.TwicePlus(k.TestBit(i) ? addP : subP);

@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
@@ -15,7 +13,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             byte[]	salt,
             int		iterations)
         {
-            this.iv = new DerOctetString(salt);
+            iv = new DerOctetString(salt);
             this.iterations = new DerInteger(iterations);
         }
 

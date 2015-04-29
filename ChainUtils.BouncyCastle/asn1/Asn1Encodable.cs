@@ -10,8 +10,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 		public byte[] GetEncoded()
         {
-            MemoryStream bOut = new MemoryStream();
-            Asn1OutputStream aOut = new Asn1OutputStream(bOut);
+            var bOut = new MemoryStream();
+            var aOut = new Asn1OutputStream(bOut);
 
 			aOut.WriteObject(this);
 
@@ -23,8 +23,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 		{
 			if (encoding.Equals(Der))
 			{
-				MemoryStream bOut = new MemoryStream();
-				DerOutputStream dOut = new DerOutputStream(bOut);
+				var bOut = new MemoryStream();
+				var dOut = new DerOutputStream(bOut);
 
 				dOut.WriteObject(this);
 
@@ -62,13 +62,13 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (obj == this)
 				return true;
 
-			IAsn1Convertible other = obj as IAsn1Convertible;
+			var other = obj as IAsn1Convertible;
 
 			if (other == null)
 				return false;
 
-			Asn1Object o1 = ToAsn1Object();
-			Asn1Object o2 = other.ToAsn1Object();
+			var o1 = ToAsn1Object();
+			var o2 = other.ToAsn1Object();
 
 			return o1 == o2 || o1.CallAsn1Equals(o2);
 		}

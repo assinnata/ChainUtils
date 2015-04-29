@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities;
 using ChainUtils.BouncyCastle.Utilities.Collections;
 
@@ -27,13 +26,13 @@ namespace ChainUtils.BouncyCastle.Asn1
             }
             else if (obj is Asn1SequenceParser)
             {
-                return Asn1Sequence.GetInstance(((Asn1SequenceParser)obj).ToAsn1Object());
+                return GetInstance(((Asn1SequenceParser)obj).ToAsn1Object());
             }
             else if (obj is byte[])
             {
                 try
                 {
-                    return Asn1Sequence.GetInstance(FromByteArray((byte[])obj));
+                    return GetInstance(FromByteArray((byte[])obj));
                 }
                 catch (IOException e)
                 {
@@ -42,7 +41,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             }
             else if (obj is Asn1Encodable)
             {
-                Asn1Object primitive = ((Asn1Encodable)obj).ToAsn1Object();
+                var primitive = ((Asn1Encodable)obj).ToAsn1Object();
                 
                 if (primitive is Asn1Sequence)
                 {
@@ -73,7 +72,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				explicitly)
         {
-            Asn1Object inner = obj.GetObject();
+            var inner = obj.GetObject();
 
             if (explicitly)
             {
@@ -134,7 +133,7 @@ namespace ChainUtils.BouncyCastle.Asn1
                 Asn1Sequence outer)
             {
                 this.outer = outer;
-                this.max = outer.Count;
+                max = outer.Count;
             }
 
             public IAsn1Convertible ReadObject()
@@ -142,7 +141,7 @@ namespace ChainUtils.BouncyCastle.Asn1
                 if (index == max)
                     return null;
 
-                Asn1Encodable obj = outer[index++];
+                var obj = outer[index++];
 
                 if (obj is Asn1Sequence)
                     return ((Asn1Sequence)obj).Parser;
@@ -199,9 +198,9 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         protected override int Asn1GetHashCode()
         {
-            int hc = Count;
+            var hc = Count;
 
-            foreach (object o in this)
+            foreach (var o in this)
             {
                 hc *= 17;
                 if (o == null)
@@ -220,7 +219,7 @@ namespace ChainUtils.BouncyCastle.Asn1
         protected override bool Asn1Equals(
             Asn1Object asn1Object)
         {
-            Asn1Sequence other = asn1Object as Asn1Sequence;
+            var other = asn1Object as Asn1Sequence;
 
             if (other == null)
                 return false;
@@ -228,13 +227,13 @@ namespace ChainUtils.BouncyCastle.Asn1
             if (Count != other.Count)
                 return false;
 
-            IEnumerator s1 = GetEnumerator();
-            IEnumerator s2 = other.GetEnumerator();
+            var s1 = GetEnumerator();
+            var s2 = other.GetEnumerator();
 
             while (s1.MoveNext() && s2.MoveNext())
             {
-                Asn1Object o1 = GetCurrent(s1).ToAsn1Object();
-                Asn1Object o2 = GetCurrent(s2).ToAsn1Object();
+                var o1 = GetCurrent(s1).ToAsn1Object();
+                var o2 = GetCurrent(s2).ToAsn1Object();
 
                 if (!o1.Equals(o2))
                     return false;
@@ -245,7 +244,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         private Asn1Encodable GetCurrent(IEnumerator e)
         {
-            Asn1Encodable encObj = (Asn1Encodable)e.Current;
+            var encObj = (Asn1Encodable)e.Current;
 
             // unfortunately null was allowed as a substitute for DER null
             if (encObj == null)

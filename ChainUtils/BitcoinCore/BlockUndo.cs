@@ -1,10 +1,6 @@
-﻿using ChainUtils.Crypto;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.Crypto;
 
 namespace ChainUtils.BitcoinCore
 {
@@ -20,61 +16,61 @@ namespace ChainUtils.BitcoinCore
 		{
 
 		}
-		public TxInUndo(ChainUtils.TxOut txOut)
+		public TxInUndo(TxOut txOut)
 		{
-			this.TxOut = txOut;
+			TxOut = txOut;
 		}
 		
-		TxOut txout;         // the txout data before being spent
+		TxOut _txout;         // the txout data before being spent
 
 		public TxOut TxOut
 		{
 			get
 			{
-				return txout;
+				return _txout;
 			}
 			set
 			{
-				txout = value;
+				_txout = value;
 			}
 		}
-		bool fCoinBase;       // if the outpoint was the last unspent: whether it belonged to a coinbase
+		bool _fCoinBase;       // if the outpoint was the last unspent: whether it belonged to a coinbase
 
 		public bool CoinBase
 		{
 			get
 			{
-				return fCoinBase;
+				return _fCoinBase;
 			}
 			set
 			{
-				fCoinBase = value;
+				_fCoinBase = value;
 			}
 		}
-		uint nHeight; // if the outpoint was the last unspent: its height
+		uint _nHeight; // if the outpoint was the last unspent: its height
 
 		public uint Height
 		{
 			get
 			{
-				return nHeight;
+				return _nHeight;
 			}
 			set
 			{
-				nHeight = value;
+				_nHeight = value;
 			}
 		}
-		uint nVersion;        // if the outpoint was the last unspent: its version
+		uint _nVersion;        // if the outpoint was the last unspent: its version
 
 		public uint Version
 		{
 			get
 			{
-				return nVersion;
+				return _nVersion;
 			}
 			set
 			{
-				nVersion = value;
+				_nVersion = value;
 			}
 		}
 
@@ -85,24 +81,24 @@ namespace ChainUtils.BitcoinCore
 		{
 			if(stream.Serializing)
 			{
-				uint o = (uint)(nHeight * 2 + (fCoinBase ? 1 : 0));
+				var o = (uint)(_nHeight * 2 + (_fCoinBase ? 1 : 0));
 				stream.ReadWriteAsCompactVarInt(ref  o);
-				if(nHeight > 0)
-					stream.ReadWriteAsCompactVarInt(ref nVersion);
-				TxOutCompressor compressor = new TxOutCompressor(txout);
+				if(_nHeight > 0)
+					stream.ReadWriteAsCompactVarInt(ref _nVersion);
+				var compressor = new TxOutCompressor(_txout);
 				stream.ReadWrite(ref compressor);
 			}
 			else
 			{
 				uint nCode = 0;
 				stream.ReadWriteAsCompactVarInt(ref nCode);
-				nHeight = nCode / 2;
-				fCoinBase = (nCode & 1) != 0;
-				if(nHeight > 0)
-					stream.ReadWriteAsCompactVarInt(ref nVersion);
-				TxOutCompressor compressor = new TxOutCompressor();
+				_nHeight = nCode / 2;
+				_fCoinBase = (nCode & 1) != 0;
+				if(_nHeight > 0)
+					stream.ReadWriteAsCompactVarInt(ref _nVersion);
+				var compressor = new TxOutCompressor();
 				stream.ReadWrite(ref compressor);
-				txout = compressor.TxOut;
+				_txout = compressor.TxOut;
 			}
 		}
 
@@ -111,12 +107,12 @@ namespace ChainUtils.BitcoinCore
 	public class TxUndo : IBitcoinSerializable
 	{
 		// undo information for all txins
-		List<TxInUndo> vprevout = new List<TxInUndo>();
+		List<TxInUndo> _vprevout = new List<TxInUndo>();
 		public List<TxInUndo> Prevout
 		{
 			get
 			{
-				return vprevout;
+				return _vprevout;
 			}
 		}
 
@@ -124,19 +120,19 @@ namespace ChainUtils.BitcoinCore
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref vprevout);
+			stream.ReadWrite(ref _vprevout);
 		}
 
 		#endregion
 	}
 	public class BlockUndo : IBitcoinSerializable
 	{
-		List<TxUndo> vtxundo = new List<TxUndo>();
+		List<TxUndo> _vtxundo = new List<TxUndo>();
 		public List<TxUndo> TxUndo
 		{
 			get
 			{
-				return vtxundo;
+				return _vtxundo;
 			}
 		}
 
@@ -146,26 +142,26 @@ namespace ChainUtils.BitcoinCore
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref vtxundo);
+			stream.ReadWrite(ref _vtxundo);
 		}
 
 		#endregion
 
 
-		public uint256 CalculatedChecksum
+		public Uint256 CalculatedChecksum
 		{
 			get;
 			internal set;
 		}
-		public void ComputeChecksum(uint256 hashBlock)
+		public void ComputeChecksum(Uint256 hashBlock)
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			hashBlock.ReadWrite(ms, true);
 			this.ReadWrite(ms, true);
 			CalculatedChecksum = Hashes.Hash256(ms.ToArray());
 		}
 
-		public uint256 BlockId
+		public Uint256 BlockId
 		{
 			get;
 			set;

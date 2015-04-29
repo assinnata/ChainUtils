@@ -22,7 +22,7 @@ namespace ChainUtils.Tests
 			//TestUtils.EnsureNew("BlockDirectoryScanSpeed");
 			var completeScan = Bench(() =>
 			{
-				BlockStore store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
+				var store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
 				//BlockStore other = new BlockStore(@"BlockDirectoryScanSpeed", Network.Main);
 				foreach(var block in store.Enumerate(false, new DiskBlockPosRange(new DiskBlockPos(120, 0))))
 				{
@@ -44,7 +44,7 @@ namespace ChainUtils.Tests
 
 			var headersOnlyScan = Bench(() =>
 			{
-				BlockStore store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
+				var store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
 				var count = store.Enumerate(true).Count();
 			});
 		}
@@ -57,7 +57,7 @@ namespace ChainUtils.Tests
 			{
 				var originalNode = server.GetLocalNode();
 				var chain = originalNode.GetChain();
-				List<ulong> speeds = new List<ulong>();
+				var speeds = new List<ulong>();
 
 				Stopwatch watch = new Stopwatch();
 				watch.Start();
@@ -83,7 +83,7 @@ namespace ChainUtils.Tests
 		[Trait("Benchmark", "Benchmark")]
 		public void BlockDirectoryScanScriptSpeed()
 		{
-			List<TimeSpan> times = new List<TimeSpan>();
+			var times = new List<TimeSpan>();
 			times.Add(BenchmarkTemplate((txout) => PayToMultiSigTemplate.Instance.ExtractScriptPubKeyParameters(txout.ScriptPubKey)));
 			times.Add(BenchmarkTemplate((txout) => PayToPubkeyHashTemplate.Instance.ExtractScriptPubKeyParameters(txout.ScriptPubKey)));
 			times.Add(BenchmarkTemplate((txout) => PayToScriptHashTemplate.Instance.ExtractScriptPubKeyParameters(txout.ScriptPubKey)));
@@ -95,7 +95,7 @@ namespace ChainUtils.Tests
 		[Trait("Benchmark", "Benchmark")]
 		public void BlockDirectoryScanScriptSpeedParallel()
 		{
-			List<Task<TimeSpan>> times = new List<Task<TimeSpan>>();
+			var times = new List<Task<TimeSpan>>();
 			times.Add(Task.Factory.StartNew(() => BenchmarkTemplate((txout) => PayToMultiSigTemplate.Instance.ExtractScriptPubKeyParameters(txout.ScriptPubKey)), TaskCreationOptions.LongRunning));
 			times.Add(Task.Factory.StartNew(() => BenchmarkTemplate((txout) => PayToPubkeyHashTemplate.Instance.ExtractScriptPubKeyParameters(txout.ScriptPubKey)), TaskCreationOptions.LongRunning));
 			times.Add(Task.Factory.StartNew(() => BenchmarkTemplate((txout) => PayToScriptHashTemplate.Instance.ExtractScriptPubKeyParameters(txout.ScriptPubKey)), TaskCreationOptions.LongRunning));
@@ -113,8 +113,8 @@ namespace ChainUtils.Tests
 		{
 			Stopwatch watch = new Stopwatch();
 			watch.Start();
-			BlockStore store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
-			IndexedBlockStore indexed = new IndexedBlockStore(new SQLiteNoSqlRepository("indexbench", true), store);
+			var store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
+			var indexed = new IndexedBlockStore(new SQLiteNoSqlRepository("indexbench", true), store);
 			indexed.ReIndex();
 			watch.Stop();
 			var time = watch.Elapsed;
@@ -132,7 +132,7 @@ namespace ChainUtils.Tests
 		[Trait("Benchmark", "Benchmark")]
 		public void BenchmarkCreateChainFromBlocks()
 		{
-			BlockStore store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
+			var store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
 			ConcurrentChain chain = null;
 			var fullBuild = Bench(() =>
 			{
@@ -143,7 +143,7 @@ namespace ChainUtils.Tests
 		{
 			Stopwatch watch = new Stopwatch();
 			watch.Start();
-			BlockStore store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
+			var store = new BlockStore(@"E:\Bitcoin\blocks\", Network.Main);
 			foreach(var txout in store.EnumerateFolder().Take(150000).SelectMany(o => o.Item.Transactions.SelectMany(t => t.Outputs)))
 			{
 				act(txout);

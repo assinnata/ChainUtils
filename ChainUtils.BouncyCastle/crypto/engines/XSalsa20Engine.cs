@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -44,7 +43,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			engineState[9] = Pack.LE_To_UInt32(ivBytes, 12);
 
 			// Process engine state to generate Salsa20 key
-			uint[] hsalsa20Out = new uint[engineState.Length];
+			var hsalsa20Out = new uint[engineState.Length];
 			SalsaCore(20, engineState, hsalsa20Out);
 
 			// Set new key, removing addition in last round of salsaCore

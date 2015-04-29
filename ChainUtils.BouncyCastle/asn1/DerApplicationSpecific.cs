@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -44,23 +43,23 @@ namespace ChainUtils.BouncyCastle.Asn1
 			int				tag,
 			Asn1Encodable	obj)
 		{
-            Asn1Object asn1Obj = obj.ToAsn1Object();
+            var asn1Obj = obj.ToAsn1Object();
 
-            byte[] data = asn1Obj.GetDerEncoded();
+            var data = asn1Obj.GetDerEncoded();
 
-			this.isConstructed = isExplicit || asn1Obj is Asn1Set || asn1Obj is Asn1Sequence;
+			isConstructed = isExplicit || asn1Obj is Asn1Set || asn1Obj is Asn1Sequence;
 			this.tag = tag;
 
 			if (isExplicit)
 			{
-				this.octets = data;
+				octets = data;
 			}
 			else
 			{
-				int lenBytes = GetLengthOfHeader(data);
-				byte[] tmp = new byte[data.Length - lenBytes];
+				var lenBytes = GetLengthOfHeader(data);
+				var tmp = new byte[data.Length - lenBytes];
 				Array.Copy(data, lenBytes, tmp, 0, tmp.Length);
-				this.octets = tmp;
+				octets = tmp;
 			}
 		}
 
@@ -68,15 +67,15 @@ namespace ChainUtils.BouncyCastle.Asn1
 			int					tagNo,
 			Asn1EncodableVector	vec)
 		{
-			this.tag = tagNo;
-			this.isConstructed = true;
-			MemoryStream bOut = new MemoryStream();
+			tag = tagNo;
+			isConstructed = true;
+			var bOut = new MemoryStream();
 
-			for (int i = 0; i != vec.Count; i++)
+			for (var i = 0; i != vec.Count; i++)
 			{
 				try
 				{
-					byte[] bs = vec[i].GetDerEncoded();
+					var bs = vec[i].GetDerEncoded();
 					bOut.Write(bs, 0, bs.Length);
                 }
 				catch (IOException e)
@@ -84,7 +83,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 					throw new InvalidOperationException("malformed object", e);
 				}
 			}
-			this.octets = bOut.ToArray();
+			octets = bOut.ToArray();
 		}
 
 		private int GetLengthOfHeader(
@@ -99,7 +98,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
             if (length > 127)
             {
-                int size = length & 0x7f;
+                var size = length & 0x7f;
 
                 // Note: The invalid long form "0xff" (see X.690 8.1.3.5c) will be caught here
                 if (size > 4)
@@ -152,8 +151,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (derTagNo >= 0x1f)
 				throw new IOException("unsupported tag number");
 
-			byte[] orig = this.GetEncoded();
-			byte[] tmp = ReplaceTagNumber(derTagNo, orig);
+			var orig = GetEncoded();
+			var tmp = ReplaceTagNumber(derTagNo, orig);
 
 			if ((orig[0] & Asn1Tags.Constructed) != 0)
 			{
@@ -166,7 +165,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		internal override void Encode(
 			DerOutputStream derOut)
         {
-			int classBits = Asn1Tags.Application;
+			var classBits = Asn1Tags.Application;
 			if (isConstructed)
 			{
 				classBits |= Asn1Tags.Constructed; 
@@ -178,14 +177,14 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
         {
-			DerApplicationSpecific other = asn1Object as DerApplicationSpecific;
+			var other = asn1Object as DerApplicationSpecific;
 
 			if (other == null)
 				return false;
 
-			return this.isConstructed == other.isConstructed
-				&& this.tag == other.tag
-				&& Arrays.AreEqual(this.octets, other.octets);
+			return isConstructed == other.isConstructed
+				&& tag == other.tag
+				&& Arrays.AreEqual(octets, other.octets);
         }
 
 		protected override int Asn1GetHashCode()
@@ -197,8 +196,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 			int		newTag,
 			byte[]	input)
 		{
-			int tagNo = input[0] & 0x1f;
-			int index = 1;
+			var tagNo = input[0] & 0x1f;
+			var index = 1;
 			//
 			// with tagged object tag number is bottom 5 bits, or stored at the start of the content
 			//
@@ -206,7 +205,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			{
 				tagNo = 0;
 
-				int b = input[index++] & 0xff;
+				var b = input[index++] & 0xff;
 
 				// X.690-0207 8.1.2.4.2
 				// "c) bits 7 to 1 of the first subsequent octet shall not all be zero."
@@ -225,7 +224,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 				tagNo |= (b & 0x7f);
 			}
 
-			byte[] tmp = new byte[input.Length - index + 1];
+			var tmp = new byte[input.Length - index + 1];
 
 			Array.Copy(input, index, tmp, 1, tmp.Length - 1);
 

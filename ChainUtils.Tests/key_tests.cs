@@ -80,7 +80,7 @@ namespace ChainUtils.Tests
 					var signature = secret.PrivateKey.SignMessage(test.Message);
 					Assert.True(Network.Main.CreateBitcoinAddress(test.Address).VerifyMessage(test.Message, signature));
 				}
-				BitcoinAddress address = Network.Main.CreateBitcoinAddress(test.Address);
+				var address = Network.Main.CreateBitcoinAddress(test.Address);
 				Assert.True(address.VerifyMessage(test.Message, test.Signature));
 				Assert.True(!address.VerifyMessage("bad message", test.Signature));
 			}
@@ -123,7 +123,7 @@ namespace ChainUtils.Tests
 
 			foreach(var test in tests)
 			{
-				BitcoinSecret secret = Network.Main.CreateBitcoinSecret(test.PrivateKeyWIF);
+				var secret = Network.Main.CreateBitcoinSecret(test.PrivateKeyWIF);
 				Assert.Equal(test.PubKey, secret.PrivateKey.PubKey.ToHex());
 
 				TestDERCoherence(secret);
@@ -173,28 +173,28 @@ namespace ChainUtils.Tests
 		[Trait("Core", "Core")]
 		public void key_test1()
 		{
-			BitcoinSecret bsecret1 = Network.Main.CreateBitcoinSecret(strSecret1);
-			BitcoinSecret bsecret2 = Network.Main.CreateBitcoinSecret(strSecret2);
-			BitcoinSecret bsecret1C = Network.Main.CreateBitcoinSecret(strSecret1C);
-			BitcoinSecret bsecret2C = Network.Main.CreateBitcoinSecret(strSecret2C);
+			var bsecret1 = Network.Main.CreateBitcoinSecret(strSecret1);
+			var bsecret2 = Network.Main.CreateBitcoinSecret(strSecret2);
+			var bsecret1C = Network.Main.CreateBitcoinSecret(strSecret1C);
+			var bsecret2C = Network.Main.CreateBitcoinSecret(strSecret2C);
 			Assert.Throws<FormatException>(() => Network.Main.CreateBitcoinSecret(strAddressBad));
 
-			Key key1 = bsecret1.PrivateKey;
+			var key1 = bsecret1.PrivateKey;
 			Assert.True(key1.IsCompressed == false);
 			Assert.True(bsecret1.Copy(true).PrivateKey.IsCompressed == true);
 			Assert.True(bsecret1.Copy(true).Copy(false).IsCompressed == false);
 			Assert.True(bsecret1.Copy(true).Copy(false).ToString() == bsecret1.ToString());
-			Key key2 = bsecret2.PrivateKey;
+			var key2 = bsecret2.PrivateKey;
 			Assert.True(key2.IsCompressed == false);
-			Key key1C = bsecret1C.PrivateKey;
+			var key1C = bsecret1C.PrivateKey;
 			Assert.True(key1C.IsCompressed == true);
-			Key key2C = bsecret2C.PrivateKey;
+			var key2C = bsecret2C.PrivateKey;
 			Assert.True(key1C.IsCompressed == true);
 
-			PubKey pubkey1 = key1.PubKey;
-			PubKey pubkey2 = key2.PubKey;
-			PubKey pubkey1C = key1C.PubKey;
-			PubKey pubkey2C = key2C.PubKey;
+			var pubkey1 = key1.PubKey;
+			var pubkey2 = key2.PubKey;
+			var pubkey1C = key1C.PubKey;
+			var pubkey2C = key2C.PubKey;
 
 			Assert.True(addr1.Hash == pubkey1.Hash);
 			Assert.True(addr2.Hash == pubkey2.Hash);
@@ -203,20 +203,20 @@ namespace ChainUtils.Tests
 
 
 
-			for(int n = 0 ; n < 16 ; n++)
+			for(var n = 0 ; n < 16 ; n++)
 			{
-				string strMsg = String.Format("Very secret message {0}: 11", n);
+				var strMsg = String.Format("Very secret message {0}: 11", n);
 				if(n == 10)
 				{
 					//Test one long message
 					strMsg = String.Join(",", Enumerable.Range(0, 2000).Select(i => i.ToString()).ToArray());
 				}
-				uint256 hashMsg = Hashes.Hash256(TestUtils.ToBytes(strMsg));
+				var hashMsg = Hashes.Hash256(TestUtils.ToBytes(strMsg));
 
 				// normal signatures
 
 				ECDSASignature sign1 = null, sign2 = null, sign1C = null, sign2C = null;
-				List<Task> tasks = new List<Task>();
+				var tasks = new List<Task>();
 				tasks.Add(Task.Run(() => sign1 = key1.Sign(hashMsg)));
 				tasks.Add(Task.Run(() => sign2 = key2.Sign(hashMsg)));
 				tasks.Add(Task.Run(() => sign1C = key1C.Sign(hashMsg)));
@@ -286,8 +286,8 @@ namespace ChainUtils.Tests
         public void key_test_from_bytes()
         {
             //Example private key taken from https://en.bitcoin.it/wiki/Private_key
-            Byte[] privateKey = new Byte[32] { 0xE9, 0x87, 0x3D, 0x79, 0xC6, 0xD8, 0x7D, 0xC0, 0xFB, 0x6A, 0x57, 0x78, 0x63, 0x33, 0x89, 0xF4, 0x45, 0x32, 0x13, 0x30, 0x3D, 0xA6, 0x1F, 0x20, 0xBD, 0x67, 0xFC, 0x23, 0x3A, 0xA3, 0x32, 0x62 };
-            Key key1 = new Key(privateKey, -1, false);
+            var privateKey = new Byte[32] { 0xE9, 0x87, 0x3D, 0x79, 0xC6, 0xD8, 0x7D, 0xC0, 0xFB, 0x6A, 0x57, 0x78, 0x63, 0x33, 0x89, 0xF4, 0x45, 0x32, 0x13, 0x30, 0x3D, 0xA6, 0x1F, 0x20, 0xBD, 0x67, 0xFC, 0x23, 0x3A, 0xA3, 0x32, 0x62 };
+            var key1 = new Key(privateKey, -1, false);
 
             ISecret wifKey = key1.GetWif(ChainUtils.Network.Main);
 

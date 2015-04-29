@@ -23,7 +23,7 @@ namespace ChainUtils.Tests
 			{
 				var testcase = JsonConvert.DeserializeObject<TestCase[]>(File.ReadAllText("Data/openasset-known-tx.json"))
 					.First(t => t.test == test);
-				NoSqlTransactionRepository repository = new NoSqlTransactionRepository();
+				var repository = new NoSqlTransactionRepository();
 				foreach(var tx in testcase.txs)
 				{
 					var txObj = new Transaction(tx);
@@ -48,7 +48,7 @@ namespace ChainUtils.Tests
 
 			public string AutoDownloadMissingTransaction(Action act)
 			{
-				StringBuilder builder = new StringBuilder();
+				var builder = new StringBuilder();
 				while(true)
 				{
 					try
@@ -446,7 +446,7 @@ namespace ChainUtils.Tests
 			Assert.Equal("16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM", address.ToString());
 
 			//Next, he builds the Pay-to-PubKey-Hash script associated to that address: OP_DUP OP_HASH160 010966776006953D5567439E5E39F86A0D273BEE OP_EQUALVERIFY OP_CHECKSIG
-			Script script = Script.CreateFromDestinationAddress(address);
+			var script = Script.CreateFromDestinationAddress(address);
 			Assert.Equal("OP_DUP OP_HASH160 010966776006953D5567439E5E39F86A0D273BEE OP_EQUALVERIFY OP_CHECKSIG", script.ToString().ToUpper());
 
 			var oo = script.GetScriptAddress(Network.Main);

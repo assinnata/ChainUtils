@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.X9
@@ -22,8 +21,8 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
         public X9FieldID(
             BigInteger primeP)
         {
-            this.id = X9ObjectIdentifiers.PrimeField;
-            this.parameters = new DerInteger(primeP);
+            id = X9ObjectIdentifiers.PrimeField;
+            parameters = new DerInteger(primeP);
         }
 
         /**
@@ -61,9 +60,9 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
             int k2,
             int k3)
         {
-            this.id = X9ObjectIdentifiers.CharacteristicTwoField;
+            id = X9ObjectIdentifiers.CharacteristicTwoField;
 
-            Asn1EncodableVector fieldIdParams = new Asn1EncodableVector(new DerInteger(m));
+            var fieldIdParams = new Asn1EncodableVector(new DerInteger(m));
 
             if (k2 == 0)
             {
@@ -87,14 +86,14 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
                         new DerInteger(k3)));
             }
 
-            this.parameters = new DerSequence(fieldIdParams);
+            parameters = new DerSequence(fieldIdParams);
         }
 
         internal X9FieldID(
             Asn1Sequence seq)
         {
-            this.id = (DerObjectIdentifier) seq[0];
-            this.parameters = (Asn1Object) seq[1];
+            id = (DerObjectIdentifier) seq[0];
+            parameters = (Asn1Object) seq[1];
         }
 
         public DerObjectIdentifier Identifier

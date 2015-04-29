@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.IO;
 using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 using ChainUtils.BouncyCastle.Utilities.Encoders;
 
@@ -32,7 +30,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
         {
             if (obj is Asn1Sequence)
             {
-                string tab = indent + Tab;
+                var tab = indent + Tab;
                 buf.Append(indent);
                 if (obj is BerSequence)
                 {
@@ -65,7 +63,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
             }
             else if (obj is DerTaggedObject)
             {
-                string tab = indent + Tab;
+                var tab = indent + Tab;
                 buf.Append(indent);
                 if (obj is BerTaggedObject)
                 {
@@ -76,7 +74,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
                     buf.Append("Tagged [");
                 }
 
-                DerTaggedObject o = (DerTaggedObject)obj;
+                var o = (DerTaggedObject)obj;
 
                 buf.Append(((int)o.TagNo).ToString());
                 buf.Append(']');
@@ -101,7 +99,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
             }
             else if (obj is BerSet)
             {
-                string tab = indent + Tab;
+                var tab = indent + Tab;
 
                 buf.Append(indent);
                 buf.Append("BER Set");
@@ -123,7 +121,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
             }
             else if (obj is DerSet)
             {
-                string tab = indent + Tab;
+                var tab = indent + Tab;
 
                 buf.Append(indent);
                 buf.Append("DER Set");
@@ -157,21 +155,21 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
             }
             else if (obj is BerOctetString)
             {
-                byte[] octets = ((Asn1OctetString)obj).GetOctets();
-                string extra = verbose ? dumpBinaryDataAsString(indent, octets) : "";
+                var octets = ((Asn1OctetString)obj).GetOctets();
+                var extra = verbose ? dumpBinaryDataAsString(indent, octets) : "";
                 buf.Append(indent + "BER Octet String" + "[" + octets.Length + "] " + extra + NewLine);
             }
             else if (obj is DerOctetString)
             {
-                byte[] octets = ((Asn1OctetString)obj).GetOctets();
-                string extra = verbose ? dumpBinaryDataAsString(indent, octets) : "";
+                var octets = ((Asn1OctetString)obj).GetOctets();
+                var extra = verbose ? dumpBinaryDataAsString(indent, octets) : "";
                 buf.Append(indent + "DER Octet String" + "[" + octets.Length + "] " + extra + NewLine);
             }
             else if (obj is DerBitString)
             {
-                DerBitString bt = (DerBitString)obj; 
-                byte[] bytes = bt.GetBytes();
-                string extra = verbose ? dumpBinaryDataAsString(indent, bytes) : "";
+                var bt = (DerBitString)obj; 
+                var bytes = bt.GetBytes();
+                var extra = verbose ? dumpBinaryDataAsString(indent, bytes) : "";
                 buf.Append(indent + "DER Bit String" + "[" + bytes.Length + ", " + bt.PadBits + "] " + extra + NewLine);
             }
             else if (obj is DerIA5String)
@@ -216,14 +214,14 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
             }
             else if (obj is DerEnumerated)
             {
-                DerEnumerated en = (DerEnumerated)obj;
+                var en = (DerEnumerated)obj;
                 buf.Append(indent + "DER Enumerated(" + en.Value + ")" + NewLine);
             }
             else if (obj is DerExternal)
             {
-                DerExternal ext = (DerExternal)obj;
+                var ext = (DerExternal)obj;
                 buf.Append(indent + "External " + NewLine);
-                string tab = indent + Tab;
+                var tab = indent + Tab;
 
                 if (ext.DirectReference != null)
                 {
@@ -252,13 +250,13 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
             bool					verbose,
             DerApplicationSpecific	app)
         {
-            StringBuilder buf = new StringBuilder();
+            var buf = new StringBuilder();
 
             if (app.IsConstructed())
             {
                 try
                 {
-                    Asn1Sequence s = Asn1Sequence.GetInstance(app.GetObject(Asn1Tags.Sequence));
+                    var s = Asn1Sequence.GetInstance(app.GetObject(Asn1Tags.Sequence));
                     buf.Append(indent + type + " ApplicationSpecific[" + app.ApplicationTag + "]" + NewLine);
                     foreach (Asn1Encodable ae in s)
                     {
@@ -282,7 +280,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
         {
             if (obj is Asn1Encodable)
             {
-                StringBuilder buf = new StringBuilder();
+                var buf = new StringBuilder();
                 AsString("", false, ((Asn1Encodable)obj).ToAsn1Object(), buf);
                 return buf.ToString();
             }
@@ -313,7 +311,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
             Asn1Encodable	obj,
             bool			verbose)
         {
-            StringBuilder buf = new StringBuilder();
+            var buf = new StringBuilder();
             AsString("", verbose, obj.ToAsn1Object(), buf);
             return buf.ToString();
         }
@@ -322,9 +320,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
         {
             indent += Tab;
 
-            StringBuilder buf = new StringBuilder(NewLine);
+            var buf = new StringBuilder(NewLine);
 
-            for (int i = 0; i < bytes.Length; i += SampleSize)
+            for (var i = 0; i < bytes.Length; i += SampleSize)
             {
                 if (bytes.Length - i > SampleSize)
                 {
@@ -338,7 +336,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
                 {
                     buf.Append(indent);
                     buf.Append(Hex.ToHexString(bytes, i, bytes.Length - i));
-                    for (int j = bytes.Length - i; j != SampleSize; j++)
+                    for (var j = bytes.Length - i; j != SampleSize; j++)
                     {
                         buf.Append("  ");
                     }
@@ -356,11 +354,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Utilities
             int		off,
             int		len)
         {
-            StringBuilder buf = new StringBuilder();
+            var buf = new StringBuilder();
 
-            for (int i = off; i != off + len; i++)
+            for (var i = off; i != off + len; i++)
             {
-                char c = (char)bytes[i]; 
+                var c = (char)bytes[i]; 
                 if (c >= ' ' && c <= '~')
                 {
                     buf.Append(c);

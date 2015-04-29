@@ -1,9 +1,5 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
-using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
@@ -39,13 +35,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 		*/
 		private byte[] GenerateDerivedKey()
 		{
-			byte[] digestBytes = new byte[digest.GetDigestSize()];
+			var digestBytes = new byte[digest.GetDigestSize()];
 
 			digest.BlockUpdate(mPassword, 0, mPassword.Length);
 			digest.BlockUpdate(mSalt, 0, mSalt.Length);
 
 			digest.DoFinal(digestBytes, 0);
-			for (int i = 1; i < mIterationCount; i++)
+			for (var i = 1; i < mIterationCount; i++)
 			{
 				digest.BlockUpdate(digestBytes, 0, digestBytes.Length);
 				digest.DoFinal(digestBytes, 0);
@@ -81,7 +77,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 					"Can't Generate a derived key " + keySize + " bytes long.");
 			}
 
-			byte[] dKey = GenerateDerivedKey();
+			var dKey = GenerateDerivedKey();
 
 			return ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
 		}
@@ -110,7 +106,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 					"Can't Generate a derived key " + (keySize + ivSize) + " bytes long.");
 			}
 
-			byte[] dKey = GenerateDerivedKey();
+			var dKey = GenerateDerivedKey();
 
 			return new ParametersWithIV(new KeyParameter(dKey, 0, keySize), dKey, keySize, ivSize);
 		}
@@ -129,8 +125,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 					"Can't Generate a derived key " + (keySize + ivSize) + " bytes long.");
 			}
 
-			byte[] dKey = GenerateDerivedKey();
-			KeyParameter key = ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
+			var dKey = GenerateDerivedKey();
+			var key = ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
 
 			return new ParametersWithIV(key, dKey, keySize, ivSize);
 		}
@@ -154,7 +150,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 					"Can't Generate a derived key " + keySize + " bytes long.");
 			}
 
-			byte[] dKey = GenerateDerivedKey();
+			var dKey = GenerateDerivedKey();
 
 			return new KeyParameter(dKey, 0, keySize);
 		}

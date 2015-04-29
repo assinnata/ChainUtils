@@ -1,11 +1,8 @@
-﻿using ChainUtils.JsonConverters;
+﻿using System;
+using System.Linq;
+using ChainUtils.JsonConverters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.MicroPayment
 {
@@ -29,7 +26,7 @@ namespace ChainUtils.MicroPayment
 	{
 		public MicroChannelArguments Parse(string json)
 		{
-			JsonSerializerSettings settings = new JsonSerializerSettings();
+			var settings = new JsonSerializerSettings();
 			settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 			return JsonConvert.DeserializeObject<MicroChannelArguments>(json, settings);
 		}
@@ -75,7 +72,7 @@ namespace ChainUtils.MicroPayment
 
 		public override string ToString()
 		{
-			JsonSerializerSettings settings = new JsonSerializerSettings();
+			var settings = new JsonSerializerSettings();
 			settings.Formatting = Formatting.Indented;
 			settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 			return JsonConvert.SerializeObject(this, settings);
@@ -106,7 +103,7 @@ namespace ChainUtils.MicroPayment
 			if(Payer == null || Payee == null || Payer.PaymentPubKey == null || Payee.PaymentPubKey == null)
 				throw new InvalidOperationException("Payer or Payee should ne set before calling MakeRedeem");
 			var pubkeys = new[] { Payer.PaymentPubKey, Payee.PaymentPubKey };
-			Random rnd = new Random();
+			var rnd = new Random();
 			pubkeys = pubkeys.OrderBy(x => rnd.Next()).ToArray();
 			Redeem = PayToMultiSigTemplate.Instance.GenerateScriptPubKey(2, pubkeys);
 			return this;
@@ -274,13 +271,13 @@ namespace ChainUtils.MicroPayment
 	
 		public MicroChannelState Parse(string json)
 		{
-			JsonSerializerSettings settings = new JsonSerializerSettings();
+			var settings = new JsonSerializerSettings();
 			settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 			return JsonConvert.DeserializeObject<MicroChannelState>(json, settings);
 		}
 		public override string ToString()
 		{
-			JsonSerializerSettings settings = new JsonSerializerSettings();
+			var settings = new JsonSerializerSettings();
 			settings.Formatting = Formatting.Indented;
 			settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 			return JsonConvert.SerializeObject(this, settings);

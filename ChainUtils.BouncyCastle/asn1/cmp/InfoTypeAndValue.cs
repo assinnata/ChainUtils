@@ -76,7 +76,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
             DerObjectIdentifier infoType)
         {
             this.infoType = infoType;
-            this.infoValue = null;
+            infoValue = null;
         }
 
         public InfoTypeAndValue(
@@ -84,7 +84,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
             Asn1Encodable       optionalValue)
         {
             this.infoType = infoType;
-            this.infoValue = optionalValue;
+            infoValue = optionalValue;
         }
 
         public virtual DerObjectIdentifier InfoType
@@ -108,7 +108,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(infoType);
+            var v = new Asn1EncodableVector(infoType);
 
             if (infoValue != null)
             {

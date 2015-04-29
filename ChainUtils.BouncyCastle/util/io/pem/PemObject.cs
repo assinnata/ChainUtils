@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 
-using ChainUtils.BouncyCastle.Utilities.Collections;
-
 namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 {
 	public class PemObject

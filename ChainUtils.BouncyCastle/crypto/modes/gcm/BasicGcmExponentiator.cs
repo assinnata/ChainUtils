@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
@@ -17,11 +16,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 		public void ExponentiateX(long pow, byte[] output)
 		{
 			// Initial value is little-endian 1
-			byte[] y = GcmUtilities.OneAsBytes();
+			var y = GcmUtilities.OneAsBytes();
 
 			if (pow > 0)
 			{
-				byte[] powX = Arrays.Clone(x);
+				var powX = Arrays.Clone(x);
 				do
 				{
 					if ((pow & 1L) != 0)

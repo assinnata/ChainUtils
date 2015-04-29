@@ -1,9 +1,5 @@
-﻿using ChainUtils.DataEncoders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils
 {
@@ -35,17 +31,17 @@ namespace ChainUtils
 			}
 		}
 
-		BitcoinAddress _Address;
+		BitcoinAddress _address;
 		public BitcoinAddress Address
 		{
 			get
 			{
-				if(_Address == null)
+				if(_address == null)
 				{
-					var base58 = Encoders.Base58Check.EncodeData(vchData);
-					_Address = BitcoinAddress.Create(base58, Network);
+					var base58 = Encoders.Base58Check.EncodeData(VchData);
+					_address = BitcoinAddress.Create(base58, Network);
 				}
-				return _Address;
+				return _address;
 			}
 		}
 
@@ -53,7 +49,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return Base58Type.COLORED_ADDRESS;
+				return Base58Type.ColoredAddress;
 			}
 		}
 
@@ -71,7 +67,7 @@ namespace ChainUtils
 
 		public static string GetWrappedBase58(string base58, Network network)
 		{
-			var coloredVersion = network.GetVersionBytes(Base58Type.COLORED_ADDRESS);
+			var coloredVersion = network.GetVersionBytes(Base58Type.ColoredAddress);
 			var inner = Encoders.Base58Check.DecodeData(base58);
 			inner = inner.Skip(coloredVersion.Length).ToArray();
 			return Encoders.Base58Check.EncodeData(inner);

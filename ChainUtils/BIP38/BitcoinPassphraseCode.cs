@@ -1,61 +1,60 @@
-﻿using ChainUtils.Crypto;
-using ChainUtils.DataEncoders;
-using ChainUtils.BouncyCastle.Math;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
-
+using ChainUtils.BouncyCastle.Math;
+using ChainUtils.Crypto;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils
 {
 	public class EncryptedKeyResult
 	{
-		public EncryptedKeyResult(BitcoinEncryptedSecretEC key, BitcoinAddress address, byte[] seed, Func<BitcoinConfirmationCode> calculateConfirmation)
+		public EncryptedKeyResult(BitcoinEncryptedSecretEc key, BitcoinAddress address, byte[] seed, Func<BitcoinConfirmationCode> calculateConfirmation)
 		{
-			_EncryptedKey = key;
-			_GeneratedAddress = address;
-			_CalculateConfirmation = calculateConfirmation;
-			_Seed = seed;
+			_encryptedKey = key;
+			_generatedAddress = address;
+			_calculateConfirmation = calculateConfirmation;
+			_seed = seed;
 		}
 
-		private readonly BitcoinEncryptedSecretEC _EncryptedKey;
-		public BitcoinEncryptedSecretEC EncryptedKey
+		private readonly BitcoinEncryptedSecretEc _encryptedKey;
+		public BitcoinEncryptedSecretEc EncryptedKey
 		{
 			get
 			{
-				return _EncryptedKey;
+				return _encryptedKey;
 			}
 		}
 
-		Func<BitcoinConfirmationCode> _CalculateConfirmation;
-		private BitcoinConfirmationCode _ConfirmationCode;
+		Func<BitcoinConfirmationCode> _calculateConfirmation;
+		private BitcoinConfirmationCode _confirmationCode;
 		public BitcoinConfirmationCode ConfirmationCode
 		{
 			get
 			{
-				if(_ConfirmationCode == null)
+				if(_confirmationCode == null)
 				{
-					_ConfirmationCode = _CalculateConfirmation();
-					_CalculateConfirmation = null;
+					_confirmationCode = _calculateConfirmation();
+					_calculateConfirmation = null;
 				}
-				return _ConfirmationCode;
+				return _confirmationCode;
 			}
 		}
-		private readonly BitcoinAddress _GeneratedAddress;
+		private readonly BitcoinAddress _generatedAddress;
 		public BitcoinAddress GeneratedAddress
 		{
 			get
 			{
-				return _GeneratedAddress;
+				return _generatedAddress;
 			}
 		}
 
-		private readonly byte[] _Seed;
+		private readonly byte[] _seed;
 		public byte[] Seed
 		{
 			get
 			{
-				return _Seed;
+				return _seed;
 			}
 		}
 	}
@@ -69,10 +68,10 @@ namespace ChainUtils
 			if(sequence > 1024 || sequence < 0)
 				throw new ArgumentOutOfRangeException("sequence");
 
-			_Lot = lot;
-			_Sequence = sequence;
-			uint lotSequence = (uint)lot * 4096 + (uint)sequence;
-			_Bytes =
+			_lot = lot;
+			_sequence = sequence;
+			var lotSequence = (uint)lot * 4096 + (uint)sequence;
+			_bytes =
 				new[]
 					{
 						(byte)(lotSequence >> 24),
@@ -83,51 +82,51 @@ namespace ChainUtils
 		}
 		public LotSequence(byte[] bytes)
 		{
-			_Bytes = bytes.ToArray();
-			uint lotSequence =
-				((uint)_Bytes[0] << 24) +
-				((uint)_Bytes[1] << 16) +
-				((uint)_Bytes[2] << 8) +
-				((uint)_Bytes[3] << 0);
+			_bytes = bytes.ToArray();
+			var lotSequence =
+				((uint)_bytes[0] << 24) +
+				((uint)_bytes[1] << 16) +
+				((uint)_bytes[2] << 8) +
+				((uint)_bytes[3] << 0);
 
-			_Lot = (int)(lotSequence / 4096);
-			_Sequence = (int)(lotSequence - _Lot);
+			_lot = (int)(lotSequence / 4096);
+			_sequence = (int)(lotSequence - _lot);
 		}
 
-		private readonly int _Lot;
+		private readonly int _lot;
 		public int Lot
 		{
 			get
 			{
-				return _Lot;
+				return _lot;
 			}
 		}
-		private readonly int _Sequence;
+		private readonly int _sequence;
 		public int Sequence
 		{
 			get
 			{
-				return _Sequence;
+				return _sequence;
 			}
 		}
 
-	    readonly byte[] _Bytes;
+	    readonly byte[] _bytes;
 		public byte[] ToBytes()
 		{
-			return _Bytes.ToArray();
+			return _bytes.ToArray();
 		}
 
 		private int Id
 		{
 			get
 			{
-				return BitConverter.ToInt32(_Bytes, 0);
+				return BitConverter.ToInt32(_bytes, 0);
 			}
 		}
 
 		public override bool Equals(object obj)
 		{
-			LotSequence item = obj as LotSequence;
+			var item = obj as LotSequence;
 			return item != null && Id.Equals(item.Id);
 		}
 		public static bool operator ==(LotSequence a, LotSequence b)
@@ -159,7 +158,7 @@ namespace ChainUtils
 		}
 		private static string GenerateWif(string passphrase, Network network, LotSequence lotsequence, byte[] ownersalt)
 		{
-			bool hasLotSequence = lotsequence != null;
+			var hasLotSequence = lotsequence != null;
 
 			//ownersalt is 8 random bytes
 			ownersalt = ownersalt ?? RandomUtils.GetBytes(8);
@@ -182,7 +181,7 @@ namespace ChainUtils
 			var passpoint = new Key(passfactor, fCompressedIn: true).PubKey.ToBytes();
 
 			var bytes =
-				network.GetVersionBytes(Base58Type.PASSPHRASE_CODE)
+				network.GetVersionBytes(Base58Type.PassphraseCode)
 				.Concat(new[] { hasLotSequence ? (byte)0x51 : (byte)0x53 })
 				.Concat(ownerEntropy)
 				.Concat(passpoint)
@@ -195,15 +194,15 @@ namespace ChainUtils
 		{
 		}
 
-		LotSequence _LotSequence;
+		LotSequence _lotSequence;
 		public LotSequence LotSequence
 		{
 			get
 			{
-				var hasLotSequence = (vchData[0]) == 0x51;
+				var hasLotSequence = (VchData[0]) == 0x51;
 				if(!hasLotSequence)
 					return null;
-			    return _LotSequence ?? (_LotSequence = new LotSequence(OwnerEntropy.Skip(4).Take(4).ToArray()));
+			    return _lotSequence ?? (_lotSequence = new LotSequence(OwnerEntropy.Skip(4).Take(4).ToArray()));
 			}
 		}
 
@@ -221,7 +220,7 @@ namespace ChainUtils
 			var factorb = Hashes.Hash256(seedb).ToBytes();
 
 			//ECMultiply passpoint by factorb.
-			var curve = ECKey.CreateCurve();
+			var curve = EcKey.CreateCurve();
 			var passpoint = curve.Curve.DecodePoint(Passpoint);
 			var pubPoint = passpoint.Multiply(new BigInteger(1, factorb));
 
@@ -236,11 +235,11 @@ namespace ChainUtils
 			var generatedaddress = pubKey.GetAddress(Network);
 
 			//Take the first four bytes of SHA256(SHA256(generatedaddress)) and call it addresshash.
-			var addresshash = BitcoinEncryptedSecretEC.HashAddress(generatedaddress);
+			var addresshash = BitcoinEncryptedSecretEc.HashAddress(generatedaddress);
 
 			//Derive a second key from passpoint using scrypt
 			//salt is addresshash + ownerentropy
-			var derived = BitcoinEncryptedSecretEC.CalculateDecryptionKey(Passpoint, addresshash, OwnerEntropy);
+			var derived = BitcoinEncryptedSecretEc.CalculateDecryptionKey(Passpoint, addresshash, OwnerEntropy);
 
 			//Now we will encrypt seedb.
 			var encrypted = BitcoinEncryptedSecret.EncryptSeed
@@ -251,12 +250,12 @@ namespace ChainUtils
 			var bytes =
 				new[] { flagByte }
 				.Concat(addresshash)
-				.Concat(this.OwnerEntropy)
+				.Concat(OwnerEntropy)
 				.Concat(encrypted.Take(8).ToArray())
 				.Concat(encrypted.Skip(16).ToArray())
 				.ToArray();
 
-			var encryptedSecret = new BitcoinEncryptedSecretEC(bytes, Network);
+			var encryptedSecret = new BitcoinEncryptedSecretEc(bytes, Network);
 
 			return new EncryptedKeyResult(encryptedSecret, generatedaddress, seedb, () =>
 			{
@@ -265,10 +264,10 @@ namespace ChainUtils
 				//The first byte is 0x02 or 0x03. XOR it by (derivedhalf2[31] & 0x01), call the resulting byte pointbprefix.
 				var pointbprefix = (byte)(pointb[0] ^ (byte)(derived[63] & 0x01));
 				var pointbx = BitcoinEncryptedSecret.EncryptKey(pointb.Skip(1).ToArray(), derived);
-				var encryptedpointb = new byte[] { pointbprefix }.Concat(pointbx).ToArray();
+				var encryptedpointb = new[] { pointbprefix }.Concat(pointbx).ToArray();
 
 				var confirmBytes =
-					Network.GetVersionBytes(Base58Type.CONFIRMATION_CODE)
+					Network.GetVersionBytes(Base58Type.ConfirmationCode)
 					.Concat(new[] { flagByte })
 					.Concat(addresshash)
 					.Concat(OwnerEntropy)
@@ -280,22 +279,22 @@ namespace ChainUtils
 		}
 
 
-		byte[] _OwnerEntropy;
+		byte[] _ownerEntropy;
 		public byte[] OwnerEntropy
 		{
-			get { return _OwnerEntropy ?? (_OwnerEntropy = vchData.Skip(1).Take(8).ToArray()); }
+			get { return _ownerEntropy ?? (_ownerEntropy = VchData.Skip(1).Take(8).ToArray()); }
 		}
-		byte[] _Passpoint;
+		byte[] _passpoint;
 		public byte[] Passpoint
 		{
-			get { return _Passpoint ?? (_Passpoint = vchData.Skip(1).Skip(8).ToArray()); }
+			get { return _passpoint ?? (_passpoint = VchData.Skip(1).Skip(8).ToArray()); }
 		}
 
 		protected override bool IsValid
 		{
 			get
 			{
-				return 1 + 8 + 33 == vchData.Length && (vchData[0] == 0x53 || vchData[0] == 0x51);
+				return 1 + 8 + 33 == VchData.Length && (VchData[0] == 0x53 || VchData[0] == 0x51);
 			}
 		}
 
@@ -304,7 +303,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return Base58Type.PASSPHRASE_CODE;
+				return Base58Type.PassphraseCode;
 			}
 		}
 	}

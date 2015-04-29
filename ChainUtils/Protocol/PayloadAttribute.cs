@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace ChainUtils.Protocol
 {
 	[AttributeUsage(AttributeTargets.Class)]
 	public class PayloadAttribute : Attribute
 	{
-		static Dictionary<string, Type> _NameToType;
-		static Dictionary<Type, string> _TypeToName;
+		static Dictionary<string, Type> _nameToType;
+		static Dictionary<Type, string> _typeToName;
 
 		static PayloadAttribute()
 		{
-			_NameToType = new Dictionary<string, Type>();
-			_TypeToName = new Dictionary<Type, string>();
+			_nameToType = new Dictionary<string, Type>();
+			_typeToName = new Dictionary<Type, string>();
 			foreach(var pair in typeof(PayloadAttribute)
 				.GetTypeInfo()
 				.Assembly.DefinedTypes
@@ -29,8 +27,8 @@ namespace ChainUtils.Protocol
 						Type = t
 					}))
 			{
-				_NameToType.Add(pair.Attr.Name, pair.Type.AsType());
-				_TypeToName.Add(pair.Type.AsType(), pair.Attr.Name);
+				_nameToType.Add(pair.Attr.Name, pair.Type.AsType());
+				_typeToName.Add(pair.Type.AsType(), pair.Attr.Name);
 			}
 		}
 
@@ -41,7 +39,7 @@ namespace ChainUtils.Protocol
 		public static Type GetCommandType(string commandName)
 		{
 			Type result;
-			if(!_NameToType.TryGetValue(commandName, out result))
+			if(!_nameToType.TryGetValue(commandName, out result))
 				return typeof(UnknowPayload);
 			return result;
 		}
@@ -58,7 +56,7 @@ namespace ChainUtils.Protocol
 		internal static string GetCommandName(Type type)
 		{
 			string result;
-			if(!_TypeToName.TryGetValue(type, out result))
+			if(!_typeToName.TryGetValue(type, out result))
 				throw new ArgumentException(type.FullName + " is not a payload");
 			return result;
 		}

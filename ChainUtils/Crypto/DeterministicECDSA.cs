@@ -1,17 +1,14 @@
-﻿using ChainUtils.BouncyCastle.Crypto;
+﻿using System;
+using System.Text;
+using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Crypto
 {
 
-	static class DeterministicDSAExtensions
+	static class DeterministicDsaExtensions
 	{
 		public static void Update(this IMac hmac, byte[] input)
 		{
@@ -19,7 +16,7 @@ namespace ChainUtils.Crypto
 		}
 		public static byte[] DoFinal(this IMac hmac)
 		{
-			byte[] result = new byte[hmac.GetMacSize()];
+			var result = new byte[hmac.GetMacSize()];
 			hmac.DoFinal(result, 0);
 			return result;
 		}
@@ -34,7 +31,7 @@ namespace ChainUtils.Crypto
 		}
 		public static byte[] Digest(this IDigest digest)
 		{
-			byte[] result = new byte[digest.GetDigestSize()];
+			var result = new byte[digest.GetDigestSize()];
 			digest.DoFinal(result, 0);
 			return result;
 		}
@@ -81,19 +78,19 @@ namespace ChainUtils.Crypto
 	 * ------------------------------------------------------------------
 	 */
 
-	internal class DeterministicECDSA
+	internal class DeterministicEcdsa
 	{
 
-		private String macName;
-		private IDigest dig;
-		private IMac hmac;
-		private BigInteger p, q, g, x;
-		private int qlen, rlen, rolen, holen;
-		private byte[] bx;
-		private ECDomainParameters curve;
+		private String _macName;
+		private IDigest _dig;
+		private IMac _hmac;
+		private BigInteger _p, _q, _g, _x;
+		private int _qlen, _rlen, _rolen, _holen;
+		private byte[] _bx;
+		private ECDomainParameters _curve;
 
 
-		public DeterministicECDSA()
+		public DeterministicEcdsa()
 			: this("SHA-256")
 		{
 		}
@@ -105,11 +102,11 @@ namespace ChainUtils.Crypto
 		 * @param hashName   the hash function name
 		 * @throws IllegalArgumentException  on unsupported name
 		 */
-		public DeterministicECDSA(String hashName)
+		public DeterministicEcdsa(String hashName)
 		{
 			try
 			{
-				dig = DigestUtilities.GetDigest(hashName);
+				_dig = DigestUtilities.GetDigest(hashName);
 			}
 			catch(SecurityUtilityException nsae)
 			{
@@ -117,33 +114,33 @@ namespace ChainUtils.Crypto
 			}
 			if(hashName.IndexOf('-') < 0)
 			{
-				macName = "Hmac" + hashName;
+				_macName = "Hmac" + hashName;
 			}
 			else
 			{
-				StringBuilder sb = new StringBuilder();
+				var sb = new StringBuilder();
 				sb.Append("Hmac");
-				int n = hashName.Length;
-				for(int i = 0 ; i < n ; i++)
+				var n = hashName.Length;
+				for(var i = 0 ; i < n ; i++)
 				{
-					char c = hashName[i];
+					var c = hashName[i];
 					if(c != '-')
 					{
 						sb.Append(c);
 					}
 				}
-				macName = sb.ToString();
+				_macName = sb.ToString();
 
 			}
 			try
 			{
-				hmac = MacUtilities.GetMac(macName);
+				_hmac = MacUtilities.GetMac(_macName);
 			}
 			catch(SecurityUtilityException nsae)
 			{
 				throw new InvalidOperationException(nsae.Message, nsae);
 			}
-			holen = hmac.GetMacSize();
+			_holen = _hmac.GetMacSize();
 		}
 
 		/**
@@ -178,70 +175,70 @@ namespace ChainUtils.Crypto
 				throw new InvalidOperationException(
 						"invalid DSA private key");
 			}
-			this.p = p;
-			this.q = q;
-			this.g = g;
-			this.x = x;
-			qlen = q.BitLength;
-			if(q.SignValue <= 0 || qlen < 8)
+			this._p = p;
+			this._q = q;
+			this._g = g;
+			this._x = x;
+			_qlen = q.BitLength;
+			if(q.SignValue <= 0 || _qlen < 8)
 			{
 				throw new InvalidOperationException(
 						"bad group order: " + q);
 
 			}
-			rolen = (qlen + 7) >> 3;
-			rlen = rolen * 8;
+			_rolen = (_qlen + 7) >> 3;
+			_rlen = _rolen * 8;
 
 			/*
 			 * Convert the private exponent (x) into a sequence
 			 * of octets.
 			 */
-			bx = int2octets(x);
+			_bx = Int2Octets(x);
 		}
 		public void setPrivateKey(ECPrivateKeyParameters ecKey)
 		{
-			this.x = ecKey.D;
-			this.q = ecKey.Parameters.N;
-			this.curve = ecKey.Parameters;
+			_x = ecKey.D;
+			_q = ecKey.Parameters.N;
+			_curve = ecKey.Parameters;
 
-			qlen = q.BitLength;
-			if(q.SignValue <= 0 || qlen < 8)
+			_qlen = _q.BitLength;
+			if(_q.SignValue <= 0 || _qlen < 8)
 			{
 				throw new InvalidOperationException(
-						"bad group order: " + q);
+						"bad group order: " + _q);
 
 			}
-			rolen = (qlen + 7) >> 3;
-			rlen = rolen * 8;
-			bx = int2octets(x);
+			_rolen = (_qlen + 7) >> 3;
+			_rlen = _rolen * 8;
+			_bx = Int2Octets(_x);
 		}
-		private BigInteger bits2int(byte[] @in)
+		private BigInteger Bits2Int(byte[] @in)
 		{
-			BigInteger v = new BigInteger(1, @in);
-			int vlen = @in.Length * 8;
-			if(vlen > qlen)
+			var v = new BigInteger(1, @in);
+			var vlen = @in.Length * 8;
+			if(vlen > _qlen)
 			{
-				v = v.ShiftRight(vlen - qlen);
+				v = v.ShiftRight(vlen - _qlen);
 			}
 			return v;
 		}
 
-		private byte[] int2octets(BigInteger v)
+		private byte[] Int2Octets(BigInteger v)
 		{
-			byte[] @out = v.ToByteArray();
-			if(@out.Length < rolen)
+			var @out = v.ToByteArray();
+			if(@out.Length < _rolen)
 			{
-				byte[] out2 = new byte[rolen];
+				var out2 = new byte[_rolen];
 				Array.Copy(@out, 0,
-						out2, rolen - @out.Length,
+						out2, _rolen - @out.Length,
 						@out.Length);
 				return out2;
 			}
-			else if(@out.Length > rolen)
+			else if(@out.Length > _rolen)
 			{
-				byte[] out2 = new byte[rolen];
-				Array.Copy(@out, @out.Length - rolen,
-						out2, 0, rolen);
+				var out2 = new byte[_rolen];
+				Array.Copy(@out, @out.Length - _rolen,
+						out2, 0, _rolen);
 				return out2;
 			}
 			else
@@ -250,11 +247,11 @@ namespace ChainUtils.Crypto
 			}
 		}
 
-		private byte[] bits2octets(byte[] @in)
+		private byte[] Bits2Octets(byte[] @in)
 		{
-			BigInteger z1 = bits2int(@in);
-			BigInteger z2 = z1.Subtract(q);
-			return int2octets(z2.SignValue < 0 ? z1 : z2);
+			var z1 = Bits2Int(@in);
+			var z2 = z1.Subtract(_q);
+			return Int2Octets(z2.SignValue < 0 ? z1 : z2);
 		}
 
 		/**
@@ -262,11 +259,11 @@ namespace ChainUtils.Crypto
 		 *
 		 * @param K   the new secret key
 		 */
-		private void setHmacKey(byte[] K)
+		private void SetHmacKey(byte[] k)
 		{
 			try
 			{
-				hmac.Init(new KeyParameter(K));
+				_hmac.Init(new KeyParameter(k));
 			}
 			catch(InvalidKeyException ike)
 			{
@@ -281,14 +278,14 @@ namespace ChainUtils.Crypto
 		 * @param h1   the hashed message
 		 * @return  the pseudorandom k to use
 		 */
-		private BigInteger computek(byte[] h1)
+		private BigInteger Computek(byte[] h1)
 		{
 			/*
 			 * Convert hash value into an appropriately truncated
 			 * and/or expanded sequence of octets.  The private
 			 * key was already processed (into field bx[]).
 			 */
-			byte[] bh = bits2octets(h1);
+			var bh = Bits2Octets(h1);
 
 			/*
 			 * HMAC is always used with K as key.
@@ -297,43 +294,43 @@ namespace ChainUtils.Crypto
 			 */
 
 			/* step b. */
-			byte[] V = new byte[holen];
-			for(int i = 0 ; i < holen ; i++)
+			var v = new byte[_holen];
+			for(var i = 0 ; i < _holen ; i++)
 			{
-				V[i] = 0x01;
+				v[i] = 0x01;
 			}
 
 			/* step c. */
-			byte[] K = new byte[holen];
-			setHmacKey(K);
+			var K = new byte[_holen];
+			SetHmacKey(K);
 
 			/* step d. */
-			hmac.Update(V);
-			hmac.Update((byte)0x00);
+			_hmac.Update(v);
+			_hmac.Update((byte)0x00);
 
-			hmac.Update(bx);
-			hmac.Update(bh);
-			K = hmac.DoFinal();
-			setHmacKey(K);
+			_hmac.Update(_bx);
+			_hmac.Update(bh);
+			K = _hmac.DoFinal();
+			SetHmacKey(K);
 
 			/* step e. */
-			hmac.Update(V);
-			V = hmac.DoFinal();
+			_hmac.Update(v);
+			v = _hmac.DoFinal();
 
 			/* step f. */
-			hmac.Update(V);
-			hmac.Update((byte)0x01);
-			hmac.Update(bx);
-			hmac.Update(bh);
-			K = hmac.DoFinal();
-			setHmacKey(K);
+			_hmac.Update(v);
+			_hmac.Update((byte)0x01);
+			_hmac.Update(_bx);
+			_hmac.Update(bh);
+			K = _hmac.DoFinal();
+			SetHmacKey(K);
 
 			/* step g. */
-			hmac.Update(V);
-			V = hmac.DoFinal();
+			_hmac.Update(v);
+			v = _hmac.DoFinal();
 
 			/* step h. */
-			byte[] T = new byte[rolen];
+			var T = new byte[_rolen];
 			for( ; ; )
 			{
 				/*
@@ -342,18 +339,18 @@ namespace ChainUtils.Crypto
 				 * multiple of 8;acd hence, we will gather
 				 * rlen bits, i.e., rolen octets.
 				 */
-				int toff = 0;
-				while(toff < rolen)
+				var toff = 0;
+				while(toff < _rolen)
 				{
-					hmac.Update(V);
-					V = hmac.DoFinal();
-					int cc = Math.Min(V.Length,
+					_hmac.Update(v);
+					v = _hmac.DoFinal();
+					var cc = Math.Min(v.Length,
 							T.Length - toff);
-					Array.Copy(V, 0, T, toff, cc);
+					Array.Copy(v, 0, T, toff, cc);
 					toff += cc;
 				}
-				BigInteger k = bits2int(T);
-				if(k.SignValue > 0 && k.CompareTo(q) < 0)
+				var k = Bits2Int(T);
+				if(k.SignValue > 0 && k.CompareTo(_q) < 0)
 				{
 					return k;
 				}
@@ -363,12 +360,12 @@ namespace ChainUtils.Crypto
 				 * K and V, and loop.
 				 */
 
-				hmac.Update(V);
-				hmac.Update((byte)0x00);
-				K = hmac.DoFinal();
-				setHmacKey(K);
-				hmac.Update(V);
-				V = hmac.DoFinal();
+				_hmac.Update(v);
+				_hmac.Update((byte)0x00);
+				K = _hmac.DoFinal();
+				SetHmacKey(K);
+				_hmac.Update(v);
+				v = _hmac.DoFinal();
 			}
 		}
 
@@ -379,7 +376,7 @@ namespace ChainUtils.Crypto
 		 */
 		public void update(byte @in)
 		{
-			dig.Update(@in);
+			_dig.Update(@in);
 		}
 
 		/**
@@ -389,7 +386,7 @@ namespace ChainUtils.Crypto
 		 */
 		public void update(byte[] @in)
 		{
-			dig.Update(@in, 0, @in.Length);
+			_dig.Update(@in, 0, @in.Length);
 		}
 
 		/**
@@ -401,7 +398,7 @@ namespace ChainUtils.Crypto
 		 */
 		public void update(byte[] @in, int off, int len)
 		{
-			dig.Update(@in, off, len);
+			_dig.Update(@in, off, len);
 		}
 
 		/**
@@ -413,9 +410,9 @@ namespace ChainUtils.Crypto
 		 *
 		 * @return  the signature
 		 */
-		public byte[] sign()
+		public byte[] Sign()
 		{
-			return signHash(dig.Digest());
+			return SignHash(_dig.Digest());
 		}
 
 		/**
@@ -435,22 +432,22 @@ namespace ChainUtils.Crypto
 		 * @param h1   the hash value
 		 * @return  the signature
 		 */
-		public byte[] signHash(byte[] h1)
+		public byte[] SignHash(byte[] h1)
 		{
-			if(p == null && curve == null)
+			if(_p == null && _curve == null)
 			{
 				throw new InvalidOperationException(
 						"no private key set");
 			}
 			try
 			{
-				BigInteger k = computek(h1);
-				BigInteger r = curve == null ?
-					g.ModPow(k, p).Mod(q) :
-					curve.G.Multiply(k).X.ToBigInteger().Mod(q);
-				BigInteger s = k.ModInverse(q).Multiply(
-						bits2int(h1).Add(x.Multiply(r)))
-						.Mod(q);
+				var k = Computek(h1);
+				var r = _curve == null ?
+					_g.ModPow(k, _p).Mod(_q) :
+					_curve.G.Multiply(k).X.ToBigInteger().Mod(_q);
+				var s = k.ModInverse(_q).Multiply(
+						Bits2Int(h1).Add(_x.Multiply(r)))
+						.Mod(_q);
 
 				/*
 				 * Signature encoding: ASN.1 SEQUENCE of
@@ -459,13 +456,13 @@ namespace ChainUtils.Crypto
 				 * s is no longer than 127 bytes for each,
 				 * including DER tag and length.
 				 */
-				byte[] br = r.ToByteArray();
-				byte[] bs = s.ToByteArray();
-				int ulen = br.Length + bs.Length + 4;
-				int slen = ulen + (ulen >= 128 ? 3 : 2);
+				var br = r.ToByteArray();
+				var bs = s.ToByteArray();
+				var ulen = br.Length + bs.Length + 4;
+				var slen = ulen + (ulen >= 128 ? 3 : 2);
 
-				byte[] sig = new byte[slen];
-				int i = 0;
+				var sig = new byte[slen];
+				var i = 0;
 				sig[i++] = 0x30;
 				if(ulen >= 128)
 				{
@@ -511,9 +508,9 @@ namespace ChainUtils.Crypto
 		 * update*()} methods is discarded.  The current private key,
 		 * if one was set, is kept unchanged.
 		 */
-		public void reset()
+		public void Reset()
 		{
-			dig.Reset();
+			_dig.Reset();
 		}
 
 

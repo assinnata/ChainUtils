@@ -17,12 +17,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 #endregion
 
-using ChainUtils.BouncyCastle.Crypto;
-using ChainUtils.Crypto.Internal;
 using System;
-using System.Diagnostics;
 using System.IO;
-
+using ChainUtils.Crypto.Internal;
 #if !USEBC
 using System.Security.Cryptography;
 #endif
@@ -83,7 +80,7 @@ namespace ChainUtils.Crypto
             if (hmacAlgorithm.HashSize == 0 || hmacAlgorithm.HashSize % 8 != 0)
                 { throw Exceptions.Argument("hmacAlgorithm", "Unsupported hash size."); }
 
-            int hmacLength = hmacAlgorithm.HashSize / 8;
+            var hmacLength = hmacAlgorithm.HashSize / 8;
             _saltBuffer = new byte[salt.Length + 4]; Array.Copy(salt, _saltBuffer, salt.Length);
             _iterations = iterations; _hmacAlgorithm = hmacAlgorithm;
             _digest = new byte[hmacLength]; _digestT1 = new byte[hmacLength];
@@ -113,8 +110,8 @@ namespace ChainUtils.Crypto
 		{
 			Check.Range("count", count, 0, int.MaxValue);
 
-			byte[] buffer = new byte[count];
-			int bytes = Read(buffer, 0, count);
+			var buffer = new byte[count];
+			var bytes = Read(buffer, 0, count);
 			if(bytes < count)
 			{
 				throw Exceptions.Argument("count", "Can only return {0} bytes.", bytes);
@@ -143,7 +140,7 @@ namespace ChainUtils.Crypto
         {
             Check.Range("derivedKeyLength", derivedKeyLength, 0, int.MaxValue);
 
-            using (Pbkdf2 kdf = new Pbkdf2(hmacAlgorithm, salt, iterations))
+            using (var kdf = new Pbkdf2(hmacAlgorithm, salt, iterations))
             {
                 return kdf.Read(derivedKeyLength);
             }
@@ -188,14 +185,14 @@ namespace ChainUtils.Crypto
 #endif
 		void ComputeBlock(uint pos)
 		{
-			BitPacking.BEBytesFromUInt32(pos, _saltBuffer, _saltBuffer.Length - 4);
+			BitPacking.BeBytesFromUInt32(pos, _saltBuffer, _saltBuffer.Length - 4);
 			ComputeHmac(_saltBuffer, _digestT1);
 			Array.Copy(_digestT1, _digest, _digestT1.Length);
 
-			for(int i = 1 ; i < _iterations ; i++)
+			for(var i = 1 ; i < _iterations ; i++)
 			{
 				ComputeHmac(_digestT1, _digestT1);
-				for(int j = 0 ; j < _digest.Length ; j++)
+				for(var j = 0 ; j < _digest.Length ; j++)
 				{
 					_digest[j] ^= _digestT1[j];
 				}
@@ -236,7 +233,7 @@ namespace ChainUtils.Crypto
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			Check.Bounds("buffer", buffer, offset, count);
-			int bytes = 0;
+			var bytes = 0;
 
 			while(count > 0)
 			{
@@ -247,14 +244,14 @@ namespace ChainUtils.Crypto
 						break;
 					}
 
-					long pos = Position / _digest.Length;
+					var pos = Position / _digest.Length;
 					ComputeBlock((uint)(pos + 1));
 					_blockStart = pos * _digest.Length;
 					_blockEnd = _blockStart + _digest.Length;
 				}
 
-				int bytesSoFar = (int)(Position - _blockStart);
-				int bytesThisTime = (int)Math.Min(_digest.Length - bytesSoFar, count);
+				var bytesSoFar = (int)(Position - _blockStart);
+				var bytesThisTime = (int)Math.Min(_digest.Length - bytesSoFar, count);
 				Array.Copy(_digest, bytesSoFar, buffer, bytes, bytesThisTime);
 				count -= bytesThisTime;
 				bytes += bytesThisTime;

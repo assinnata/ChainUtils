@@ -8,7 +8,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		internal BerSequenceParser(
 			Asn1StreamParser parser)
 		{
-			this._parser = parser;
+			_parser = parser;
 		}
 
 		public IAsn1Convertible ReadObject()

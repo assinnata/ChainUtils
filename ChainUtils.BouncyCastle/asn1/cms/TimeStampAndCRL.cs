@@ -1,4 +1,4 @@
-using System;
+using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
@@ -6,7 +6,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		: Asn1Encodable
 	{
 		private ContentInfo timeStamp;
-		private X509.CertificateList crl;
+		private CertificateList crl;
 
 		public TimeStampAndCrl(ContentInfo timeStamp)
 		{
@@ -15,10 +15,10 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 		private TimeStampAndCrl(Asn1Sequence seq)
 		{
-			this.timeStamp = ContentInfo.GetInstance(seq[0]);
+			timeStamp = ContentInfo.GetInstance(seq[0]);
 			if (seq.Count == 2)
 			{
-				this.crl = X509.CertificateList.GetInstance(seq[1]);
+				crl = CertificateList.GetInstance(seq[1]);
 			}
 		}
 
@@ -35,12 +35,12 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
 		public virtual ContentInfo TimeStampToken
 		{
-			get { return this.timeStamp; }
+			get { return timeStamp; }
 		}
 
-		public virtual X509.CertificateList Crl
+		public virtual CertificateList Crl
 		{
-			get { return this.crl; }
+			get { return crl; }
 		}
 
 		/**
@@ -54,7 +54,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(timeStamp);
+			var v = new Asn1EncodableVector(timeStamp);
 			v.AddOptional(crl);
 			return new DerSequence(v);
 		}

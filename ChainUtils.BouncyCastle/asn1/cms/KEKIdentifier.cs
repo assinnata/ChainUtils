@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
     public class KekIdentifier
@@ -110,7 +108,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(keyIdentifier);
+            var v = new Asn1EncodableVector(keyIdentifier);
 			v.AddOptional(date, other);
 			return new DerSequence(v);
         }

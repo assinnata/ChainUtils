@@ -15,7 +15,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanConvertText()
 		{
-			string testPhrase = "é ^ç hello \"12345\"  wooorld";
+			var testPhrase = "é ^ç hello \"12345\"  wooorld";
 			var tests = new[]
 			{
 				new 

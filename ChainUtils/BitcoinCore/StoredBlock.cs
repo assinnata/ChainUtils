@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
 	public class DiskBlockPosRange
 	{
-		private static DiskBlockPosRange _All = new DiskBlockPosRange(DiskBlockPos.Begin, DiskBlockPos.End);
+		private static DiskBlockPosRange _all = new DiskBlockPosRange(DiskBlockPos.Begin, DiskBlockPos.End);
 
 		public static DiskBlockPosRange All
 		{
 			get
 			{
-				return DiskBlockPosRange._All;
+				return _all;
 			}
 		}
 
@@ -32,25 +28,25 @@ namespace ChainUtils.BitcoinCore
 				begin = DiskBlockPos.Begin;
 			if(end == null)
 				end = DiskBlockPos.End;
-			_Begin = begin;
-			_End = end;
+			_begin = begin;
+			_end = end;
 			if(end <= begin)
 				throw new ArgumentException("End should be more than begin");
 		}
-		private readonly DiskBlockPos _Begin;
+		private readonly DiskBlockPos _begin;
 		public DiskBlockPos Begin
 		{
 			get
 			{
-				return _Begin;
+				return _begin;
 			}
 		}
-		private readonly DiskBlockPos _End;
+		private readonly DiskBlockPos _end;
 		public DiskBlockPos End
 		{
 			get
 			{
-				return _End;
+				return _end;
 			}
 		}
 
@@ -65,22 +61,22 @@ namespace ChainUtils.BitcoinCore
 	}
 	public class DiskBlockPos : IBitcoinSerializable
 	{
-		private static DiskBlockPos _Begin = new DiskBlockPos(0, 0);
+		private static DiskBlockPos _begin = new DiskBlockPos(0, 0);
 
 		public static DiskBlockPos Begin
 		{
 			get
 			{
-				return DiskBlockPos._Begin;
+				return _begin;
 			}
 		}
 
-		private static DiskBlockPos _End = new DiskBlockPos(uint.MaxValue, uint.MaxValue);
+		private static DiskBlockPos _end = new DiskBlockPos(uint.MaxValue, uint.MaxValue);
 		public static DiskBlockPos End
 		{
 			get
 			{
-				return DiskBlockPos._End;
+				return _end;
 			}
 		}
 
@@ -90,24 +86,24 @@ namespace ChainUtils.BitcoinCore
 		}
 		public DiskBlockPos(uint file, uint position)
 		{
-			_File = file;
-			_Position = position;
+			_file = file;
+			_position = position;
 			UpdateHash();
 		}
-		private uint _File;
+		private uint _file;
 		public uint File
 		{
 			get
 			{
-				return _File;
+				return _file;
 			}
 		}
-		private uint _Position;
+		private uint _position;
 		public uint Position
 		{
 			get
 			{
-				return _Position;
+				return _position;
 			}
 		}
 
@@ -115,35 +111,35 @@ namespace ChainUtils.BitcoinCore
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWriteAsCompactVarInt(ref _File);
-			stream.ReadWriteAsCompactVarInt(ref _Position);
+			stream.ReadWriteAsCompactVarInt(ref _file);
+			stream.ReadWriteAsCompactVarInt(ref _position);
 			if(!stream.Serializing)
 				UpdateHash();
 		}
 
 		private void UpdateHash()
 		{
-			_Hash = ToString().GetHashCode();
+			_hash = ToString().GetHashCode();
 		}
 
-		int _Hash;
+		int _hash;
 
 		#endregion
 
 		public override bool Equals(object obj)
 		{
-			DiskBlockPos item = obj as DiskBlockPos;
+			var item = obj as DiskBlockPos;
 			if(item == null)
 				return false;
-			return _Hash.Equals(item._Hash);
+			return _hash.Equals(item._hash);
 		}
 		public static bool operator ==(DiskBlockPos a, DiskBlockPos b)
 		{
-			if(System.Object.ReferenceEquals(a, b))
+			if(ReferenceEquals(a, b))
 				return true;
 			if(((object)a == null) || ((object)b == null))
 				return false;
-			return a._Hash == b._Hash;
+			return a._hash == b._hash;
 		}
 
 		public static bool operator !=(DiskBlockPos a, DiskBlockPos b)
@@ -177,7 +173,7 @@ namespace ChainUtils.BitcoinCore
 		}
 		public override int GetHashCode()
 		{
-			return _Hash.GetHashCode();
+			return _hash.GetHashCode();
 		}
 
 
@@ -191,14 +187,14 @@ namespace ChainUtils.BitcoinCore
 			return "f:" + File + "p:" + Position;
 		}
 
-		static readonly Regex _Reg = new Regex("f:([0-9]*)p:([0-9]*)"
+		static readonly Regex Reg = new Regex("f:([0-9]*)p:([0-9]*)"
 #if !PORTABLE
 			,RegexOptions.Compiled
 #endif			
 			);
 		public static DiskBlockPos Parse(string data)
 		{
-			var match = _Reg.Match(data);
+			var match = Reg.Match(data);
 			if(!match.Success)
 				throw new FormatException("Invalid position string : " + data);
 			return new DiskBlockPos(uint.Parse(match.Groups[1].Value), uint.Parse(match.Groups[2].Value));
@@ -225,7 +221,7 @@ namespace ChainUtils.BitcoinCore
 		#region IBitcoinSerializable Members
 
 
-		static byte[] _Unused = new byte[1024 * 4];
+		static byte[] _unused = new byte[1024 * 4];
 		protected override void ReadWriteItem(BitcoinStream stream, ref Block item)
 		{
 			if(!ParseSkipBlockContent)
@@ -233,20 +229,20 @@ namespace ChainUtils.BitcoinCore
 			else
 			{
 				var beforeReading = stream.Inner.Position;
-				BlockHeader header = item == null ? null : item.Header;
+				var header = item == null ? null : item.Header;
 				stream.ReadWrite(ref header);
 				if(!stream.Serializing)
 					item = new Block(header);
 
 				var headerSize = stream.Inner.Position - beforeReading;
-				var bodySize = this.Header.ItemSize - headerSize;
+				var bodySize = Header.ItemSize - headerSize;
 				if(bodySize > 1024 * 4)
 				{
 					stream.Inner.Position = beforeReading + Header.ItemSize;
 				}
 				else //Does not refill internal buffer, thus quicker than Seek
 				{
-					stream.Inner.Read(_Unused, 0, (int)bodySize);
+					stream.Inner.Read(_unused, 0, (int)bodySize);
 				}
 			}
 		}

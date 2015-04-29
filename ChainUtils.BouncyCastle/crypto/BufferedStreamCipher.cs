@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto
@@ -78,7 +77,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 			if (length < 1)
 				return null;
 
-			byte[] output = new byte[length];
+			var output = new byte[length];
 			cipher.ProcessBytes(input, inOff, length, output, 0);
 			return output;
 		}
@@ -116,7 +115,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 			if (length < 1)
 				return EmptyBuffer;
 
-			byte[] output = ProcessBytes(input, inOff, length);
+			var output = ProcessBytes(input, inOff, length);
 
 			Reset();
 

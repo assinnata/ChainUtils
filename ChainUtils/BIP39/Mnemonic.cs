@@ -1,16 +1,11 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ChainUtils.Crypto;
 #if !USEBC
 using System.Security.Cryptography;
 #endif
-using ChainUtils.BouncyCastle.Security;
-using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils
 {
@@ -28,20 +23,20 @@ namespace ChainUtils
 		{
 			if(mnemonic == null)
 				throw new ArgumentNullException("mnemonic");
-			_Mnemonic = mnemonic.Trim();
+			_mnemonic = mnemonic.Trim();
 
 			if(wordlist == null)
 				wordlist = Wordlist.AutoDetect(mnemonic) ?? Wordlist.English;
 
-			var words = mnemonic.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries);
+			var words = mnemonic.Split(new[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries);
 			//if the sentence is not at least 12 characters or cleanly divisible by 3, it is bad!
 			if(!CorrectWordCount(words.Length))
 			{
 				throw new FormatException("Word count should be equals to 12,15,18,21 or 24");
 			}
-			_Words = words;
-			_WordList = wordlist;
-			_Indices = wordlist.ToIndices(words);
+			_words = words;
+			_wordList = wordlist;
+			_indices = wordlist.ToIndices(words);
 		}
 
 		/// <summary>
@@ -52,25 +47,25 @@ namespace ChainUtils
 		public Mnemonic(Wordlist wordList, byte[] entropy = null)
 		{
 			wordList = wordList ?? Wordlist.English;
-			_WordList = wordList;
+			_wordList = wordList;
 			if(entropy == null)
 				entropy = RandomUtils.GetBytes(32);
 
-			var i = Array.IndexOf(entArray, entropy.Length * 8);
+			var i = Array.IndexOf(EntArray, entropy.Length * 8);
 			if(i == -1)
-				throw new ArgumentException("The length for entropy should be : " + String.Join(",", entArray), "entropy");
+				throw new ArgumentException("The length for entropy should be : " + String.Join(",", EntArray), "entropy");
 
-			int entcs = entcsArray[i];
-			int ent = entArray[i];
-			int cs = csArray[i];
-			byte[] checksum = Hashes.SHA256(entropy);
-			BitWriter entcsResult = new BitWriter();
+			var entcs = EntcsArray[i];
+			var ent = EntArray[i];
+			var cs = CsArray[i];
+			var checksum = Hashes.SHA256(entropy);
+			var entcsResult = new BitWriter();
 
 			entcsResult.Write(entropy);
 			entcsResult.Write(checksum, cs);
-			_Indices = entcsResult.ToIntegers();
-			_Words = _WordList.GetWords(_Indices);
-			_Mnemonic = _WordList.GetSentence(_Indices);
+			_indices = entcsResult.ToIntegers();
+			_words = _wordList.GetWords(_indices);
+			_mnemonic = _wordList.GetSentence(_indices);
 		}
 
 		public Mnemonic(Wordlist wordList, WordCount wordCount)
@@ -84,37 +79,37 @@ namespace ChainUtils
 			var ms = (int)wordCount;
 			if(!CorrectWordCount(ms))
 				throw new ArgumentException("Word count should be equal to 12,15,18,21 or 24", "wordCount");
-			int i = Array.IndexOf(msArray, (int)wordCount);
-			return RandomUtils.GetBytes(entArray[i] / 8);
+			var i = Array.IndexOf(MsArray, (int)wordCount);
+			return RandomUtils.GetBytes(EntArray[i] / 8);
 		}
 
-		static readonly int[] msArray = new[] { 12, 15, 18, 21, 24 };
-		static readonly int[] entcsArray = new[] { 132, 165, 198, 231, 264 };
-		static readonly int[] csArray = new[] { 4, 5, 6, 7, 8 };
-		static readonly int[] entArray = new[] { 128, 160, 192, 224, 256 };
+		static readonly int[] MsArray = new[] { 12, 15, 18, 21, 24 };
+		static readonly int[] EntcsArray = new[] { 132, 165, 198, 231, 264 };
+		static readonly int[] CsArray = new[] { 4, 5, 6, 7, 8 };
+		static readonly int[] EntArray = new[] { 128, 160, 192, 224, 256 };
 
-		bool? _IsValidChecksum;
+		bool? _isValidChecksum;
 		public bool IsValidChecksum
 		{
 			get
 			{
-				if(_IsValidChecksum == null)
+				if(_isValidChecksum == null)
 				{
-					int i = Array.IndexOf(msArray, _Indices.Length);
-					int cs = csArray[i];
-					int ent = entArray[i];
+					var i = Array.IndexOf(MsArray, _indices.Length);
+					var cs = CsArray[i];
+					var ent = EntArray[i];
 
-					BitWriter writer = new BitWriter();
-					var bits = Wordlist.ToBits(_Indices);
+					var writer = new BitWriter();
+					var bits = Wordlist.ToBits(_indices);
 					writer.Write(bits, ent);
 					var entropy = writer.ToBytes();
 					var checksum = Hashes.SHA256(entropy);
 
 					writer.Write(checksum, cs);
 					var expectedIndices = writer.ToIntegers();
-					_IsValidChecksum = expectedIndices.SequenceEqual(_Indices);
+					_isValidChecksum = expectedIndices.SequenceEqual(_indices);
 				}
-				return _IsValidChecksum.Value;
+				return _isValidChecksum.Value;
 			}
 		}
 
@@ -125,7 +120,7 @@ namespace ChainUtils
 
 		private static bool CorrectWordCount(int ms)
 		{
-			return msArray.Any(_ => _ == ms);
+			return MsArray.Any(_ => _ == ms);
 		}
 
 
@@ -136,8 +131,8 @@ namespace ChainUtils
 				throw new InvalidOperationException("should never happen, bug in ChainUtils");
 			}
 
-			int number = 0;
-			int base2Divide = 1024; //it's all downhill from here...literally we halve this for each bit we move to.
+			var number = 0;
+			var base2Divide = 1024; //it's all downhill from here...literally we halve this for each bit we move to.
 
 			//literally picture this loop as going from the most significant bit across to the least in the 11 bits, dividing by 2 for each bit as per binary/base 2
 			foreach(bool b in bits)
@@ -153,37 +148,37 @@ namespace ChainUtils
 			return number;
 		}
 
-		private readonly Wordlist _WordList;
+		private readonly Wordlist _wordList;
 		public Wordlist WordList
 		{
 			get
 			{
-				return _WordList;
+				return _wordList;
 			}
 		}
 
-		private readonly int[] _Indices;
+		private readonly int[] _indices;
 		public int[] Indices
 		{
 			get
 			{
-				return _Indices;
+				return _indices;
 			}
 		}
-		private readonly string[] _Words;
+		private readonly string[] _words;
 		public string[] Words
 		{
 			get
 			{
-				return _Words;
+				return _words;
 			}
 		}
 
 		public byte[] DeriveSeed(string passphrase = null)
 		{
 			passphrase = passphrase ?? "";
-			var salt = Concat(UTF8Encoding.UTF8.GetBytes("mnemonic"), Normalize(passphrase));
-			var bytes = Normalize(_Mnemonic);
+			var salt = Concat(Encoding.UTF8.GetBytes("mnemonic"), Normalize(passphrase));
+			var bytes = Normalize(_mnemonic);
 
 #if !USEBC
 			return Pbkdf2.ComputeDerivedKey(new HMACSHA512(bytes), salt, 2048, 64);
@@ -217,18 +212,18 @@ namespace ChainUtils
 		static Byte[] Concat(Byte[] source1, Byte[] source2)
 		{
 			//Most efficient way to merge two arrays this according to http://stackoverflow.com/questions/415291/best-way-to-combine-two-or-more-byte-arrays-in-c-sharp
-			Byte[] buffer = new Byte[source1.Length + source2.Length];
-			System.Buffer.BlockCopy(source1, 0, buffer, 0, source1.Length);
-			System.Buffer.BlockCopy(source2, 0, buffer, source1.Length, source2.Length);
+			var buffer = new Byte[source1.Length + source2.Length];
+			Buffer.BlockCopy(source1, 0, buffer, 0, source1.Length);
+			Buffer.BlockCopy(source2, 0, buffer, source1.Length, source2.Length);
 
 			return buffer;
 		}
 
 
-		string _Mnemonic;
+		string _mnemonic;
 		public override string ToString()
 		{
-			return _Mnemonic;
+			return _mnemonic;
 		}
 
 

@@ -27,7 +27,7 @@ namespace ChainUtils.Crypto.Internal
             (string valueName, string message, params object[] args)
         {
             message = string.Format(message, args);
-            ArgumentException e = valueName == null
+            var e = valueName == null
                 ? new ArgumentException(message)
                 : new ArgumentException(message, valueName);
             return e;
@@ -35,7 +35,7 @@ namespace ChainUtils.Crypto.Internal
 
         public static ArgumentNullException ArgumentNull(string valueName)
         {
-            ArgumentNullException e = valueName == null
+            var e = valueName == null
                 ? new ArgumentNullException()
                 : new ArgumentNullException(valueName);
             return e;
@@ -45,7 +45,7 @@ namespace ChainUtils.Crypto.Internal
             (string valueName, string message, params object[] args)
         {
             message = string.Format(message, args);
-            ArgumentOutOfRangeException e = valueName == null
+            var e = valueName == null
                 ? new ArgumentOutOfRangeException(message, (Exception)null)
                 : new ArgumentOutOfRangeException(valueName, message);
             return e;
@@ -53,7 +53,7 @@ namespace ChainUtils.Crypto.Internal
 
         public static InvalidOperationException InvalidOperation()
         {
-            InvalidOperationException e = new InvalidOperationException();
+            var e = new InvalidOperationException();
             return e;
         }
 

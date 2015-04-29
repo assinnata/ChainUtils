@@ -1,8 +1,6 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
-using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Agreement
 {
@@ -32,8 +30,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
                 throw new ArgumentException("DHEngine expects DHPrivateKeyParameters");
             }
 
-            this.key = (DHPrivateKeyParameters) parameters;
-            this.dhParams = key.Parameters;
+            key = (DHPrivateKeyParameters) parameters;
+            dhParams = key.Parameters;
         }
 
         public virtual int GetFieldSize()
@@ -48,10 +46,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
         public virtual BigInteger CalculateAgreement(
             ICipherParameters pubKey)
         {
-            if (this.key == null)
+            if (key == null)
                 throw new InvalidOperationException("Agreement algorithm not initialised");
 
-            DHPublicKeyParameters pub = (DHPublicKeyParameters)pubKey;
+            var pub = (DHPublicKeyParameters)pubKey;
 
             if (!pub.Parameters.Equals(dhParams))
             {

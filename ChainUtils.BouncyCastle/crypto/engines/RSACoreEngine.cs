@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
@@ -33,9 +31,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			if (!(parameters is RsaKeyParameters))
 				throw new InvalidKeyException("Not an RSA key");
 
-			this.key = (RsaKeyParameters) parameters;
+			key = (RsaKeyParameters) parameters;
 			this.forEncryption = forEncryption;
-			this.bitSize = key.Modulus.BitLength;
+			bitSize = key.Modulus.BitLength;
 		}
 
 		/**
@@ -77,12 +75,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			int		inOff,
 			int		inLen)
 		{
-			int maxLength = (bitSize + 7) / 8;
+			var maxLength = (bitSize + 7) / 8;
 
 			if (inLen > maxLength)
 				throw new DataLengthException("input too large for RSA cipher.");
 
-			BigInteger input = new BigInteger(1, inBuf, inOff, inLen);
+			var input = new BigInteger(1, inBuf, inOff, inLen);
 
 			if (input.CompareTo(key.Modulus) >= 0)
 				throw new DataLengthException("input too large for RSA cipher.");
@@ -93,17 +91,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		public byte[] ConvertOutput(
 			BigInteger result)
 		{
-			byte[] output = result.ToByteArrayUnsigned();
+			var output = result.ToByteArrayUnsigned();
 
 			if (forEncryption)
 			{
-				int outSize = GetOutputBlockSize();
+				var outSize = GetOutputBlockSize();
 
 				// TODO To avoid this, create version of BigInteger.ToByteArray that
 				// writes to an existing array
 				if (output.Length < outSize) // have ended up with less bytes than normal, lengthen
 				{
-					byte[] tmp = new byte[outSize];
+					var tmp = new byte[outSize];
 					output.CopyTo(tmp, tmp.Length - output.Length);
 					output = tmp;
 				}
@@ -122,13 +120,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				// wishes to express his thanks to Dirk Bonekaemper at rtsffm.com for
 				// advice regarding the expression of this.
 				//
-				RsaPrivateCrtKeyParameters crtKey = (RsaPrivateCrtKeyParameters)key;
+				var crtKey = (RsaPrivateCrtKeyParameters)key;
 
-				BigInteger p = crtKey.P;;
-				BigInteger q = crtKey.Q;
-				BigInteger dP = crtKey.DP;
-				BigInteger dQ = crtKey.DQ;
-				BigInteger qInv = crtKey.QInv;
+				var p = crtKey.P;;
+				var q = crtKey.Q;
+				var dP = crtKey.DP;
+				var dQ = crtKey.DQ;
+				var qInv = crtKey.QInv;
 
 				BigInteger mP, mQ, h, m;
 

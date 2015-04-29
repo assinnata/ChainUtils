@@ -1,7 +1,3 @@
-using ChainUtils.BouncyCastle.Asn1;
-using System;
-using System.Collections;
-
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
@@ -28,7 +24,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 		public DHParameter(
             Asn1Sequence seq)
         {
-            IEnumerator e = seq.GetEnumerator();
+            var e = seq.GetEnumerator();
 
 			e.MoveNext();
             p = (DerInteger)e.Current;
@@ -59,9 +55,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 
 		public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(p, g);
+            var v = new Asn1EncodableVector(p, g);
 
-			if (this.l != null)
+			if (l != null)
             {
                 v.Add(l);
             }

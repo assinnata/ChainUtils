@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
@@ -18,24 +14,24 @@ namespace ChainUtils
 				throw new ArgumentNullException("output");
 			if(txout == null)
 				throw new ArgumentNullException("txout");
-			_Out = txout;
-			_OutPoint = output;
+			_out = txout;
+			_outPoint = output;
 		}
 
-		private OutPoint _OutPoint;
+		private OutPoint _outPoint;
 		public OutPoint OutPoint
 		{
 			get
 			{
-				return _OutPoint;
+				return _outPoint;
 			}
 		}
-		private TxOut _Out;
+		private TxOut _out;
 		public TxOut TxOut
 		{
 			get
 			{
-				return _Out;
+				return _out;
 			}
 		}
 
@@ -43,17 +39,17 @@ namespace ChainUtils
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref _OutPoint);
+			stream.ReadWrite(ref _outPoint);
 			if(stream.Serializing)
 			{
-				TxOutCompressor compressor = new TxOutCompressor(_Out);
+				var compressor = new TxOutCompressor(_out);
 				stream.ReadWrite(ref compressor);
 			}
 			else
 			{
-				TxOutCompressor compressor = new TxOutCompressor();
+				var compressor = new TxOutCompressor();
 				stream.ReadWrite(ref compressor);
-				_Out = compressor.TxOut;
+				_out = compressor.TxOut;
 			}
 		}
 

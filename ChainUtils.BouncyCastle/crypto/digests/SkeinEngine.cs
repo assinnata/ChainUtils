@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Crypto.Engines;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Utilities;
@@ -256,7 +255,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             public void Reset(UbiTweak tweak)
             {
                 this.tweak = Arrays.Clone(tweak.tweak, this.tweak);
-                this.extendedPosition = tweak.extendedPosition;
+                extendedPosition = tweak.extendedPosition;
             }
 
             public void Reset()
@@ -327,13 +326,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
                 // Bits 0..95 = position
                 if (extendedPosition)
                 {
-                    ulong[] parts = new ulong[3];
+                    var parts = new ulong[3];
                     parts[0] = tweak[0] & 0xFFFFFFFFUL;
                     parts[1] = (tweak[0] >> 32) & 0xFFFFFFFFUL;
                     parts[2] = tweak[1] & 0xFFFFFFFFUL;
 
-                    ulong carry = (ulong)advance;
-                    for (int i = 0; i < parts.Length; i++)
+                    var carry = (ulong)advance;
+                    for (var i = 0; i < parts.Length; i++)
                     {
                         carry += parts[i];
                         parts[i] = carry;
@@ -344,7 +343,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
                 }
                 else
                 {
-                    ulong position = tweak[0];
+                    var position = tweak[0];
                     position += (uint)advance;
                     tweak[0] = position;
                     if (position > LOW_RANGE)
@@ -402,7 +401,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             {
                 currentBlock = Arrays.Clone(ubi.currentBlock, currentBlock);
                 currentOffset = ubi.currentOffset;
-                message = Arrays.Clone(ubi.message, this.message);
+                message = Arrays.Clone(ubi.message, message);
                 tweak.Reset(ubi.tweak);
             }
 
@@ -419,7 +418,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
                  * Buffer complete blocks for the underlying Threefish cipher, only flushing when there
                  * are subsequent bytes (last block must be processed in doFinal() with final=true set).
                  */
-                int copied = 0;
+                var copied = 0;
                 while (len > copied)
                 {
                     if (currentOffset == currentBlock.Length)
@@ -429,7 +428,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
                         currentOffset = 0;
                     }
 
-                    int toCopy = System.Math.Min((len - copied), currentBlock.Length - currentOffset);
+                    var toCopy = System.Math.Min((len - copied), currentBlock.Length - currentOffset);
                     Array.Copy(value, offset + copied, currentBlock, currentOffset, toCopy);
                     copied += toCopy;
                     currentOffset += toCopy;
@@ -440,14 +439,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             private void ProcessBlock(ulong[] output)
             {
                 engine.threefish.Init(true, engine.chain, tweak.GetWords());
-                for (int i = 0; i < message.Length; i++)
+                for (var i = 0; i < message.Length; i++)
                 {
                     message[i] = ThreefishEngine.BytesToWord(currentBlock, i * 8);
                 }
 
                 engine.threefish.ProcessBlock(message, output);
 
-                for (int i = 0; i < output.Length; i++)
+                for (var i = 0; i < output.Length; i++)
                 {
                     output[i] ^= message[i];
                 }
@@ -456,7 +455,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             public void DoFinal(ulong[] output)
             {
                 // Pad remainder of current block with zeroes
-                for (int i = currentOffset; i < currentBlock.Length; i++)
+                for (var i = currentOffset; i < currentBlock.Length; i++)
                 {
                     currentBlock[i] = 0;
                 }
@@ -526,10 +525,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
                 throw new ArgumentException("Output size must be a multiple of 8 bits. :" + outputSizeBits);
             }
             // TODO: Prevent digest sizes > block size?
-            this.outputSizeBytes = outputSizeBits / 8;
+            outputSizeBytes = outputSizeBits / 8;
 
-            this.threefish = new ThreefishEngine(blockSizeBits);
-            this.ubi = new UBI(this,threefish.GetBlockSize());
+            threefish = new ThreefishEngine(blockSizeBits);
+            ubi = new UBI(this,threefish.GetBlockSize());
         }
 
         /// <summary>
@@ -543,12 +542,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void CopyIn(SkeinEngine engine)
         {
-            this.ubi.Reset(engine.ubi);
-            this.chain = Arrays.Clone(engine.chain, this.chain);
-            this.initialState = Arrays.Clone(engine.initialState, this.initialState);
-            this.key = Arrays.Clone(engine.key, this.key);
-            this.preMessageParameters = Clone(engine.preMessageParameters, this.preMessageParameters);
-            this.postMessageParameters = Clone(engine.postMessageParameters, this.postMessageParameters);
+            ubi.Reset(engine.ubi);
+            chain = Arrays.Clone(engine.chain, chain);
+            initialState = Arrays.Clone(engine.initialState, initialState);
+            key = Arrays.Clone(engine.key, key);
+            preMessageParameters = Clone(engine.preMessageParameters, preMessageParameters);
+            postMessageParameters = Clone(engine.postMessageParameters, postMessageParameters);
         }
 
         private static Parameter[] Clone(Parameter[] data, Parameter[] existing)
@@ -572,7 +571,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         public void Reset(IMemoable other)
         {
-            SkeinEngine s = (SkeinEngine)other;
+            var s = (SkeinEngine)other;
             if ((BlockSize != s.BlockSize) || (outputSizeBytes != s.outputSizeBytes))
             {
                 throw new MemoableResetException("Incompatible parameters in provided SkeinEngine.");
@@ -597,14 +596,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
         /// <param name="parameters">the parameters to apply to this engine, or <code>null</code> to use no parameters.</param>
         public void Init(SkeinParameters parameters)
         {
-            this.chain = null;
+            chain = null;
             this.key = null;
-            this.preMessageParameters = null;
-            this.postMessageParameters = null;
+            preMessageParameters = null;
+            postMessageParameters = null;
 
             if (parameters != null)
             {
-                byte[] key = parameters.GetKey();
+                var key = parameters.GetKey();
                 if (key.Length < 16)
                 {
                     throw new ArgumentException("Skein key must be at least 128 bits.");
@@ -619,18 +618,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void InitParams(IDictionary parameters)
         {
-            IEnumerator keys = parameters.Keys.GetEnumerator();
-            IList pre = Platform.CreateArrayList();
-            IList post = Platform.CreateArrayList();
+            var keys = parameters.Keys.GetEnumerator();
+            var pre = Platform.CreateArrayList();
+            var post = Platform.CreateArrayList();
 
             while (keys.MoveNext())
             {
-                int type = (int)keys.Current;
-                byte[] value = (byte[])parameters[type];
+                var type = (int)keys.Current;
+                var value = (byte[])parameters[type];
 
                 if (type == PARAM_TYPE_KEY)
                 {
-                    this.key = value;
+                    key = value;
                 }
                 else if (type < PARAM_TYPE_MESSAGE)
                 {
@@ -655,7 +654,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
          */
         private void CreateInitialState()
         {
-            ulong[] precalc = (ulong[])INITIAL_STATES[VariantIdentifier(BlockSize, OutputSize)];
+            var precalc = (ulong[])INITIAL_STATES[VariantIdentifier(BlockSize, OutputSize)];
             if ((key == null) && (precalc != null))
             {
                 // Precalculated UBI(CFG)
@@ -679,9 +678,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             // Process additional pre-message parameters
             if (preMessageParameters != null)
             {
-                for (int i = 0; i < preMessageParameters.Length; i++)
+                for (var i = 0; i < preMessageParameters.Length; i++)
                 {
-                    Parameter param = preMessageParameters[i];
+                    var param = preMessageParameters[i];
                     UbiComplete(param.Type, param.Value);
                 }
             }
@@ -702,13 +701,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
         private void UbiComplete(int type, byte[] value)
         {
             UbiInit(type);
-            this.ubi.Update(value, 0, value.Length, chain);
+            ubi.Update(value, 0, value.Length, chain);
             UbiFinal();
         }
 
         private void UbiInit(int type)
         {
-            this.ubi.Reset(type);
+            ubi.Reset(type);
         }
 
         private void UbiFinal()
@@ -718,7 +717,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void CheckInitialised()
         {
-            if (this.ubi == null)
+            if (ubi == null)
             {
                 throw new ArgumentException("Skein engine is not initialised.");
             }
@@ -750,19 +749,19 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             // Process additional post-message parameters
             if (postMessageParameters != null)
             {
-                for (int i = 0; i < postMessageParameters.Length; i++)
+                for (var i = 0; i < postMessageParameters.Length; i++)
                 {
-                    Parameter param = postMessageParameters[i];
+                    var param = postMessageParameters[i];
                     UbiComplete(param.Type, param.Value);
                 }
             }
 
             // Perform the output transform
-            int blockSize = BlockSize;
-            int blocksRequired = ((outputSizeBytes + blockSize - 1) / blockSize);
-            for (int i = 0; i < blocksRequired; i++)
+            var blockSize = BlockSize;
+            var blocksRequired = ((outputSizeBytes + blockSize - 1) / blockSize);
+            for (var i = 0; i < blocksRequired; i++)
             {
-                int toWrite = System.Math.Min(blockSize, outputSizeBytes - (i * blockSize));
+                var toWrite = System.Math.Min(blockSize, outputSizeBytes - (i * blockSize));
                 Output((ulong)i, outBytes, outOff + (i * blockSize), toWrite);
             }
 
@@ -773,20 +772,20 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void Output(ulong outputSequence, byte[] outBytes, int outOff, int outputBytes)
         {
-            byte[] currentBytes = new byte[8];
+            var currentBytes = new byte[8];
             ThreefishEngine.WordToBytes(outputSequence, currentBytes, 0);
 
             // Output is a sequence of UBI invocations all of which use and preserve the pre-output
             // state
-            ulong[] outputWords = new ulong[chain.Length];
+            var outputWords = new ulong[chain.Length];
             UbiInit(PARAM_TYPE_OUTPUT);
-            this.ubi.Update(currentBytes, 0, currentBytes.Length, outputWords);
+            ubi.Update(currentBytes, 0, currentBytes.Length, outputWords);
             ubi.DoFinal(outputWords);
 
-            int wordsRequired = ((outputBytes + 8 - 1) / 8);
-            for (int i = 0; i < wordsRequired; i++)
+            var wordsRequired = ((outputBytes + 8 - 1) / 8);
+            for (var i = 0; i < wordsRequired; i++)
             {
-                int toWrite = System.Math.Min(8, outputBytes - (i * 8));
+                var toWrite = System.Math.Min(8, outputBytes - (i * 8));
                 if (toWrite == 8)
                 {
                     ThreefishEngine.WordToBytes(outputWords[i], outBytes, outOff + (i * 8));

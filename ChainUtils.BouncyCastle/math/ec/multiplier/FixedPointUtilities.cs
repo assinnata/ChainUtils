@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
+﻿namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 {
     public class FixedPointUtilities
     {
@@ -8,7 +6,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
         public static int GetCombSize(ECCurve c)
         {
-            BigInteger order = c.Order;
+            var order = c.Order;
             return order == null ? c.FieldSize + 1 : order.BitLength;
         }
 
@@ -24,20 +22,20 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
         public static FixedPointPreCompInfo Precompute(ECPoint p, int minWidth)
         {
-            ECCurve c = p.Curve;
+            var c = p.Curve;
 
-            int n = 1 << minWidth;
-            FixedPointPreCompInfo info = GetFixedPointPreCompInfo(c.GetPreCompInfo(p, PRECOMP_NAME));
-            ECPoint[] lookupTable = info.PreComp;
+            var n = 1 << minWidth;
+            var info = GetFixedPointPreCompInfo(c.GetPreCompInfo(p, PRECOMP_NAME));
+            var lookupTable = info.PreComp;
 
             if (lookupTable == null || lookupTable.Length < n)
             {
-                int bits = GetCombSize(c);
-                int d = (bits + minWidth - 1) / minWidth;
+                var bits = GetCombSize(c);
+                var d = (bits + minWidth - 1) / minWidth;
 
-                ECPoint[] pow2Table = new ECPoint[minWidth];
+                var pow2Table = new ECPoint[minWidth];
                 pow2Table[0] = p;
-                for (int i = 1; i < minWidth; ++i)
+                for (var i = 1; i < minWidth; ++i)
                 {
                     pow2Table[i] = pow2Table[i - 1].TimesPow2(d);
                 }
@@ -47,12 +45,12 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
                 lookupTable = new ECPoint[n];
                 lookupTable[0] = c.Infinity;
 
-                for (int bit = minWidth - 1; bit >= 0; --bit)
+                for (var bit = minWidth - 1; bit >= 0; --bit)
                 {
-                    ECPoint pow2 = pow2Table[bit];
+                    var pow2 = pow2Table[bit];
 
-                    int step = 1 << bit;
-                    for (int i = step; i < n; i += (step << 1))
+                    var step = 1 << bit;
+                    for (var i = step; i < n; i += (step << 1))
                     {
                         lookupTable[i] = lookupTable[i - step].Add(pow2);
                     }

@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
@@ -42,9 +41,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             AlgorithmIdentifier			algorithm,
             DerBitString				signature)
         {
-            this.reqInfo = requestInfo;
-            this.sigAlgId = algorithm;
-            this.sigBits = signature;
+            reqInfo = requestInfo;
+            sigAlgId = algorithm;
+            sigBits = signature;
         }
 
 		public CertificationRequest(

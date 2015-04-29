@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -42,7 +41,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             if (obj == null)
                 throw new ArgumentNullException("obj");
 
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is DerInteger)
 			{
@@ -101,12 +100,12 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
 		{
-			DerInteger other = asn1Object as DerInteger;
+			var other = asn1Object as DerInteger;
 
 			if (other == null)
 				return false;
 
-			return Arrays.AreEqual(this.bytes, other.bytes);
+			return Arrays.AreEqual(bytes, other.bytes);
         }
 
 		public override string ToString()

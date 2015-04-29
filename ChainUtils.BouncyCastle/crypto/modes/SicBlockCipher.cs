@@ -1,7 +1,5 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Modes
 {
@@ -26,10 +24,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
         public SicBlockCipher(IBlockCipher cipher)
         {
             this.cipher = cipher;
-            this.blockSize = cipher.GetBlockSize();
-            this.IV = new byte[blockSize];
-            this.counter = new byte[blockSize];
-            this.counterOut = new byte[blockSize];
+            blockSize = cipher.GetBlockSize();
+            IV = new byte[blockSize];
+            counter = new byte[blockSize];
+            counterOut = new byte[blockSize];
         }
 
         /**
@@ -48,8 +46,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
         {
             if (parameters is ParametersWithIV)
             {
-                ParametersWithIV ivParam = (ParametersWithIV) parameters;
-                byte[] iv = ivParam.GetIV();
+                var ivParam = (ParametersWithIV) parameters;
+                var iv = ivParam.GetIV();
                 Array.Copy(iv, 0, IV, 0, IV.Length);
 
                 Reset();
@@ -92,13 +90,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             //
             // XOR the counterOut with the plaintext producing the cipher text
             //
-            for (int i = 0; i < counterOut.Length; i++)
+            for (var i = 0; i < counterOut.Length; i++)
             {
                 output[outOff + i] = (byte)(counterOut[i] ^ input[inOff + i]);
             }
 
             // Increment the counter
-            int j = counter.Length;
+            var j = counter.Length;
             while (--j >= 0 && ++counter[j] == 0)
             {
             }

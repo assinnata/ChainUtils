@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 
 namespace ChainUtils.BouncyCastle.Utilities.Encoders
 {
@@ -45,7 +44,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             int off,
             int length)
         {
-            string s = Convert.ToBase64String(data, off, length);
+            var s = Convert.ToBase64String(data, off, length);
             return Strings.ToAsciiByteArray(s);
         }
 
@@ -58,7 +57,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             byte[]	data,
             Stream	outStream)
         {
-            byte[] encoded = Encode(data);
+            var encoded = Encode(data);
             outStream.Write(encoded, 0, encoded.Length);
             return encoded.Length;
         }
@@ -74,7 +73,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             int		length,
             Stream	outStream)
         {
-            byte[] encoded = Encode(data, off, length);
+            var encoded = Encode(data, off, length);
             outStream.Write(encoded, 0, encoded.Length);
             return encoded.Length;
         }
@@ -87,7 +86,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
         public static byte[] Decode(
             byte[] data)
         {
-            string s = Strings.FromAsciiByteArray(data);
+            var s = Strings.FromAsciiByteArray(data);
             return Convert.FromBase64String(s);
         }
 
@@ -112,7 +111,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             string	data,
             Stream	outStream)
         {
-            byte[] decoded = Decode(data);
+            var decoded = Decode(data);
             outStream.Write(decoded, 0, decoded.Length);
             return decoded.Length;
         }

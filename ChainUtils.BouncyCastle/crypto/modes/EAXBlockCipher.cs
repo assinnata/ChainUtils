@@ -1,8 +1,6 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Macs;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Modes
 {
@@ -86,7 +84,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
 			if (parameters is AeadParameters)
 			{
-				AeadParameters param = (AeadParameters) parameters;
+				var param = (AeadParameters) parameters;
 
 				nonce = param.GetNonce();
                 initialAssociatedText = param.GetAssociatedText();
@@ -95,7 +93,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 			}
 			else if (parameters is ParametersWithIV)
 			{
-				ParametersWithIV param = (ParametersWithIV) parameters;
+				var param = (ParametersWithIV) parameters;
 
 				nonce = param.GetIV();
                 initialAssociatedText = null;
@@ -107,7 +105,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 				throw new ArgumentException("invalid parameters passed to EAX");
 			}
 
-            byte[] tag = new byte[blockSize];
+            var tag = new byte[blockSize];
 
             // Key reuse implemented in CBC mode of underlying CMac
             mac.Init(keyParam);
@@ -140,17 +138,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
             mac.DoFinal(associatedTextMac, 0);
 
-            byte[] tag = new byte[blockSize];
+            var tag = new byte[blockSize];
             tag[blockSize - 1] = (byte)Tag.C;
             mac.BlockUpdate(tag, 0, blockSize);
         }
 
         private void CalculateMac()
 		{
-			byte[] outC = new byte[blockSize];
+			var outC = new byte[blockSize];
 			mac.DoFinal(outC, 0);
 
-			for (int i = 0; i < macBlock.Length; i++)
+			for (var i = 0; i < macBlock.Length; i++)
 			{
 				macBlock[i] = (byte)(nonceMac[i] ^ associatedTextMac[i] ^ outC[i]);
 			}
@@ -175,7 +173,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 				Array.Clear(macBlock, 0, macBlock.Length);
 			}
 
-            byte[] tag = new byte[blockSize];
+            var tag = new byte[blockSize];
             tag[blockSize - 1] = (byte)Tag.H;
             mac.BlockUpdate(tag, 0, blockSize);
 
@@ -224,9 +222,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 		{
             InitCipher();
 
-            int resultLen = 0;
+            var resultLen = 0;
 
-			for (int i = 0; i != len; i++)
+			for (var i = 0; i != len; i++)
 			{
 				resultLen += Process(inBytes[inOff + i], outBytes, outOff + resultLen);
 			}
@@ -240,8 +238,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 		{
             InitCipher();
 
-            int extra = bufOff;
-			byte[] tmp = new byte[bufBlock.Length];
+            var extra = bufOff;
+			var tmp = new byte[bufBlock.Length];
 
             bufOff = 0;
 
@@ -287,7 +285,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
 		public virtual byte[] GetMac()
 		{
-			byte[] mac = new byte[macSize];
+			var mac = new byte[macSize];
 
 			Array.Copy(macBlock, 0, mac, 0, macSize);
 
@@ -297,7 +295,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
         public virtual int GetUpdateOutputSize(
 			int len)
 		{
-            int totalData = len + bufOff;
+            var totalData = len + bufOff;
             if (!forEncryption)
             {
                 if (totalData < macSize)
@@ -312,7 +310,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 		public virtual int GetOutputSize(
 			int len)
 		{
-            int totalData = len + bufOff;
+            var totalData = len + bufOff;
 
             if (forEncryption)
             {
@@ -357,9 +355,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
 		private bool VerifyMac(byte[] mac, int off)
 		{
-            int nonEqual = 0;
+            var nonEqual = 0;
 
-            for (int i = 0; i < macSize; i++)
+            for (var i = 0; i < macSize; i++)
             {
                 nonEqual |= (macBlock[i] ^ mac[off + i]);
             }

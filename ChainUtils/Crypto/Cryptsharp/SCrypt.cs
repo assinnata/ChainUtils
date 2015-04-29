@@ -17,16 +17,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 #endregion
 
-using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Security;
-using ChainUtils.Crypto.Internal;
 using System;
+using System.Text;
+using System.Threading;
+using ChainUtils.Crypto.Internal;
 #if !USEBC
 using System.Security.Cryptography;
 #endif
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Crypto
 {
@@ -39,7 +36,7 @@ namespace ChainUtils.Crypto
 	/// </summary>
 	public static class SCrypt
 	{
-		const int hLen = 32;
+		const int HLen = 32;
 
 		/// <summary>
 		/// Computes a derived key.
@@ -74,7 +71,7 @@ namespace ChainUtils.Crypto
 		{
 			Check.Range("derivedKeyLength", derivedKeyLength, 0, int.MaxValue);
 
-			using(Pbkdf2 kdf = GetStream(key, salt, cost, blockSize, parallel, maxThreads))
+			using(var kdf = GetStream(key, salt, cost, blockSize, parallel, maxThreads))
 			{
 				return kdf.Read(derivedKeyLength);
 			}
@@ -145,9 +142,9 @@ namespace ChainUtils.Crypto
 		public static Pbkdf2 GetStream(byte[] key, byte[] salt,
 									   int cost, int blockSize, int parallel, int? maxThreads)
 		{
-			byte[] B = GetEffectivePbkdf2Salt(key, salt, cost, blockSize, parallel, maxThreads);
-			Pbkdf2 kdf = new Pbkdf2(new HMACSHA256(key), B, 1);
-			Security.Clear(B);
+			var b = GetEffectivePbkdf2Salt(key, salt, cost, blockSize, parallel, maxThreads);
+			var kdf = new Pbkdf2(new HMACSHA256(key), b, 1);
+			Security.Clear(b);
 			return kdf;
 		}
 
@@ -164,10 +161,10 @@ namespace ChainUtils.Crypto
 		}
 #endif
 
-		static byte[] MFcrypt(byte[] P, byte[] S,
+		static byte[] MFcrypt(byte[] p, byte[] s,
 							  int cost, int blockSize, int parallel, int? maxThreads)
 		{
-			int MFLen = blockSize * 128;
+			var mfLen = blockSize * 128;
 			if(maxThreads == null)
 			{
 				maxThreads = int.MaxValue;
@@ -178,57 +175,57 @@ namespace ChainUtils.Crypto
 				throw Exceptions.ArgumentOutOfRange("cost", "Cost must be a positive power of 2.");
 			}
 			Check.Range("blockSize", blockSize, 1, int.MaxValue / 128);
-			Check.Range("parallel", parallel, 1, int.MaxValue / MFLen);
+			Check.Range("parallel", parallel, 1, int.MaxValue / mfLen);
 			Check.Range("maxThreads", (int)maxThreads, 1, int.MaxValue);
 
 #if !USEBC
-			byte[] B = Pbkdf2.ComputeDerivedKey(new HMACSHA256(P), S, 1, parallel * MFLen);
+			var b = Pbkdf2.ComputeDerivedKey(new HMACSHA256(p), s, 1, parallel * mfLen);
 #else
 			var mac = MacUtilities.GetMac("HMAC-SHA_256");
 			mac.Init(new KeyParameter(P));
 			byte[] B = Pbkdf2.ComputeDerivedKey(mac, S, 1, parallel * MFLen);
 #endif
-			uint[] B0 = new uint[B.Length / 4];
-			for(int i = 0 ; i < B0.Length ; i++)
+			var b0 = new uint[b.Length / 4];
+			for(var i = 0 ; i < b0.Length ; i++)
 			{
-				B0[i] = BitPacking.UInt32FromLEBytes(B, i * 4);
+				b0[i] = BitPacking.UInt32FromLeBytes(b, i * 4);
 			} // code is easier with uint[]
-			ThreadSMixCalls(B0, MFLen, cost, blockSize, parallel, (int)maxThreads);
-			for(int i = 0 ; i < B0.Length ; i++)
+			ThreadSMixCalls(b0, mfLen, cost, blockSize, parallel, (int)maxThreads);
+			for(var i = 0 ; i < b0.Length ; i++)
 			{
-				BitPacking.LEBytesFromUInt32(B0[i], B, i * 4);
+				BitPacking.LeBytesFromUInt32(b0[i], b, i * 4);
 			}
-			Security.Clear(B0);
+			Security.Clear(b0);
 
-			return B;
+			return b;
 		}
 #if !USEBC
-		static void ThreadSMixCalls(uint[] B0, int MFLen,
+		static void ThreadSMixCalls(uint[] b0, int mfLen,
 									int cost, int blockSize, int parallel, int maxThreads)
 		{
-			int current = 0;
+			var current = 0;
 			ThreadStart workerThread = delegate()
 			{
 				while(true)
 				{
-					int j = Interlocked.Increment(ref current) - 1;
+					var j = Interlocked.Increment(ref current) - 1;
 					if(j >= parallel)
 					{
 						break;
 					}
 
-					SMix(B0, j * MFLen / 4, B0, j * MFLen / 4, (uint)cost, blockSize);
+					SMix(b0, j * mfLen / 4, b0, j * mfLen / 4, (uint)cost, blockSize);
 				}
 			};
 
-			int threadCount = Math.Max(1, Math.Min(Environment.ProcessorCount, Math.Min(maxThreads, parallel)));
-			Thread[] threads = new Thread[threadCount - 1];
-			for(int i = 0 ; i < threads.Length ; i++)
+			var threadCount = Math.Max(1, Math.Min(Environment.ProcessorCount, Math.Min(maxThreads, parallel)));
+			var threads = new Thread[threadCount - 1];
+			for(var i = 0 ; i < threads.Length ; i++)
 			{
 				(threads[i] = new Thread(workerThread, 8192)).Start();
 			}
 			workerThread();
-			for(int i = 0 ; i < threads.Length ; i++)
+			for(var i = 0 ; i < threads.Length ; i++)
 			{
 				threads[i].Join();
 			}
@@ -266,40 +263,40 @@ namespace ChainUtils.Crypto
 			}
 		}
 #endif
-		static void SMix(uint[] B, int Boffset, uint[] Bp, int Bpoffset, uint N, int r)
+		static void SMix(uint[] b, int boffset, uint[] bp, int bpoffset, uint n, int r)
 		{
-			uint Nmask = N - 1;
-			int Bs = 16 * 2 * r;
-			uint[] scratch1 = new uint[16];
-			uint[] scratchX = new uint[16], scratchY = new uint[Bs];
-			uint[] scratchZ = new uint[Bs];
+			var nmask = n - 1;
+			var bs = 16 * 2 * r;
+			var scratch1 = new uint[16];
+			uint[] scratchX = new uint[16], scratchY = new uint[bs];
+			var scratchZ = new uint[bs];
 
-			uint[] x = new uint[Bs];
-			uint[][] v = new uint[N][];
-			for(int i = 0 ; i < v.Length ; i++)
+			var x = new uint[bs];
+			var v = new uint[n][];
+			for(var i = 0 ; i < v.Length ; i++)
 			{
-				v[i] = new uint[Bs];
+				v[i] = new uint[bs];
 			}
 
-			Array.Copy(B, Boffset, x, 0, Bs);
-			for(uint i = 0 ; i < N ; i++)
+			Array.Copy(b, boffset, x, 0, bs);
+			for(uint i = 0 ; i < n ; i++)
 			{
-				Array.Copy(x, v[i], Bs);
+				Array.Copy(x, v[i], bs);
 				BlockMix(x, 0, x, 0, scratchX, scratchY, scratch1, r);
 			}
-			for(uint i = 0 ; i < N ; i++)
+			for(uint i = 0 ; i < n ; i++)
 			{
-				uint j = x[Bs - 16] & Nmask;
-				uint[] vj = v[j];
-				for(int k = 0 ; k < scratchZ.Length ; k++)
+				var j = x[bs - 16] & nmask;
+				var vj = v[j];
+				for(var k = 0 ; k < scratchZ.Length ; k++)
 				{
 					scratchZ[k] = x[k] ^ vj[k];
 				}
 				BlockMix(scratchZ, 0, x, 0, scratchX, scratchY, scratch1, r);
 			}
-			Array.Copy(x, 0, Bp, Bpoffset, Bs);
+			Array.Copy(x, 0, bp, bpoffset, bs);
 
-			for(int i = 0 ; i < v.Length ; i++)
+			for(var i = 0 ; i < v.Length ; i++)
 			{
 				Security.Clear(v[i]);
 			}
@@ -312,31 +309,31 @@ namespace ChainUtils.Crypto
 		}
 
 		static void BlockMix
-			(uint[] B,        // 16*2*r
-			 int Boffset,
-			 uint[] Bp,       // 16*2*r
-			 int Bpoffset,
+			(uint[] b,        // 16*2*r
+			 int boffset,
+			 uint[] bp,       // 16*2*r
+			 int bpoffset,
 			 uint[] x,        // 16
 			 uint[] y,        // 16*2*r -- unnecessary but it allows us to alias B and Bp
 			 uint[] scratch,  // 16
 			 int r)
 		{
-			int k = Boffset, m = 0, n = 16 * r;
-			Array.Copy(B, (2 * r - 1) * 16, x, 0, 16);
+			int k = boffset, m = 0, n = 16 * r;
+			Array.Copy(b, (2 * r - 1) * 16, x, 0, 16);
 
-			for(int i = 0 ; i < r ; i++)
+			for(var i = 0 ; i < r ; i++)
 			{
-				for(int j = 0 ; j < scratch.Length ; j++)
+				for(var j = 0 ; j < scratch.Length ; j++)
 				{
-					scratch[j] = x[j] ^ B[j + k];
+					scratch[j] = x[j] ^ b[j + k];
 				}
 				Salsa20Core.Compute(8, scratch, 0, x, 0);
 				Array.Copy(x, 0, y, m, 16);
 				k += 16;
 
-				for(int j = 0 ; j < scratch.Length ; j++)
+				for(var j = 0 ; j < scratch.Length ; j++)
 				{
-					scratch[j] = x[j] ^ B[j + k];
+					scratch[j] = x[j] ^ b[j + k];
 				}
 				Salsa20Core.Compute(8, scratch, 0, x, 0);
 				Array.Copy(x, 0, y, m + n, 16);
@@ -345,7 +342,7 @@ namespace ChainUtils.Crypto
 				m += 16;
 			}
 
-			Array.Copy(y, 0, Bp, Bpoffset, y.Length);
+			Array.Copy(y, 0, bp, bpoffset, y.Length);
 		}
 
 		//REF BIP38
@@ -354,12 +351,12 @@ namespace ChainUtils.Crypto
 		//•Use of the parallelization parameter provides a modest opportunity for speedups in environments where concurrent threading is available - such environments would be selected for processes that must handle bulk quantities of encryption/decryption operations. Estimated time for an operation is in the tens or hundreds of milliseconds.
 		public static byte[] BitcoinComputeDerivedKey(byte[] password, byte[] salt, int outputCount = 64)
 		{
-			return ChainUtils.Crypto.SCrypt.ComputeDerivedKey(password, salt, 16384, 8, 8, 8, outputCount);
+			return ComputeDerivedKey(password, salt, 16384, 8, 8, 8, outputCount);
 		}
 
 		public static byte[] BitcoinComputeDerivedKey2(byte[] password, byte[] salt, int outputCount = 64)
 		{
-			return ChainUtils.Crypto.SCrypt.ComputeDerivedKey(password, salt, 1024, 1, 1, 1, outputCount);
+			return ComputeDerivedKey(password, salt, 1024, 1, 1, 1, outputCount);
 		}
 
 		public static byte[] BitcoinComputeDerivedKey(string password, byte[] salt)

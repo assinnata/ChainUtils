@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
@@ -34,36 +31,36 @@ namespace ChainUtils
 	public class ChainedBlock
 	{
 		// pointer to the hash of the block, if any. memory is owned by this CBlockIndex
-		uint256 phashBlock;
+		Uint256 _phashBlock;
 
-		public uint256 HashBlock
+		public Uint256 HashBlock
 		{
 			get
 			{
-				return phashBlock;
+				return _phashBlock;
 			}
 		}
 
 
 		// pointer to the index of the predecessor of this block
-		ChainedBlock pprev;
+		ChainedBlock _pprev;
 
 		public ChainedBlock Previous
 		{
 			get
 			{
-				return pprev;
+				return _pprev;
 			}
 		}
 
 		// height of the entry in the chain. The genesis block has height 0
-		int nHeight;
+		int _nHeight;
 
 		public int Height
 		{
 			get
 			{
-				return nHeight;
+				return _nHeight;
 			}
 		}
 
@@ -101,13 +98,13 @@ namespace ChainUtils
 		//	}
 		//}
 
-		BlockHeader header;
+		BlockHeader _header;
 
 		public BlockHeader Header
 		{
 			get
 			{
-				return header;
+				return _header;
 			}
 		}
 
@@ -117,16 +114,16 @@ namespace ChainUtils
 		// (memory only) Sequencial id assigned to distinguish order in which blocks are received.
 		//uint nSequenceId;
 
-		public ChainedBlock(BlockHeader header,uint256 headerHash, ChainedBlock previous)
+		public ChainedBlock(BlockHeader header,Uint256 headerHash, ChainedBlock previous)
 		{
 			if(previous != null)
 			{
-				nHeight = previous.Height + 1;
+				_nHeight = previous.Height + 1;
 			}
-			this.pprev = previous;
+			_pprev = previous;
 			//this.nDataPos = pos;
-			this.header = header;
-			this.phashBlock = headerHash ?? header.GetHash();
+			this._header = header;
+			_phashBlock = headerHash ?? header.GetHash();
 
 			if(previous == null)
 			{
@@ -142,16 +139,16 @@ namespace ChainUtils
 
 		public ChainedBlock(BlockHeader header, int height)
 		{
-			nHeight = height;
+			_nHeight = height;
 			//this.nDataPos = pos;
-			this.header = header;
-			this.phashBlock = header.GetHash();
+			this._header = header;
+			_phashBlock = header.GetHash();
 		}
 
 		public BlockLocator GetLocator()
 		{
-			int nStep = 1;
-			List<uint256> vHave = new List<uint256>();
+			var nStep = 1;
+			var vHave = new List<Uint256>();
 
 			var pindex = this;
 			while(pindex != null)
@@ -161,7 +158,7 @@ namespace ChainUtils
 				if(pindex.Height == 0)
 					break;
 				// Exponentially larger steps back, plus the genesis block.
-				int nHeight = Math.Max(pindex.Height - nStep, 0);
+				var nHeight = Math.Max(pindex.Height - nStep, 0);
 				while(pindex.Height > nHeight)
 					pindex = pindex.Previous;
 				if(vHave.Count > 10)
@@ -173,18 +170,18 @@ namespace ChainUtils
 
 		public override bool Equals(object obj)
 		{
-			ChainedBlock item = obj as ChainedBlock;
+			var item = obj as ChainedBlock;
 			if(item == null)
 				return false;
-			return phashBlock.Equals(item.phashBlock);
+			return _phashBlock.Equals(item._phashBlock);
 		}
 		public static bool operator ==(ChainedBlock a, ChainedBlock b)
 		{
-			if(System.Object.ReferenceEquals(a, b))
+			if(ReferenceEquals(a, b))
 				return true;
 			if(((object)a == null) || ((object)b == null))
 				return false;
-			return a.phashBlock == b.phashBlock;
+			return a._phashBlock == b._phashBlock;
 		}
 
 		public static bool operator !=(ChainedBlock a, ChainedBlock b)
@@ -194,7 +191,7 @@ namespace ChainUtils
 
 		public override int GetHashCode()
 		{
-			return phashBlock.GetHashCode();
+			return _phashBlock.GetHashCode();
 		}
 
 
@@ -220,16 +217,16 @@ namespace ChainUtils
 				throw new InvalidOperationException("Can only find blocks below or equals to current height");
 			if(height < 0)
 				throw new ArgumentOutOfRangeException("height");
-			ChainedBlock currentBlock = this;
+			var currentBlock = this;
 			while(height != currentBlock.Height)
 			{
 				currentBlock = currentBlock.Previous;
 			}
 			return currentBlock;
 		}
-		public ChainedBlock FindAncestorOrSelf(uint256 blockHash)
+		public ChainedBlock FindAncestorOrSelf(Uint256 blockHash)
 		{
-			ChainedBlock currentBlock = this;
+			var currentBlock = this;
 			while(currentBlock != null && currentBlock.HashBlock != blockHash)
 			{
 				currentBlock = currentBlock.Previous;

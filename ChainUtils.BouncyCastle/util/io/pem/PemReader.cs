@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.IO;
 using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities.Encoders;
 
 namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
@@ -33,13 +31,13 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 		/// <exception cref="IOException"></exception>
 		public PemObject ReadPemObject()
 		{
-			string line = reader.ReadLine();
+			var line = reader.ReadLine();
 
 			if (line != null && line.StartsWith(BeginString))
 			{
 				line = line.Substring(BeginString.Length);
-				int index = line.IndexOf('-');
-				string type = line.Substring(0, index);
+				var index = line.IndexOf('-');
+				var type = line.Substring(0, index);
 
 				if (index > 0)
 					return LoadObject(type);
@@ -50,15 +48,15 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 
 		private PemObject LoadObject(string type)
 		{
-			string endMarker = EndString + type;
-			IList headers = Platform.CreateArrayList();
-			StringBuilder buf = new StringBuilder();
+			var endMarker = EndString + type;
+			var headers = Platform.CreateArrayList();
+			var buf = new StringBuilder();
 
 			string line;
 			while ((line = reader.ReadLine()) != null
 				&& line.IndexOf(endMarker) == -1)
 			{
-				int colonPos = line.IndexOf(':');
+				var colonPos = line.IndexOf(':');
 
 				if (colonPos == -1)
 				{
@@ -67,12 +65,12 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 				else
 				{
 					// Process field
-					string fieldName = line.Substring(0, colonPos).Trim();
+					var fieldName = line.Substring(0, colonPos).Trim();
 
 					if (fieldName.StartsWith("X-"))
 						fieldName = fieldName.Substring(2);
 
-					string fieldValue = line.Substring(colonPos + 1).Trim();
+					var fieldValue = line.Substring(colonPos + 1).Trim();
 
 					headers.Add(new PemHeader(fieldName, fieldValue));
 				}

@@ -1,12 +1,10 @@
-﻿using ChainUtils.Crypto;
+﻿using System;
+using System.Linq;
+using ChainUtils.BouncyCastle.Math;
+using ChainUtils.BouncyCastle.Math.EC;
+using ChainUtils.Crypto;
 using ChainUtils.DataEncoders;
 using ChainUtils.Stealth;
-using ChainUtils.BouncyCastle.Math;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
@@ -43,13 +41,13 @@ namespace ChainUtils
 				throw new FormatException("Invalid public key");
 			}
 			if(@unsafe)
-				this.vch = bytes;
+				_vch = bytes;
 			else
 			{
-				this.vch = bytes.ToArray();
+				_vch = bytes.ToArray();
 				try
 				{
-					_ECKey = new ECKey(bytes, false);
+					_ecKey = new EcKey(bytes, false);
 				}
 				catch(Exception ex)
 				{
@@ -58,28 +56,23 @@ namespace ChainUtils
 			}
 		}
 
-		ECKey _ECKey;
-		private ECKey ECKey
+		EcKey _ecKey;
+		private EcKey EcKey
 		{
-			get
-			{
-				if(_ECKey == null)
-					_ECKey = new ECKey(vch, false);
-				return _ECKey;
-			}
+			get { return _ecKey ?? (_ecKey = new EcKey(_vch, false)); }
 		}
 
 		public PubKey Compress()
 		{
 			if(IsCompressed)
 				return this;
-			return ECKey.GetPubKey(true);
+			return EcKey.GetPubKey(true);
 		}
 		public PubKey Decompress()
 		{
 			if(!IsCompressed)
 				return this;
-			return ECKey.GetPubKey(false);
+			return EcKey.GetPubKey(false);
 		}
 
 		/// <summary>
@@ -99,7 +92,7 @@ namespace ChainUtils
 				return quick;
 			try
 			{
-				new ECKey(data, false);
+				new EcKey(data, false);
 				return true;
 			}
 			catch
@@ -108,41 +101,27 @@ namespace ChainUtils
 			}
 		}
 
-		byte[] vch = new byte[0];
-		KeyId _ID;
+		byte[] _vch;
+		KeyId _id;
 
 		[Obsolete("Use Hash instead")]
-		public KeyId ID
+		public KeyId Id
 		{
-			get
-			{
-				if(_ID == null)
-				{
-					_ID = new KeyId(Hashes.Hash160(vch, vch.Length));
-				}
-				return _ID;
-			}
+			get { return _id ?? (_id = new KeyId(Hashes.Hash160(_vch, _vch.Length))); }
 		}
 
 		public KeyId Hash
 		{
-			get
-			{
-				if(_ID == null)
-				{
-					_ID = new KeyId(Hashes.Hash160(vch, vch.Length));
-				}
-				return _ID;
-			}
+			get { return _id ?? (_id = new KeyId(Hashes.Hash160(_vch, _vch.Length))); }
 		}
 
 		public bool IsCompressed
 		{
 			get
 			{
-				if(this.vch.Length == 65)
+				if(_vch.Length == 65)
 					return false;
-				if(this.vch.Length == 33)
+				if(_vch.Length == 33)
 					return true;
 				throw new NotSupportedException("Invalid public key size");
 			}
@@ -150,7 +129,7 @@ namespace ChainUtils
 
 		public BitcoinAddress GetAddress(Network network)
 		{
-			return network.CreateBitcoinAddress(this.Hash);
+			return network.CreateBitcoinAddress(Hash);
 		}
 
 		public BitcoinScriptAddress GetScriptAddress(Network network)
@@ -160,13 +139,13 @@ namespace ChainUtils
 		}
 
 
-		public bool Verify(uint256 hash, ECDSASignature sig)
+		public bool Verify(Uint256 hash, EcdsaSignature sig)
 		{
-			return ECKey.Verify(hash, sig);
+			return EcKey.Verify(hash, sig);
 		}
-		public bool Verify(uint256 hash, byte[] sig)
+		public bool Verify(Uint256 hash, byte[] sig)
 		{
-			return Verify(hash, ECDSASignature.FromDER(sig));
+			return Verify(hash, EcdsaSignature.FromDer(sig));
 		}
 
 		[Obsolete("Use ScriptPubKey instead")]
@@ -180,30 +159,30 @@ namespace ChainUtils
 
 		public string ToHex()
 		{
-			return Encoders.Hex.EncodeData(vch);
+			return Encoders.Hex.EncodeData(_vch);
 		}
 
 		#region IBitcoinSerializable Members
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref vch);
+			stream.ReadWrite(ref _vch);
 			if(!stream.Serializing)
-				_ECKey = new ECKey(vch, false);
+				_ecKey = new EcKey(_vch, false);
 		}
 
 		#endregion
 
 		public byte[] ToBytes()
 		{
-			return vch.ToArray();
+			return _vch.ToArray();
 		}
 		public byte[] ToBytes(bool @unsafe)
 		{
 			if(@unsafe)
-				return vch;
+				return _vch;
 			else
-				return vch.ToArray();
+				return _vch.ToArray();
 		}
 		public override string ToString()
 		{
@@ -213,7 +192,7 @@ namespace ChainUtils
 
 		public bool VerifyMessage(string message, string signature)
 		{
-			var key = PubKey.RecoverFromMessage(message, signature);
+			var key = RecoverFromMessage(message, signature);
 			return key.Hash == Hash;
 		}
 
@@ -227,7 +206,7 @@ namespace ChainUtils
 			return RecoverCompact(hash, signatureEncoded);
 		}
 
-		public static PubKey RecoverCompact(uint256 hash, byte[] signatureEncoded)
+		public static PubKey RecoverCompact(Uint256 hash, byte[] signatureEncoded)
 		{
 			if(signatureEncoded.Length < 65)
 				throw new ArgumentException("Signature truncated, expected 65 bytes and got " + signatureEncoded.Length);
@@ -241,32 +220,37 @@ namespace ChainUtils
 			if(header < 27 || header > 34)
 				throw new ArgumentException("Header byte out of range: " + header);
 
-			BigInteger r = new BigInteger(1, signatureEncoded.Skip(1).Take(32).ToArray());
-			BigInteger s = new BigInteger(1, signatureEncoded.Skip(33).Take(32).ToArray());
-			var sig = new ECDSASignature(r, s);
-			bool compressed = false;
+			var r = new BigInteger(1, signatureEncoded.Skip(1).Take(32).ToArray());
+			var s = new BigInteger(1, signatureEncoded.Skip(33).Take(32).ToArray());
+			var sig = new EcdsaSignature(r, s);
+			var compressed = false;
 
 			if(header >= 31)
 			{
 				compressed = true;
 				header -= 4;
 			}
-			int recId = header - 27;
+			var recId = header - 27;
 
-			ECKey key = ECKey.RecoverFromSignature(recId, sig, hash, compressed);
+			var key = EcKey.RecoverFromSignature(recId, sig, hash, compressed);
 			return key.GetPubKey(compressed);
 		}
+
+	    public byte[] Encrypt(string data)
+	    {
+	        return new byte[] {};
+	    }
 
 
 		public PubKey Derivate(byte[] cc, uint nChild, out byte[] ccChild)
 		{
-			byte[] lr = null;
-			byte[] l = new byte[32];
-			byte[] r = new byte[32];
+			byte[] lr;
+			var l = new byte[32];
+			var r = new byte[32];
 			if((nChild >> 31) == 0)
 			{
 				var pubKey = ToBytes();
-				lr = Hashes.BIP32Hash(cc, nChild, pubKey[0], pubKey.Skip(1).ToArray());
+				lr = Hashes.Bip32Hash(cc, nChild, pubKey[0], pubKey.Skip(1).ToArray());
 			}
 			else
 			{
@@ -277,31 +261,28 @@ namespace ChainUtils
 			ccChild = r;
 
 
-			BigInteger N = ECKey.CURVE.N;
-			BigInteger kPar = new BigInteger(1, this.vch);
-			BigInteger parse256LL = new BigInteger(1, l);
+			var n = EcKey.Curve.N;
+			var parse256Ll = new BigInteger(1, l);
 
-			if(parse256LL.CompareTo(N) >= 0)
+			if(parse256Ll.CompareTo(n) >= 0)
 				throw new InvalidOperationException("You won a prize ! this should happen very rarely. Take a screenshot, and roll the dice again.");
 
-			var q = ECKey.CURVE.G.Multiply(parse256LL).Add(ECKey.GetPublicKeyParameters().Q);
+			var q = EcKey.Curve.G.Multiply(parse256Ll).Add(EcKey.GetPublicKeyParameters().Q);
 			if(q.IsInfinity)
 				throw new InvalidOperationException("You won the big prize ! this would happen only 1 in 2^127. Take a screenshot, and roll the dice again.");
 
-			var p = new ChainUtils.BouncyCastle.Math.EC.FpPoint(ECKey.CURVE.Curve, q.X, q.Y, true);
+			var p = new FpPoint(EcKey.Curve.Curve, q.X, q.Y, true);
 			return new PubKey(p.GetEncoded());
 		}
 
 		public override bool Equals(object obj)
 		{
-			PubKey item = obj as PubKey;
-			if(item == null)
-				return false;
-			return ToHex().Equals(item.ToHex());
+			var item = obj as PubKey;
+			return item != null && ToHex().Equals(item.ToHex());
 		}
 		public static bool operator ==(PubKey a, PubKey b)
 		{
-			if(System.Object.ReferenceEquals(a, b))
+			if(ReferenceEquals(a, b))
 				return true;
 			if(((object)a == null) || ((object)b == null))
 				return false;
@@ -328,16 +309,16 @@ namespace ChainUtils
 		}
 		public PubKey Uncover(Key priv, PubKey pub)
 		{
-			var curve = ECKey.CreateCurve();
+			var curve = EcKey.CreateCurve();
 			var hash = GetStealthSharedSecret(priv, pub);
 			//Q' = Q + cG
-			var qprim = curve.G.Multiply(new BigInteger(1, hash)).Add(curve.Curve.DecodePoint(this.ToBytes()));
-			return new PubKey(qprim.GetEncoded()).Compress(this.IsCompressed);
+			var qprim = curve.G.Multiply(new BigInteger(1, hash)).Add(curve.Curve.DecodePoint(ToBytes()));
+			return new PubKey(qprim.GetEncoded()).Compress(IsCompressed);
 		}
 
 		internal static byte[] GetStealthSharedSecret(Key priv, PubKey pub)
 		{
-			var curve = ECKey.CreateCurve();
+			var curve = EcKey.CreateCurve();
 			var pubec = curve.Curve.DecodePoint(pub.ToBytes());
 			var p = pubec.Multiply(new BigInteger(1, priv.ToBytes()));
 			var pBytes = new PubKey(p.GetEncoded()).Compress().ToBytes();
@@ -347,37 +328,27 @@ namespace ChainUtils
 
 		public PubKey Compress(bool compression)
 		{
-			if(IsCompressed == compression)
+		    if(IsCompressed == compression)
 				return this;
-			if(compression)
-				return this.Compress();
-			else
-				return this.Decompress();
+		    return compression ? Compress() : Decompress();
 		}
 
-		public BitcoinStealthAddress CreateStealthAddress(PubKey scanKey, Network network)
+	    public BitcoinStealthAddress CreateStealthAddress(PubKey scanKey, Network network)
 		{
-			return new BitcoinStealthAddress(scanKey, new PubKey[] { this }, 1, null, network);
+			return new BitcoinStealthAddress(scanKey, new[] { this }, 1, null, network);
 		}
 
 		public string ToString(Network network)
 		{
-			return new BitcoinAddress(this.Hash, network).ToString();
+			return new BitcoinAddress(Hash, network).ToString();
 		}
 
 		#region IDestination Members
 
-		Script _ScriptPubKey;
+		Script _scriptPubKey;
 		public Script ScriptPubKey
 		{
-			get
-			{
-				if(_ScriptPubKey == null)
-				{
-					_ScriptPubKey = PayToPubkeyTemplate.Instance.GenerateScriptPubKey(this);
-				}
-				return _ScriptPubKey;
-			}
+			get { return _scriptPubKey ?? (_scriptPubKey = PayToPubkeyTemplate.Instance.GenerateScriptPubKey(this)); }
 		}
 
 		#endregion

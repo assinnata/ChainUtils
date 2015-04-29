@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChainUtils.Protocol
+﻿namespace ChainUtils.Protocol
 {
 	public class Payload : IBitcoinSerializable
 	{
@@ -12,7 +6,7 @@ namespace ChainUtils.Protocol
 		{
 			get
 			{
-				return PayloadAttribute.GetCommandName(this.GetType());
+				return PayloadAttribute.GetCommandName(GetType());
 			}
 		}
 
@@ -34,7 +28,7 @@ namespace ChainUtils.Protocol
 
 		public override string ToString()
 		{
-			return this.GetType().Name;
+			return GetType().Name;
 		}
 	}
 }

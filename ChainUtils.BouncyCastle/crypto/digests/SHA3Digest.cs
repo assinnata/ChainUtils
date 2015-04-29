@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Digests
@@ -19,25 +18,25 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private static ulong[] KeccakInitializeRoundConstants()
         {
-            ulong[] keccakRoundConstants = new ulong[24];
+            var keccakRoundConstants = new ulong[24];
             byte LFSRState = 0x01;
 
-            for (int i = 0; i < 24; i++)
+            for (var i = 0; i < 24; i++)
             {
                 keccakRoundConstants[i] = 0;
-                for (int j = 0; j < 7; j++)
+                for (var j = 0; j < 7; j++)
                 {
-                    int bitPosition = (1 << j) - 1;
+                    var bitPosition = (1 << j) - 1;
 
                     // LFSR86540
 
-                    bool loBit = (LFSRState & 0x01) != 0;
+                    var loBit = (LFSRState & 0x01) != 0;
                     if (loBit)
                     {
                         keccakRoundConstants[i] ^= 1UL << bitPosition;
                     }
 
-                    bool hiBit = (LFSRState & 0x80) != 0;
+                    var hiBit = (LFSRState & 0x80) != 0;
                     LFSRState <<= 1;
                     if (hiBit)
                     {
@@ -52,10 +51,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private static int[] KeccakInitializeRhoOffsets()
         {
-            int[] keccakRhoOffsets = new int[25];
+            var keccakRhoOffsets = new int[25];
             int x, y, t, newX, newY;
 
-            int rhoOffset = 0;
+            var rhoOffset = 0;
             keccakRhoOffsets[(((0) % 5) + 5 * ((0) % 5))] = rhoOffset;
             x = 1;
             y = 0;
@@ -85,7 +84,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void ClearDataQueueSection(int off, int len)
         {
-            for (int i = off; i != off + len; i++)
+            for (var i = off; i != off + len; i++)
             {
                 dataQueue[i] = 0;
             }
@@ -108,15 +107,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private void CopyIn(Sha3Digest source)
 		{
-            Array.Copy(source.state, 0, this.state, 0, source.state.Length);
-            Array.Copy(source.dataQueue, 0, this.dataQueue, 0, source.dataQueue.Length);
-            this.rate = source.rate;
-            this.bitsInQueue = source.bitsInQueue;
-            this.fixedOutputLength = source.fixedOutputLength;
-            this.squeezing = source.squeezing;
-            this.bitsAvailableForSqueezing = source.bitsAvailableForSqueezing;
-            this.chunk = Arrays.Clone(source.chunk);
-            this.oneByte = Arrays.Clone(source.oneByte);
+            Array.Copy(source.state, 0, state, 0, source.state.Length);
+            Array.Copy(source.dataQueue, 0, dataQueue, 0, source.dataQueue.Length);
+            rate = source.rate;
+            bitsInQueue = source.bitsInQueue;
+            fixedOutputLength = source.fixedOutputLength;
+            squeezing = source.squeezing;
+            bitsAvailableForSqueezing = source.bitsAvailableForSqueezing;
+            chunk = Arrays.Clone(source.chunk);
+            oneByte = Arrays.Clone(source.oneByte);
         }
 
         public virtual string AlgorithmName
@@ -200,7 +199,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             {
                 Absorb(data, off, databitlen - (databitlen % 8));
 
-                byte[] lastByte = new byte[1];
+                var lastByte = new byte[1];
 
                 lastByte[0] = (byte)(data[off + (int)(databitlen / 8)] >> (int)(8 - (databitlen % 8)));
                 Absorb(lastByte, off, databitlen % 8);
@@ -221,15 +220,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             this.rate = rate;
             // this is never read, need to check to see why we want to save it
             //  this.capacity = capacity;
-            this.fixedOutputLength = 0;
-            Arrays.Fill(this.state, (byte)0);
-            Arrays.Fill(this.dataQueue, (byte)0);
-            this.bitsInQueue = 0;
-            this.squeezing = false;
-            this.bitsAvailableForSqueezing = 0;
-            this.fixedOutputLength = capacity / 2;
-            this.chunk = new byte[rate / 8];
-            this.oneByte = new byte[1];
+            fixedOutputLength = 0;
+            Arrays.Fill(state, (byte)0);
+            Arrays.Fill(dataQueue, (byte)0);
+            bitsInQueue = 0;
+            squeezing = false;
+            bitsAvailableForSqueezing = 0;
+            fixedOutputLength = capacity / 2;
+            chunk = new byte[rate / 8];
+            oneByte = new byte[1];
         }
 
         private void AbsorbQueue()
@@ -272,12 +271,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
                 }
                 else
                 {
-                    int partialBlock = (int)(databitlen - i);
+                    var partialBlock = (int)(databitlen - i);
                     if (partialBlock + bitsInQueue > rate)
                     {
                         partialBlock = rate - bitsInQueue;
                     }
-                    int partialByte = partialBlock % 8;
+                    var partialByte = partialBlock % 8;
                     partialBlock -= partialByte;
                     Array.Copy(data, off + (int)(i / 8), dataQueue, bitsInQueue / 8, partialBlock / 8);
 
@@ -289,7 +288,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
                     }
                     if (partialByte > 0)
                     {
-                        int mask = (1 << partialByte) - 1;
+                        var mask = (1 << partialByte) - 1;
                         dataQueue[bitsInQueue / 8] = (byte)(data[off + ((int)(i / 8))] & mask);
                         bitsInQueue += partialByte;
                         i += partialByte;
@@ -382,11 +381,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private static void FromBytesToWords(ulong[] stateAsWords, byte[] state)
         {
-            for (int i = 0; i < (1600 / 64); i++)
+            for (var i = 0; i < (1600 / 64); i++)
             {
                 stateAsWords[i] = 0;
-                int index = i * (64 / 8);
-                for (int j = 0; j < (64 / 8); j++)
+                var index = i * (64 / 8);
+                for (var j = 0; j < (64 / 8); j++)
                 {
                     stateAsWords[i] |= ((ulong)state[index + j] & 0xff) << ((8 * j));
                 }
@@ -395,10 +394,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private static void FromWordsToBytes(byte[] state, ulong[] stateAsWords)
         {
-            for (int i = 0; i < (1600 / 64); i++)
+            for (var i = 0; i < (1600 / 64); i++)
             {
-                int index = i * (64 / 8);
-                for (int j = 0; j < (64 / 8); j++)
+                var index = i * (64 / 8);
+                for (var j = 0; j < (64 / 8); j++)
                 {
                     state[index + j] = (byte)(stateAsWords[i] >> (8 * j));
                 }
@@ -407,7 +406,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void KeccakPermutation(byte[] state)
         {
-            ulong[] longState = new ulong[state.Length / 8];
+            var longState = new ulong[state.Length / 8];
 
             FromBytesToWords(longState, state);
 
@@ -422,7 +421,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void KeccakPermutationAfterXor(byte[] state, byte[] data, int dataLengthInBytes)
         {
-            for (int i = 0; i < dataLengthInBytes; i++)
+            for (var i = 0; i < dataLengthInBytes; i++)
             {
                 state[i] ^= data[i];
             }
@@ -461,18 +460,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void Theta(ulong[] A)
         {
-            for (int x = 0; x < 5; x++)
+            for (var x = 0; x < 5; x++)
             {
                 C[x] = 0;
-                for (int y = 0; y < 5; y++)
+                for (var y = 0; y < 5; y++)
                 {
                     C[x] ^= A[x + 5 * y];
                 }
             }
-            for (int x = 0; x < 5; x++)
+            for (var x = 0; x < 5; x++)
             {
-                ulong dX = ((((C[(x + 1) % 5]) << 1) ^ ((C[(x + 1) % 5]) >> (64 - 1)))) ^ C[(x + 4) % 5];
-                for (int y = 0; y < 5; y++)
+                var dX = ((((C[(x + 1) % 5]) << 1) ^ ((C[(x + 1) % 5]) >> (64 - 1)))) ^ C[(x + 4) % 5];
+                for (var y = 0; y < 5; y++)
                 {
                     A[x + 5 * y] ^= dX;
                 }
@@ -481,11 +480,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void Rho(ulong[] A)
         {
-            for (int x = 0; x < 5; x++)
+            for (var x = 0; x < 5; x++)
             {
-                for (int y = 0; y < 5; y++)
+                for (var y = 0; y < 5; y++)
                 {
-                    int index = x + 5 * y;
+                    var index = x + 5 * y;
                     A[index] = ((KeccakRhoOffsets[index] != 0) ? (((A[index]) << KeccakRhoOffsets[index]) ^ ((A[index]) >> (64 - KeccakRhoOffsets[index]))) : A[index]);
                 }
             }
@@ -497,9 +496,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
         {
             Array.Copy(A, 0, tempA, 0, tempA.Length);
 
-            for (int x = 0; x < 5; x++)
+            for (var x = 0; x < 5; x++)
             {
-                for (int y = 0; y < 5; y++)
+                for (var y = 0; y < 5; y++)
                 {
                     A[y + 5 * ((2 * x + 3 * y) % 5)] = tempA[x + 5 * y];
                 }
@@ -510,13 +509,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void Chi(ulong[] A)
         {
-            for (int y = 0; y < 5; y++)
+            for (var y = 0; y < 5; y++)
             {
-                for (int x = 0; x < 5; x++)
+                for (var x = 0; x < 5; x++)
                 {
                     chiC[x] = A[x + 5 * y] ^ ((~A[(((x + 1) % 5) + 5 * y)]) & A[(((x + 2) % 5) + 5 * y)]);
                 }
-                for (int x = 0; x < 5; x++)
+                for (var x = 0; x < 5; x++)
                 {
                     A[x + 5 * y] = chiC[x];
                 }
@@ -550,7 +549,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public void Reset(IMemoable other)
 		{
-			Sha3Digest d = (Sha3Digest)other;
+			var d = (Sha3Digest)other;
 
 			CopyIn(d);
 		}

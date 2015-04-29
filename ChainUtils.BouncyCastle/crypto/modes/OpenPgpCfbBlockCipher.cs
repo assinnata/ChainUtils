@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Modes
@@ -37,10 +36,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
         {
             this.cipher = cipher;
 
-            this.blockSize = cipher.GetBlockSize();
-            this.IV = new byte[blockSize];
-            this.FR = new byte[blockSize];
-            this.FRE = new byte[blockSize];
+            blockSize = cipher.GetBlockSize();
+            IV = new byte[blockSize];
+            FR = new byte[blockSize];
+            FRE = new byte[blockSize];
         }
 
 		/**
@@ -133,14 +132,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
             if (parameters is ParametersWithIV)
             {
-                ParametersWithIV ivParam = (ParametersWithIV)parameters;
-                byte[] iv = ivParam.GetIV();
+                var ivParam = (ParametersWithIV)parameters;
+                var iv = ivParam.GetIV();
 
                 if (iv.Length < IV.Length)
                 {
                     // prepend the supplied IV with zeros (per FIPS PUB 81)
                     Array.Copy(iv, 0, IV, IV.Length - iv.Length, iv.Length);
-                    for (int i = 0; i < IV.Length - iv.Length; i++)
+                    for (var i = 0; i < IV.Length - iv.Length; i++)
                     {
                         IV[i] = 0;
                     }
@@ -204,7 +203,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
                 cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 2; n < blockSize; n++)
+                for (var n = 2; n < blockSize; n++)
                 {
 					FR[n - 2] = outBytes[outOff + n] = EncryptByte(input[inOff + n], n - 2);
                 }
@@ -213,7 +212,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             {
                 cipher.ProcessBlock(FR, 0, FRE, 0);
 
-				for (int n = 0; n < blockSize; n++)
+				for (var n = 0; n < blockSize; n++)
                 {
 					FR[n] = outBytes[outOff + n] = EncryptByte(input[inOff + n], n);
                 }
@@ -235,7 +234,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
                 cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 2; n < blockSize; n++)
+                for (var n = 2; n < blockSize; n++)
                 {
 					FR[n - 2] = outBytes[outOff + n] = EncryptByte(input[inOff + n], n - 2);
                 }
@@ -276,7 +275,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
             if (count > blockSize)
             {
-				byte inVal = input[inOff];
+				var inVal = input[inOff];
 				FR[blockSize - 2] = inVal;
 				outBytes[outOff] = EncryptByte(inVal, blockSize - 2);
 
@@ -286,7 +285,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
                 cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 2; n < blockSize; n++)
+                for (var n = 2; n < blockSize; n++)
                 {
 					inVal = input[inOff + n];
 					FR[n - 2] = inVal;
@@ -297,7 +296,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             {
                 cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 0; n < blockSize; n++)
+                for (var n = 0; n < blockSize; n++)
                 {
                     FR[n] = input[inOff + n];
                     outBytes[n] = EncryptByte(input[inOff + n], n);
@@ -309,8 +308,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             {
                 cipher.ProcessBlock(FR, 0, FRE, 0);
 
-				byte inVal1 = input[inOff];
-				byte inVal2 = input[inOff + 1];
+				var inVal1 = input[inOff];
+				var inVal2 = input[inOff + 1];
 				outBytes[outOff    ] = EncryptByte(inVal1, 0);
 				outBytes[outOff + 1] = EncryptByte(inVal2, 1);
 
@@ -321,9 +320,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
                 cipher.ProcessBlock(FR, 0, FRE, 0);
 
-                for (int n = 2; n < blockSize; n++)
+                for (var n = 2; n < blockSize; n++)
                 {
-					byte inVal = input[inOff + n];
+					var inVal = input[inOff + n];
 					FR[n - 2] = inVal;
 					outBytes[outOff + n] = EncryptByte(inVal, n - 2);
                 }

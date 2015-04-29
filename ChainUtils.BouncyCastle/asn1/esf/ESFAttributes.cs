@@ -1,6 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.Pkcs;
 
 namespace ChainUtils.BouncyCastle.Asn1.Esf

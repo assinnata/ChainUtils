@@ -10,12 +10,12 @@
         {
             ECPoint R0 = p.Curve.Infinity, R1 = p;
 
-            int n = k.BitLength;
-            int s = k.GetLowestSetBit();
+            var n = k.BitLength;
+            var s = k.GetLowestSetBit();
 
             R1 = R1.TimesPow2(s);
 
-            int i = s;
+            var i = s;
             while (++i < n)
             {
                 R0 = R0.Add(k.TestBit(i) ? R1 : R1.Negate());

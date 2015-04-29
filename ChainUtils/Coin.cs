@@ -1,10 +1,8 @@
-﻿using ChainUtils.OpenAsset;
-using ChainUtils.Stealth;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.OpenAsset;
+using ChainUtils.Stealth;
 
 namespace ChainUtils
 {
@@ -196,7 +194,7 @@ namespace ChainUtils
 		{
 			return Find(null, tx, colored);
 		}
-		public static IEnumerable<ColoredCoin> Find(uint256 txId, Transaction tx, ColoredTransaction colored)
+		public static IEnumerable<ColoredCoin> Find(Uint256 txId, Transaction tx, ColoredTransaction colored)
 		{
 			if(colored == null)
 				throw new ArgumentNullException("colored");
@@ -215,7 +213,7 @@ namespace ChainUtils
 		{
 			return Find(null, tx, repo);
 		}
-		public static IEnumerable<ColoredCoin> Find(uint256 txId, Transaction tx, IColoredTransactionRepository repo)
+		public static IEnumerable<ColoredCoin> Find(Uint256 txId, Transaction tx, IColoredTransactionRepository repo)
 		{
 			if(txId == null)
 				txId = tx.GetHash();
@@ -248,7 +246,7 @@ namespace ChainUtils
 
 		public Coin(Transaction fromTx, TxOut fromOutput)
 		{
-			uint outputIndex = (uint)fromTx.Outputs.FindIndex(r => Object.ReferenceEquals(fromOutput, r));
+			var outputIndex = (uint)fromTx.Outputs.FindIndex(r => ReferenceEquals(fromOutput, r));
 			Outpoint = new OutPoint(fromTx, outputIndex);
 			TxOut = fromOutput;
 		}
@@ -258,7 +256,7 @@ namespace ChainUtils
 			TxOut = txOut.TxOut;
 		}
 
-		public Coin(uint256 fromTxHash, uint fromOutputIndex, Money amount, Script scriptPubKey)
+		public Coin(Uint256 fromTxHash, uint fromOutputIndex, Money amount, Script scriptPubKey)
 		{
 			Outpoint = new OutPoint(fromTxHash, fromOutputIndex);
 			TxOut = new TxOut(amount, scriptPubKey);
@@ -382,7 +380,7 @@ namespace ChainUtils
 			AssertCoherent();
 		}
 
-		public ScriptCoin(uint256 txHash, uint outputIndex, Money amount, Script redeem)
+		public ScriptCoin(Uint256 txHash, uint outputIndex, Money amount, Script redeem)
 			: base(txHash, outputIndex, amount, redeem.Hash.ScriptPubKey)
 		{
 			Redeem = redeem;
@@ -451,7 +449,7 @@ namespace ChainUtils
 		public PubKey[] Uncover(PubKey[] spendPubKeys, Key scanKey)
 		{
 			var pubKeys = new PubKey[spendPubKeys.Length];
-			for(int i = 0 ; i < pubKeys.Length ; i++)
+			for(var i = 0 ; i < pubKeys.Length ; i++)
 			{
 				pubKeys[i] = spendPubKeys[i].UncoverReceiver(scanKey, StealthMetadata.EphemKey);
 			}
@@ -461,7 +459,7 @@ namespace ChainUtils
 		public Key[] Uncover(Key[] spendKeys, Key scanKey)
 		{
 			var keys = new Key[spendKeys.Length];
-			for(int i = 0 ; i < keys.Length ; i++)
+			for(var i = 0 ; i < keys.Length ; i++)
 			{
 				keys[i] = spendKeys[i].Uncover(scanKey, StealthMetadata.EphemKey);
 			}

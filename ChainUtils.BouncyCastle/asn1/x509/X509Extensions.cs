@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities;
 using ChainUtils.BouncyCastle.Utilities.Collections;
 
@@ -203,21 +202,21 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
         private X509Extensions(
             Asn1Sequence seq)
         {
-            this.ordering = Platform.CreateArrayList();
+            ordering = Platform.CreateArrayList();
 
 			foreach (Asn1Encodable ae in seq)
 			{
-				Asn1Sequence s = Asn1Sequence.GetInstance(ae.ToAsn1Object());
+				var s = Asn1Sequence.GetInstance(ae.ToAsn1Object());
 
 				if (s.Count < 2 || s.Count > 3)
 					throw new ArgumentException("Bad sequence size: " + s.Count);
 
-				DerObjectIdentifier oid = DerObjectIdentifier.GetInstance(s[0].ToAsn1Object());
+				var oid = DerObjectIdentifier.GetInstance(s[0].ToAsn1Object());
 
-				bool isCritical = s.Count == 3
+				var isCritical = s.Count == 3
 					&& DerBoolean.GetInstance(s[1].ToAsn1Object()).IsTrue;
 
-				Asn1OctetString octets = Asn1OctetString.GetInstance(s[s.Count - 1].ToAsn1Object());
+				var octets = Asn1OctetString.GetInstance(s[s.Count - 1].ToAsn1Object());
 
 				extensions.Add(oid, new X509Extension(isCritical, octets));
 				ordering.Add(oid);
@@ -269,12 +268,12 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
             IList oids,
             IList values)
         {
-            this.ordering = Platform.CreateArrayList(oids);
+            ordering = Platform.CreateArrayList(oids);
 
-            int count = 0;
-            foreach (DerObjectIdentifier oid in this.ordering)
+            var count = 0;
+            foreach (DerObjectIdentifier oid in ordering)
             {
-                this.extensions.Add(oid, (X509Extension)values[count++]);
+                extensions.Add(oid, (X509Extension)values[count++]);
             }
         }
 
@@ -375,12 +374,12 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		 */
 		public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector	vec = new Asn1EncodableVector();
+            var	vec = new Asn1EncodableVector();
 
 			foreach (DerObjectIdentifier oid in ordering)
 			{
-                X509Extension ext = (X509Extension) extensions[oid];
-                Asn1EncodableVector	v = new Asn1EncodableVector(oid);
+                var ext = (X509Extension) extensions[oid];
+                var	v = new Asn1EncodableVector(oid);
 
 				if (ext.IsCritical)
                 {
@@ -427,11 +426,11 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 		private DerObjectIdentifier[] GetExtensionOids(bool isCritical)
 		{
-			IList oids = Platform.CreateArrayList();
+			var oids = Platform.CreateArrayList();
 
-			foreach (DerObjectIdentifier oid in this.ordering)
+			foreach (DerObjectIdentifier oid in ordering)
             {
-				X509Extension ext = (X509Extension)extensions[oid];
+				var ext = (X509Extension)extensions[oid];
 				if (ext.IsCritical == isCritical)
 				{
 					oids.Add(oid);
@@ -443,7 +442,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 		private static DerObjectIdentifier[] ToOidArray(IList oids)
 		{
-			DerObjectIdentifier[] oidArray = new DerObjectIdentifier[oids.Count];
+			var oidArray = new DerObjectIdentifier[oids.Count];
 			oids.CopyTo(oidArray, 0);
 			return oidArray;
 		}

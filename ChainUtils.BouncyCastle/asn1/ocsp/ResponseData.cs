@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
@@ -66,36 +64,36 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 		private ResponseData(
 			Asn1Sequence seq)
 		{
-			int index = 0;
+			var index = 0;
 
-			Asn1Encodable enc = seq[0];
+			var enc = seq[0];
 			if (enc is Asn1TaggedObject)
 			{
-				Asn1TaggedObject o = (Asn1TaggedObject)enc;
+				var o = (Asn1TaggedObject)enc;
 
 				if (o.TagNo == 0)
 				{
-					this.versionPresent = true;
-					this.version = DerInteger.GetInstance(o, true);
+					versionPresent = true;
+					version = DerInteger.GetInstance(o, true);
 					index++;
 				}
 				else
 				{
-					this.version = V1;
+					version = V1;
 				}
 			}
 			else
 			{
-				this.version = V1;
+				version = V1;
 			}
 
-			this.responderID = ResponderID.GetInstance(seq[index++]);
-			this.producedAt = (DerGeneralizedTime)seq[index++];
-			this.responses = (Asn1Sequence)seq[index++];
+			responderID = ResponderID.GetInstance(seq[index++]);
+			producedAt = (DerGeneralizedTime)seq[index++];
+			responses = (Asn1Sequence)seq[index++];
 
 			if (seq.Count > index)
 			{
-				this.responseExtensions = X509Extensions.GetInstance(
+				responseExtensions = X509Extensions.GetInstance(
 					(Asn1TaggedObject)seq[index], true);
 			}
 		}
@@ -138,7 +136,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
 			if (versionPresent || !version.Equals(V1))
 			{

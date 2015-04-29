@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Math;
 
@@ -38,7 +36,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (obj == this)
 				return true;
 
-			DHPrivateKeyParameters other = obj as DHPrivateKeyParameters;
+			var other = obj as DHPrivateKeyParameters;
 
 			if (other == null)
 				return false;

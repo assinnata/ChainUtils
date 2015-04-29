@@ -16,7 +16,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		{
 			if (tagged.TagNo == 0)
 			{
-				this.tstEvidence = TimeStampTokenEvidence.GetInstance(tagged, false);
+				tstEvidence = TimeStampTokenEvidence.GetInstance(tagged, false);
 			}
 		}
 

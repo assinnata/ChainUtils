@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
 
@@ -60,8 +58,8 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
          */
         public override Asn1Object ToAsn1Object()
         {
-            int byteCount = X9IntegerConverter.GetByteLength(f);
-            byte[] paddedBigInteger = X9IntegerConverter.IntegerToBytes(f.ToBigInteger(), byteCount);
+            var byteCount = X9IntegerConverter.GetByteLength(f);
+            var paddedBigInteger = X9IntegerConverter.IntegerToBytes(f.ToBigInteger(), byteCount);
 
             return new DerOctetString(paddedBigInteger);
         }

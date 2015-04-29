@@ -1,11 +1,6 @@
 ﻿using ChainUtils.DataEncoders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.RPC
 {
@@ -13,22 +8,22 @@ namespace ChainUtils.RPC
 	{
 		protected override void BuildTransaction(JObject json, Transaction tx)
 		{
-			var hash = new uint256((string)json.GetValue("hash"));
+			var hash = new Uint256((string)json.GetValue("hash"));
 			tx.Version = (uint)json.GetValue("ver");
 			tx.LockTime = (uint)json.GetValue("lock_time");
 			var size = (uint)json.GetValue("size");
 
 
 			var vin = (JArray)json.GetValue("in");
-			int vinCount = (int)json.GetValue("vin_sz");
-			for(int i = 0 ; i < vinCount ; i++)
+			var vinCount = (int)json.GetValue("vin_sz");
+			for(var i = 0 ; i < vinCount ; i++)
 			{
 				var jsonIn = (JObject)vin[i];
-				var txin = new ChainUtils.TxIn();
+				var txin = new TxIn();
 				tx.Inputs.Add(txin);
 				var prevout = (JObject)jsonIn.GetValue("prev_out");
 
-				txin.PrevOut.Hash = new uint256((string)prevout.GetValue("hash"));
+				txin.PrevOut.Hash = new Uint256((string)prevout.GetValue("hash"));
 				txin.PrevOut.N = (uint)prevout.GetValue("n");
 
 
@@ -51,11 +46,11 @@ namespace ChainUtils.RPC
 			}
 
 			var vout = (JArray)json.GetValue("out");
-			int voutCount = (int)json.GetValue("vout_sz");
-			for(int i = 0 ; i < voutCount ; i++)
+			var voutCount = (int)json.GetValue("vout_sz");
+			for(var i = 0 ; i < voutCount ; i++)
 			{
 				var jsonOut = (JObject)vout[i];
-				var txout = new ChainUtils.TxOut();
+				var txout = new TxOut();
 				tx.Outputs.Add(txout);
 
 				txout.Value = Money.Parse((string)jsonOut.GetValue("value"));
@@ -86,7 +81,7 @@ namespace ChainUtils.RPC
 				WritePropertyValue(writer, "n", txin.PrevOut.N);
 				writer.WriteEndObject();
 
-				if(txin.PrevOut.Hash == new uint256(0))
+				if(txin.PrevOut.Hash == new Uint256(0))
 				{
 					WritePropertyValue(writer, "coinbase", Encoders.Hex.EncodeData(txin.ScriptSig.ToBytes()));
 				}

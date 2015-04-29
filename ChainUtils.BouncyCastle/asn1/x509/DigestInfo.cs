@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
 {

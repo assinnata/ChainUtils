@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Generators;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
@@ -56,7 +55,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
          */
         public Poly1305()
         {
-            this.cipher = null;
+            cipher = null;
         }
 
         /**
@@ -85,7 +84,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
                 if (!(parameters is ParametersWithIV))
                     throw new ArgumentException("Poly1305 requires an IV when used with a block cipher.", "parameters");
 
-                ParametersWithIV ivParams = (ParametersWithIV)parameters;
+                var ivParams = (ParametersWithIV)parameters;
                 nonce = ivParams.GetIV();
                 parameters = ivParams.Parameters;
             }
@@ -93,7 +92,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             if (!(parameters is KeyParameter))
                 throw new ArgumentException("Poly1305 requires a key.");
 
-            KeyParameter keyParams = (KeyParameter)parameters;
+            var keyParams = (KeyParameter)parameters;
 
             SetKey(keyParams.GetKey(), nonce);
 
@@ -108,10 +107,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             Poly1305KeyGenerator.CheckKey(key);
 
             // Extract r portion of key
-            uint t0 = Pack.LE_To_UInt32(key, BLOCK_SIZE + 0);
-            uint t1 = Pack.LE_To_UInt32(key, BLOCK_SIZE + 4);
-            uint t2 = Pack.LE_To_UInt32(key, BLOCK_SIZE + 8);
-            uint t3 = Pack.LE_To_UInt32(key, BLOCK_SIZE + 12);
+            var t0 = Pack.LE_To_UInt32(key, BLOCK_SIZE + 0);
+            var t1 = Pack.LE_To_UInt32(key, BLOCK_SIZE + 4);
+            var t2 = Pack.LE_To_UInt32(key, BLOCK_SIZE + 8);
+            var t3 = Pack.LE_To_UInt32(key, BLOCK_SIZE + 12);
 
             r0 = t0 & 0x3ffffff; t0 >>= 26; t0 |= t1 << 6;
             r1 = t0 & 0x3ffff03; t1 >>= 20; t1 |= t2 << 12;
@@ -162,7 +161,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
         public void BlockUpdate(byte[] input, int inOff, int len)
         {
-            int copied = 0;
+            var copied = 0;
             while (len > copied)
             {
                 if (currentBlockOffset == BLOCK_SIZE)
@@ -171,7 +170,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
                     currentBlockOffset = 0;
                 }
 
-                int toCopy = System.Math.Min((len - copied), BLOCK_SIZE - currentBlockOffset);
+                var toCopy = System.Math.Min((len - copied), BLOCK_SIZE - currentBlockOffset);
                 Array.Copy(input, copied + inOff, currentBlock, currentBlockOffset, toCopy);
                 copied += toCopy;
                 currentBlockOffset += toCopy;
@@ -184,7 +183,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             if (currentBlockOffset < BLOCK_SIZE)
             {
                 currentBlock[currentBlockOffset] = 1;
-                for (int i = currentBlockOffset + 1; i < BLOCK_SIZE; i++)
+                for (var i = currentBlockOffset + 1; i < BLOCK_SIZE; i++)
                 {
                     currentBlock[i] = 0;
                 }
@@ -206,11 +205,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
                 h4 += (1 << 24);
             }
 
-            ulong tp0 = mul32x32_64(h0,r0) + mul32x32_64(h1,s4) + mul32x32_64(h2,s3) + mul32x32_64(h3,s2) + mul32x32_64(h4,s1);
-            ulong tp1 = mul32x32_64(h0,r1) + mul32x32_64(h1,r0) + mul32x32_64(h2,s4) + mul32x32_64(h3,s3) + mul32x32_64(h4,s2);
-            ulong tp2 = mul32x32_64(h0,r2) + mul32x32_64(h1,r1) + mul32x32_64(h2,r0) + mul32x32_64(h3,s4) + mul32x32_64(h4,s3);
-            ulong tp3 = mul32x32_64(h0,r3) + mul32x32_64(h1,r2) + mul32x32_64(h2,r1) + mul32x32_64(h3,r0) + mul32x32_64(h4,s4);
-            ulong tp4 = mul32x32_64(h0,r4) + mul32x32_64(h1,r3) + mul32x32_64(h2,r2) + mul32x32_64(h3,r1) + mul32x32_64(h4,r0);
+            var tp0 = mul32x32_64(h0,r0) + mul32x32_64(h1,s4) + mul32x32_64(h2,s3) + mul32x32_64(h3,s2) + mul32x32_64(h4,s1);
+            var tp1 = mul32x32_64(h0,r1) + mul32x32_64(h1,r0) + mul32x32_64(h2,s4) + mul32x32_64(h3,s3) + mul32x32_64(h4,s2);
+            var tp2 = mul32x32_64(h0,r2) + mul32x32_64(h1,r1) + mul32x32_64(h2,r0) + mul32x32_64(h3,s4) + mul32x32_64(h4,s3);
+            var tp3 = mul32x32_64(h0,r3) + mul32x32_64(h1,r2) + mul32x32_64(h2,r1) + mul32x32_64(h3,r0) + mul32x32_64(h4,s4);
+            var tp4 = mul32x32_64(h0,r4) + mul32x32_64(h1,r3) + mul32x32_64(h2,r2) + mul32x32_64(h3,r1) + mul32x32_64(h4,r0);
 
             ulong b;
             h0 = (uint)tp0 & 0x3ffffff; b = (tp0 >> 26);
@@ -236,7 +235,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
             ulong f0, f1, f2, f3;
 
-            uint b = h0 >> 26;
+            var b = h0 >> 26;
             h0 = h0 & 0x3ffffff;
             h1 += b; b = h1 >> 26; h1 = h1 & 0x3ffffff;
             h2 += b; b = h2 >> 26; h2 = h2 & 0x3ffffff;
@@ -252,7 +251,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             g4 = h4 + b - (1 << 26);
 
             b = (g4 >> 31) - 1;
-            uint nb = ~b;
+            var nb = ~b;
             h0 = (h0 & nb) | (g0 & b);
             h1 = (h1 & nb) | (g1 & b);
             h2 = (h2 & nb) | (g2 & b);

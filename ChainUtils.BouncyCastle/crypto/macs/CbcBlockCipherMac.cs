@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Modes;
 using ChainUtils.BouncyCastle.Crypto.Paddings;
 
@@ -88,7 +87,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
 			this.cipher = new CbcBlockCipher(cipher);
             this.padding = padding;
-            this.macSize = macSizeInBits / 8;
+            macSize = macSizeInBits / 8;
 
 			buf = new byte[cipher.GetBlockSize()];
             bufOff = 0;
@@ -132,8 +131,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             if (len < 0)
                 throw new ArgumentException("Can't have a negative input length!");
 
-			int blockSize = cipher.GetBlockSize();
-            int gapLen = blockSize - bufOff;
+			var blockSize = cipher.GetBlockSize();
+            var gapLen = blockSize - bufOff;
 
             if (len > gapLen)
             {
@@ -163,7 +162,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             byte[]	output,
             int		outOff)
         {
-            int blockSize = cipher.GetBlockSize();
+            var blockSize = cipher.GetBlockSize();
 
             if (padding == null)
             {

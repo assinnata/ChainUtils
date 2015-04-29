@@ -1,56 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
 	public class Coins : IBitcoinSerializable
 	{
 		// whether transaction is a coinbase
-		bool fCoinBase;
+		bool _fCoinBase;
 		public bool Coinbase
 		{
 			get
 			{
-				return fCoinBase;
+				return _fCoinBase;
 			}
 			set
 			{
-				fCoinBase = value;
+				_fCoinBase = value;
 			}
 		}
 
 		// unspent transaction outputs; spent outputs are .IsNull(); spent outputs at the end of the array are dropped
-		List<TxOut> vout = new List<TxOut>();
+		List<TxOut> _vout = new List<TxOut>();
 
 		// at which height this transaction was included in the active block chain
-		uint nHeight;
+		uint _nHeight;
 		public uint Height
 		{
 			get
 			{
-				return nHeight;
+				return _nHeight;
 			}
 			set
 			{
-				nHeight = value;
+				_nHeight = value;
 			}
 		}
 
 		// version of the CTransaction; accesses to this value should probably check for nHeight as well,
 		// as new tx version will probably only be introduced at certain heights
-		uint nVersion;
+		uint _nVersion;
 		public uint Version
 		{
 			get
 			{
-				return nVersion;
+				return _nVersion;
 			}
 			set
 			{
-				nVersion = value;
+				_nVersion = value;
 			}
 		}
 
@@ -58,16 +56,16 @@ namespace ChainUtils.BitcoinCore
 		{
 			get
 			{
-				return vout;
+				return _vout;
 			}
 		}
 
-		Money _Value;
+		Money _value;
 		public Money Value
 		{
 			get
 			{
-				return _Value;
+				return _value;
 			}
 		}
 
@@ -83,35 +81,35 @@ namespace ChainUtils.BitcoinCore
 		{
 			if(belongsToCoins == null)
 				belongsToCoins = o => !o.ScriptPubKey.IsUnspendable;
-			fCoinBase = tx.IsCoinBase;
-			vout = tx.Outputs.ToList();
-			nVersion = tx.Version;
-			nHeight = (uint)height;
+			_fCoinBase = tx.IsCoinBase;
+			_vout = tx.Outputs.ToList();
+			_nVersion = tx.Version;
+			_nHeight = (uint)height;
 			ClearUnused(belongsToCoins);
 			UpdateValue();
 		}
 
 		private void UpdateValue()
 		{
-			_Value = Outputs.Where(o => !o.IsNull).Select(o => o.Value).Sum();
+			_value = Outputs.Where(o => !o.IsNull).Select(o => o.Value).Sum();
 		}
 
 		public bool IsEmpty
 		{
 			get
 			{
-				return vout.Count == 0;
+				return _vout.Count == 0;
 			}
 		}
 
 		private void ClearUnused(Func<TxOut, bool> belongsToCoins)
 		{
-			for(int i = 0 ; i < vout.Count ; i++)
+			for(var i = 0 ; i < _vout.Count ; i++)
 			{
-				var o = vout[i];
+				var o = _vout[i];
 				if(o.ScriptPubKey.IsUnspendable || !belongsToCoins(o))
 				{
-					vout[i] = new TxOut();
+					_vout[i] = new TxOut();
 				}
 			}
 			Cleanup();
@@ -119,12 +117,12 @@ namespace ChainUtils.BitcoinCore
 
 		private void Cleanup()
 		{
-			var count = vout.Count;
+			var count = _vout.Count;
 			// remove spent outputs at the end of vout
-			for(int i = count - 1 ; i >= 0 ; i--)
+			for(var i = count - 1 ; i >= 0 ; i--)
 			{
-				if(vout[i].IsNull)
-					vout.RemoveAt(i);
+				if(_vout[i].IsNull)
+					_vout.RemoveAt(i);
 				else
 					break;
 			}
@@ -134,18 +132,18 @@ namespace ChainUtils.BitcoinCore
 		public bool Spend(int position, out TxInUndo undo)
 		{
 			undo = null;
-			if(position >= vout.Count)
+			if(position >= _vout.Count)
 				return false;
-			if(vout[position].IsNull)
+			if(_vout[position].IsNull)
 				return false;
-			undo = new TxInUndo(vout[position].Clone());
-			vout[position].SetNull();
+			undo = new TxInUndo(_vout[position].Clone());
+			_vout[position].SetNull();
 			Cleanup();
-			if(vout.Count == 0)
+			if(_vout.Count == 0)
 			{
-				undo.Height = nHeight;
-				undo.CoinBase = fCoinBase;
-				undo.Version = nVersion;
+				undo.Height = _nHeight;
+				undo.CoinBase = _fCoinBase;
+				undo.Version = _nVersion;
 			}
 			return true;
 		}
@@ -164,47 +162,47 @@ namespace ChainUtils.BitcoinCore
 			{
 				uint nMaskSize = 0, nMaskCode = 0;
 				CalcMaskSize(ref nMaskSize, ref nMaskCode);
-				bool fFirst = vout.Count > 0 && !vout[0].IsNull;
-				bool fSecond = vout.Count > 1 && !vout[1].IsNull;
-				uint nCode = unchecked((uint)(8 * (nMaskCode - (fFirst || fSecond ? 0 : 1)) + (fCoinBase ? 1 : 0) + (fFirst ? 2 : 0) + (fSecond ? 4 : 0)));
+				var fFirst = _vout.Count > 0 && !_vout[0].IsNull;
+				var fSecond = _vout.Count > 1 && !_vout[1].IsNull;
+				var nCode = unchecked((uint)(8 * (nMaskCode - (fFirst || fSecond ? 0 : 1)) + (_fCoinBase ? 1 : 0) + (fFirst ? 2 : 0) + (fSecond ? 4 : 0)));
 				// version
-				stream.ReadWriteAsVarInt(ref nVersion);
+				stream.ReadWriteAsVarInt(ref _nVersion);
 				// size of header code
 				stream.ReadWriteAsVarInt(ref nCode);
 				// spentness bitmask
 				for(uint b = 0 ; b < nMaskSize ; b++)
 				{
 					byte chAvail = 0;
-					for(uint i = 0 ; i < 8 && 2 + b * 8 + i < vout.Count ; i++)
-						if(!vout[2 + (int)b * 8 + (int)i].IsNull)
+					for(uint i = 0 ; i < 8 && 2 + b * 8 + i < _vout.Count ; i++)
+						if(!_vout[2 + (int)b * 8 + (int)i].IsNull)
 							chAvail |= (byte)(1 << (int)i);
 					stream.ReadWrite(ref chAvail);
 				}
 
 				// txouts themself
-				for(uint i = 0 ; i < vout.Count ; i++)
+				for(uint i = 0 ; i < _vout.Count ; i++)
 				{
-					if(!vout[(int)i].IsNull)
+					if(!_vout[(int)i].IsNull)
 					{
-						var compressedTx = new TxOutCompressor(vout[(int)i]);
+						var compressedTx = new TxOutCompressor(_vout[(int)i]);
 						stream.ReadWrite(ref compressedTx);
 					}
 				}
 				// coinbase height
-				stream.ReadWriteAsVarInt(ref nHeight);
+				stream.ReadWriteAsVarInt(ref _nHeight);
 			}
 			else
 			{
 				uint nCode = 0;
 				// version
-				stream.ReadWriteAsVarInt(ref nVersion);
+				stream.ReadWriteAsVarInt(ref _nVersion);
 				//// header code
 				stream.ReadWriteAsVarInt(ref nCode);
-				fCoinBase = (nCode & 1) != 0;
-				List<bool> vAvail = new List<bool>() { false, false };
+				_fCoinBase = (nCode & 1) != 0;
+				var vAvail = new List<bool>() { false, false };
 				vAvail[0] = (nCode & 2) != 0;
 				vAvail[1] = (nCode & 4) != 0;
-				uint nMaskCode = unchecked((uint)((nCode / 8) + ((nCode & 6) != 0 ? 0 : 1)));
+				var nMaskCode = unchecked((uint)((nCode / 8) + ((nCode & 6) != 0 ? 0 : 1)));
 				//// spentness bitmask
 				while(nMaskCode > 0)
 				{
@@ -212,25 +210,25 @@ namespace ChainUtils.BitcoinCore
 					stream.ReadWrite(ref chAvail);
 					for(uint p = 0 ; p < 8 ; p++)
 					{
-						bool f = (chAvail & (1 << (int)p)) != 0;
+						var f = (chAvail & (1 << (int)p)) != 0;
 						vAvail.Add(f);
 					}
 					if(chAvail != 0)
 						nMaskCode--;
 				}
 				// txouts themself
-				vout = Enumerable.Range(0, vAvail.Count).Select(_ => new TxOut()).ToList();
+				_vout = Enumerable.Range(0, vAvail.Count).Select(_ => new TxOut()).ToList();
 				for(uint i = 0 ; i < vAvail.Count ; i++)
 				{
 					if(vAvail[(int)i])
 					{
-						TxOutCompressor compressed = new TxOutCompressor();
+						var compressed = new TxOutCompressor();
 						stream.ReadWrite(ref compressed);
-						vout[(int)i] = compressed.TxOut;
+						_vout[(int)i] = compressed.TxOut;
 					}
 				}
 				//// coinbase height
-				stream.ReadWriteAsVarInt(ref nHeight);
+				stream.ReadWriteAsVarInt(ref _nHeight);
 				Cleanup();
 				UpdateValue();
 			}
@@ -242,12 +240,12 @@ namespace ChainUtils.BitcoinCore
 		private void CalcMaskSize(ref uint nBytes, ref uint nNonzeroBytes)
 		{
 			uint nLastUsedByte = 0;
-			for(uint b = 0 ; 2 + b * 8 < vout.Count ; b++)
+			for(uint b = 0 ; 2 + b * 8 < _vout.Count ; b++)
 			{
-				bool fZero = true;
-				for(uint i = 0 ; i < 8 && 2 + b * 8 + i < vout.Count ; i++)
+				var fZero = true;
+				for(uint i = 0 ; i < 8 && 2 + b * 8 + i < _vout.Count ; i++)
 				{
-					if(!vout[2 + (int)b * 8 + (int)i].IsNull)
+					if(!_vout[2 + (int)b * 8 + (int)i].IsNull)
 					{
 						fZero = false;
 						continue;
@@ -265,7 +263,7 @@ namespace ChainUtils.BitcoinCore
 		// check whether a particular output is still available
 		public bool IsAvailable(uint position)
 		{
-			return (position < vout.Count && !vout[(int)position].IsNull);
+			return (position < _vout.Count && !_vout[(int)position].IsNull);
 		}
 
 		// check whether the entire CCoins is spent
@@ -274,7 +272,7 @@ namespace ChainUtils.BitcoinCore
 		{
 			get
 			{
-				return vout.All(v => v.IsNull);
+				return _vout.All(v => v.IsNull);
 			}
 		}
 
@@ -287,17 +285,17 @@ namespace ChainUtils.BitcoinCore
 
 		public void MergeFrom(Coins otherCoin)
 		{
-			var diff = otherCoin.Outputs.Count - this.Outputs.Count;
+			var diff = otherCoin.Outputs.Count - Outputs.Count;
 			if(diff > 0)
 			{
 				Outputs.Resize(otherCoin.Outputs.Count);
-				for(int i = 0 ; i < Outputs.Count ; i++)
+				for(var i = 0 ; i < Outputs.Count ; i++)
 				{
 					if(Outputs[i] == null)
 						Outputs[i] = new TxOut();
 				}
 			}
-			for(int i = 0 ; i < otherCoin.Outputs.Count ; i++)
+			for(var i = 0 ; i < otherCoin.Outputs.Count ; i++)
 			{
 				if(!otherCoin.Outputs[i].IsNull)
 					Outputs[i] = otherCoin.Outputs[i];

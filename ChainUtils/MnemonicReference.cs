@@ -1,10 +1,9 @@
-﻿using ChainUtils.Crypto;
-using System;
+﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ChainUtils.Crypto;
 
 namespace ChainUtils
 {
@@ -54,7 +53,7 @@ namespace ChainUtils
 			var rawAddress = DecryptFinalAddress(finalAddress);
 
 			int blockHeight;
-			int x = DecodeBlockHeight(rawAddress, out blockHeight);
+			var x = DecodeBlockHeight(rawAddress, out blockHeight);
 
 			var header = chain.GetBlock(blockHeight);
 			if(header == null)
@@ -63,10 +62,10 @@ namespace ChainUtils
 			if(block == null || block.GetHash() != header.HashBlock)
 				throw new InvalidBrainAddressException("This block does not exists");
 
-			int y1 = BitCount((int)block.Transactions.Count);
-			int y2 = 11 * w - 1 - x - c;
-			int y = Math.Min(y1, y2);
-			int txIndex = Decode(Substring(rawAddress, x, y));
+			var y1 = BitCount((int)block.Transactions.Count);
+			var y2 = 11 * w - 1 - x - C;
+			var y = Math.Min(y1, y2);
+			var txIndex = Decode(Substring(rawAddress, x, y));
 			if(txIndex >= block.Transactions.Count)
 				throw new InvalidBrainAddressException("The Transaction Index is out of the bound of the block");
 
@@ -127,27 +126,27 @@ namespace ChainUtils
 			var block = chain.GetBlock(blockId);
 
 
-			BitArray encodedBlockHeight = EncodeBlockHeight(blockHeight);
-			int x = encodedBlockHeight.Length;
+			var encodedBlockHeight = EncodeBlockHeight(blockHeight);
+			var x = encodedBlockHeight.Length;
 
 			//ymin = ceiling(log(txIndex + 1, 2))
-			int ymin = BitCount(txIndex + 1);
+			var ymin = BitCount(txIndex + 1);
 			//zmin = ceiling(log(outputIndex + 1, 2))
-			int zmin = BitCount(txOutIndex + 1);
+			var zmin = BitCount(txOutIndex + 1);
 
 			//w = ceiling((x + ymin + zmin + c + 1)/11)
-			int w = RoundTo(x + ymin + zmin + c + 1, 11) / 11;
-			int y = 0;
-			int z = 0;
+			var w = RoundTo(x + ymin + zmin + C + 1, 11) / 11;
+			var y = 0;
+			var z = 0;
 			for( ; ; w++)
 			{
-				int y1 = BitCount((int)merkleBlock.PartialMerkleTree.TransactionCount);
-				int y2 = 11 * w - 1 - x - c;
+				var y1 = BitCount((int)merkleBlock.PartialMerkleTree.TransactionCount);
+				var y2 = 11 * w - 1 - x - C;
 				y = Math.Min(y1, y2);
 				if(ymin > y)
 					continue;
-				int z1 = BitCount(transaction.Outputs.Count);
-				int z2 = 11 * w - 1 - x - y - c;
+				var z1 = BitCount(transaction.Outputs.Count);
+				var z2 = 11 * w - 1 - x - y - C;
 				z = Math.Min(z1, z2);
 				if(zmin > z)
 					continue;
@@ -177,8 +176,8 @@ namespace ChainUtils
 
 		private static BitArray Concat(params BitArray[] arrays)
 		{
-			BitArray result = new BitArray(arrays.Select(a => a.Length).Sum());
-			int i = 0;
+			var result = new BitArray(arrays.Select(a => a.Length).Sum());
+			var i = 0;
 			foreach(var v in arrays.SelectMany(a => a.OfType<bool>()))
 			{
 				result.Set(i, v);
@@ -209,13 +208,13 @@ namespace ChainUtils
 			var indices = wordList.ToIndices(sentence);
 
 			//Step1: Determine w = number of words in the mnemonic code 
-			int w = indices.Length;
+			var w = indices.Length;
 
 			//Convert mnemonic code into finalAddress following BIP-0039
 			var finalAddress = Wordlist.ToBits(indices);
 
 			var rawAddress = DecryptFinalAddress(finalAddress);
-			int blockHeight = 0;
+			var blockHeight = 0;
 			var x = DecodeBlockHeight(rawAddress, out blockHeight);
 
 			var header = chain.GetBlock((int)blockHeight);
@@ -224,23 +223,23 @@ namespace ChainUtils
 			if(header.HashBlock != merkleBlock.Header.GetHash())
 				throw new InvalidBrainAddressException("The provided merkleblock do not match the block of the sentence");
 			var blockId = header.HashBlock;
-			MerkleNode root = merkleBlock.PartialMerkleTree.TryGetMerkleRoot();
+			var root = merkleBlock.PartialMerkleTree.TryGetMerkleRoot();
 			if(root == null || root.Hash != header.Header.HashMerkleRoot)
 				throw new InvalidBrainAddressException("Invalid partial merkle tree");
 
-			int y1 = BitCount((int)merkleBlock.PartialMerkleTree.TransactionCount);
-			int y2 = 11 * w - 1 - x - c;
-			int y = Math.Min(y1, y2);
-			int txIndex = Decode(Substring(rawAddress, x, y));
+			var y1 = BitCount((int)merkleBlock.PartialMerkleTree.TransactionCount);
+			var y2 = 11 * w - 1 - x - C;
+			var y = Math.Min(y1, y2);
+			var txIndex = Decode(Substring(rawAddress, x, y));
 
 			var txLeaf = root.GetLeafs().Skip((int)txIndex).FirstOrDefault();
 			if(txLeaf == null || txLeaf.Hash != transaction.GetHash())
 				throw new InvalidBrainAddressException("The transaction do not appear in the block");
 
-			int z1 = BitCount(transaction.Outputs.Count);
-			int z2 = 11 * w - 1 - x - y - c;
-			int z = Math.Min(z1, z2);
-			int outputIndex = Decode(Substring(rawAddress, x + y, z));
+			var z1 = BitCount(transaction.Outputs.Count);
+			var z2 = 11 * w - 1 - x - y - C;
+			var z = Math.Min(z1, z2);
+			var outputIndex = Decode(Substring(rawAddress, x + y, z));
 
 			if(outputIndex >= transaction.Outputs.Count)
 				throw new InvalidBrainAddressException("The specified txout index is outside of the transaction bounds");
@@ -267,19 +266,19 @@ namespace ChainUtils
 			};
 		}
 
-		const int c = 20;
+		const int C = 20;
 		private static BitArray DecryptFinalAddress(BitArray finalAddress)
 		{
 			if(finalAddress[finalAddress.Length - 1] != false)
 				throw new InvalidBrainAddressException("Invalid version bit");
-			var encryptionKey = Substring(finalAddress, finalAddress.Length - 1 - c, c);
-			var encryptedAddress = Xor(Substring(finalAddress, 0, finalAddress.Length - 1 - c), encryptionKey);
+			var encryptionKey = Substring(finalAddress, finalAddress.Length - 1 - C, C);
+			var encryptedAddress = Xor(Substring(finalAddress, 0, finalAddress.Length - 1 - C), encryptionKey);
 			return Concat(encryptedAddress, encryptionKey);
 		}
 		private static BitArray EncryptRawAddress(BitArray rawAddress)
 		{
-			var encryptionKey = Substring(rawAddress, rawAddress.Length - c, c);
-			var encryptedAddress = Xor(Substring(rawAddress, 0, rawAddress.Length - c), encryptionKey);
+			var encryptionKey = Substring(rawAddress, rawAddress.Length - C, C);
+			var encryptedAddress = Xor(Substring(rawAddress, 0, rawAddress.Length - C), encryptionKey);
 			var finalAddress = Concat(encryptedAddress, encryptionKey, new BitArray(new[] { false }));
 			return finalAddress;
 		}
@@ -287,7 +286,7 @@ namespace ChainUtils
 
 		static BitArray Xor(BitArray a, BitArray b)
 		{
-			BitArray result = new BitArray(a.Length);
+			var result = new BitArray(a.Length);
 			for(int i = 0, y = 0 ; i < a.Length ; i++, y++)
 			{
 				if(y >= b.Length)
@@ -302,7 +301,7 @@ namespace ChainUtils
 			return new BitArray(input.OfType<bool>().Skip(from).Take(count).ToArray());
 		}
 
-		private static BitArray CalculateChecksum(uint256 blockId, int txIndex, int txOutIndex, Script scriptPubKey, int bitCount)
+		private static BitArray CalculateChecksum(Uint256 blockId, int txIndex, int txOutIndex, Script scriptPubKey, int bitCount)
 		{
 			//All in little endian
 			var hashed =
@@ -314,11 +313,11 @@ namespace ChainUtils
 				.ToArray();
 			var hash = Hashes.Hash256(hashed);
 			var bytes = hash.ToBytes(true);
-			BitArray result = new BitArray(bitCount);
-			for(int i = 0 ; i < bitCount ; i++)
+			var result = new BitArray(bitCount);
+			for(var i = 0 ; i < bitCount ; i++)
 			{
-				int byteIndex = i / 8;
-				int bitIndex = i % 8;
+				var byteIndex = i / 8;
+				var bitIndex = i % 8;
 				result.Set(i, ((bytes[byteIndex] >> bitIndex) & 1) == 1);
 			}
 			return result;
@@ -362,7 +361,7 @@ namespace ChainUtils
 		private static BitArray Encode(int value, int bitCount)
 		{
 			var result = new BitArray(bitCount);
-			for(int i = 0 ; i < bitCount ; i++)
+			for(var i = 0 ; i < bitCount ; i++)
 			{
 				result.Set(i, (((value >> i) & 1) == 1));
 			}
@@ -373,9 +372,9 @@ namespace ChainUtils
 		{
 			var sb = new StringBuilder();
 
-			for(int i = 0 ; i < bits.Count ; i++)
+			for(var i = 0 ; i < bits.Count ; i++)
 			{
-				char c = bits[i] ? '1' : '0';
+				var c = bits[i] ? '1' : '0';
 				sb.Append(c);
 			}
 			return sb.ToString();
@@ -384,8 +383,8 @@ namespace ChainUtils
 
 		private static int Decode(BitArray array)
 		{
-			int result = 0;
-			for(int i = 0 ; i < array.Length ; i++)
+			var result = 0;
+			for(var i = 0 ; i < array.Length ; i++)
 			{
 				if(array.Get(i))
 					result += 1 << i;
@@ -404,7 +403,7 @@ namespace ChainUtils
 		{
 			possibilities = Math.Max(0, possibilities);
 			possibilities--;
-			int bitCount = 0;
+			var bitCount = 0;
 			while(possibilities != 0)
 			{
 				possibilities = possibilities >> 1;
@@ -446,7 +445,7 @@ namespace ChainUtils
 			private set;
 		}
 
-		public uint256 BlockId
+		public Uint256 BlockId
 		{
 			get;
 			private set;

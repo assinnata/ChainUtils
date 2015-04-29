@@ -17,8 +17,8 @@ namespace ChainUtils.Tests
 		{
 			OpcodeType[] oplist = { OpcodeType.OP_FALSE, OpcodeType.OP_1, OpcodeType.OP_2, OpcodeType.OP_3, OpcodeType.OP_CHECKSIG, OpcodeType.OP_IF, OpcodeType.OP_VERIF, OpcodeType.OP_RETURN, OpcodeType.OP_CODESEPARATOR };
 			var script = new Script();
-			int ops = (rand.Next() % 10);
-			for(int i = 0 ; i < ops ; i++)
+			var ops = (rand.Next() % 10);
+			for(var i = 0 ; i < ops ; i++)
 				script += oplist[rand.Next() % oplist.Length];
 
 			return script;
@@ -67,8 +67,8 @@ namespace ChainUtils.Tests
 
 				string raw_tx, raw_script, sigHashHex;
 				int nIn, nHashType;
-				Transaction tx = new Transaction();
-				Script scriptCode = new Script();
+				var tx = new Transaction();
+				var scriptCode = new Script();
 
 
 				// deserialize test data
@@ -82,7 +82,7 @@ namespace ChainUtils.Tests
 				tx.ReadWrite(ParseHex(raw_tx));
 
 
-				ValidationState state = Network.Main.CreateValidationState();
+				var state = Network.Main.CreateValidationState();
 				Assert.True(state.CheckTransaction(tx), strTest);
 				Assert.True(state.IsValid);
 

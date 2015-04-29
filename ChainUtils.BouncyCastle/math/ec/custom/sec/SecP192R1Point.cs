@@ -56,28 +56,28 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECPoint Add(ECPoint b)
         {
-            if (this.IsInfinity)
+            if (IsInfinity)
                 return b;
             if (b.IsInfinity)
                 return this;
             if (this == b)
                 return Twice();
 
-            ECCurve curve = this.Curve;
+            var curve = Curve;
 
-            SecP192R1FieldElement X1 = (SecP192R1FieldElement)this.RawXCoord, Y1 = (SecP192R1FieldElement)this.RawYCoord;
+            SecP192R1FieldElement X1 = (SecP192R1FieldElement)RawXCoord, Y1 = (SecP192R1FieldElement)RawYCoord;
             SecP192R1FieldElement X2 = (SecP192R1FieldElement)b.RawXCoord, Y2 = (SecP192R1FieldElement)b.RawYCoord;
 
-            SecP192R1FieldElement Z1 = (SecP192R1FieldElement)this.RawZCoords[0];
-            SecP192R1FieldElement Z2 = (SecP192R1FieldElement)b.RawZCoords[0];
+            var Z1 = (SecP192R1FieldElement)RawZCoords[0];
+            var Z2 = (SecP192R1FieldElement)b.RawZCoords[0];
 
             uint c;
-            uint[] tt1 = Nat192.CreateExt();
-            uint[] t2 = Nat192.Create();
-            uint[] t3 = Nat192.Create();
-            uint[] t4 = Nat192.Create();
+            var tt1 = Nat192.CreateExt();
+            var t2 = Nat192.Create();
+            var t3 = Nat192.Create();
+            var t4 = Nat192.Create();
 
-            bool Z1IsOne = Z1.IsOne;
+            var Z1IsOne = Z1.IsOne;
             uint[] U2, S2;
             if (Z1IsOne)
             {
@@ -96,7 +96,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 SecP192R1Field.Multiply(S2, Y2.x, S2);
             }
 
-            bool Z2IsOne = Z2.IsOne;
+            var Z2IsOne = Z2.IsOne;
             uint[] U1, S1;
             if (Z2IsOne)
             {
@@ -115,10 +115,10 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 SecP192R1Field.Multiply(S1, Y1.x, S1);
             }
 
-            uint[] H = Nat192.Create();
+            var H = Nat192.Create();
             SecP192R1Field.Subtract(U1, U2, H);
 
-            uint[] R = t2;
+            var R = t2;
             SecP192R1Field.Subtract(S1, S2, R);
 
             // Check if b == this or b == -this
@@ -127,20 +127,20 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 if (Nat192.IsZero(R))
                 {
                     // this == b, i.e. this must be doubled
-                    return this.Twice();
+                    return Twice();
                 }
 
                 // this == -b, i.e. the result is the point at infinity
                 return curve.Infinity;
             }
 
-            uint[] HSquared = t3;
+            var HSquared = t3;
             SecP192R1Field.Square(H, HSquared);
 
-            uint[] G = Nat192.Create();
+            var G = Nat192.Create();
             SecP192R1Field.Multiply(HSquared, H, G);
 
-            uint[] V = t3;
+            var V = t3;
             SecP192R1Field.Multiply(HSquared, U1, V);
 
             SecP192R1Field.Negate(G, G);
@@ -149,16 +149,16 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             c = Nat192.AddBothTo(V, V, G);
             SecP192R1Field.Reduce32(c, G);
 
-            SecP192R1FieldElement X3 = new SecP192R1FieldElement(t4);
+            var X3 = new SecP192R1FieldElement(t4);
             SecP192R1Field.Square(R, X3.x);
             SecP192R1Field.Subtract(X3.x, G, X3.x);
 
-            SecP192R1FieldElement Y3 = new SecP192R1FieldElement(G);
+            var Y3 = new SecP192R1FieldElement(G);
             SecP192R1Field.Subtract(V, X3.x, Y3.x);
             SecP192R1Field.MultiplyAddToExt(Y3.x, R, tt1);
             SecP192R1Field.Reduce(tt1, Y3.x);
 
-            SecP192R1FieldElement Z3 = new SecP192R1FieldElement(H);
+            var Z3 = new SecP192R1FieldElement(H);
             if (!Z1IsOne)
             {
                 SecP192R1Field.Multiply(Z3.x, Z1.x, Z3.x);
@@ -168,37 +168,37 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 SecP192R1Field.Multiply(Z3.x, Z2.x, Z3.x);
             }
 
-            ECFieldElement[] zs = new ECFieldElement[] { Z3 };
+            var zs = new ECFieldElement[] { Z3 };
 
             return new SecP192R1Point(curve, X3, Y3, zs, IsCompressed);
         }
 
         public override ECPoint Twice()
         {
-            if (this.IsInfinity)
+            if (IsInfinity)
                 return this;
 
-            ECCurve curve = this.Curve;
+            var curve = Curve;
 
-            SecP192R1FieldElement Y1 = (SecP192R1FieldElement)this.RawYCoord;
+            var Y1 = (SecP192R1FieldElement)RawYCoord;
             if (Y1.IsZero)
                 return curve.Infinity;
 
-            SecP192R1FieldElement X1 = (SecP192R1FieldElement)this.RawXCoord, Z1 = (SecP192R1FieldElement)this.RawZCoords[0];
+            SecP192R1FieldElement X1 = (SecP192R1FieldElement)RawXCoord, Z1 = (SecP192R1FieldElement)RawZCoords[0];
 
             uint c;
-            uint[] t1 = Nat192.Create();
-            uint[] t2 = Nat192.Create();
+            var t1 = Nat192.Create();
+            var t2 = Nat192.Create();
 
-            uint[] Y1Squared = Nat192.Create();
+            var Y1Squared = Nat192.Create();
             SecP192R1Field.Square(Y1.x, Y1Squared);
 
-            uint[] T = Nat192.Create();
+            var T = Nat192.Create();
             SecP192R1Field.Square(Y1Squared, T);
 
-            bool Z1IsOne = Z1.IsOne;
+            var Z1IsOne = Z1.IsOne;
 
-            uint[] Z1Squared = Z1.x;
+            var Z1Squared = Z1.x;
             if (!Z1IsOne)
             {
                 Z1Squared = t2;
@@ -207,13 +207,13 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
             SecP192R1Field.Subtract(X1.x, Z1Squared, t1);
 
-            uint[] M = t2;
+            var M = t2;
             SecP192R1Field.Add(X1.x, Z1Squared, M);
             SecP192R1Field.Multiply(M, t1, M);
             c = Nat192.AddBothTo(M, M, M);
             SecP192R1Field.Reduce32(c, M);
 
-            uint[] S = Y1Squared;
+            var S = Y1Squared;
             SecP192R1Field.Multiply(Y1Squared, X1.x, S);
             c = Nat.ShiftUpBits(6, S, 2, 0);
             SecP192R1Field.Reduce32(c, S);
@@ -221,17 +221,17 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             c = Nat.ShiftUpBits(6, T, 3, 0, t1);
             SecP192R1Field.Reduce32(c, t1);
 
-            SecP192R1FieldElement X3 = new SecP192R1FieldElement(T);
+            var X3 = new SecP192R1FieldElement(T);
             SecP192R1Field.Square(M, X3.x);
             SecP192R1Field.Subtract(X3.x, S, X3.x);
             SecP192R1Field.Subtract(X3.x, S, X3.x);
 
-            SecP192R1FieldElement Y3 = new SecP192R1FieldElement(S);
+            var Y3 = new SecP192R1FieldElement(S);
             SecP192R1Field.Subtract(S, X3.x, Y3.x);
             SecP192R1Field.Multiply(Y3.x, M, Y3.x);
             SecP192R1Field.Subtract(Y3.x, t1, Y3.x);
 
-            SecP192R1FieldElement Z3 = new SecP192R1FieldElement(M);
+            var Z3 = new SecP192R1FieldElement(M);
             SecP192R1Field.Twice(Y1.x, Z3.x);
             if (!Z1IsOne)
             {
@@ -245,12 +245,12 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         {
             if (this == b)
                 return ThreeTimes();
-            if (this.IsInfinity)
+            if (IsInfinity)
                 return b;
             if (b.IsInfinity)
                 return Twice();
 
-            ECFieldElement Y1 = this.RawYCoord;
+            var Y1 = RawYCoord;
             if (Y1.IsZero)
                 return b;
 
@@ -259,7 +259,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECPoint ThreeTimes()
         {
-            if (this.IsInfinity || this.RawYCoord.IsZero)
+            if (IsInfinity || RawYCoord.IsZero)
                 return this;
 
             // NOTE: Be careful about recursions between TwicePlus and ThreeTimes

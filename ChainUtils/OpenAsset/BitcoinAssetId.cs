@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChainUtils.OpenAsset
+﻿namespace ChainUtils.OpenAsset
 {
 	public class BitcoinAssetId : Base58Data
 	{
@@ -18,18 +12,18 @@ namespace ChainUtils.OpenAsset
 		}
 
 		public BitcoinAssetId(AssetId assetId, Network network)
-			: this(assetId._Bytes, network)
+			: this(assetId.Bytes, network)
 		{
 		}
 
-		AssetId _AssetId;
+		AssetId _assetId;
 		public AssetId AssetId
 		{
 			get
 			{
-				if(_AssetId == null)
-					_AssetId = new AssetId(vchData);
-				return _AssetId;
+				if(_assetId == null)
+					_assetId = new AssetId(VchData);
+				return _assetId;
 			}
 		}
 
@@ -37,7 +31,7 @@ namespace ChainUtils.OpenAsset
 		{
 			get
 			{
-				return vchData.Length == 20;
+				return VchData.Length == 20;
 			}
 		}
 
@@ -45,7 +39,7 @@ namespace ChainUtils.OpenAsset
 		{
 			get
 			{
-				return Base58Type.ASSET_ID;
+				return Base58Type.AssetId;
 			}
 		}
 	}

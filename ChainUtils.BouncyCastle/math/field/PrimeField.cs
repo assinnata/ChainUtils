@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChainUtils.BouncyCastle.Math.Field
+﻿namespace ChainUtils.BouncyCastle.Math.Field
 {
     internal class PrimeField
         : IFiniteField
@@ -28,7 +26,7 @@ namespace ChainUtils.BouncyCastle.Math.Field
             {
                 return true;
             }
-            PrimeField other = obj as PrimeField;
+            var other = obj as PrimeField;
             if (null == other)
             {
                 return false;

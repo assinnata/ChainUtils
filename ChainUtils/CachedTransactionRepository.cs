@@ -1,63 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public class CachedTransactionRepository : ITransactionRepository
 	{
-		ITransactionRepository _Inner;
-		Dictionary<uint256, Transaction> _Transactions = new Dictionary<uint256, Transaction>();
-		ReaderWriterLock @lock = new ReaderWriterLock();
+		ITransactionRepository _inner;
+		Dictionary<Uint256, Transaction> _transactions = new Dictionary<Uint256, Transaction>();
+		ReaderWriterLock _lock = new ReaderWriterLock();
 		public CachedTransactionRepository(ITransactionRepository inner)
 		{
 			if(inner == null)
 				throw new ArgumentNullException("inner");
-			_Inner = inner;
+			_inner = inner;
 		}
 
-		public Transaction GetFromCache(uint256 txId)
+		public Transaction GetFromCache(Uint256 txId)
 		{
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
-				return _Transactions.TryGet(txId);
+				return _transactions.TryGet(txId);
 			}
 		}
 
 		#region ITransactionRepository Members
 
-		public async Task<Transaction> GetAsync(uint256 txId)
+		public async Task<Transaction> GetAsync(Uint256 txId)
 		{
-			bool found = false;
+			var found = false;
 			Transaction result = null;
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
-				found = _Transactions.TryGetValue(txId, out result);
+				found = _transactions.TryGetValue(txId, out result);
 			}
 			if(!found)
 			{
-				result = await _Inner.GetAsync(txId).ConfigureAwait(false);
-				using(@lock.LockWrite())
+				result = await _inner.GetAsync(txId).ConfigureAwait(false);
+				using(_lock.LockWrite())
 				{
-					_Transactions.AddOrReplace(txId, result);
+					_transactions.AddOrReplace(txId, result);
 				}
 			}
 			return result;
 
 		}
 
-		public Task PutAsync(uint256 txId, Transaction tx)
+		public Task PutAsync(Uint256 txId, Transaction tx)
 		{
-			using(@lock.LockWrite())
+			using(_lock.LockWrite())
 			{
-				if(!_Transactions.ContainsKey(txId))
-					_Transactions.AddOrReplace(txId, tx);
+				if(!_transactions.ContainsKey(txId))
+					_transactions.AddOrReplace(txId, tx);
 				else
-					_Transactions[txId] = tx;
+					_transactions[txId] = tx;
 			}
-			return _Inner.PutAsync(txId, tx);
+			return _inner.PutAsync(txId, tx);
 		}
 
 		#endregion

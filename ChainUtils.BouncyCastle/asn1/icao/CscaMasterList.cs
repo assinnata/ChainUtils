@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Icao
@@ -43,12 +42,12 @@ namespace ChainUtils.BouncyCastle.Asn1.Icao
 			if (seq.Count != 2)
 				throw new ArgumentException("Incorrect sequence size: " + seq.Count);
 
-			this.version = DerInteger.GetInstance(seq[0]);
+			version = DerInteger.GetInstance(seq[0]);
 
-			Asn1Set certSet = Asn1Set.GetInstance(seq[1]);
+			var certSet = Asn1Set.GetInstance(seq[1]);
 
-			this.certList = new X509CertificateStructure[certSet.Count];
-			for (int i = 0; i < certList.Length; i++)
+			certList = new X509CertificateStructure[certSet.Count];
+			for (var i = 0; i < certList.Length; i++)
 			{
 				certList[i] = X509CertificateStructure.GetInstance(certSet[i]);
 			}

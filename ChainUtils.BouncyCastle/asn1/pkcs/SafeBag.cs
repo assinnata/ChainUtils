@@ -1,5 +1,3 @@
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 {
     public class SafeBag
@@ -13,9 +11,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             DerObjectIdentifier	oid,
             Asn1Object			obj)
         {
-            this.bagID = oid;
-            this.bagValue = obj;
-            this.bagAttributes = null;
+            bagID = oid;
+            bagValue = obj;
+            bagAttributes = null;
         }
 
 		public SafeBag(
@@ -23,19 +21,19 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             Asn1Object			obj,
             Asn1Set				bagAttributes)
         {
-            this.bagID = oid;
-            this.bagValue = obj;
+            bagID = oid;
+            bagValue = obj;
             this.bagAttributes = bagAttributes;
         }
 
 		public SafeBag(
             Asn1Sequence seq)
         {
-            this.bagID = (DerObjectIdentifier) seq[0];
-            this.bagValue = ((DerTaggedObject) seq[1]).GetObject();
+            bagID = (DerObjectIdentifier) seq[0];
+            bagValue = ((DerTaggedObject) seq[1]).GetObject();
             if (seq.Count == 3)
             {
-                this.bagAttributes = (Asn1Set) seq[2];
+                bagAttributes = (Asn1Set) seq[2];
             }
         }
 
@@ -56,7 +54,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 
 		public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
 				bagID, new DerTaggedObject(0, bagValue));
 
 			if (bagAttributes != null)

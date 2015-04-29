@@ -57,28 +57,28 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECPoint Add(ECPoint b)
         {
-            if (this.IsInfinity)
+            if (IsInfinity)
                 return b;
             if (b.IsInfinity)
                 return this;
             if (this == b)
                 return Twice();
 
-            ECCurve curve = this.Curve;
+            var curve = Curve;
 
-            SecP256K1FieldElement X1 = (SecP256K1FieldElement)this.RawXCoord, Y1 = (SecP256K1FieldElement)this.RawYCoord;
+            SecP256K1FieldElement X1 = (SecP256K1FieldElement)RawXCoord, Y1 = (SecP256K1FieldElement)RawYCoord;
             SecP256K1FieldElement X2 = (SecP256K1FieldElement)b.RawXCoord, Y2 = (SecP256K1FieldElement)b.RawYCoord;
 
-            SecP256K1FieldElement Z1 = (SecP256K1FieldElement)this.RawZCoords[0];
-            SecP256K1FieldElement Z2 = (SecP256K1FieldElement)b.RawZCoords[0];
+            var Z1 = (SecP256K1FieldElement)RawZCoords[0];
+            var Z2 = (SecP256K1FieldElement)b.RawZCoords[0];
 
             uint c;
-            uint[] tt1 = Nat256.CreateExt();
-            uint[] t2 = Nat256.Create();
-            uint[] t3 = Nat256.Create();
-            uint[] t4 = Nat256.Create();
+            var tt1 = Nat256.CreateExt();
+            var t2 = Nat256.Create();
+            var t3 = Nat256.Create();
+            var t4 = Nat256.Create();
 
-            bool Z1IsOne = Z1.IsOne;
+            var Z1IsOne = Z1.IsOne;
             uint[] U2, S2;
             if (Z1IsOne)
             {
@@ -97,7 +97,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 SecP256K1Field.Multiply(S2, Y2.x, S2);
             }
 
-            bool Z2IsOne = Z2.IsOne;
+            var Z2IsOne = Z2.IsOne;
             uint[] U1, S1;
             if (Z2IsOne)
             {
@@ -116,10 +116,10 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 SecP256K1Field.Multiply(S1, Y1.x, S1);
             }
 
-            uint[] H = Nat256.Create();
+            var H = Nat256.Create();
             SecP256K1Field.Subtract(U1, U2, H);
 
-            uint[] R = t2;
+            var R = t2;
             SecP256K1Field.Subtract(S1, S2, R);
 
             // Check if b == this or b == -this
@@ -128,20 +128,20 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 if (Nat256.IsZero(R))
                 {
                     // this == b, i.e. this must be doubled
-                    return this.Twice();
+                    return Twice();
                 }
 
                 // this == -b, i.e. the result is the point at infinity
                 return curve.Infinity;
             }
 
-            uint[] HSquared = t3;
+            var HSquared = t3;
             SecP256K1Field.Square(H, HSquared);
 
-            uint[] G = Nat256.Create();
+            var G = Nat256.Create();
             SecP256K1Field.Multiply(HSquared, H, G);
 
-            uint[] V = t3;
+            var V = t3;
             SecP256K1Field.Multiply(HSquared, U1, V);
 
             SecP256K1Field.Negate(G, G);
@@ -150,16 +150,16 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             c = Nat256.AddBothTo(V, V, G);
             SecP256K1Field.Reduce32(c, G);
 
-            SecP256K1FieldElement X3 = new SecP256K1FieldElement(t4);
+            var X3 = new SecP256K1FieldElement(t4);
             SecP256K1Field.Square(R, X3.x);
             SecP256K1Field.Subtract(X3.x, G, X3.x);
 
-            SecP256K1FieldElement Y3 = new SecP256K1FieldElement(G);
+            var Y3 = new SecP256K1FieldElement(G);
             SecP256K1Field.Subtract(V, X3.x, Y3.x);
             SecP256K1Field.MultiplyAddToExt(Y3.x, R, tt1);
             SecP256K1Field.Reduce(tt1, Y3.x);
 
-            SecP256K1FieldElement Z3 = new SecP256K1FieldElement(H);
+            var Z3 = new SecP256K1FieldElement(H);
             if (!Z1IsOne)
             {
                 SecP256K1Field.Multiply(Z3.x, Z1.x, Z3.x);
@@ -169,57 +169,57 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 SecP256K1Field.Multiply(Z3.x, Z2.x, Z3.x);
             }
 
-            ECFieldElement[] zs = new ECFieldElement[] { Z3 };
+            var zs = new ECFieldElement[] { Z3 };
 
             return new SecP256K1Point(curve, X3, Y3, zs, IsCompressed);
         }
 
         public override ECPoint Twice()
         {
-            if (this.IsInfinity)
+            if (IsInfinity)
                 return this;
 
-            ECCurve curve = this.Curve;
+            var curve = Curve;
 
-            SecP256K1FieldElement Y1 = (SecP256K1FieldElement)this.RawYCoord;
+            var Y1 = (SecP256K1FieldElement)RawYCoord;
             if (Y1.IsZero)
                 return curve.Infinity;
 
-            SecP256K1FieldElement X1 = (SecP256K1FieldElement)this.RawXCoord, Z1 = (SecP256K1FieldElement)this.RawZCoords[0];
+            SecP256K1FieldElement X1 = (SecP256K1FieldElement)RawXCoord, Z1 = (SecP256K1FieldElement)RawZCoords[0];
 
             uint c;
 
-            uint[] Y1Squared = Nat256.Create();
+            var Y1Squared = Nat256.Create();
             SecP256K1Field.Square(Y1.x, Y1Squared);
 
-            uint[] T = Nat256.Create();
+            var T = Nat256.Create();
             SecP256K1Field.Square(Y1Squared, T);
 
-            uint[] M = Nat256.Create();
+            var M = Nat256.Create();
             SecP256K1Field.Square(X1.x, M);
             c = Nat256.AddBothTo(M, M, M);
             SecP256K1Field.Reduce32(c, M);
 
-            uint[] S = Y1Squared;
+            var S = Y1Squared;
             SecP256K1Field.Multiply(Y1Squared, X1.x, S);
             c = Nat.ShiftUpBits(8, S, 2, 0);
             SecP256K1Field.Reduce32(c, S);
 
-            uint[] t1 = Nat256.Create();
+            var t1 = Nat256.Create();
             c = Nat.ShiftUpBits(8, T, 3, 0, t1);
             SecP256K1Field.Reduce32(c, t1);
 
-            SecP256K1FieldElement X3 = new SecP256K1FieldElement(T);
+            var X3 = new SecP256K1FieldElement(T);
             SecP256K1Field.Square(M, X3.x);
             SecP256K1Field.Subtract(X3.x, S, X3.x);
             SecP256K1Field.Subtract(X3.x, S, X3.x);
 
-            SecP256K1FieldElement Y3 = new SecP256K1FieldElement(S);
+            var Y3 = new SecP256K1FieldElement(S);
             SecP256K1Field.Subtract(S, X3.x, Y3.x);
             SecP256K1Field.Multiply(Y3.x, M, Y3.x);
             SecP256K1Field.Subtract(Y3.x, t1, Y3.x);
 
-            SecP256K1FieldElement Z3 = new SecP256K1FieldElement(M);
+            var Z3 = new SecP256K1FieldElement(M);
             SecP256K1Field.Twice(Y1.x, Z3.x);
             if (!Z1.IsOne)
             {
@@ -233,12 +233,12 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         {
             if (this == b)
                 return ThreeTimes();
-            if (this.IsInfinity)
+            if (IsInfinity)
                 return b;
             if (b.IsInfinity)
                 return Twice();
 
-            ECFieldElement Y1 = this.RawYCoord;
+            var Y1 = RawYCoord;
             if (Y1.IsZero)
                 return b;
 
@@ -247,7 +247,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECPoint ThreeTimes()
         {
-            if (this.IsInfinity || this.RawYCoord.IsZero)
+            if (IsInfinity || RawYCoord.IsZero)
                 return this;
 
             // NOTE: Be careful about recursions between TwicePlus and ThreeTimes

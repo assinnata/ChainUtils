@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -37,7 +34,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             Asn1OctetString         encryptedDigest,
             Asn1Set                 unauthenticatedAttributes)
         {
-            this.version = new DerInteger(sid.IsTagged ? 3 : 1);
+            version = new DerInteger(sid.IsTagged ? 3 : 1);
             this.sid = sid;
             this.digAlgorithm = digAlgorithm;
             this.authenticatedAttributes = authenticatedAttributes;
@@ -54,7 +51,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             Asn1OctetString         encryptedDigest,
             Attributes              unauthenticatedAttributes)
         {
-            this.version = new DerInteger(sid.IsTagged ? 3 : 1);
+            version = new DerInteger(sid.IsTagged ? 3 : 1);
             this.sid = sid;
             this.digAlgorithm = digAlgorithm;
             this.authenticatedAttributes = Asn1Set.GetInstance(authenticatedAttributes);
@@ -66,7 +63,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         public SignerInfo(
             Asn1Sequence seq)
         {
-            IEnumerator e = seq.GetEnumerator();
+            var e = seq.GetEnumerator();
 
             e.MoveNext();
             version = (DerInteger) e.Current;
@@ -78,7 +75,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             digAlgorithm = AlgorithmIdentifier.GetInstance(e.Current);
 
             e.MoveNext();
-            object obj = e.Current;
+            var obj = e.Current;
 
             if (obj is Asn1TaggedObject)
             {
@@ -94,7 +91,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             }
 
             e.MoveNext();
-            encryptedDigest = DerOctetString.GetInstance(e.Current);
+            encryptedDigest = Asn1OctetString.GetInstance(e.Current);
 
             if (e.MoveNext())
             {
@@ -163,7 +160,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
                 version, sid, digAlgorithm);
 
             if (authenticatedAttributes != null)

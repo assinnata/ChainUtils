@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -136,7 +135,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             }
             else
             {
-                int     p = x * y;
+                var     p = x * y;
                 y = p & MASK;
                 x = (int) ((uint) p >> 16);
                 x = y - x + ((y < x) ? 1 : 0);
@@ -151,12 +150,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             int     outOff)
         {
             int     x0, x1, x2, x3, t0, t1;
-            int     keyOff = 0;
+            var     keyOff = 0;
             x0 = BytesToWord(input, inOff);
             x1 = BytesToWord(input, inOff + 2);
             x2 = BytesToWord(input, inOff + 4);
             x3 = BytesToWord(input, inOff + 6);
-            for (int round = 0; round < 8; round++)
+            for (var round = 0; round < 8; round++)
             {
                 x0 = Mul(x0, workingKey[keyOff++]);
                 x1 += workingKey[keyOff++];
@@ -193,18 +192,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         private int[] ExpandKey(
             byte[]  uKey)
         {
-            int[]   key = new int[52];
+            var   key = new int[52];
             if (uKey.Length < 16)
             {
-                byte[]  tmp = new byte[16];
+                var  tmp = new byte[16];
                 Array.Copy(uKey, 0, tmp, tmp.Length - uKey.Length, uKey.Length);
                 uKey = tmp;
             }
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
             {
                 key[i] = BytesToWord(uKey, i * 2);
             }
-            for (int i = 8; i < 52; i++)
+            for (var i = 8; i < 52; i++)
             {
                 if ((i & 7) < 6)
                 {
@@ -275,9 +274,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             int[] inKey)
         {
             int     t1, t2, t3, t4;
-            int     p = 52;                 /* We work backwards */
-            int[]   key = new int[52];
-            int     inOff = 0;
+            var     p = 52;                 /* We work backwards */
+            var   key = new int[52];
+            var     inOff = 0;
 
             t1 = MulInv(inKey[inOff++]);
             t2 = AddInv(inKey[inOff++]);
@@ -288,7 +287,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             key[--p] = t2;
             key[--p] = t1;
 
-            for (int round = 1; round < 8; round++)
+            for (var round = 1; round < 8; round++)
             {
                 t1 = inKey[inOff++];
                 t2 = inKey[inOff++];

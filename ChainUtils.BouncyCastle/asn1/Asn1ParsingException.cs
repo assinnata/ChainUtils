@@ -9,7 +9,6 @@ namespace ChainUtils.BouncyCastle.Asn1
 		: InvalidOperationException
 	{
 		public Asn1ParsingException()
-			: base()
 		{
 		}
 

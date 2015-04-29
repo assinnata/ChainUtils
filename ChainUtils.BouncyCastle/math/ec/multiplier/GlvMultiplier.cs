@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Math.EC.Endo;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
@@ -24,11 +23,11 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
             if (!curve.Equals(p.Curve))
                 throw new InvalidOperationException();
 
-            BigInteger n = p.Curve.Order;
-            BigInteger[] ab = glvEndomorphism.DecomposeScalar(k.Mod(n));
+            var n = p.Curve.Order;
+            var ab = glvEndomorphism.DecomposeScalar(k.Mod(n));
             BigInteger a = ab[0], b = ab[1];
 
-            ECPointMap pointMap = glvEndomorphism.PointMap;
+            var pointMap = glvEndomorphism.PointMap;
             if (glvEndomorphism.HasEfficientPointMap)
             {
                 return ECAlgorithms.ImplShamirsTrickWNaf(p, a, pointMap, b);

@@ -1,6 +1,4 @@
 using System;
-using System.Text;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
@@ -71,17 +69,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			 * irrelevant. (Like 90% of stream ciphers)
 			 */
 
-			ParametersWithIV ivParams = parameters as ParametersWithIV;
+			var ivParams = parameters as ParametersWithIV;
 
 			if (ivParams == null)
 				throw new ArgumentException(AlgorithmName + " Init requires an IV", "parameters");
 
-			byte[] iv = ivParams.GetIV();
+			var iv = ivParams.GetIV();
 
 			if (iv == null || iv.Length != NonceSize)
 				throw new ArgumentException(AlgorithmName + " requires exactly " + NonceSize + " bytes of IV");
 
-			KeyParameter key = ivParams.Parameters as KeyParameter;
+			var key = ivParams.Parameters as KeyParameter;
 
 			if (key == null)
 				throw new ArgumentException(AlgorithmName + " Init requires a key", "parameters");
@@ -99,7 +97,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		public virtual string AlgorithmName
 		{
 			get { 
-				string name = "Salsa20";
+				var name = "Salsa20";
 				if (rounds != DEFAULT_ROUNDS)
 				{
 					name += "/" + rounds;
@@ -122,7 +120,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				AdvanceCounter();
 			}
 
-			byte output = (byte)(keyStream[index] ^ input);
+			var output = (byte)(keyStream[index] ^ input);
 			index = (index + 1) & 63;
 
 			return output;
@@ -163,7 +161,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				throw new MaxBytesExceededException("2^70 byte limit per IV would be exceeded; Change IV");
 			}
 
-			for (int i = 0; i < len; i++)
+			for (var i = 0; i < len; i++)
 			{
 				if (index == 0)
 				{
@@ -193,7 +191,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				throw new ArgumentException(AlgorithmName + " requires 128 bit or 256 bit key");
 			}
 
-			int offset = 0;
+			var offset = 0;
 			byte[] constants;
 
 			// Key
@@ -245,24 +243,24 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				throw new ArgumentException("Number of rounds must be even");
 			}
 
-			uint x00 = input[ 0];
-			uint x01 = input[ 1];
-			uint x02 = input[ 2];
-			uint x03 = input[ 3];
-			uint x04 = input[ 4];
-			uint x05 = input[ 5];
-			uint x06 = input[ 6];
-			uint x07 = input[ 7];
-			uint x08 = input[ 8];
-			uint x09 = input[ 9];
-			uint x10 = input[10];
-			uint x11 = input[11];
-			uint x12 = input[12];
-			uint x13 = input[13];
-			uint x14 = input[14];
-			uint x15 = input[15];
+			var x00 = input[ 0];
+			var x01 = input[ 1];
+			var x02 = input[ 2];
+			var x03 = input[ 3];
+			var x04 = input[ 4];
+			var x05 = input[ 5];
+			var x06 = input[ 6];
+			var x07 = input[ 7];
+			var x08 = input[ 8];
+			var x09 = input[ 9];
+			var x10 = input[10];
+			var x11 = input[11];
+			var x12 = input[12];
+			var x13 = input[13];
+			var x14 = input[14];
+			var x15 = input[15];
 
-			for (int i = rounds; i > 0; i -= 2)
+			for (var i = rounds; i > 0; i -= 2)
 			{
 				x04 ^= R((x00+x12), 7);
 				x08 ^= R((x04+x00), 9);
@@ -356,7 +354,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		private bool LimitExceeded(
 			uint len)
 		{
-			uint old = cW0;
+			var old = cW0;
 			cW0 += len;
 			if (cW0 < old)
 			{

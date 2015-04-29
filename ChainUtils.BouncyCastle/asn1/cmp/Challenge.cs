@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cmp
@@ -13,7 +12,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 
 		private Challenge(Asn1Sequence seq)
 		{
-			int index = 0;
+			var index = 0;
 
 			if (seq.Count == 3)
 			{
@@ -69,7 +68,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 			v.AddOptional(owf);
 			v.Add(witness);
 			v.Add(challenge);

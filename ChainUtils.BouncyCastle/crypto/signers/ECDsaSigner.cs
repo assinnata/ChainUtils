@@ -1,6 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
@@ -25,7 +22,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
          */
         public ECDsaSigner()
         {
-            this.kCalculator = new RandomDsaKCalculator();
+            kCalculator = new RandomDsaKCalculator();
         }
 
         /**
@@ -51,7 +48,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             {
                 if (parameters is ParametersWithRandom)
                 {
-                    ParametersWithRandom rParam = (ParametersWithRandom)parameters;
+                    var rParam = (ParametersWithRandom)parameters;
 
                     providedRandom = rParam.Random;
                     parameters = rParam.Parameters;
@@ -60,17 +57,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 if (!(parameters is ECPrivateKeyParameters))
                     throw new InvalidKeyException("EC private key required for signing");
 
-                this.key = (ECPrivateKeyParameters)parameters;
+                key = (ECPrivateKeyParameters)parameters;
             }
             else
             {
                 if (!(parameters is ECPublicKeyParameters))
                     throw new InvalidKeyException("EC public key required for verification");
 
-                this.key = (ECPublicKeyParameters)parameters;
+                key = (ECPublicKeyParameters)parameters;
             }
 
-            this.random = InitSecureRandom(forSigning && !kCalculator.IsDeterministic, providedRandom);
+            random = InitSecureRandom(forSigning && !kCalculator.IsDeterministic, providedRandom);
         }
 
         // 5.3 pg 28
@@ -83,10 +80,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
          */
         public virtual BigInteger[] GenerateSignature(byte[] message)
         {
-            ECDomainParameters ec = key.Parameters;
-            BigInteger n = ec.N;
-            BigInteger e = CalculateE(n, message);
-            BigInteger d = ((ECPrivateKeyParameters)key).D;
+            var ec = key.Parameters;
+            var n = ec.N;
+            var e = CalculateE(n, message);
+            var d = ((ECPrivateKeyParameters)key).D;
 
             if (kCalculator.IsDeterministic)
             {
@@ -99,7 +96,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 
             BigInteger r, s;
 
-            ECMultiplier basePointMultiplier = CreateBasePointMultiplier();
+            var basePointMultiplier = CreateBasePointMultiplier();
 
             // 5.3.2
             do // Generate s
@@ -109,7 +106,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 {
                     k = kCalculator.NextK();
 
-                    ECPoint p = basePointMultiplier.Multiply(ec.G, k).Normalize();
+                    var p = basePointMultiplier.Multiply(ec.G, k).Normalize();
 
                     // 5.3.3
                     r = p.AffineXCoord.ToBigInteger().Mod(n);
@@ -131,7 +128,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
          */
         public virtual bool VerifySignature(byte[] message, BigInteger r, BigInteger s)
         {
-            BigInteger n = key.Parameters.N;
+            var n = key.Parameters.N;
 
             // r and s should both in the range [1,n-1]
             if (r.SignValue < 1 || s.SignValue < 1
@@ -140,29 +137,29 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 return false;
             }
 
-            BigInteger e = CalculateE(n, message);
-            BigInteger c = s.ModInverse(n);
+            var e = CalculateE(n, message);
+            var c = s.ModInverse(n);
 
-            BigInteger u1 = e.Multiply(c).Mod(n);
-            BigInteger u2 = r.Multiply(c).Mod(n);
+            var u1 = e.Multiply(c).Mod(n);
+            var u2 = r.Multiply(c).Mod(n);
 
-            ECPoint G = key.Parameters.G;
-            ECPoint Q = ((ECPublicKeyParameters) key).Q;
+            var G = key.Parameters.G;
+            var Q = ((ECPublicKeyParameters) key).Q;
 
-            ECPoint point = ECAlgorithms.SumOfTwoMultiplies(G, u1, Q, u2).Normalize();
+            var point = ECAlgorithms.SumOfTwoMultiplies(G, u1, Q, u2).Normalize();
 
             if (point.IsInfinity)
                 return false;
 
-            BigInteger v = point.AffineXCoord.ToBigInteger().Mod(n);
+            var v = point.AffineXCoord.ToBigInteger().Mod(n);
 
             return v.Equals(r);
         }
 
         protected virtual BigInteger CalculateE(BigInteger n, byte[] message)
         {
-            int messageBitLength = message.Length * 8;
-            BigInteger trunc = new BigInteger(1, message);
+            var messageBitLength = message.Length * 8;
+            var trunc = new BigInteger(1, message);
 
             if (n.BitLength < messageBitLength)
             {

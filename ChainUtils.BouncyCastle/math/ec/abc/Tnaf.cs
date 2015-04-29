@@ -90,13 +90,13 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
             BigInteger norm;
 
             // s1 = u^2
-            BigInteger s1 = lambda.u.Multiply(lambda.u);
+            var s1 = lambda.u.Multiply(lambda.u);
 
             // s2 = u * v
-            BigInteger s2 = lambda.u.Multiply(lambda.v);
+            var s2 = lambda.u.Multiply(lambda.v);
 
             // s3 = 2 * v^2
-            BigInteger s3 = lambda.v.Multiply(lambda.v).ShiftLeft(1);
+            var s3 = lambda.v.Multiply(lambda.v).ShiftLeft(1);
 
             if (mu == 1)
             {
@@ -131,13 +131,13 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
             SimpleBigDecimal norm;
 
             // s1 = u^2
-            SimpleBigDecimal s1 = u.Multiply(u);
+            var s1 = u.Multiply(u);
 
             // s2 = u * v
-            SimpleBigDecimal s2 = u.Multiply(v);
+            var s2 = u.Multiply(v);
 
             // s3 = 2 * v^2
-            SimpleBigDecimal s3 = v.Multiply(v).ShiftLeft(1);
+            var s3 = v.Multiply(v).ShiftLeft(1);
 
             if (mu == 1)
             {
@@ -171,21 +171,21 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
         public static ZTauElement Round(SimpleBigDecimal lambda0,
             SimpleBigDecimal lambda1, sbyte mu)
         {
-            int scale = lambda0.Scale;
+            var scale = lambda0.Scale;
             if (lambda1.Scale != scale)
                 throw new ArgumentException("lambda0 and lambda1 do not have same scale");
 
             if (!((mu == 1) || (mu == -1)))
                 throw new ArgumentException("mu must be 1 or -1");
 
-            BigInteger f0 = lambda0.Round();
-            BigInteger f1 = lambda1.Round();
+            var f0 = lambda0.Round();
+            var f1 = lambda1.Round();
 
-            SimpleBigDecimal eta0 = lambda0.Subtract(f0);
-            SimpleBigDecimal eta1 = lambda1.Subtract(f1);
+            var eta0 = lambda0.Subtract(f0);
+            var eta1 = lambda1.Subtract(f1);
 
             // eta = 2*eta0 + mu*eta1
-            SimpleBigDecimal eta = eta0.Add(eta0);
+            var eta = eta0.Add(eta0);
             if (mu == 1)
             {
                 eta = eta.Add(eta1);
@@ -198,8 +198,8 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
 
             // check1 = eta0 - 3*mu*eta1
             // check2 = eta0 + 4*mu*eta1
-            SimpleBigDecimal threeEta1 = eta1.Add(eta1).Add(eta1);
-            SimpleBigDecimal fourEta1 = threeEta1.Add(eta1);
+            var threeEta1 = eta1.Add(eta1).Add(eta1);
+            var fourEta1 = threeEta1.Add(eta1);
             SimpleBigDecimal check1;
             SimpleBigDecimal check2;
             if (mu == 1)
@@ -259,8 +259,8 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
                 }
             }
 
-            BigInteger q0 = f0.Add(BigInteger.ValueOf(h0));
-            BigInteger q1 = f1.Add(BigInteger.ValueOf(h1));
+            var q0 = f0.Add(BigInteger.ValueOf(h0));
+            var q1 = f1.Add(BigInteger.ValueOf(h1));
             return new ZTauElement(q0, q1);
         }
 
@@ -283,17 +283,17 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
         public static SimpleBigDecimal ApproximateDivisionByN(BigInteger k,
             BigInteger s, BigInteger vm, sbyte a, int m, int c)
         {
-            int _k = (m + 5)/2 + c;
-            BigInteger ns = k.ShiftRight(m - _k - 2 + a);
+            var _k = (m + 5)/2 + c;
+            var ns = k.ShiftRight(m - _k - 2 + a);
 
-            BigInteger gs = s.Multiply(ns);
+            var gs = s.Multiply(ns);
 
-            BigInteger hs = gs.ShiftRight(m);
+            var hs = gs.ShiftRight(m);
 
-            BigInteger js = vm.Multiply(hs);
+            var js = vm.Multiply(hs);
 
-            BigInteger gsPlusJs = gs.Add(js);
-            BigInteger ls = gsPlusJs.ShiftRight(_k-c);
+            var gsPlusJs = gs.Add(js);
+            var ls = gsPlusJs.ShiftRight(_k-c);
             if (gsPlusJs.TestBit(_k-c-1))
             {
                 // round up
@@ -316,23 +316,23 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
             if (!((mu == 1) || (mu == -1))) 
                 throw new ArgumentException("mu must be 1 or -1");
 
-            BigInteger norm = Norm(mu, lambda);
+            var norm = Norm(mu, lambda);
 
             // Ceiling of log2 of the norm 
-            int log2Norm = norm.BitLength;
+            var log2Norm = norm.BitLength;
 
             // If length(TNAF) > 30, then length(TNAF) < log2Norm + 3.52
-            int maxLength = log2Norm > 30 ? log2Norm + 4 : 34;
+            var maxLength = log2Norm > 30 ? log2Norm + 4 : 34;
 
             // The array holding the TNAF
-            sbyte[] u = new sbyte[maxLength];
-            int i = 0;
+            var u = new sbyte[maxLength];
+            var i = 0;
 
             // The actual length of the TNAF
-            int length = 0;
+            var length = 0;
 
-            BigInteger r0 = lambda.u;
-            BigInteger r1 = lambda.v;
+            var r0 = lambda.u;
+            var r1 = lambda.v;
 
             while(!((r0.Equals(BigInteger.Zero)) && (r1.Equals(BigInteger.Zero))))
             {
@@ -358,8 +358,8 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
                     u[i] = 0;
                 }
 
-                BigInteger t = r0;
-                BigInteger s = r0.ShiftRight(1);
+                var t = r0;
+                var s = r0.ShiftRight(1);
                 if (mu == 1) 
                 {
                     r0 = r1.Add(s);
@@ -377,7 +377,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
             length++;
 
             // Reduce the TNAF array to its actual length
-            sbyte[] tnaf = new sbyte[length];
+            var tnaf = new sbyte[length];
             Array.Copy(u, 0, tnaf, 0, length);
             return tnaf;
         }
@@ -405,7 +405,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
         */
         public static sbyte GetMu(F2mCurve curve)
         {
-            BigInteger a = curve.A.ToBigInteger();
+            var a = curve.A.ToBigInteger();
 
             sbyte mu;
             if (a.SignValue == 0)
@@ -457,7 +457,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
                 u1 = BigInteger.One;
             }
 
-            for (int i = 1; i < k; i++)
+            for (var i = 1; i < k; i++)
             {
                 // u2 = mu*u1 - 2*u0;
                 BigInteger s = null;
@@ -507,9 +507,9 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
             else
             {
                 // For w <> 4, the values must be computed
-                BigInteger[] us = GetLucas(mu, w, false);
-                BigInteger twoToW = BigInteger.Zero.SetBit(w);
-                BigInteger u1invert = us[1].ModInverse(twoToW);
+                var us = GetLucas(mu, w, false);
+                var twoToW = BigInteger.Zero.SetBit(w);
+                var u1invert = us[1].ModInverse(twoToW);
                 BigInteger tw;
                 tw = BigInteger.Two.Multiply(us[0]).Multiply(u1invert).Mod(twoToW);
                 //System.out.println("mu = " + mu);
@@ -531,12 +531,12 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
             if (!curve.IsKoblitz)
                 throw new ArgumentException("si is defined for Koblitz curves only");
 
-            int m = curve.M;
-            int a = curve.A.ToBigInteger().IntValue;
-            sbyte mu = curve.GetMu();
-            int h = curve.Cofactor.IntValue;
-            int index = m + 3 - a;
-            BigInteger[] ui = GetLucas(mu, index, false);
+            var m = curve.M;
+            var a = curve.A.ToBigInteger().IntValue;
+            var mu = curve.GetMu();
+            var h = curve.Cofactor.IntValue;
+            var index = m + 3 - a;
+            var ui = GetLucas(mu, index, false);
 
             BigInteger dividend0;
             BigInteger dividend1;
@@ -555,7 +555,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
                 throw new ArgumentException("mu must be 1 or -1");
             }
 
-            BigInteger[] si = new BigInteger[2];
+            var si = new BigInteger[2];
 
             if (h == 2)
             {
@@ -602,23 +602,23 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
                 d0 = s[0].Subtract(s[1]);
             }
 
-            BigInteger[] v = GetLucas(mu, m, true);
-            BigInteger vm = v[1];
+            var v = GetLucas(mu, m, true);
+            var vm = v[1];
 
-            SimpleBigDecimal lambda0 = ApproximateDivisionByN(
+            var lambda0 = ApproximateDivisionByN(
                 k, s[0], vm, a, m, c);
             
-            SimpleBigDecimal lambda1 = ApproximateDivisionByN(
+            var lambda1 = ApproximateDivisionByN(
                 k, s[1], vm, a, m, c);
 
-            ZTauElement q = Round(lambda0, lambda1, mu);
+            var q = Round(lambda0, lambda1, mu);
 
             // r0 = n - d0*q0 - 2*s1*q1
-            BigInteger r0 = k.Subtract(d0.Multiply(q.u)).Subtract(
+            var r0 = k.Subtract(d0.Multiply(q.u)).Subtract(
                 BigInteger.ValueOf(2).Multiply(s[1]).Multiply(q.v));
 
             // r1 = s1*q0 - s0*q1
-            BigInteger r1 = s[1].Multiply(q.u).Subtract(s[0].Multiply(q.v));
+            var r1 = s[1].Multiply(q.u).Subtract(s[0].Multiply(q.v));
             
             return new ZTauElement(r0, r1);
         }
@@ -633,12 +633,12 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
         */
         public static F2mPoint MultiplyRTnaf(F2mPoint p, BigInteger k)
         {
-            F2mCurve curve = (F2mCurve) p.Curve;
-            int m = curve.M;
-            sbyte a = (sbyte) curve.A.ToBigInteger().IntValue;
-            sbyte mu = curve.GetMu();
-            BigInteger[] s = curve.GetSi();
-            ZTauElement rho = PartModReduction(k, m, a, s, mu, (sbyte)10);
+            var curve = (F2mCurve) p.Curve;
+            var m = curve.M;
+            var a = (sbyte) curve.A.ToBigInteger().IntValue;
+            var mu = curve.GetMu();
+            var s = curve.GetSi();
+            var rho = PartModReduction(k, m, a, s, mu, (sbyte)10);
 
             return MultiplyTnaf(p, rho);
         }
@@ -654,11 +654,11 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
         */
         public static F2mPoint MultiplyTnaf(F2mPoint p, ZTauElement lambda)
         {
-            F2mCurve curve = (F2mCurve)p.Curve;
-            sbyte mu = curve.GetMu();
-            sbyte[] u = TauAdicNaf(mu, lambda);
+            var curve = (F2mCurve)p.Curve;
+            var mu = curve.GetMu();
+            var u = TauAdicNaf(mu, lambda);
 
-            F2mPoint q = MultiplyFromTnaf(p, u);
+            var q = MultiplyFromTnaf(p, u);
 
             return q;
         }
@@ -674,9 +674,9 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
         */
         public static F2mPoint MultiplyFromTnaf(F2mPoint p, sbyte[] u)
         {
-            F2mCurve curve = (F2mCurve)p.Curve;
-            F2mPoint q = (F2mPoint) curve.Infinity;
-            for (int i = u.Length - 1; i >= 0; i--)
+            var curve = (F2mCurve)p.Curve;
+            var q = (F2mPoint) curve.Infinity;
+            for (var i = u.Length - 1; i >= 0; i--)
             {
                 q = Tau(q);
                 if (u[i] == 1)
@@ -711,24 +711,24 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
             if (!((mu == 1) || (mu == -1))) 
                 throw new ArgumentException("mu must be 1 or -1");
 
-            BigInteger norm = Norm(mu, lambda);
+            var norm = Norm(mu, lambda);
 
             // Ceiling of log2 of the norm 
-            int log2Norm = norm.BitLength;
+            var log2Norm = norm.BitLength;
 
             // If length(TNAF) > 30, then length(TNAF) < log2Norm + 3.52
-            int maxLength = log2Norm > 30 ? log2Norm + 4 + width : 34 + width;
+            var maxLength = log2Norm > 30 ? log2Norm + 4 + width : 34 + width;
 
             // The array holding the TNAF
-            sbyte[] u = new sbyte[maxLength];
+            var u = new sbyte[maxLength];
 
             // 2^(width - 1)
-            BigInteger pow2wMin1 = pow2w.ShiftRight(1);
+            var pow2wMin1 = pow2w.ShiftRight(1);
 
             // Split lambda into two BigIntegers to simplify calculations
-            BigInteger r0 = lambda.u;
-            BigInteger r1 = lambda.v;
-            int i = 0;
+            var r0 = lambda.u;
+            var r1 = lambda.v;
+            var i = 0;
 
             // while lambda <> (0, 0)
             while (!((r0.Equals(BigInteger.Zero))&&(r1.Equals(BigInteger.Zero))))
@@ -737,7 +737,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
                 if (r0.TestBit(0)) 
                 {
                     // uUnMod = r0 + r1*tw Mod 2^width
-                    BigInteger uUnMod
+                    var uUnMod
                         = r0.Add(r1.Multiply(tw)).Mod(pow2w);
                     
                     sbyte uLocal;
@@ -753,7 +753,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
                     // uLocal is now in [-2^(width-1), 2^(width-1)-1]
 
                     u[i] = uLocal;
-                    bool s = true;
+                    var s = true;
                     if (uLocal < 0) 
                     {
                         s = false;
@@ -777,7 +777,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
                     u[i] = 0;
                 }
 
-                BigInteger t = r0;
+                var t = r0;
 
                 if (mu == 1)
                 {
@@ -808,18 +808,18 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
             sbyte[][] alphaTnaf;
             if (a == 0)
             {
-                alphaTnaf = Tnaf.Alpha0Tnaf;
+                alphaTnaf = Alpha0Tnaf;
             }
             else
             {
                 // a == 1
-                alphaTnaf = Tnaf.Alpha1Tnaf;
+                alphaTnaf = Alpha1Tnaf;
             }
 
-            int precompLen = alphaTnaf.Length;
-            for (int i = 3; i < precompLen; i = i + 2)
+            var precompLen = alphaTnaf.Length;
+            for (var i = 3; i < precompLen; i = i + 2)
             {
-                pu[i] = Tnaf.MultiplyFromTnaf(p, alphaTnaf[i]);
+                pu[i] = MultiplyFromTnaf(p, alphaTnaf[i]);
             }
             
             return pu;

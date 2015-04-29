@@ -17,7 +17,7 @@ namespace ChainUtils.Tests
 			var repo = new NoSqlBlockRepository();
 			var chain = new ConcurrentChain();
 
-			Block b = new Block();
+			var b = new Block();
 			b.Transactions.Add(new Transaction());
 			b.Transactions.Add(new Transaction()
 			{
@@ -32,8 +32,8 @@ namespace ChainUtils.Tests
 			chain.SetTip(b.Header);
 
 
-			MnemonicReference address = MnemonicReference.CreateAsync(chain, repo, 0, 1, 1).Result;
-			MnemonicReference address2 = MnemonicReference.ParseAsync(chain, repo, Wordlist.English, address.ToString(Wordlist.English)).Result;
+			var address = MnemonicReference.CreateAsync(chain, repo, 0, 1, 1).Result;
+			var address2 = MnemonicReference.ParseAsync(chain, repo, Wordlist.English, address.ToString(Wordlist.English)).Result;
 			Assert.Equal(address.ToString(), address2.ToString());
 
 
@@ -126,13 +126,13 @@ namespace ChainUtils.Tests
 			var block = new Block();
 			Transaction relevantTx = null;
 
-			for(int i = 0 ; i < txCount ; i++)
+			for(var i = 0 ; i < txCount ; i++)
 			{
 				var tx = block.AddTransaction(new Transaction());
 				if(i == txIndex)
 				{
 					relevantTx = tx;
-					for(int ii = 0 ; ii < txOutCount ; ii++)
+					for(var ii = 0 ; ii < txOutCount ; ii++)
 					{
 						var txout = tx.AddOutput(new TxOut());
 						if(ii == txOutIndex)

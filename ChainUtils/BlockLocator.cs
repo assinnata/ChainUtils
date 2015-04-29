@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ChainUtils
 {
@@ -12,17 +8,17 @@ namespace ChainUtils
 		{
 
 		}
-		public BlockLocator(List<uint256> hashes)
+		public BlockLocator(List<Uint256> hashes)
 		{
-			vHave = hashes;
+			_vHave = hashes;
 		}
 
-		List<uint256> vHave = new List<uint256>();
-		public List<uint256> Blocks
+		List<Uint256> _vHave = new List<Uint256>();
+		public List<Uint256> Blocks
 		{
 			get
 			{
-				return vHave;
+				return _vHave;
 			}
 		}
 
@@ -30,7 +26,7 @@ namespace ChainUtils
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref vHave);
+			stream.ReadWrite(ref _vHave);
 		}
 
 		#endregion

@@ -43,8 +43,8 @@ namespace Mono.Nat.Upnp
 
         public override System.Net.WebRequest Encode(out byte[] body)
         {
-            StringBuilder sb = new StringBuilder(128);
-            XmlWriter writer = CreateWriter(sb);
+            var sb = new StringBuilder(128);
+            var writer = CreateWriter(sb);
 
             WriteFullElement(writer, "NewPortMappingIndex", index.ToString());
 

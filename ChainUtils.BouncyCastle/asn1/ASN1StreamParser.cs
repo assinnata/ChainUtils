@@ -23,9 +23,9 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (!inStream.CanRead)
 				throw new ArgumentException("Expected stream to be readable", "inStream");
 
-			this._in = inStream;
-			this._limit = limit;
-            this.tmpBuffers = new byte[16][];
+			_in = inStream;
+			_limit = limit;
+            tmpBuffers = new byte[16][];
         }
 
 		public Asn1StreamParser(
@@ -97,11 +97,11 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (!constructed)
 			{
 				// Note: !CONSTRUCTED => IMPLICIT
-				DefiniteLengthInputStream defIn = (DefiniteLengthInputStream)_in;
+				var defIn = (DefiniteLengthInputStream)_in;
 				return new DerTaggedObject(false, tag, new DerOctetString(defIn.ToArray()));
 			}
 
-			Asn1EncodableVector v = ReadVector();
+			var v = ReadVector();
 
 			if (_in is IndefiniteLengthInputStream)
 			{
@@ -117,7 +117,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 		public virtual IAsn1Convertible ReadObject()
 		{
-			int tag = _in.ReadByte();
+			var tag = _in.ReadByte();
 			if (tag == -1)
 				return null;
 
@@ -127,22 +127,22 @@ namespace ChainUtils.BouncyCastle.Asn1
 			//
 			// calculate tag number
 			//
-			int tagNo = Asn1InputStream.ReadTagNumber(_in, tag);
+			var tagNo = Asn1InputStream.ReadTagNumber(_in, tag);
 
-			bool isConstructed = (tag & Asn1Tags.Constructed) != 0;
+			var isConstructed = (tag & Asn1Tags.Constructed) != 0;
 
 			//
 			// calculate length
 			//
-			int length = Asn1InputStream.ReadLength(_in, _limit);
+			var length = Asn1InputStream.ReadLength(_in, _limit);
 
 			if (length < 0) // indefinite length method
 			{
 				if (!isConstructed)
 					throw new IOException("indefinite length primitive encoding encountered");
 
-				IndefiniteLengthInputStream indIn = new IndefiniteLengthInputStream(_in, _limit);
-				Asn1StreamParser sp = new Asn1StreamParser(indIn, _limit);
+				var indIn = new IndefiniteLengthInputStream(_in, _limit);
+				var sp = new Asn1StreamParser(indIn, _limit);
 
 				if ((tag & Asn1Tags.Application) != 0)
 				{
@@ -158,7 +158,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			}
 			else
 			{
-				DefiniteLengthInputStream defIn = new DefiniteLengthInputStream(_in, length);
+				var defIn = new DefiniteLengthInputStream(_in, length);
 
 				if ((tag & Asn1Tags.Application) != 0)
 				{
@@ -220,7 +220,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 		internal Asn1EncodableVector ReadVector()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 
 			IAsn1Convertible obj;
 			while ((obj = ReadObject()) != null)

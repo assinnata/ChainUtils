@@ -43,8 +43,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count != 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.otherRevRefType = (DerObjectIdentifier) seq[0].ToAsn1Object();
-			this.otherRevRefs = seq[1].ToAsn1Object();
+			otherRevRefType = (DerObjectIdentifier) seq[0].ToAsn1Object();
+			otherRevRefs = seq[1].ToAsn1Object();
 		}
 
 		public OtherRevRefs(

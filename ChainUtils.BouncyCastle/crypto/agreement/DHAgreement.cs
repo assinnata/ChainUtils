@@ -1,6 +1,4 @@
 using System;
-using System.Diagnostics;
-
 using ChainUtils.BouncyCastle.Crypto.Generators;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
@@ -32,14 +30,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
 			AsymmetricKeyParameter kParam;
 			if (parameters is ParametersWithRandom)
 			{
-				ParametersWithRandom rParam = (ParametersWithRandom)parameters;
+				var rParam = (ParametersWithRandom)parameters;
 
-				this.random = rParam.Random;
+				random = rParam.Random;
 				kParam = (AsymmetricKeyParameter)rParam.Parameters;
 			}
 			else
 			{
-				this.random = new SecureRandom();
+				random = new SecureRandom();
 				kParam = (AsymmetricKeyParameter)parameters;
 			}
 
@@ -48,8 +46,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
 				throw new ArgumentException("DHEngine expects DHPrivateKeyParameters");
 			}
 
-			this.key = (DHPrivateKeyParameters)kParam;
-			this.dhParams = key.Parameters;
+			key = (DHPrivateKeyParameters)kParam;
+			dhParams = key.Parameters;
 		}
 
 		/**
@@ -57,11 +55,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
 		 */
 		public BigInteger CalculateMessage()
 		{
-			DHKeyPairGenerator dhGen = new DHKeyPairGenerator();
+			var dhGen = new DHKeyPairGenerator();
 			dhGen.Init(new DHKeyGenerationParameters(random, dhParams));
-			AsymmetricCipherKeyPair dhPair = dhGen.GenerateKeyPair();
+			var dhPair = dhGen.GenerateKeyPair();
 
-			this.privateValue = ((DHPrivateKeyParameters)dhPair.Private).X;
+			privateValue = ((DHPrivateKeyParameters)dhPair.Private).X;
 
 			return ((DHPublicKeyParameters)dhPair.Public).Y;
 		}
@@ -85,7 +83,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
 				throw new ArgumentException("Diffie-Hellman public key has wrong parameters.");
 			}
 
-			BigInteger p = dhParams.P;
+			var p = dhParams.P;
 
 			return message.ModPow(key.X, p).Multiply(pub.Y.ModPow(privateValue, p)).Mod(p);
 		}

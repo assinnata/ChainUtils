@@ -1,7 +1,4 @@
-using System;
-
 using ChainUtils.BouncyCastle.Asn1;
-using ChainUtils.BouncyCastle.Asn1.CryptoPro;
 using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -17,7 +14,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			SecureRandom		random)
 			: base(random, domainParameters.N.BitLength)
         {
-            this.domainParams = domainParameters;
+            domainParams = domainParameters;
         }
 
 		public ECKeyGenerationParameters(

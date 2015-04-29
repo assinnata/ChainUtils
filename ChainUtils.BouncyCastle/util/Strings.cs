@@ -8,7 +8,7 @@ namespace ChainUtils.BouncyCastle.Utilities
     {
         internal static bool IsOneOf(string s, params string[] candidates)
         {
-            foreach (string candidate in candidates)
+            foreach (var candidate in candidates)
             {
                 if (s == candidate)
                     return true;
@@ -19,8 +19,8 @@ namespace ChainUtils.BouncyCastle.Utilities
         public static string FromByteArray(
             byte[] bs)
         {
-            char[] cs = new char[bs.Length];
-            for (int i = 0; i < cs.Length; ++i)
+            var cs = new char[bs.Length];
+            for (var i = 0; i < cs.Length; ++i)
             {
                 cs[i] = Convert.ToChar(bs[i]);
             }
@@ -30,8 +30,8 @@ namespace ChainUtils.BouncyCastle.Utilities
         public static byte[] ToByteArray(
             char[] cs)
         {
-            byte[] bs = new byte[cs.Length];
-            for (int i = 0; i < bs.Length; ++i)
+            var bs = new byte[cs.Length];
+            for (var i = 0; i < bs.Length; ++i)
             {
                 bs[i] = Convert.ToByte(cs[i]);
             }
@@ -41,8 +41,8 @@ namespace ChainUtils.BouncyCastle.Utilities
         public static byte[] ToByteArray(
             string s)
         {
-            byte[] bs = new byte[s.Length];
-            for (int i = 0; i < bs.Length; ++i)
+            var bs = new byte[s.Length];
+            for (var i = 0; i < bs.Length; ++i)
             {
                 bs[i] = Convert.ToByte(s[i]);
             }

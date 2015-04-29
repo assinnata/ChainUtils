@@ -36,7 +36,7 @@ namespace Mono.Nat.Upnp
         /// <returns></returns>
         public static byte[] Encode()
         {
-            string s = "M-SEARCH * HTTP/1.1\r\n"
+            var s = "M-SEARCH * HTTP/1.1\r\n"
                         + "HOST: 239.255.255.250:1900\r\n"
                         + "MAN: \"ssdp:discover\"\r\n"
                         + "MX: 3\r\n"

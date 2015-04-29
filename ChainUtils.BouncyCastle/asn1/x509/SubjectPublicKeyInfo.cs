@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
 {
@@ -39,7 +37,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
             AlgorithmIdentifier	algID,
             Asn1Encodable		publicKey)
         {
-            this.keyData = new DerBitString(publicKey);
+            keyData = new DerBitString(publicKey);
             this.algID = algID;
         }
 
@@ -47,7 +45,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
             AlgorithmIdentifier	algID,
             byte[]				publicKey)
         {
-            this.keyData = new DerBitString(publicKey);
+            keyData = new DerBitString(publicKey);
             this.algID = algID;
         }
 
@@ -57,8 +55,8 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 			if (seq.Count != 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-            this.algID = AlgorithmIdentifier.GetInstance(seq[0]);
-			this.keyData = DerBitString.GetInstance(seq[1]);
+            algID = AlgorithmIdentifier.GetInstance(seq[0]);
+			keyData = DerBitString.GetInstance(seq[1]);
 		}
 
 		public AlgorithmIdentifier AlgorithmID

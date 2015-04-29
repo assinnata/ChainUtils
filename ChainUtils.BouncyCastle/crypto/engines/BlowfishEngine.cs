@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -331,9 +330,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             if (!(parameters is KeyParameter))
 				throw new ArgumentException("invalid parameter passed to Blowfish init - " + parameters.GetType().ToString());
 
-			this.encrypting = forEncryption;
-			this.workingKey = ((KeyParameter)parameters).GetKey();
-			SetKey(this.workingKey);
+			encrypting = forEncryption;
+			workingKey = ((KeyParameter)parameters).GetKey();
+			SetKey(workingKey);
         }
 
 		public string AlgorithmName
@@ -405,13 +404,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             uint	xr,
             uint[]	table)
         {
-            int size = table.Length;
+            var size = table.Length;
 
-            for (int s = 0; s < size; s += 2)
+            for (var s = 0; s < size; s += 2)
             {
                 xl ^= P[0];
 
-                for (int i = 1; i < ROUNDS; i += 2)
+                for (var i = 1; i < ROUNDS; i += 2)
                 {
                     xr ^= F(xl) ^ P[i];
                     xl ^= F(xr) ^ P[i + 1];
@@ -452,14 +451,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             * (up to P[17]).  Repeatedly cycle through the key bits until the
             * entire P-array has been XOR-ed with the key bits
             */
-            int keyLength = key.Length;
-            int keyIndex = 0;
+            var keyLength = key.Length;
+            var keyIndex = 0;
 
-            for (int i=0; i < P_SZ; i++)
+            for (var i=0; i < P_SZ; i++)
             {
                 // Get the 32 bits of the key, in 4 * 8 bit chunks
                 uint data = 0x0000000;
-                for (int j=0; j < 4; j++)
+                for (var j=0; j < 4; j++)
                 {
                     // create a 32 bit block
                     data = (data << 8) | (uint)key[keyIndex++];
@@ -513,12 +512,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]  dst,
             int     dstIndex)
         {
-            uint xl = Pack.BE_To_UInt32(src, srcIndex);
-            uint xr = Pack.BE_To_UInt32(src, srcIndex+4);
+            var xl = Pack.BE_To_UInt32(src, srcIndex);
+            var xr = Pack.BE_To_UInt32(src, srcIndex+4);
 
             xl ^= P[0];
 
-            for (int i = 1; i < ROUNDS; i += 2)
+            for (var i = 1; i < ROUNDS; i += 2)
             {
                 xr ^= F(xl) ^ P[i];
                 xl ^= F(xr) ^ P[i + 1];
@@ -541,12 +540,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[] dst,
             int dstIndex)
         {
-            uint xl = Pack.BE_To_UInt32(src, srcIndex);
-            uint xr = Pack.BE_To_UInt32(src, srcIndex + 4);
+            var xl = Pack.BE_To_UInt32(src, srcIndex);
+            var xr = Pack.BE_To_UInt32(src, srcIndex + 4);
 
             xl ^= P[ROUNDS + 1];
 
-            for (int i = ROUNDS; i > 0 ; i -= 2)
+            for (var i = ROUNDS; i > 0 ; i -= 2)
             {
                 xr ^= F(xl) ^ P[i];
                 xl ^= F(xr) ^ P[i - 1];

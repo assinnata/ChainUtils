@@ -1,38 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public class MerkleBlock : IBitcoinSerializable
 	{
 		// Public only for unit testing
-		BlockHeader header;
+		BlockHeader _header;
 
 		public BlockHeader Header
 		{
 			get
 			{
-				return header;
+				return _header;
 			}
 			set
 			{
-				header = value;
+				_header = value;
 			}
 		}
-		PartialMerkleTree _PartialMerkleTree;
+		PartialMerkleTree _partialMerkleTree;
 
 		public PartialMerkleTree PartialMerkleTree
 		{
 			get
 			{
-				return _PartialMerkleTree;
+				return _partialMerkleTree;
 			}
 			set
 			{
-				_PartialMerkleTree = value;
+				_partialMerkleTree = value;
 			}
 		}
 
@@ -41,43 +38,43 @@ namespace ChainUtils
 		// thus the filter will likely be modified.
 		public MerkleBlock(Block block, BloomFilter filter)
 		{
-			header = block.Header;
+			_header = block.Header;
 
-			List<bool> vMatch = new List<bool>();
-			List<uint256> vHashes = new List<uint256>();
+			var vMatch = new List<bool>();
+			var vHashes = new List<Uint256>();
 
 
 			for(uint i = 0 ; i < block.Transactions.Count ; i++)
 			{
-				uint256 hash = block.Transactions[(int)i].GetHash();
+				var hash = block.Transactions[(int)i].GetHash();
 				vMatch.Add(filter.IsRelevantAndUpdate(block.Transactions[(int)i]));
 				vHashes.Add(hash);
 			}
 
-			_PartialMerkleTree = new PartialMerkleTree(vHashes.ToArray(), vMatch.ToArray());
+			_partialMerkleTree = new PartialMerkleTree(vHashes.ToArray(), vMatch.ToArray());
 		}
 
-		public MerkleBlock(Block block, uint256[] txIds)
+		public MerkleBlock(Block block, Uint256[] txIds)
 		{
-			header = block.Header;
+			_header = block.Header;
 
-			List<bool> vMatch = new List<bool>();
-			List<uint256> vHashes = new List<uint256>();
-			for(int i = 0 ; i < block.Transactions.Count ; i++)
+			var vMatch = new List<bool>();
+			var vHashes = new List<Uint256>();
+			for(var i = 0 ; i < block.Transactions.Count ; i++)
 			{
 				var hash = block.Transactions[i].GetHash();
 				vHashes.Add(hash);
 				vMatch.Add(txIds.Contains(hash));
 			}
-			_PartialMerkleTree = new PartialMerkleTree(vHashes.ToArray(), vMatch.ToArray());
+			_partialMerkleTree = new PartialMerkleTree(vHashes.ToArray(), vMatch.ToArray());
 		}
 
 		#region IBitcoinSerializable Members
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref header);
-			stream.ReadWrite(ref _PartialMerkleTree);
+			stream.ReadWrite(ref _header);
+			stream.ReadWrite(ref _partialMerkleTree);
 		}
 
 		#endregion

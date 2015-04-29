@@ -40,7 +40,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				isExplicit)
         {
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is DerUtf8String)
 			{
@@ -79,12 +79,12 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
 		{
-			DerUtf8String other = asn1Object as DerUtf8String;
+			var other = asn1Object as DerUtf8String;
 
 			if (other == null)
 				return false;
 
-			return this.str.Equals(other.str);
+			return str.Equals(other.str);
         }
 
 		internal override void Encode(

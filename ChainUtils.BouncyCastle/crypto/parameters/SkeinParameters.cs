@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
-
+using System.Text;
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -150,20 +150,20 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 
 			public Builder(IDictionary paramsMap)
 			{
-				IEnumerator keys = paramsMap.Keys.GetEnumerator();
+				var keys = paramsMap.Keys.GetEnumerator();
 				while (keys.MoveNext())
 				{
-					int key = (int)keys.Current;
+					var key = (int)keys.Current;
 					parameters.Add(key, paramsMap[key]);
 				}
 			}
 
 			public Builder(SkeinParameters parameters)
 			{
-				IEnumerator keys = parameters.parameters.Keys.GetEnumerator();
+				var keys = parameters.parameters.Keys.GetEnumerator();
 				while (keys.MoveNext())
 				{
-					int key = (int)keys.Current;
+					var key = (int)keys.Current;
 					this.parameters.Add(key, parameters.parameters[key]);
 				}
 			}
@@ -197,7 +197,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 					throw new ArgumentException("Parameter type " + PARAM_TYPE_CONFIG
 					                            + " is reserved for internal use.");
 				}
-				this.parameters.Add(type, value);
+				parameters.Add(type, value);
 				return this;
 			}
 
@@ -232,8 +232,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			{
 				try
 				{
-					MemoryStream bout = new MemoryStream();
-					StreamWriter outBytes = new StreamWriter(bout, System.Text.Encoding.UTF8);
+					var bout = new MemoryStream();
+					var outBytes = new StreamWriter(bout, Encoding.UTF8);
 					outBytes.Write(date.ToString("YYYYMMDD"));
 					outBytes.Write(" ");
 					outBytes.Write(emailAddress);

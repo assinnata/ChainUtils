@@ -1,41 +1,36 @@
-﻿using ChainUtils.Crypto;
-using ChainUtils.BouncyCastle.Math;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Stealth
 {
 	public class StealthSpendKey
 	{
-		private readonly StealthPayment _Payment;
+		private readonly StealthPayment _payment;
 		public StealthPayment Payment
 		{
 			get
 			{
-				return _Payment;
+				return _payment;
 			}
 		}
-		private readonly KeyId _ID;
-		public KeyId ID
+		private readonly KeyId _id;
+		public KeyId Id
 		{
 			get
 			{
-				return _ID;
+				return _id;
 			}
 		}
 		public StealthSpendKey(KeyId id, StealthPayment payment)
 		{
-			_ID = id;
-			_Payment = payment;
+			_id = id;
+			_payment = payment;
 		}
 
 		public BitcoinAddress GetAddress(Network network)
 		{
-			return new BitcoinAddress(ID, network);
+			return new BitcoinAddress(Id, network);
 		}
 	}
 
@@ -145,15 +140,15 @@ namespace ChainUtils.Stealth
 
 		public static StealthPayment[] GetPayments(Transaction transaction, BitcoinStealthAddress address, Key scan)
 		{
-			List<StealthPayment> result = new List<StealthPayment>();
-			for(int i = 0 ; i < transaction.Outputs.Count - 1 ; i++)
+			var result = new List<StealthPayment>();
+			for(var i = 0 ; i < transaction.Outputs.Count - 1 ; i++)
 			{
 				var metadata = StealthMetadata.TryParse(transaction.Outputs[i].ScriptPubKey);
 				if(metadata != null && (address == null || address.Prefix.Match(metadata.BitField)))
 				{
 					var scriptPubKey = transaction.Outputs[i + 1].ScriptPubKey;
 					var scriptId = PayToScriptHashTemplate.Instance.ExtractScriptPubKeyParameters(scriptPubKey);
-					Script expectedScriptPubKey = address == null ? scriptPubKey : null;
+					var expectedScriptPubKey = address == null ? scriptPubKey : null;
 					Script redeem = null;
 
 					if(scriptId != null)

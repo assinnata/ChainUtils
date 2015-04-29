@@ -1,6 +1,4 @@
-﻿using System;
-
-using ChainUtils.BouncyCastle.Asn1.Pkcs;
+﻿using ChainUtils.BouncyCastle.Asn1.Pkcs;
 
 namespace ChainUtils.BouncyCastle.Asn1.Crmf
 {

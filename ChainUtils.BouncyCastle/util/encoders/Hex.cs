@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using System.Text;
 
 namespace ChainUtils.BouncyCastle.Utilities.Encoders
 {
@@ -26,7 +24,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             int		off,
             int		length)
         {
-            byte[] hex = Encode(data, off, length);
+            var hex = Encode(data, off, length);
             return Strings.FromAsciiByteArray(hex);
         }
 
@@ -51,7 +49,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             int		off,
             int		length)
         {
-            MemoryStream bOut = new MemoryStream(length * 2);
+            var bOut = new MemoryStream(length * 2);
 
             encoder.Encode(data, off, length, bOut);
 
@@ -92,7 +90,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
         public static byte[] Decode(
             byte[] data)
         {
-            MemoryStream bOut = new MemoryStream((data.Length + 1) / 2);
+            var bOut = new MemoryStream((data.Length + 1) / 2);
 
             encoder.Decode(data, 0, data.Length, bOut);
 
@@ -107,7 +105,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
         public static byte[] Decode(
             string data)
         {
-            MemoryStream bOut = new MemoryStream((data.Length + 1) / 2);
+            var bOut = new MemoryStream((data.Length + 1) / 2);
 
             encoder.DecodeString(data, bOut);
 

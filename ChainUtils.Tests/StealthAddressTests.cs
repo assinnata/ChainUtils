@@ -81,7 +81,7 @@ namespace ChainUtils.Tests
 			};
 			foreach(var test in tests)
 			{
-				BitField field = new BitField(test.Encoded, test.BitCount);
+				var field = new BitField(test.Encoded, test.BitCount);
 				Assert.Equal(test.Match, field.Match(Utils.ToUInt32(TestUtils.ParseHex(test.Data), true)));
 			}
 		}
@@ -119,7 +119,7 @@ namespace ChainUtils.Tests
 			foreach(var test in tests)
 			{
 				var field = new BitField(TestUtils.ParseHex(test.Encoded), test.BitCount);
-				Transaction transaction = new Transaction();
+				var transaction = new Transaction();
 				transaction.FromBytes(TestUtils.ParseHex(test.Transaction));
 
 				var stealthOutput = field.GetPayments(transaction).FirstOrDefault();
@@ -169,7 +169,7 @@ namespace ChainUtils.Tests
 
 				AssertEx.CollectionEquals(stealth.ScanPubKey.ToBytes(),
 											  TestUtils.ParseHex(test.ScanPubKey));
-				for(int i = 0 ; i < test.SpendPubKeys.Length ; i++)
+				for(var i = 0 ; i < test.SpendPubKeys.Length ; i++)
 				{
 					AssertEx.CollectionEquals(stealth.SpendPubKeys[i].ToBytes(),
 											  TestUtils.ParseHex(test.SpendPubKeys[i]));
@@ -258,10 +258,10 @@ namespace ChainUtils.Tests
 		{
 			if(key == null)
 				return null;
-			Key k = new Key(TestUtils.ParseHex(key));
+			var k = new Key(TestUtils.ParseHex(key));
 			if(pub != null)
 			{
-				PubKey p = new PubKey(TestUtils.ParseHex(pub));
+				var p = new PubKey(TestUtils.ParseHex(pub));
 				AssertEx.Equal(k.PubKey.ToBytes(), p.ToBytes());
 			}
 			return k;
@@ -327,9 +327,9 @@ namespace ChainUtils.Tests
 
 		internal static IEnumerable<CanCreatePaymentData> GenerateRandoms(int count)
 		{
-			for(int i = 0 ; i < count ; i++)
+			for(var i = 0 ; i < count ; i++)
 			{
-				CanCreatePaymentData data = new CanCreatePaymentData();
+				var data = new CanCreatePaymentData();
 				var spend = new Key();
 				var scan = new Key();
 				var ephem = new Key();

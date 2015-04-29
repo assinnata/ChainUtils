@@ -1,6 +1,4 @@
 using System;
-using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -95,17 +93,17 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
 		{
-			DerVisibleString other = asn1Object as DerVisibleString;
+			var other = asn1Object as DerVisibleString;
 
 			if (other == null)
 				return false;
 
-			return this.str.Equals(other.str);
+			return str.Equals(other.str);
         }
 
 		protected override int Asn1GetHashCode()
 		{
-            return this.str.GetHashCode();
+            return str.GetHashCode();
         }
     }
 }

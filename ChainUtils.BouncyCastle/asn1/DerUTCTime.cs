@@ -1,7 +1,5 @@
 using System;
 using System.Globalization;
-using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -43,7 +41,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				isExplicit)
         {
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is DerUtcTime)
 			{
@@ -95,7 +93,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             //
             // explicitly convert to characters
             //
-            this.time = Strings.FromAsciiByteArray(bytes);
+            time = Strings.FromAsciiByteArray(bytes);
         }
 
 //		public DateTime ToDateTime()
@@ -139,7 +137,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			string	dateStr,
 			string	formatStr)
 		{
-			DateTime dt = DateTime.ParseExact(
+			var dt = DateTime.ParseExact(
 				dateStr,
 				formatStr,
 				DateTimeFormatInfo.InvariantInfo);
@@ -183,12 +181,12 @@ namespace ChainUtils.BouncyCastle.Asn1
 				}
 				else
 				{
-					int index = time.IndexOf('-');
+					var index = time.IndexOf('-');
 					if (index < 0)
 					{
 						index = time.IndexOf('+');
 					}
-					string d = time;
+					var d = time;
 
 					if (index == time.Length - 3)
 					{
@@ -221,8 +219,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 		{
 			get
 			{
-				string d = TimeString;
-				string c = d[0] < '5' ? "20" : "19";
+				var d = TimeString;
+				var c = d[0] < '5' ? "20" : "19";
 
 				return c + d;
 			}
@@ -242,12 +240,12 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
 		{
-			DerUtcTime other = asn1Object as DerUtcTime;
+			var other = asn1Object as DerUtcTime;
 
 			if (other == null)
 				return false;
 
-			return this.time.Equals(other.time);
+			return time.Equals(other.time);
         }
 
 		protected override int Asn1GetHashCode()

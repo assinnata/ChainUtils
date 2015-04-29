@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC.Multiplier;
 using ChainUtils.BouncyCastle.Security;
@@ -17,8 +15,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 
         private static BigInteger[] ConstructBigPrimeProducts(int[] primeProducts)
         {
-            BigInteger[] bpp = new BigInteger[primeProducts.Length];
-            for (int i = 0; i < bpp.Length; ++i)
+            var bpp = new BigInteger[primeProducts.Length];
+            for (var i = 0; i < bpp.Length; ++i)
             {
                 bpp[i] = BigInteger.ValueOf(primeProducts[i]);
             }
@@ -33,8 +31,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         internal static BigInteger[] GenerateSafePrimes(int size, int certainty, SecureRandom random)
         {
             BigInteger p, q;
-            int qLength = size - 1;
-            int minWeight = size >> 2;
+            var qLength = size - 1;
+            var minWeight = size >> 2;
 
             if (size <= 32)
             {
@@ -61,26 +59,26 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                     q = new BigInteger(qLength, 0, random);
 
                 retry:
-                    for (int i = 0; i < primeLists.Length; ++i)
+                    for (var i = 0; i < primeLists.Length; ++i)
                     {
-                        int test = q.Remainder(BigPrimeProducts[i]).IntValue;
+                        var test = q.Remainder(BigPrimeProducts[i]).IntValue;
 
                         if (i == 0)
                         {
-                            int rem3 = test % 3;
+                            var rem3 = test % 3;
                             if (rem3 != 2)
                             {
-                                int diff = 2 * rem3 + 2;
+                                var diff = 2 * rem3 + 2;
                                 q = q.Add(BigInteger.ValueOf(diff));
                                 test = (test + diff) % primeProducts[i];
                             }
                         }
 
-                        int[] primeList = primeLists[i];
-                        for (int j = 0; j < primeList.Length; ++j)
+                        var primeList = primeLists[i];
+                        for (var j = 0; j < primeList.Length; ++j)
                         {
-                            int prime = primeList[j];
-                            int qRem = test % prime;
+                            var prime = primeList[j];
+                            var qRem = test % prime;
                             if (qRem == 0 || qRem == (prime >> 1))
                             {
                                 q = q.Add(Six);
@@ -126,7 +124,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
          */
         internal static BigInteger SelectGenerator(BigInteger p, BigInteger q, SecureRandom random)
         {
-            BigInteger pMinusTwo = p.Subtract(BigInteger.Two);
+            var pMinusTwo = p.Subtract(BigInteger.Two);
             BigInteger g;
 
             /*
@@ -144,7 +142,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
              */
             do
             {
-                BigInteger h = BigIntegers.CreateRandomInRange(BigInteger.Two, pMinusTwo, random);
+                var h = BigIntegers.CreateRandomInRange(BigInteger.Two, pMinusTwo, random);
 
                 g = h.ModPow(BigInteger.Two, p);
             }

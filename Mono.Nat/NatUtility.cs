@@ -55,7 +55,7 @@ namespace Mono.Nat
 
 		internal static void Log(string format, params object[] args)
 		{
-			TextWriter logger = Logger;
+			var logger = Logger;
 			if (logger != null)
 				logger.WriteLine(format, args);
 		}
@@ -64,10 +64,10 @@ namespace Mono.Nat
 		[Obsolete ("This method serves no purpose and shouldn't be used")]
 		public static IPAddress[] GetLocalAddresses (bool includeIPv6)
 		{
-			List<IPAddress> addresses = new List<IPAddress> ();
+			var addresses = new List<IPAddress> ();
 
-			IPHostEntry hostInfo = Dns.GetHostEntry (Dns.GetHostName ());
-			foreach (IPAddress address in hostInfo.AddressList) {
+			var hostInfo = Dns.GetHostEntry (Dns.GetHostName ());
+			foreach (var address in hostInfo.AddressList) {
 				if (address.AddressFamily == AddressFamily.InterNetwork ||
 					(includeIPv6 && address.AddressFamily == AddressFamily.InterNetworkV6)) {
 					addresses.Add (address);
@@ -80,7 +80,7 @@ namespace Mono.Nat
 		//checks if an IP address is a private address space as defined by RFC 1918
 		public static bool IsPrivateAddressSpace (IPAddress address)
 		{
-			byte[] ba = address.GetAddressBytes ();
+			var ba = address.GetAddressBytes ();
 
 			switch ((int)ba[0]) {
 			case 10:

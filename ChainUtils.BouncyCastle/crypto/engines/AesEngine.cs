@@ -1,6 +1,4 @@
 using System;
-using System.Diagnostics;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -255,10 +253,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
         private static uint Inv_Mcol(uint x)
         {
-            uint f2 = FFmulX(x);
-            uint f4 = FFmulX(f2);
-            uint f8 = FFmulX(f4);
-            uint f9 = x ^ f8;
+            var f2 = FFmulX(x);
+            var f4 = FFmulX(f2);
+            var f8 = FFmulX(f4);
+            var f9 = x ^ f8;
 
             return f2 ^ f4 ^ f8 ^ Shift(f2 ^ f9, 8) ^ Shift(f4 ^ f9, 16) ^ Shift(f9, 24);
         }
@@ -281,7 +279,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]	key,
             bool	forEncryption)
         {
-            int KC = key.Length / 4;  // key length in words
+            var KC = key.Length / 4;  // key length in words
             int t;
 
             if ((KC != 4) && (KC != 6) && (KC != 8)) 
@@ -289,8 +287,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
             ROUNDS = KC + 6;  // This is not always true for the generalized Rijndael that allows larger block sizes
 
-            uint[][] W = new uint[ROUNDS + 1][]; // 4 words in a block
-            for (int i = 0; i <= ROUNDS; ++i)
+            var W = new uint[ROUNDS + 1][]; // 4 words in a block
+            for (var i = 0; i <= ROUNDS; ++i)
             {
                 W[i] = new uint[4];
             }
@@ -300,7 +298,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             //
 
             t = 0;
-            for (int i = 0; i < key.Length; t++)
+            for (var i = 0; i < key.Length; t++)
             {
                 W[t >> 2][t & 3] = Pack.LE_To_UInt32(key, i);
                 i+=4;
@@ -310,10 +308,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             // while not enough round key material calculated
             // calculate new values
             //
-            int k = (ROUNDS + 1) << 2;
-            for (int i = KC; (i < k); i++)
+            var k = (ROUNDS + 1) << 2;
+            for (var i = KC; (i < k); i++)
             {
-                uint temp = W[(i-1)>>2][(i-1)&3];
+                var temp = W[(i-1)>>2][(i-1)&3];
                 if ((i % KC) == 0) 
                 {
                     temp = SubWord(Shift(temp, 8)) ^ rcon[(i / KC)-1];
@@ -328,10 +326,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
             if (!forEncryption)
             {
-                for (int j = 1; j < ROUNDS; j++)
+                for (var j = 1; j < ROUNDS; j++)
                 {
-                    uint[] w = W[j];
-                    for (int i = 0; i < 4; i++)
+                    var w = W[j];
+                    for (var i = 0; i < 4; i++)
                     {
                         w[i] = Inv_Mcol(w[i]);
                     }
@@ -367,7 +365,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             bool				forEncryption,
             ICipherParameters	parameters)
         {
-            KeyParameter keyParameter = parameters as KeyParameter;
+            var keyParameter = parameters as KeyParameter;
 
             if (keyParameter == null)
                 throw new ArgumentException("invalid parameter passed to AES init - " + parameters.GetType().Name);
@@ -455,13 +453,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
         private void EncryptBlock(uint[][] KW)
         {
-            uint[] kw = KW[0];
-            uint t0 = this.C0 ^ kw[0];
-            uint t1 = this.C1 ^ kw[1];
-            uint t2 = this.C2 ^ kw[2];
+            var kw = KW[0];
+            var t0 = C0 ^ kw[0];
+            var t1 = C1 ^ kw[1];
+            var t2 = C2 ^ kw[2];
 
-            uint r0, r1, r2, r3 = this.C3 ^ kw[3];
-            int r = 1;
+            uint r0, r1, r2, r3 = C3 ^ kw[3];
+            var r = 1;
             while (r < ROUNDS - 1)
             {
                 kw = KW[r++];
@@ -485,21 +483,21 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             // the final round's table is a simple function of S so we don't use a whole other four tables for it
 
             kw = KW[r];
-            this.C0 = (uint)S[r0 & 255] ^ (((uint)S[(r1 >> 8) & 255]) << 8) ^ (((uint)S[(r2 >> 16) & 255]) << 16) ^ (((uint)S[(r3 >> 24) & 255]) << 24) ^ kw[0];
-            this.C1 = (uint)S[r1 & 255] ^ (((uint)S[(r2 >> 8) & 255]) << 8) ^ (((uint)S[(r3 >> 16) & 255]) << 16) ^ (((uint)S[(r0 >> 24) & 255]) << 24) ^ kw[1];
-            this.C2 = (uint)S[r2 & 255] ^ (((uint)S[(r3 >> 8) & 255]) << 8) ^ (((uint)S[(r0 >> 16) & 255]) << 16) ^ (((uint)S[(r1 >> 24) & 255]) << 24) ^ kw[2];
-            this.C3 = (uint)S[r3 & 255] ^ (((uint)S[(r0 >> 8) & 255]) << 8) ^ (((uint)S[(r1 >> 16) & 255]) << 16) ^ (((uint)S[(r2 >> 24) & 255]) << 24) ^ kw[3];
+            C0 = (uint)S[r0 & 255] ^ (((uint)S[(r1 >> 8) & 255]) << 8) ^ (((uint)S[(r2 >> 16) & 255]) << 16) ^ (((uint)S[(r3 >> 24) & 255]) << 24) ^ kw[0];
+            C1 = (uint)S[r1 & 255] ^ (((uint)S[(r2 >> 8) & 255]) << 8) ^ (((uint)S[(r3 >> 16) & 255]) << 16) ^ (((uint)S[(r0 >> 24) & 255]) << 24) ^ kw[1];
+            C2 = (uint)S[r2 & 255] ^ (((uint)S[(r3 >> 8) & 255]) << 8) ^ (((uint)S[(r0 >> 16) & 255]) << 16) ^ (((uint)S[(r1 >> 24) & 255]) << 24) ^ kw[2];
+            C3 = (uint)S[r3 & 255] ^ (((uint)S[(r0 >> 8) & 255]) << 8) ^ (((uint)S[(r1 >> 16) & 255]) << 16) ^ (((uint)S[(r2 >> 24) & 255]) << 24) ^ kw[3];
         }
 
         private void DecryptBlock(uint[][] KW)
         {
-            uint[] kw = KW[ROUNDS];
-            uint t0 = this.C0 ^ kw[0];
-            uint t1 = this.C1 ^ kw[1];
-            uint t2 = this.C2 ^ kw[2];
+            var kw = KW[ROUNDS];
+            var t0 = C0 ^ kw[0];
+            var t1 = C1 ^ kw[1];
+            var t2 = C2 ^ kw[2];
 
-            uint r0, r1, r2, r3 = this.C3 ^ kw[3];
-            int r = ROUNDS - 1;
+            uint r0, r1, r2, r3 = C3 ^ kw[3];
+            var r = ROUNDS - 1;
             while (r > 1)
             {
                 kw = KW[r--];
@@ -523,10 +521,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             // the final round's table is a simple function of Si so we don't use a whole other four tables for it
 
             kw = KW[0];
-            this.C0 = (uint)Si[r0 & 255] ^ (((uint)Si[(r3 >> 8) & 255]) << 8) ^ (((uint)Si[(r2 >> 16) & 255]) << 16) ^ (((uint)Si[(r1 >> 24) & 255]) << 24) ^ kw[0];
-            this.C1 = (uint)Si[r1 & 255] ^ (((uint)Si[(r0 >> 8) & 255]) << 8) ^ (((uint)Si[(r3 >> 16) & 255]) << 16) ^ (((uint)Si[(r2 >> 24) & 255]) << 24) ^ kw[1];
-            this.C2 = (uint)Si[r2 & 255] ^ (((uint)Si[(r1 >> 8) & 255]) << 8) ^ (((uint)Si[(r0 >> 16) & 255]) << 16) ^ (((uint)Si[(r3 >> 24) & 255]) << 24) ^ kw[2];
-            this.C3 = (uint)Si[r3 & 255] ^ (((uint)Si[(r2 >> 8) & 255]) << 8) ^ (((uint)Si[(r1 >> 16) & 255]) << 16) ^ (((uint)Si[(r0 >> 24) & 255]) << 24) ^ kw[3];
+            C0 = (uint)Si[r0 & 255] ^ (((uint)Si[(r3 >> 8) & 255]) << 8) ^ (((uint)Si[(r2 >> 16) & 255]) << 16) ^ (((uint)Si[(r1 >> 24) & 255]) << 24) ^ kw[0];
+            C1 = (uint)Si[r1 & 255] ^ (((uint)Si[(r0 >> 8) & 255]) << 8) ^ (((uint)Si[(r3 >> 16) & 255]) << 16) ^ (((uint)Si[(r2 >> 24) & 255]) << 24) ^ kw[1];
+            C2 = (uint)Si[r2 & 255] ^ (((uint)Si[(r1 >> 8) & 255]) << 8) ^ (((uint)Si[(r0 >> 16) & 255]) << 16) ^ (((uint)Si[(r3 >> 24) & 255]) << 24) ^ kw[2];
+            C3 = (uint)Si[r3 & 255] ^ (((uint)Si[(r2 >> 8) & 255]) << 8) ^ (((uint)Si[(r1 >> 16) & 255]) << 16) ^ (((uint)Si[(r0 >> 24) & 255]) << 24) ^ kw[3];
         }
     }
 }

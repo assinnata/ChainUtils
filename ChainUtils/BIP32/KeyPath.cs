@@ -8,7 +8,7 @@ namespace ChainUtils
 	{
 		public KeyPath(string path)
 		{
-			_Indexes =
+			_indexes =
 				path
 				.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries)
 				.Select(Parse)
@@ -18,7 +18,7 @@ namespace ChainUtils
 
 		private static uint Parse(string i)
 		{
-			bool hardened = i.EndsWith("'");
+			var hardened = i.EndsWith("'");
 			var nonhardened = hardened ? i.Substring(0, i.Length - 1) : i;
 			var index = uint.Parse(nonhardened);
 			return hardened ? index | 0x80000000u : index;
@@ -26,15 +26,15 @@ namespace ChainUtils
 
 		public KeyPath(params uint[] indexes)
 		{
-			_Indexes = indexes;
+			_indexes = indexes;
 		}
 
-	    readonly uint[] _Indexes;
+	    readonly uint[] _indexes;
 		public uint this[int index]
 		{
 			get
 			{
-				return _Indexes[index];
+				return _indexes[index];
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return _Indexes;
+				return _indexes;
 			}
 		}
 
@@ -50,7 +50,7 @@ namespace ChainUtils
 		{
 			if(index < 0)
 				throw new ArgumentOutOfRangeException("index", "the index can't be negative");
-			uint realIndex = (uint)index;
+			var realIndex = (uint)index;
 			realIndex = hardened ? realIndex | 0x80000000u : realIndex;
 			return Derive(new KeyPath(realIndex));
 		}
@@ -63,14 +63,14 @@ namespace ChainUtils
 		public KeyPath Derive(KeyPath derivation)
 		{
 			return new KeyPath(
-				_Indexes
-				.Concat(derivation._Indexes)
+				_indexes
+				.Concat(derivation._indexes)
 				.ToArray());
 		}
 
 		public override bool Equals(object obj)
 		{
-			KeyPath item = obj as KeyPath;
+			var item = obj as KeyPath;
 			if(item == null)
 				return false;
 			return ToString().Equals(item.ToString());
@@ -94,10 +94,10 @@ namespace ChainUtils
 			return ToString().GetHashCode();
 		}
 
-		string _Path;
+		string _path;
 		public override string ToString()
 		{
-		    return _Path ?? (_Path = string.Join("/", _Indexes.Select(ToString).ToArray()));
+		    return _path ?? (_path = string.Join("/", _indexes.Select(ToString).ToArray()));
 		}
 
 	    private static string ToString(uint i)
@@ -111,9 +111,9 @@ namespace ChainUtils
 		{
 			get
 			{
-				if(_Indexes.Length == 0)
+				if(_indexes.Length == 0)
 					throw new InvalidOperationException("No indice found in this KeyPath");
-				return (_Indexes[_Indexes.Length - 1] & 0x80000000u) != 0;
+				return (_indexes[_indexes.Length - 1] & 0x80000000u) != 0;
 			}
 		}
 	}

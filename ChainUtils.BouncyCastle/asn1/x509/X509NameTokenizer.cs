@@ -25,8 +25,8 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
             string	oid,
             char	separator)
         {
-            this.value = oid;
-            this.index = -1;
+            value = oid;
+            index = -1;
             this.separator = separator;
         }
 
@@ -42,15 +42,15 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
                 return null;
             }
 
-            int end = index + 1;
-            bool quoted = false;
-            bool escaped = false;
+            var end = index + 1;
+            var quoted = false;
+            var escaped = false;
 
 			buffer.Remove(0, buffer.Length);
 
 			while (end != value.Length)
             {
-                char c = value[end];
+                var c = value[end];
 
 				if (c == '"')
                 {

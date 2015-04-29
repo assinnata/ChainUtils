@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
-using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math.EC
 {
@@ -10,7 +8,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
     {
         public static void Invert(uint[] p, uint[] x, uint[] z)
         {
-            int len = p.Length;
+            var len = p.Length;
             if (Nat.IsZero(len, x))
                 throw new ArgumentException("cannot be 0", "x");
             if (Nat.IsOne(len, x))
@@ -19,10 +17,10 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 return;
             }
 
-            uint[] u = Nat.Copy(len, x);
-            uint[] a = Nat.Create(len);
+            var u = Nat.Copy(len, x);
+            var a = Nat.Create(len);
             a[0] = 1;
-            int ac = 0;
+            var ac = 0;
 
             if ((u[0] & 1) == 0)
             {
@@ -34,11 +32,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 return;
             }
 
-            uint[] v = Nat.Copy(len, p);
-            uint[] b = Nat.Create(len);
-            int bc = 0;
+            var v = Nat.Copy(len, p);
+            var b = Nat.Create(len);
+            var bc = 0;
 
-            int uvLen = len;
+            var uvLen = len;
 
             for (;;)
             {
@@ -76,11 +74,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public static uint[] Random(uint[] p)
         {
-            int len = p.Length;
-            Random rand = new Random();
-            uint[] s = Nat.Create(len);
+            var len = p.Length;
+            var rand = new Random();
+            var s = Nat.Create(len);
 
-            uint m = p[len - 1];
+            var m = p[len - 1];
             m |= m >> 1;
             m |= m >> 2;
             m |= m >> 4;
@@ -89,7 +87,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
             do
             {
-                byte[] bytes = new byte[len << 2];
+                var bytes = new byte[len << 2];
                 rand.NextBytes(bytes);
                 Pack.BE_To_UInt32(bytes, 0, s);
                 s[len - 1] &= m;
@@ -101,8 +99,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public static void Add(uint[] p, uint[] x, uint[] y, uint[] z)
         {
-            int len = p.Length;
-            uint c = Nat.Add(len, x, y, z);
+            var len = p.Length;
+            var c = Nat.Add(len, x, y, z);
             if (c != 0)
             {
                 Nat.SubFrom(len, p, z);
@@ -111,8 +109,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public static void Subtract(uint[] p, uint[] x, uint[] y, uint[] z)
         {
-            int len = p.Length;
-            int c = Nat.Sub(len, x, y, z);
+            var len = p.Length;
+            var c = Nat.Sub(len, x, y, z);
             if (c != 0)
             {
                 Nat.AddTo(len, p, z);
@@ -133,8 +131,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void InversionStep(uint[] p, uint[] u, int uLen, uint[] x, ref int xc)
         {
-            int len = p.Length;
-            int count = 0;
+            var len = p.Length;
+            var count = 0;
             while (u[0] == 0)
             {
                 Nat.ShiftDownWord(uLen, u, 0);
@@ -142,7 +140,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
 
             {
-                int zeroes = GetTrailingZeroes(u[0]);
+                var zeroes = GetTrailingZeroes(u[0]);
                 if (zeroes > 0)
                 {
                     Nat.ShiftDownBits(uLen, u, zeroes, 0);
@@ -150,7 +148,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 }
             }
 
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 if ((x[0] & 1) != 0)
                 {
@@ -172,7 +170,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
         private static int GetTrailingZeroes(uint x)
         {
             Debug.Assert(x != 0);
-            int count = 0;
+            var count = 0;
             while ((x & 1) == 0)
             {
                 x >>= 1;

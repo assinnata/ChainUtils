@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
@@ -25,17 +22,17 @@ namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
 
         static ECGost3410NamedCurves()
         {
-            BigInteger mod_p = new BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639319");
-            BigInteger mod_q = new BigInteger("115792089237316195423570985008687907853073762908499243225378155805079068850323");
+            var mod_p = new BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639319");
+            var mod_q = new BigInteger("115792089237316195423570985008687907853073762908499243225378155805079068850323");
 
-            FpCurve curve = new FpCurve(
+            var curve = new FpCurve(
                 mod_p, // p
                 new BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639316"), // a
                 new BigInteger("166"), // b
                 mod_q,
                 BigInteger.One);
 
-            ECDomainParameters ecParams = new ECDomainParameters(
+            var ecParams = new ECDomainParameters(
                 curve,
                 curve.CreatePoint(
                     new BigInteger("1"), // x
@@ -156,7 +153,7 @@ namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
         public static ECDomainParameters GetByName(
             string name)
         {
-            DerObjectIdentifier oid = (DerObjectIdentifier) objIds[name];
+            var oid = (DerObjectIdentifier) objIds[name];
 
             if (oid != null)
             {

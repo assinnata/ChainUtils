@@ -1,28 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChainUtils.Protocol
+﻿namespace ChainUtils.Protocol
 {
 	public class UnknowPayload : Payload
 	{
-		private byte[] _Data = new byte[0];
+		private byte[] _data = new byte[0];
 		public byte[] Data
 		{
 			get
 			{
-				return _Data;
+				return _data;
 			}
 			set
 			{
-				_Data = value;
+				_data = value;
 			}
 		}
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref _Data);
+			stream.ReadWrite(ref _data);
 		}
 	}
 }

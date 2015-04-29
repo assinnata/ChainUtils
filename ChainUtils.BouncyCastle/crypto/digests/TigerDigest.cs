@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Digests
@@ -726,9 +724,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             //
             // save abc
             //
-            long aa = a;
-            long bb = b;
-            long cc = c;
+            var aa = a;
+            var bb = b;
+            var cc = c;
 
             //
             // rounds and schedule
@@ -775,7 +773,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             // clear the x buffer
             //
             xOff = 0;
-            for (int i = 0; i != x.Length; i++)
+            for (var i = 0; i != x.Length; i++)
             {
                 x[i] = 0;
             }
@@ -804,7 +802,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private void Finish()
         {
-            long    bitLength = (byteCount << 3);
+            var    bitLength = (byteCount << 3);
 
             Update((byte)0x01);
 
@@ -843,13 +841,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             c = unchecked((long) 0xF096A5B4C3B2E187L);
 
             xOff = 0;
-            for (int i = 0; i != x.Length; i++)
+            for (var i = 0; i != x.Length; i++)
             {
                 x[i] = 0;
             }
 
             bOff = 0;
-            for (int i = 0; i != Buffer.Length; i++)
+            for (var i = 0; i != Buffer.Length; i++)
             {
                 Buffer[i] = 0;
             }
@@ -864,7 +862,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public void Reset(IMemoable other)
 		{
-			TigerDigest t = (TigerDigest)other;
+			var t = (TigerDigest)other;
 
 			a = t.a;
 			b = t.b;

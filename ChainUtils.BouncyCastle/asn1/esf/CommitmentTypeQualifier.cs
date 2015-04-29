@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Esf
 {
     /**
@@ -105,7 +103,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
         */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(
+			var v = new Asn1EncodableVector(
 				commitmentTypeIdentifier);
 
 			if (qualifier != null)

@@ -37,7 +37,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public SignaturePolicyIdentifier()
 		{
-			this.sigPolicy = null;
+			sigPolicy = null;
 		}
 
 		public SignaturePolicyIdentifier(
@@ -46,7 +46,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (signaturePolicyId == null)
 				throw new ArgumentNullException("signaturePolicyId");
 
-			this.sigPolicy = signaturePolicyId;
+			sigPolicy = signaturePolicyId;
 		}
 
 		public SignaturePolicyId SignaturePolicyId

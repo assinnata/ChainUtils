@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils
@@ -13,65 +12,65 @@ namespace ChainUtils
 		{
 			WordlistSource = new HardcodedWordlistSource();
 		}
-		private static Wordlist _Japanese;
+		private static Wordlist _japanese;
 		public static Wordlist Japanese
 		{
 			get
 			{
-				if(_Japanese == null)
-					_Japanese = LoadWordList(Language.Japanese).Result;
-				return _Japanese;
+				if(_japanese == null)
+					_japanese = LoadWordList(Language.Japanese).Result;
+				return _japanese;
 			}
 		}
 
-		private static Wordlist _ChineseSimplified;
+		private static Wordlist _chineseSimplified;
 		public static Wordlist ChineseSimplified
 		{
 			get
 			{
-				if(_ChineseSimplified == null)
-					_ChineseSimplified = LoadWordList(Language.ChineseSimplified).Result;
-				return _ChineseSimplified;
+				if(_chineseSimplified == null)
+					_chineseSimplified = LoadWordList(Language.ChineseSimplified).Result;
+				return _chineseSimplified;
 			}
 		}
 
-		private static Wordlist _ChineseTraditional;
+		private static Wordlist _chineseTraditional;
 		public static Wordlist ChineseTraditional
 		{
 			get
 			{
-				if(_ChineseTraditional == null)
-					_ChineseTraditional = LoadWordList(Language.ChineseTraditional).Result;
-				return _ChineseTraditional;
+				if(_chineseTraditional == null)
+					_chineseTraditional = LoadWordList(Language.ChineseTraditional).Result;
+				return _chineseTraditional;
 			}
 		}
 
-		private static Wordlist _Spanish;
+		private static Wordlist _spanish;
 		public static Wordlist Spanish
 		{
 			get
 			{
-				if(_Spanish == null)
-					_Spanish = LoadWordList(Language.Spanish).Result;
-				return _Spanish;
+				if(_spanish == null)
+					_spanish = LoadWordList(Language.Spanish).Result;
+				return _spanish;
 			}
 		}
 
-		private static Wordlist _English;
+		private static Wordlist _english;
 		public static Wordlist English
 		{
 			get
 			{
-				if(_English == null)
-					_English = LoadWordList(Language.English).Result;
-				return _English;
+				if(_english == null)
+					_english = LoadWordList(Language.English).Result;
+				return _english;
 			}
 		}
 
 
 		public static Task<Wordlist> LoadWordList(Language language)
 		{
-			string name = GetLanguageFileName(language);
+			var name = GetLanguageFileName(language);
 			return LoadWordList(name);
 		}
 
@@ -101,15 +100,15 @@ namespace ChainUtils
 			return name;
 		}
 
-		static Dictionary<string, Wordlist> _LoadedLists = new Dictionary<string, Wordlist>();
+		static Dictionary<string, Wordlist> _loadedLists = new Dictionary<string, Wordlist>();
 		public static async Task<Wordlist> LoadWordList(string name)
 		{
 			if(name == null)
 				throw new ArgumentNullException("name");
 			Wordlist result = null;
-			lock(_LoadedLists)
+			lock(_loadedLists)
 			{
-				_LoadedLists.TryGetValue(name, out result);
+				_loadedLists.TryGetValue(name, out result);
 			}
 			if(result != null)
 				return await Task.FromResult<Wordlist>(result).ConfigureAwait(false);
@@ -119,9 +118,9 @@ namespace ChainUtils
 				throw new InvalidOperationException("Wordlist.WordlistSource is not set, impossible to fetch word list.");
 			result = await WordlistSource.Load(name).ConfigureAwait(false);
 			if(result != null)
-				lock(_LoadedLists)
+				lock(_loadedLists)
 				{
-					_LoadedLists.AddOrReplace(name, result);
+					_loadedLists.AddOrReplace(name, result);
 				}
 			return result;
 		}
@@ -143,24 +142,24 @@ namespace ChainUtils
 			_words = words
 						.Select(w => Mnemonic.NormalizeString(w))
 						.ToArray();
-			_Space = space;
-			_Name = name;
+			_space = space;
+			_name = name;
 		}
 
-		private readonly string _Name;
+		private readonly string _name;
 		public string Name
 		{
 			get
 			{
-				return _Name;
+				return _name;
 			}
 		}
-		private readonly char _Space;
+		private readonly char _space;
 		public char Space
 		{
 			get
 			{
-				return _Space;
+				return _space;
 			}
 		}
 
@@ -215,36 +214,36 @@ namespace ChainUtils
 		}
 		public static Language AutoDetectLanguage(string[] words)
 		{
-			List<int> languageCount = new List<int>(new int[] { 0, 0, 0, 0, 0 });
+			var languageCount = new List<int>(new[] { 0, 0, 0, 0, 0 });
 			int index;
 
-			foreach(string s in words)
+			foreach(var s in words)
 			{
-				if(Wordlist.English.WordExists(s, out index))
+				if(English.WordExists(s, out index))
 				{
 					//english is at 0
 					languageCount[0]++;
 				}
 
-				if(Wordlist.Japanese.WordExists(s, out index))
+				if(Japanese.WordExists(s, out index))
 				{
 					//japanese is at 1
 					languageCount[1]++;
 				}
 
-				if(Wordlist.Spanish.WordExists(s, out index))
+				if(Spanish.WordExists(s, out index))
 				{
 					//spanish is at 2
 					languageCount[2]++;
 				}
 
-				if(Wordlist.ChineseSimplified.WordExists(s, out index))
+				if(ChineseSimplified.WordExists(s, out index))
 				{
 					//chinese simplified is at 3
 					languageCount[3]++;
 				}
 
-				if(Wordlist.ChineseTraditional.WordExists(s, out index) && !Wordlist.ChineseSimplified.WordExists(s, out index))
+				if(ChineseTraditional.WordExists(s, out index) && !ChineseSimplified.WordExists(s, out index))
 				{
 					//chinese traditional is at 4
 					languageCount[4]++;
@@ -288,19 +287,19 @@ namespace ChainUtils
 		}
 		public static Language AutoDetectLanguage(string sentence)
 		{
-			string[] words = sentence.Split(new char[] { ' ', '　' }); //normal space and JP space
+			var words = sentence.Split(new[] { ' ', '　' }); //normal space and JP space
 
 			return AutoDetectLanguage(words);
 		}
 
 		public string[] Split(string mnemonic)
 		{
-			return mnemonic.Split(new char[] { Space }, StringSplitOptions.RemoveEmptyEntries);
+			return mnemonic.Split(new[] { Space }, StringSplitOptions.RemoveEmptyEntries);
 		}
 
 		public override string ToString()
 		{
-			return _Name;
+			return _name;
 		}
 
 		public string[] GetWords(int[] indices)
@@ -320,9 +319,9 @@ namespace ChainUtils
 		public int[] ToIndices(string[] words)
 		{
 			var indices = new int[words.Length];
-			for(int i = 0 ; i < words.Length ; i++)
+			for(var i = 0 ; i < words.Length ; i++)
 			{
-				int idx = -1;
+				var idx = -1;
 
 				if(!WordExists(words[i], out idx))
 				{
@@ -342,11 +341,11 @@ namespace ChainUtils
 		{
 			if(values.Any(v => v >= 2048))
 				throw new ArgumentException("values should be between 0 and 2048", "values");
-			BitArray result = new BitArray(values.Length * 11);
-			int i = 0;
+			var result = new BitArray(values.Length * 11);
+			var i = 0;
 			foreach(var val in values)
 			{
-				for(int p = 0 ; p < 11 ; p++)
+				for(var p = 0 ; p < 11 ; p++)
 				{
 					var v = (val & (1 << (10 - p))) != 0;
 					result.Set(i, v);

@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Digests
@@ -64,14 +62,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 		{
 			EIGHT[BITCOUNT_ARRAY_SIZE - 1] = 8;
 
-			for (int i = 0; i < 256; i++)
+			for (var i = 0; i < 256; i++)
 			{
-				int v1 = SBOX[i];
-				int v2 = maskWithReductionPolynomial(v1 << 1);
-				int v4 = maskWithReductionPolynomial(v2 << 1);
-				int v5 = v4 ^ v1;
-				int v8 = maskWithReductionPolynomial(v4 << 1);
-				int v9 = v8 ^ v1;
+				var v1 = SBOX[i];
+				var v2 = maskWithReductionPolynomial(v1 << 1);
+				var v4 = maskWithReductionPolynomial(v2 << 1);
+				var v5 = v4 ^ v1;
+				var v8 = maskWithReductionPolynomial(v4 << 1);
+				var v9 = v8 ^ v1;
 
 				C0[i] = packIntoLong(v1, v1, v4, v1, v8, v5, v2, v9);
 				C1[i] = packIntoLong(v9, v1, v1, v4, v1, v8, v5, v2);
@@ -87,9 +85,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 		public WhirlpoolDigest()
 		{
 			_rc[0] = 0L;
-			for (int r = 1; r <= ROUNDS; r++)
+			for (var r = 1; r <= ROUNDS; r++)
 			{
-				int i = 8 * (r - 1);
+				var i = 8 * (r - 1);
 				_rc[r] = (long)((ulong)C0[i] & 0xff00000000000000L) ^
 					(C1[i + 1] & (long) 0x00ff000000000000L) ^
 					(C2[i + 2] & (long) 0x0000ff0000000000L) ^
@@ -120,7 +118,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 			*/
 		private static int maskWithReductionPolynomial(int input)
 		{
-			int rv = input;
+			var rv = input;
 			if (rv >= 0x100L) // high bit set
 			{
 				rv ^= REDUCTION_POLYNOMIAL; // reduced by the polynomial
@@ -169,7 +167,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 			// sets output[outOff] .. output[outOff+DIGEST_LENGTH_BYTES]
 			finish();
 
-			for (int i = 0; i < 8; i++)
+			for (var i = 0; i < 8; i++)
 			{
 				convertLongToByteArray(_hash[i], output, outOff + (i * 8));
 			}
@@ -199,7 +197,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 		private void processFilledBuffer()
 		{
 			// copies into the block...
-			for (int i = 0; i < _state.Length; i++)
+			for (var i = 0; i < _state.Length; i++)
 			{
 				_block[i] = bytesToLongFromBuffer(_buffer, i * 8);
 			}
@@ -210,7 +208,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private static long bytesToLongFromBuffer(byte[] buffer, int startPos)
 		{
-			long rv = (((buffer[startPos + 0] & 0xffL) << 56) |
+			var rv = (((buffer[startPos + 0] & 0xffL) << 56) |
 				((buffer[startPos + 1] & 0xffL) << 48) |
 				((buffer[startPos + 2] & 0xffL) << 40) |
 				((buffer[startPos + 3] & 0xffL) << 32) |
@@ -224,7 +222,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private static void convertLongToByteArray(long inputLong, byte[] outputArray, int offSet)
 		{
-			for (int i = 0; i < 8; i++)
+			for (var i = 0; i < 8; i++)
 			{
 				outputArray[offSet + i] = (byte)((inputLong >> (56 - (i * 8))) & 0xff);
 			}
@@ -236,15 +234,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 			// processFilledBuffer
 
 			// compute and apply K^0
-			for (int i = 0; i < 8; i++)
+			for (var i = 0; i < 8; i++)
 			{
 				_state[i] = _block[i] ^ (_K[i] = _hash[i]);
 			}
 
 			// iterate over the rounds
-			for (int round = 1; round <= ROUNDS; round++)
+			for (var round = 1; round <= ROUNDS; round++)
 			{
-				for (int i = 0; i < 8; i++)
+				for (var i = 0; i < 8; i++)
 				{
 					_L[i] = 0;
 					_L[i] ^= C0[(int)(_K[(i - 0) & 7] >> 56) & 0xff];
@@ -262,7 +260,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 				_K[0] ^= _rc[round];
 
 				// apply the round transformation
-				for (int i = 0; i < 8; i++)
+				for (var i = 0; i < 8; i++)
 				{
 					_L[i] = _K[i];
 
@@ -281,7 +279,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 			}
 
 			// apply Miuaguchi-Preneel compression
-			for (int i = 0; i < 8; i++)
+			for (var i = 0; i < 8; i++)
 			{
 				_hash[i] ^= _state[i] ^ _block[i];
 			}
@@ -306,10 +304,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private void increment()
 		{
-			int carry = 0;
-			for (int i = _bitCount.Length - 1; i >= 0; i--)
+			var carry = 0;
+			for (var i = _bitCount.Length - 1; i >= 0; i--)
 			{
-				int sum = (_bitCount[i] & 0xff) + EIGHT[i] + carry;
+				var sum = (_bitCount[i] & 0xff) + EIGHT[i] + carry;
 
 				carry = sum >> 8;
 				_bitCount[i] = (short)(sum & 0xff);
@@ -334,7 +332,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 				* object creation of 32 bytes rather than providing a _stopCounting
 				* boolean which was the alternative I could think of.
 				*/
-			byte[] bitLength = copyBitLength();
+			var bitLength = copyBitLength();
 
 			_buffer[_bufferPos++] |= 0x80;
 
@@ -371,8 +369,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private byte[] copyBitLength()
 		{
-			byte[] rv = new byte[BITCOUNT_ARRAY_SIZE];
-			for (int i = 0; i < rv.Length; i++)
+			var rv = new byte[BITCOUNT_ARRAY_SIZE];
+			for (var i = 0; i < rv.Length; i++)
 			{
 				rv[i] = (byte)(_bitCount[i] & 0xff);
 			}
@@ -391,13 +389,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public void Reset(IMemoable other)
 		{
-			WhirlpoolDigest originalDigest = (WhirlpoolDigest)other;
+			var originalDigest = (WhirlpoolDigest)other;
 
 			Array.Copy(originalDigest._rc, 0, _rc, 0, _rc.Length);
 
 			Array.Copy(originalDigest._buffer, 0, _buffer, 0, _buffer.Length);
 
-			this._bufferPos = originalDigest._bufferPos;
+			_bufferPos = originalDigest._bufferPos;
 			Array.Copy(originalDigest._bitCount, 0, _bitCount, 0, _bitCount.Length);
 
 			// -- internal hash state --

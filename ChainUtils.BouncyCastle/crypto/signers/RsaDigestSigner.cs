@@ -1,18 +1,13 @@
 using System;
 using System.Collections;
-using System.IO;
-using System.Text;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.Nist;
 using ChainUtils.BouncyCastle.Asn1.Pkcs;
 using ChainUtils.BouncyCastle.Asn1.TeleTrust;
-using ChainUtils.BouncyCastle.Asn1.Utilities;
 using ChainUtils.BouncyCastle.Asn1.X509;
-using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Encodings;
 using ChainUtils.BouncyCastle.Crypto.Engines;
-using ChainUtils.BouncyCastle.Crypto.Signers;
+using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Security;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -132,10 +127,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             if (!forSigning)
                 throw new InvalidOperationException("RsaDigestSigner not initialised for signature generation.");
 
-            byte[] hash = new byte[digest.GetDigestSize()];
+            var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
-            byte[] data = DerEncode(hash);
+            var data = DerEncode(hash);
             return rsaEngine.ProcessBlock(data, 0, data.Length);
         }
 
@@ -149,7 +144,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             if (forSigning)
                 throw new InvalidOperationException("RsaDigestSigner not initialised for verification");
 
-            byte[] hash = new byte[digest.GetDigestSize()];
+            var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
             byte[] sig;
@@ -171,20 +166,20 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             }
             else if (sig.Length == expected.Length - 2)  // NULL left out
             {
-                int sigOffset = sig.Length - hash.Length - 2;
-                int expectedOffset = expected.Length - hash.Length - 2;
+                var sigOffset = sig.Length - hash.Length - 2;
+                var expectedOffset = expected.Length - hash.Length - 2;
 
                 expected[1] -= 2;      // adjust lengths
                 expected[3] -= 2;
 
-                int nonEqual = 0;
+                var nonEqual = 0;
 
-                for (int i = 0; i < hash.Length; i++)
+                for (var i = 0; i < hash.Length; i++)
                 {
                     nonEqual |= (sig[sigOffset + i] ^ expected[expectedOffset + i]);
                 }
 
-                for (int i = 0; i < sigOffset; i++)
+                for (var i = 0; i < sigOffset; i++)
                 {
                     nonEqual |= (sig[i] ^ expected[i]);  // check header less NULL
                 }
@@ -210,7 +205,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 return hash;
             }
 
-            DigestInfo dInfo = new DigestInfo(algId, hash);
+            var dInfo = new DigestInfo(algId, hash);
 
             return dInfo.GetDerEncoded();
         }

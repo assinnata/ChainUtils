@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
@@ -20,7 +18,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
                 parameters = ((ParametersWithRandom)parameters).Parameters;
             }
 
-            this.privParams = (MqvPrivateParameters)parameters;
+            privParams = (MqvPrivateParameters)parameters;
         }
 
         public virtual int GetFieldSize()
@@ -31,11 +29,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
         public virtual BigInteger CalculateAgreement(
             ICipherParameters pubKey)
         {
-            MqvPublicParameters pubParams = (MqvPublicParameters)pubKey;
+            var pubParams = (MqvPublicParameters)pubKey;
 
-            ECPrivateKeyParameters staticPrivateKey = privParams.StaticPrivateKey;
+            var staticPrivateKey = privParams.StaticPrivateKey;
 
-            ECPoint agreement = CalculateMqvAgreement(staticPrivateKey.Parameters, staticPrivateKey,
+            var agreement = CalculateMqvAgreement(staticPrivateKey.Parameters, staticPrivateKey,
                 privParams.EphemeralPrivateKey, privParams.EphemeralPublicKey,
                 pubParams.StaticPublicKey, pubParams.EphemeralPublicKey).Normalize();
 
@@ -54,13 +52,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
             ECPublicKeyParameters	Q1V,
             ECPublicKeyParameters	Q2V)
         {
-            BigInteger n = parameters.N;
-            int e = (n.BitLength + 1) / 2;
-            BigInteger powE = BigInteger.One.ShiftLeft(e);
+            var n = parameters.N;
+            var e = (n.BitLength + 1) / 2;
+            var powE = BigInteger.One.ShiftLeft(e);
 
-            ECCurve curve = parameters.Curve;
+            var curve = parameters.Curve;
 
-            ECPoint[] points = new ECPoint[]{
+            var points = new ECPoint[]{
                 // The Q2U public key is optional
                 ECAlgorithms.ImportPoint(curve, Q2U == null ? parameters.G.Multiply(d2U.D) : Q2U.Q),
                 ECAlgorithms.ImportPoint(curve, Q1V.Q),
@@ -71,16 +69,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement
 
             ECPoint q2u = points[0], q1v = points[1], q2v = points[2];
 
-            BigInteger x = q2u.AffineXCoord.ToBigInteger();
-            BigInteger xBar = x.Mod(powE);
-            BigInteger Q2UBar = xBar.SetBit(e);
-            BigInteger s = d1U.D.Multiply(Q2UBar).Add(d2U.D).Mod(n);
+            var x = q2u.AffineXCoord.ToBigInteger();
+            var xBar = x.Mod(powE);
+            var Q2UBar = xBar.SetBit(e);
+            var s = d1U.D.Multiply(Q2UBar).Add(d2U.D).Mod(n);
 
-            BigInteger xPrime = q2v.AffineXCoord.ToBigInteger();
-            BigInteger xPrimeBar = xPrime.Mod(powE);
-            BigInteger Q2VBar = xPrimeBar.SetBit(e);
+            var xPrime = q2v.AffineXCoord.ToBigInteger();
+            var xPrimeBar = xPrime.Mod(powE);
+            var Q2VBar = xPrimeBar.SetBit(e);
 
-            BigInteger hs = parameters.H.Multiply(s).Mod(n);
+            var hs = parameters.H.Multiply(s).Mod(n);
 
             return ECAlgorithms.SumOfTwoMultiplies(
                 q1v, Q2VBar.Multiply(hs).Mod(n), q2v, hs);

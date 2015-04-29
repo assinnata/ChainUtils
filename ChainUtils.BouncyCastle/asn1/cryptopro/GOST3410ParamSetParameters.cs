@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
@@ -53,10 +50,10 @@ namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
 			if (seq.Count != 4)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-			this.keySize = DerInteger.GetInstance(seq[0]).Value.IntValue;
-			this.p = DerInteger.GetInstance(seq[1]);
-            this.q = DerInteger.GetInstance(seq[2]);
-			this.a = DerInteger.GetInstance(seq[3]);
+			keySize = DerInteger.GetInstance(seq[0]).Value.IntValue;
+			p = DerInteger.GetInstance(seq[1]);
+            q = DerInteger.GetInstance(seq[2]);
+			a = DerInteger.GetInstance(seq[3]);
         }
 
 		public int KeySize

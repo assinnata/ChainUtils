@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -43,7 +42,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				isExplicit)
         {
-            Asn1Object o = obj.GetObject();
+            var o = obj.GetObject();
 
             if (isExplicit || o is DerGeneralizedTime)
             {
@@ -92,7 +91,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             //
             // explicitly convert to characters
             //
-            this.time = Strings.FromAsciiByteArray(bytes);
+            time = Strings.FromAsciiByteArray(bytes);
         }
 
         /**
@@ -127,8 +126,8 @@ namespace ChainUtils.BouncyCastle.Asn1
             }
             else
             {
-                int signPos = time.Length - 5;
-                char sign = time[signPos];
+                var signPos = time.Length - 5;
+                var sign = time[signPos];
                 if (sign == '-' || sign == '+')
                 {
                     return time.Substring(0, signPos)
@@ -156,18 +155,18 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         private string CalculateGmtOffset()
         {
-            char sign = '+';
-            DateTime time = ToDateTime();
+            var sign = '+';
+            var time = ToDateTime();
 
 #if SILVERLIGHT
-            long offset = time.Ticks - time.ToUniversalTime().Ticks;
+            var offset = time.Ticks - time.ToUniversalTime().Ticks;
             if (offset < 0)
             {
                 sign = '-';
                 offset = -offset;
             }
-            int hours = (int)(offset / TimeSpan.TicksPerHour);
-            int minutes = (int)(offset / TimeSpan.TicksPerMinute) % 60;
+            var hours = (int)(offset / TimeSpan.TicksPerHour);
+            var minutes = (int)(offset / TimeSpan.TicksPerMinute) % 60;
 #else
             // Note: GetUtcOffset incorporates Daylight Savings offset
             TimeSpan offset =  TimeZone.CurrentTimeZone.GetUtcOffset(time);
@@ -197,14 +196,14 @@ namespace ChainUtils.BouncyCastle.Asn1
         public DateTime ToDateTime()
         {
             string formatStr;
-            string d = time;
-            bool makeUniversal = false;
+            var d = time;
+            var makeUniversal = false;
 
             if (d.EndsWith("Z"))
             {
                 if (HasFractionalSeconds)
                 {
-                    int fCount = d.Length - d.IndexOf('.') - 2;
+                    var fCount = d.Length - d.IndexOf('.') - 2;
                     formatStr = @"yyyyMMddHHmmss." + FString(fCount) + @"\Z";
                 }
                 else
@@ -219,7 +218,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
                 if (HasFractionalSeconds)
                 {
-                    int fCount = d.IndexOf("GMT") - 1 - d.IndexOf('.');
+                    var fCount = d.IndexOf("GMT") - 1 - d.IndexOf('.');
                     formatStr = @"yyyyMMddHHmmss." + FString(fCount) + @"'GMT'zzz";
                 }
                 else
@@ -231,7 +230,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             {
                 if (HasFractionalSeconds)
                 {
-                    int fCount = d.Length - 1 - d.IndexOf('.');
+                    var fCount = d.Length - 1 - d.IndexOf('.');
                     formatStr = @"yyyyMMddHHmmss." + FString(fCount);
                 }
                 else
@@ -249,8 +248,8 @@ namespace ChainUtils.BouncyCastle.Asn1
         private string FString(
             int count)
         {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < count; ++i)
+            var sb = new StringBuilder();
+            for (var i = 0; i < count; ++i)
             {
                 sb.Append('f');
             }
@@ -262,7 +261,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             /*
              * NOTE: DateTime.Kind and DateTimeStyles.AssumeUniversal not available in .NET 1.1
              */
-            DateTimeStyles style = DateTimeStyles.None;
+            var style = DateTimeStyles.None;
             if (format.EndsWith("Z"))
             {
                 try
@@ -276,7 +275,7 @@ namespace ChainUtils.BouncyCastle.Asn1
                 style |= DateTimeStyles.AdjustToUniversal;
             }
 
-            DateTime dt = DateTime.ParseExact(s, format, DateTimeFormatInfo.InvariantInfo, style);
+            var dt = DateTime.ParseExact(s, format, DateTimeFormatInfo.InvariantInfo, style);
 
             return makeUniversal ? dt.ToUniversalTime() : dt;
         }
@@ -300,12 +299,12 @@ namespace ChainUtils.BouncyCastle.Asn1
         protected override bool Asn1Equals(
             Asn1Object asn1Object)
         {
-            DerGeneralizedTime other = asn1Object as DerGeneralizedTime;
+            var other = asn1Object as DerGeneralizedTime;
 
             if (other == null)
                 return false;
 
-            return this.time.Equals(other.time);
+            return time.Equals(other.time);
         }
 
         protected override int Asn1GetHashCode()

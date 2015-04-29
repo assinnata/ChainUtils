@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -20,11 +18,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
         {
             if (rid.ToAsn1Object() is Asn1TaggedObject)
             {
-                this.version = new DerInteger(2);
+                version = new DerInteger(2);
             }
             else
             {
-                this.version = new DerInteger(0);
+                version = new DerInteger(0);
             }
 
 			this.rid = rid;
@@ -35,10 +33,10 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		public KeyTransRecipientInfo(
             Asn1Sequence seq)
         {
-            this.version = (DerInteger) seq[0];
-            this.rid = RecipientIdentifier.GetInstance(seq[1]);
-            this.keyEncryptionAlgorithm = AlgorithmIdentifier.GetInstance(seq[2]);
-            this.encryptedKey = (Asn1OctetString) seq[3];
+            version = (DerInteger) seq[0];
+            rid = RecipientIdentifier.GetInstance(seq[1]);
+            keyEncryptionAlgorithm = AlgorithmIdentifier.GetInstance(seq[2]);
+            encryptedKey = (Asn1OctetString) seq[3];
         }
 
 		/**

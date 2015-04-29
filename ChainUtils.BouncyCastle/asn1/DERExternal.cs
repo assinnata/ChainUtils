@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -20,8 +19,8 @@ namespace ChainUtils.BouncyCastle.Asn1
 		public DerExternal(
 			Asn1EncodableVector vector)
 		{
-			int offset = 0;
-			Asn1Object enc = GetObjFromVector(vector, offset);
+			var offset = 0;
+			var enc = GetObjFromVector(vector, offset);
 			if (enc is DerObjectIdentifier)
 			{
 				directReference = (DerObjectIdentifier)enc;
@@ -52,7 +51,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (!(enc is DerTaggedObject))
 				throw new ArgumentException("No tagged object found in vector. Structure doesn't seem to be of type External", "vector");
 
-			DerTaggedObject obj = (DerTaggedObject)enc;
+			var obj = (DerTaggedObject)enc;
 
 			// Use property accessor to include check on value
 			Encoding = obj.TagNo;
@@ -96,7 +95,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 		internal override void Encode(DerOutputStream derOut)
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			WriteEncodable(ms, directReference);
 			WriteEncodable(ms, indirectReference);
 			WriteEncodable(ms, dataValueDescriptor);
@@ -107,7 +106,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
 		protected override int Asn1GetHashCode()
 		{
-			int ret = externalContent.GetHashCode();
+			var ret = externalContent.GetHashCode();
 			if (directReference != null)
 			{
 				ret ^= directReference.GetHashCode();
@@ -129,27 +128,27 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (this == asn1Object)
 				return true;
 
-			DerExternal other = asn1Object as DerExternal;
+			var other = asn1Object as DerExternal;
 
 			if (other == null)
 				return false;
 
-			return Platform.Equals(directReference, other.directReference)
-				&& Platform.Equals(indirectReference, other.indirectReference)
-				&& Platform.Equals(dataValueDescriptor, other.dataValueDescriptor)
+			return Equals(directReference, other.directReference)
+				&& Equals(indirectReference, other.indirectReference)
+				&& Equals(dataValueDescriptor, other.dataValueDescriptor)
 				&& externalContent.Equals(other.externalContent);
 		}
 
 		public Asn1Object DataValueDescriptor
 		{
 			get { return dataValueDescriptor; }
-			set { this.dataValueDescriptor = value; }
+			set { dataValueDescriptor = value; }
 		}
 
 		public DerObjectIdentifier DirectReference
 		{
 			get { return directReference; }
-			set { this.directReference = value; }
+			set { directReference = value; }
 		}
 
 		/**
@@ -171,20 +170,20 @@ namespace ChainUtils.BouncyCastle.Asn1
 				if (encoding < 0 || encoding > 2)
 					throw new InvalidOperationException("invalid encoding value: " + encoding);
 
-				this.encoding = value;
+				encoding = value;
 			}
 		}
 
 		public Asn1Object ExternalContent
 		{
 			get { return externalContent; }
-			set { this.externalContent = value; }
+			set { externalContent = value; }
 		}
 
 		public DerInteger IndirectReference
 		{
 			get { return indirectReference; }
-			set { this.indirectReference = value; }
+			set { indirectReference = value; }
 		}
 
 		private static Asn1Object GetObjFromVector(Asn1EncodableVector v, int index)
@@ -199,7 +198,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		{
 			if (e != null)
 			{
-				byte[] bs = e.GetDerEncoded();
+				var bs = e.GetDerEncoded();
 				ms.Write(bs, 0, bs.Length);
 			}
 		}

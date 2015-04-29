@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 
@@ -40,7 +38,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			if (param is ParametersWithRandom)
 			{
-				ParametersWithRandom rParam = (ParametersWithRandom)param;
+				var rParam = (ParametersWithRandom)param;
 
 				p = (RsaBlindingParameters)rParam.Parameters;
 			}
@@ -52,8 +50,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			core.Init(forEncryption, p.PublicKey);
 
 			this.forEncryption = forEncryption;
-			this.key = p.PublicKey;
-			this.blindingFactor = p.BlindingFactor;
+			key = p.PublicKey;
+			blindingFactor = p.BlindingFactor;
 		}
 
 		/**
@@ -94,7 +92,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			int		inOff,
 			int		inLen)
 		{
-			BigInteger msg = core.ConvertInput(inBuf, inOff, inLen);
+			var msg = core.ConvertInput(inBuf, inOff, inLen);
 
 			if (forEncryption)
 			{
@@ -114,7 +112,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		private BigInteger BlindMessage(
 			BigInteger msg)
 		{
-			BigInteger blindMsg = blindingFactor;
+			var blindMsg = blindingFactor;
 			blindMsg = msg.Multiply(blindMsg.ModPow(key.Exponent, key.Modulus));
 			blindMsg = blindMsg.Mod(key.Modulus);
 
@@ -127,9 +125,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 		private BigInteger UnblindMessage(
 			BigInteger blindedMsg)
 		{
-			BigInteger m = key.Modulus;
-			BigInteger msg = blindedMsg;
-			BigInteger blindFactorInverse = blindingFactor.ModInverse(m);
+			var m = key.Modulus;
+			var msg = blindedMsg;
+			var blindFactorInverse = blindingFactor.ModInverse(m);
 			msg = msg.Multiply(blindFactorInverse);
 			msg = msg.Mod(m);
 

@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.Pkcs;
 using ChainUtils.BouncyCastle.Utilities;
@@ -46,7 +44,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (obj == this)
 				return true;
 
-			DHKeyParameters other = obj as DHKeyParameters;
+			var other = obj as DHKeyParameters;
 
 			if (other == null)
 				return false;
@@ -57,13 +55,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 		protected bool Equals(
 			DHKeyParameters other)
 		{
-			return Platform.Equals(parameters, other.parameters)
+			return Equals(parameters, other.parameters)
 				&& base.Equals(other);
 		}
 
 		public override int GetHashCode()
         {
-			int hc = base.GetHashCode();
+			var hc = base.GetHashCode();
 
 			if (parameters != null)
 			{

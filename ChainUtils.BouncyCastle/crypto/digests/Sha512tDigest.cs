@@ -1,6 +1,4 @@
 ﻿using System;
-
-using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Digests
@@ -29,7 +27,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             if (bitLength == 384)
                 throw new ArgumentException("cannot be 384 use SHA384 instead", "bitLength");
 
-            this.digestLength = bitLength / 8;
+            digestLength = bitLength / 8;
 
             tIvGenerate(digestLength * 8);
 
@@ -43,7 +41,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
         public Sha512tDigest(Sha512tDigest t)
             : base(t)
         {
-            this.digestLength = t.digestLength;
+            digestLength = t.digestLength;
 
 			Reset(t);
         }
@@ -162,10 +160,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         private static void UInt32_To_BE(uint n, byte[] bs, int off, int max)
         {
-            int num = System.Math.Min(4, max);
+            var num = System.Math.Min(4, max);
             while (--num >= 0)
             {
-                int shift = 8 * (3 - num);
+                var shift = 8 * (3 - num);
                 bs[off + num] = (byte)(n >> shift);
             }
         }
@@ -177,23 +175,23 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public override void Reset(IMemoable other)
 		{
-			Sha512tDigest t = (Sha512tDigest)other;
+			var t = (Sha512tDigest)other;
 
-			if (this.digestLength != t.digestLength)
+			if (digestLength != t.digestLength)
 			{
 				throw new MemoableResetException("digestLength inappropriate in other");
 			}
 
-			base.CopyIn(t);
+			CopyIn(t);
 
-			this.H1t = t.H1t;
-			this.H2t = t.H2t;
-			this.H3t = t.H3t;
-			this.H4t = t.H4t;
-			this.H5t = t.H5t;
-			this.H6t = t.H6t;
-			this.H7t = t.H7t;
-			this.H8t = t.H8t;
+			H1t = t.H1t;
+			H2t = t.H2t;
+			H3t = t.H3t;
+			H4t = t.H4t;
+			H5t = t.H5t;
+			H6t = t.H6t;
+			H7t = t.H7t;
+			H8t = t.H8t;
 		}
 
 	}

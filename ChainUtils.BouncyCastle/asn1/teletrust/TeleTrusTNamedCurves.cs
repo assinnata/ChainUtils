@@ -1,5 +1,4 @@
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1.X9;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
@@ -29,10 +28,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("E95E4A5F737059DC60DF5991D45029409E60FC09", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("E95E4A5F737059DC60DF5991D45029409E60FC09", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     new BigInteger("E95E4A5F737059DC60DFC7AD95B3D8139515620F", 16), // q
                     new BigInteger("340E7BE2A280EB74E2BE61BADA745D97E8F7C300", 16), // a
                     new BigInteger("1E589A8595423412134FAA2DBDEC95C8D8675E58", 16), // b
@@ -54,10 +53,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("E95E4A5F737059DC60DF5991D45029409E60FC09", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("E95E4A5F737059DC60DF5991D45029409E60FC09", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     //   new BigInteger("24DBFF5DEC9B986BBFE5295A29BFBAE45E0F5D0B", 16), // Z
                     new BigInteger("E95E4A5F737059DC60DFC7AD95B3D8139515620F", 16), // q
                     new BigInteger("E95E4A5F737059DC60DFC7AD95B3D8139515620C", 16), // a'
@@ -80,10 +79,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("C302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("C302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     new BigInteger("C302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297", 16), // q
                     new BigInteger("6A91174076B1E0E19C39C031FE8685C1CAE040E5C69A28EF", 16), // a
                     new BigInteger("469A28EF7C28CCA3DC721D044F4496BCCA7EF4146FBF25C9", 16), // b
@@ -105,10 +104,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("C302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("C302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     //new BigInteger("1B6F5CC8DB4DC7AF19458A9CB80DC2295E5EB9C3732104CB") //Z
                     new BigInteger("C302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297", 16), // q
                     new BigInteger("C302F41D932A36CDA7A3463093D18DB78FCE476DE1A86294", 16), // a'
@@ -131,10 +130,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("D7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("D7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     new BigInteger("D7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FF", 16), // q
                     new BigInteger("68A5E62CA9CE6C1C299803A6C1530B514E182AD8B0042A59CAD29F43", 16), // a
                     new BigInteger("2580F63CCFE44138870713B1A92369E33E2135D266DBB372386C400B", 16), // b
@@ -156,10 +155,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("D7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("D7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     //new BigInteger("2DF271E14427A346910CF7A2E6CFA7B3F484E5C2CCE1C8B730E28B3F") //Z
                     new BigInteger("D7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FF", 16), // q
                     new BigInteger("D7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FC", 16), // a'
@@ -182,10 +181,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("A9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("A9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     new BigInteger("A9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377", 16), // q
                     new BigInteger("7D5A0975FC2C3057EEF67530417AFFE7FB8055C126DC5C6CE94A4B44F330B5D9", 16), // a
                     new BigInteger("26DC5C6CE94A4B44F330B5D9BBD77CBF958416295CF7E1CE6BCCDC18FF8C07B6", 16), // b
@@ -207,10 +206,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("A9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("A9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     //new BigInteger("3E2D4BD9597B58639AE7AA669CAB9837CF5CF20A2C852D10F655668DFC150EF0") //Z
                     new BigInteger("A9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377", 16), // q
                     new BigInteger("A9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5374", 16), // a'
@@ -233,10 +232,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("D35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("D35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     new BigInteger("D35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E27", 16), // q
                     new BigInteger("3EE30B568FBAB0F883CCEBD46D3F3BB8A2A73513F5EB79DA66190EB085FFA9F492F375A97D860EB4", 16), // a
                     new BigInteger("520883949DFDBC42D3AD198640688A6FE13F41349554B49ACC31DCCD884539816F5EB4AC8FB1F1A6", 16), // b
@@ -258,10 +257,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("D35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("D35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     //new BigInteger("15F75CAF668077F7E85B42EB01F0A81FF56ECD6191D55CB82B7D861458A18FEFC3E5AB7496F3C7B1") //Z
                     new BigInteger("D35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E27", 16), // q
                     new BigInteger("D35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E24", 16), // a'
@@ -284,10 +283,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     new BigInteger("8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71874700133107EC53", 16), // q
                     new BigInteger("7BC382C63D8C150C3C72080ACE05AFA0C2BEA28E4FB22787139165EFBA91F90F8AA5814A503AD4EB04A8C7DD22CE2826", 16), // a
                     new BigInteger("4A8C7DD22CE28268B39B55416F0447C2FB77DE107DCD2A62E880EA53EEB62D57CB4390295DBC9943AB78696FA504C11", 16), // b
@@ -309,10 +308,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     //new BigInteger("41DFE8DD399331F7166A66076734A89CD0D2BCDB7D068E44E1F378F41ECBAE97D2D63DBC87BCCDDCCC5DA39E8589291C") //Z
                     new BigInteger("8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71874700133107EC53", 16), // q
                     new BigInteger("8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71874700133107EC50", 16), // a'
@@ -335,10 +334,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619418661197FAC10471DB1D381085DDADDB58796829CA90069", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619418661197FAC10471DB1D381085DDADDB58796829CA90069", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     new BigInteger("AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842AECDA12AE6A380E62881FF2F2D82C68528AA6056583A48F3", 16), // q
                     new BigInteger("7830A3318B603B89E2327145AC234CC594CBDD8D3DF91610A83441CAEA9863BC2DED5D5AA8253AA10A2EF1C98B9AC8B57F1117A72BF2C7B9E7C1AC4D77FC94CA", 16), // a
                     new BigInteger("3DF91610A83441CAEA9863BC2DED5D5AA8253AA10A2EF1C98B9AC8B57F1117A72BF2C7B9E7C1AC4D77FC94CADC083E67984050B75EBAE5DD2809BD638016F723", 16), // b
@@ -360,10 +359,10 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
 
             protected override X9ECParameters CreateParameters()
             {
-                BigInteger n = new BigInteger("AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619418661197FAC10471DB1D381085DDADDB58796829CA90069", 16);
-                BigInteger h = new BigInteger("01", 16);
+                var n = new BigInteger("AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619418661197FAC10471DB1D381085DDADDB58796829CA90069", 16);
+                var h = new BigInteger("01", 16);
 
-                ECCurve curve = ConfigureCurve(new FpCurve(
+                var curve = ConfigureCurve(new FpCurve(
                     //new BigInteger("12EE58E6764838B69782136F0F2D3BA06E27695716054092E60A80BEDB212B64E585D90BCE13761F85C3F1D2A64E3BE8FEA2220F01EBA5EEB0F35DBD29D922AB") //Z
                     new BigInteger("AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842AECDA12AE6A380E62881FF2F2D82C68528AA6056583A48F3", 16), // q
                     new BigInteger("AADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842AECDA12AE6A380E62881FF2F2D82C68528AA6056583A48F0", 16), // a'
@@ -413,7 +412,7 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
         public static X9ECParameters GetByName(
             string name)
         {
-            DerObjectIdentifier oid = (DerObjectIdentifier)
+            var oid = (DerObjectIdentifier)
                 objIds[Platform.ToLowerInvariant(name)];
 
             return oid == null ? null : GetByOid(oid);
@@ -428,7 +427,7 @@ namespace ChainUtils.BouncyCastle.Asn1.TeleTrust
         public static X9ECParameters GetByOid(
             DerObjectIdentifier oid)
         {
-            X9ECParametersHolder holder = (X9ECParametersHolder) curves[oid];
+            var holder = (X9ECParametersHolder) curves[oid];
 
             return holder == null ? null : holder.Parameters;
         }

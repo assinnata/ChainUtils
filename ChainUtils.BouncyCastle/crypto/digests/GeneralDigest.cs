@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Digests
@@ -91,7 +90,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
         public void Finish()
         {
-            long    bitLength = (byteCount << 3);
+            var    bitLength = (byteCount << 3);
 
             //
             // add the pad bytes.

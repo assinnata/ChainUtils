@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ChainUtils.Protocol
 {
@@ -14,25 +10,25 @@ namespace ChainUtils.Protocol
 		}
 		public GetDataPayload(params InventoryVector[] vectors)
 		{
-			inventory.AddRange(vectors);
+			_inventory.AddRange(vectors);
 		}
-		List<InventoryVector> inventory = new List<InventoryVector>();
+		List<InventoryVector> _inventory = new List<InventoryVector>();
 
 		public List<InventoryVector> Inventory
 		{
 			set
 			{
-				inventory = value;
+				_inventory = value;
 			}
 			get
 			{
-				return inventory;
+				return _inventory;
 			}
 		}
 
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref inventory);
+			stream.ReadWrite(ref _inventory);
 		}
 	}
 }

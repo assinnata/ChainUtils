@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
 	public class TimeStampedDataParser
@@ -14,26 +12,26 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		private TimeStampedDataParser(Asn1SequenceParser parser)
 		{
 			this.parser = parser;
-			this.version = DerInteger.GetInstance(parser.ReadObject());
+			version = DerInteger.GetInstance(parser.ReadObject());
 
-			Asn1Object obj = parser.ReadObject().ToAsn1Object();
+			var obj = parser.ReadObject().ToAsn1Object();
 
 			if (obj is DerIA5String)
 			{
-				this.dataUri = DerIA5String.GetInstance(obj);
+				dataUri = DerIA5String.GetInstance(obj);
 				obj = parser.ReadObject().ToAsn1Object();
 			}
 
             if (//obj is MetaData ||
                 obj is Asn1SequenceParser)
 			{
-				this.metaData = MetaData.GetInstance(obj.ToAsn1Object());
+				metaData = MetaData.GetInstance(obj.ToAsn1Object());
 				obj = parser.ReadObject().ToAsn1Object();
 			}
 
 			if (obj is Asn1OctetStringParser)
 			{
-				this.content = (Asn1OctetStringParser)obj;
+				content = (Asn1OctetStringParser)obj;
 			}
 		}
 

@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
 
@@ -18,7 +17,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 
         public virtual void Init(BigInteger n, SecureRandom random)
         {
-            this.q = n;
+            q = n;
             this.random = random;
         }
 
@@ -29,7 +28,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 
         public virtual BigInteger NextK()
         {
-            int qBitLength = q.BitLength;
+            var qBitLength = q.BitLength;
 
             BigInteger k;
             do

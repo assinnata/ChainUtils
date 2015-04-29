@@ -47,11 +47,11 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public PolicyMappings(
 			IDictionary mappings)
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 
 			foreach (string idp in mappings.Keys)
 			{
-				string sdp = (string) mappings[idp];
+				var sdp = (string) mappings[idp];
 
 				v.Add(
 					new DerSequence(

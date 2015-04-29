@@ -1,26 +1,21 @@
 ﻿#if !USEBC
-using ChainUtils.Crypto;
-using ProtoBuf;
-using ProtoBuf.Meta;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using ChainUtils.Crypto;
+using Proto;
+using ProtoBuf.Meta;
 
 namespace ChainUtils.Payment
 {
-	public enum PKIType
+	public enum PkiType
 	{
 		None,
-		X509SHA256,
-		X509SHA1,
+		X509Sha256,
+		X509Sha1,
 	}
 
 	public class PaymentOutput
@@ -40,10 +35,10 @@ namespace ChainUtils.Payment
 			if(destination != null)
 				Script = destination.ScriptPubKey;
 		}
-		internal PaymentOutput(Proto.Output output)
+		internal PaymentOutput(Output output)
 		{
-			Amount = new Money(output.amount);
-			Script = output.script == null ? null : new Script(output.script);
+			Amount = new Money(output.Amount);
+			Script = output.Script == null ? null : new Script(output.Script);
 			OriginalData = output;
 		}
 		public Money Amount
@@ -56,17 +51,17 @@ namespace ChainUtils.Payment
 			get;
 			set;
 		}
-		internal Proto.Output OriginalData
+		internal Output OriginalData
 		{
 			get;
 			set;
 		}
 
-		internal Proto.Output ToData()
+		internal Output ToData()
 		{
-			var data = OriginalData == null ? new Proto.Output() : (Proto.Output)PaymentRequest.Serializer.DeepClone(OriginalData);
-			data.amount = (ulong)Amount.Satoshi;
-			data.script = Script.ToBytes();
+			var data = OriginalData == null ? new Output() : (Output)PaymentRequest.Serializer.DeepClone(OriginalData);
+			data.Amount = (ulong)Amount.Satoshi;
+			data.Script = Script.ToBytes();
 			return data;
 		}
 	}
@@ -86,16 +81,16 @@ namespace ChainUtils.Payment
 		{
 			var result = new PaymentDetails();
 			var details = PaymentRequest.Serializer.Deserialize<Proto.PaymentDetails>(source);
-			result.Network = details.network == "main" ? Network.Main :
-							 details.network == "test" ? Network.TestNet : null;
+			result.Network = details.Network == "main" ? Network.Main :
+							 details.Network == "test" ? Network.TestNet : null;
 			if(result.Network == null)
 				throw new NotSupportedException("Invalid network");
-			result.Time = Utils.UnixTimeToDateTime(details.time);
-			result.Expires = Utils.UnixTimeToDateTime(details.expires);
-			result.Memo = details.memoSpecified ? details.memo : null;
-			result.MerchantData = details.merchant_dataSpecified ? details.merchant_data : null;
-			result.PaymentUrl = details.payment_urlSpecified ? new Uri(details.payment_url, UriKind.Absolute) : null;
-			foreach(var output in details.outputs)
+			result.Time = Utils.UnixTimeToDateTime(details.Time);
+			result.Expires = Utils.UnixTimeToDateTime(details.Expires);
+			result.Memo = details.MemoSpecified ? details.Memo : null;
+			result.MerchantData = details.MerchantDataSpecified ? details.MerchantData : null;
+			result.PaymentUrl = details.PaymentUrlSpecified ? new Uri(details.PaymentUrl, UriKind.Absolute) : null;
+			foreach(var output in details.Outputs)
 			{
 				result.Outputs.Add(new PaymentOutput(output));
 			}
@@ -148,53 +143,53 @@ namespace ChainUtils.Payment
 			get;
 			set;
 		}
-		private readonly List<PaymentOutput> _Outputs = new List<PaymentOutput>();
+		private readonly List<PaymentOutput> _outputs = new List<PaymentOutput>();
 		public List<PaymentOutput> Outputs
 		{
 			get
 			{
-				return _Outputs;
+				return _outputs;
 			}
 		}
 
 		public byte[] ToBytes()
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			WriteTo(ms);
 			return ms.ToArray();
 		}
 
 		static byte[] GetByte<T>(T obj)
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			PaymentRequest.Serializer.Serialize(ms, obj);
 			return ms.ToArray();
 		}
 		public void WriteTo(Stream output)
 		{
 			var details = OriginalData == null ? new Proto.PaymentDetails() : (Proto.PaymentDetails)PaymentRequest.Serializer.DeepClone(OriginalData);
-			details.memo = Memo;
+			details.Memo = Memo;
 
 
-			details.merchant_data = MerchantData;
+			details.MerchantData = MerchantData;
 
 			var network = Network == Network.Main ? "main" :
 							  Network == Network.TestNet ? "test" : null;
-			if(details.network != network)
-				details.network = network;
+			if(details.Network != network)
+				details.Network = network;
 
 			var time = Utils.DateTimeToUnixTimeLong(Time);
-			if(time != details.time)
-				details.time = time;
+			if(time != details.Time)
+				details.Time = time;
 			var expires = Utils.DateTimeToUnixTimeLong(Expires);
-			if(expires != details.expires)
-				details.expires = expires;
+			if(expires != details.Expires)
+				details.Expires = expires;
 
-			details.payment_url = PaymentUrl == null ? null : PaymentUrl.AbsoluteUri;
-			details.outputs.Clear();
+			details.PaymentUrl = PaymentUrl == null ? null : PaymentUrl.AbsoluteUri;
+			details.Outputs.Clear();
 			foreach(var o in Outputs)
 			{
-				details.outputs.Add(o.ToData());
+				details.Outputs.Add(o.ToData());
 			}
 			PaymentRequest.Serializer.Serialize(output, details);
 		}
@@ -244,12 +239,12 @@ namespace ChainUtils.Payment
 		{
 			var result = new PaymentRequest();
 			var req = Serializer.Deserialize<Proto.PaymentRequest>(source);
-			result.PKIType = ToPKIType(req.pki_type);
-			if(req.pki_data != null && req.pki_data.Length != 0)
+			result.PkiType = ToPkiType(req.PkiType);
+			if(req.PkiData != null && req.PkiData.Length != 0)
 			{
-				var certs = Serializer.Deserialize<Proto.X509Certificates>(new MemoryStream(req.pki_data));
-				bool first = true;
-				foreach(var cert in certs.certificate)
+				var certs = Serializer.Deserialize<X509Certificates>(new MemoryStream(req.PkiData));
+				var first = true;
+				foreach(var cert in certs.Certificate)
 				{
 					if(first)
 					{
@@ -262,8 +257,8 @@ namespace ChainUtils.Payment
 					}
 				}
 			}
-			result._PaymentDetails = PaymentDetails.Load(req.serialized_payment_details);
-			result.Signature = req.signature;
+			result._paymentDetails = PaymentDetails.Load(req.SerializedPaymentDetails);
+			result.Signature = req.Signature;
 			result.OriginalData = req;
 			return result;
 		}
@@ -278,60 +273,60 @@ namespace ChainUtils.Payment
 		public void WriteTo(Stream output)
 		{
 			var req = OriginalData == null ? new Proto.PaymentRequest() : (Proto.PaymentRequest)Serializer.DeepClone(OriginalData);
-			req.pki_type = ToPKITypeString(PKIType);
+			req.PkiType = ToPkiTypeString(PkiType);
 
-			var certs = new Proto.X509Certificates();
-			if(this.MerchantCertificate != null)
+			var certs = new X509Certificates();
+			if(MerchantCertificate != null)
 			{
-				certs.certificate.Add(MerchantCertificate.Export(X509ContentType.Cert));
+				certs.Certificate.Add(MerchantCertificate.Export(X509ContentType.Cert));
 			}
 			foreach(var cert in AdditionalCertificates)
 			{
-				certs.certificate.Add(cert.Export(X509ContentType.Cert));
+				certs.Certificate.Add(cert.Export(X509ContentType.Cert));
 			}
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			Serializer.Serialize(ms, certs);
-			req.pki_data = ms.ToArray();
-			req.serialized_payment_details = Details.ToBytes();
-			req.signature = Signature;
+			req.PkiData = ms.ToArray();
+			req.SerializedPaymentDetails = Details.ToBytes();
+			req.Signature = Signature;
 			if(Details.Version != 1)
 			{
-				req.payment_details_version = Details.Version;
+				req.PaymentDetailsVersion = Details.Version;
 			}
 			Serializer.Serialize(output, req);
 		}
 
-		private string ToPKITypeString(PKIType pkitype)
+		private string ToPkiTypeString(PkiType pkitype)
 		{
 			switch(pkitype)
 			{
-				case Payment.PKIType.None:
+				case PkiType.None:
 					return "none";
-				case Payment.PKIType.X509SHA1:
+				case PkiType.X509Sha1:
 					return "x509+sha1";
-				case Payment.PKIType.X509SHA256:
+				case PkiType.X509Sha256:
 					return "x509+sha256";
 				default:
 					throw new NotSupportedException(pkitype.ToString());
 			}
 		}
 
-		private static PKIType ToPKIType(string str)
+		private static PkiType ToPkiType(string str)
 		{
 			switch(str)
 			{
 				case "none":
-					return PKIType.None;
+					return PkiType.None;
 				case "x509+sha256":
-					return PKIType.X509SHA256;
+					return PkiType.X509Sha256;
 				case "x509+sha1":
-					return PKIType.X509SHA1;
+					return PkiType.X509Sha1;
 				default:
 					throw new NotSupportedException(str);
 			}
 		}
 
-		public PKIType PKIType
+		public PkiType PkiType
 		{
 			get;
 			set;
@@ -365,21 +360,21 @@ namespace ChainUtils.Payment
 		}
 
 
-		private readonly List<X509Certificate2> _AdditionalCertificates = new List<X509Certificate2>();
+		private readonly List<X509Certificate2> _additionalCertificates = new List<X509Certificate2>();
 		public List<X509Certificate2> AdditionalCertificates
 		{
 			get
 			{
-				return _AdditionalCertificates;
+				return _additionalCertificates;
 			}
 		}
 
-		private PaymentDetails _PaymentDetails = new PaymentDetails();
+		private PaymentDetails _paymentDetails = new PaymentDetails();
 		public PaymentDetails Details
 		{
 			get
 			{
-				return _PaymentDetails;
+				return _paymentDetails;
 			}
 		}
 
@@ -404,9 +399,9 @@ namespace ChainUtils.Payment
 		/// <returns>true if the certificate chain and the signature is trusted or if PKIType == None</returns>
 		public bool Verify()
 		{
-			bool valid = true;
-			if(this.PKIType != Payment.PKIType.None)
-				valid = this.VerifyChain() && VerifySignature();
+			var valid = true;
+			if(PkiType != PkiType.None)
+				valid = VerifyChain() && VerifySignature();
 			if(!valid)
 				return valid;
 
@@ -422,7 +417,7 @@ namespace ChainUtils.Payment
 		public bool VerifyChain(out X509Chain chain, X509VerificationFlags flags = X509VerificationFlags.NoFlag)
 		{
 			chain = null;
-			if(MerchantCertificate == null || PKIType == Payment.PKIType.None)
+			if(MerchantCertificate == null || PkiType == PkiType.None)
 				return false;
 			chain = new X509Chain();
 			chain.ChainPolicy.VerificationFlags = flags;
@@ -433,7 +428,7 @@ namespace ChainUtils.Payment
 
 		public bool VerifySignature()
 		{
-			if(MerchantCertificate == null || PKIType == Payment.PKIType.None)
+			if(MerchantCertificate == null || PkiType == PkiType.None)
 				return false;
 
 			var key = (RSACryptoServiceProvider)MerchantCertificate.PublicKey.Key;
@@ -442,7 +437,7 @@ namespace ChainUtils.Payment
 			byte[] data = null;
 			try
 			{
-				data = this.ToBytes();
+				data = ToBytes();
 			}
 			finally
 			{
@@ -451,18 +446,18 @@ namespace ChainUtils.Payment
 
 			byte[] hash = null;
 			string hashName = null;
-			if(PKIType == Payment.PKIType.X509SHA256)
+			if(PkiType == PkiType.X509Sha256)
 			{
 				hash = Hashes.SHA256(data);
 				hashName = "sha256";
 			}
-			else if(PKIType == Payment.PKIType.X509SHA1)
+			else if(PkiType == PkiType.X509Sha1)
 			{
-				hash = Hashes.SHA1(data, data.Length);
+				hash = Hashes.Sha1(data, data.Length);
 				hashName = "sha1";
 			}
 			else
-				throw new NotSupportedException(PKIType.ToString());
+				throw new NotSupportedException(PkiType.ToString());
 
 			return key.VerifyHash(hash, hashName, Signature);
 		}
@@ -474,31 +469,31 @@ namespace ChainUtils.Payment
 		}
 
 
-		public void Sign(X509Certificate2 certificate, Payment.PKIType type)
+		public void Sign(X509Certificate2 certificate, PkiType type)
 		{
-			if(type == Payment.PKIType.None)
+			if(type == PkiType.None)
 				throw new ArgumentException("PKIType can't be none if signing");
 			var privateKey = certificate.PrivateKey as RSACryptoServiceProvider;
 			if(privateKey == null)
 				throw new ArgumentException("Private key not present in the certificate, impossible to sign");
 			MerchantCertificate = new X509Certificate2(certificate.Export(X509ContentType.Cert));
-			PKIType = type;
+			PkiType = type;
 			Signature = new byte[0];
-			var data = this.ToBytes();
+			var data = ToBytes();
 			byte[] hash = null;
 			string hashName = null;
-			if(type == Payment.PKIType.X509SHA256)
+			if(type == PkiType.X509Sha256)
 			{
 				hash = Hashes.SHA256(data);
 				hashName = "sha256";
 			}
-			else if(type == Payment.PKIType.X509SHA1)
+			else if(type == PkiType.X509Sha1)
 			{
-				hash = Hashes.SHA1(data, data.Length);
+				hash = Hashes.Sha1(data, data.Length);
 				hashName = "sha1";
 			}
 			else
-				throw new NotSupportedException(PKIType.ToString());
+				throw new NotSupportedException(PkiType.ToString());
 
 			Signature = privateKey.SignHash(hash, hashName);
 		}

@@ -1,24 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public class CompositeDisposable : IDisposable
 	{
-		IDisposable[] _Disposables;
+		IDisposable[] _disposables;
 		public CompositeDisposable(params IDisposable[] disposables)
 		{
-			_Disposables = disposables;
+			_disposables = disposables;
 		}
 		#region IDisposable Members
 
 		public void Dispose()
 		{
-			if(_Disposables != null)
-				foreach(var dispo in _Disposables)
+			if(_disposables != null)
+				foreach(var dispo in _disposables)
 					dispo.Dispose();
 		}
 

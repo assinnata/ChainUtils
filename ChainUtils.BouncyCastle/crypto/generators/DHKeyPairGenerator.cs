@@ -1,7 +1,4 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
 {
@@ -19,16 +16,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 		public virtual void Init(
 			KeyGenerationParameters parameters)
         {
-            this.param = (DHKeyGenerationParameters)parameters;
+            param = (DHKeyGenerationParameters)parameters;
         }
 
 		public virtual AsymmetricCipherKeyPair GenerateKeyPair()
         {
-			DHKeyGeneratorHelper helper = DHKeyGeneratorHelper.Instance;
-			DHParameters dhp = param.Parameters;
+			var helper = DHKeyGeneratorHelper.Instance;
+			var dhp = param.Parameters;
 
-			BigInteger x = helper.CalculatePrivate(dhp, param.Random);
-			BigInteger y = helper.CalculatePublic(dhp, x);
+			var x = helper.CalculatePrivate(dhp, param.Random);
+			var y = helper.CalculatePublic(dhp, x);
 
 			return new AsymmetricCipherKeyPair(
                 new DHPublicKeyParameters(y, dhp),

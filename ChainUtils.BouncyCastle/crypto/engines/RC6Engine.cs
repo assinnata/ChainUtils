@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -80,7 +79,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
             this.forEncryption = forEncryption;
 
-			KeyParameter p = (KeyParameter)parameters;
+			var p = (KeyParameter)parameters;
 			SetKey(p.GetKey());
         }
 
@@ -90,7 +89,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]	output,
             int		outOff)
         {
-			int blockSize = GetBlockSize();
+			var blockSize = GetBlockSize();
 			if (_S == null)
 				throw new InvalidOperationException("RC6 engine not initialised");
 			if ((inOff + blockSize) > input.Length)
@@ -128,15 +127,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             //   case that b = c = 0, set c = 1 and L[0] = 0.
             //
             // compute number of dwords
-            int c = (key.Length + (bytesPerWord - 1)) / bytesPerWord;
+            var c = (key.Length + (bytesPerWord - 1)) / bytesPerWord;
             if (c == 0)
             {
                 c = 1;
             }
-            int[]   L = new int[(key.Length + bytesPerWord - 1) / bytesPerWord];
+            var   L = new int[(key.Length + bytesPerWord - 1) / bytesPerWord];
 
             // load all key bytes into array of key dwords
-            for (int i = key.Length - 1; i >= 0; i--)
+            for (var i = key.Length - 1; i >= 0; i--)
             {
                 L[i / bytesPerWord] = (L[i / bytesPerWord] << 8) + (key[i] & 0xff);
             }
@@ -151,7 +150,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             _S            = new int[2+2*_noRounds+2];
 
             _S[0] = P32;
-            for (int i=1; i < _S.Length; i++)
+            for (var i=1; i < _S.Length; i++)
             {
                 _S[i] = (_S[i-1] + Q32);
             }
@@ -172,11 +171,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                 iter = 3 * _S.Length;
             }
 
-            int A = 0;
-            int B = 0;
+            var A = 0;
+            var B = 0;
             int ii = 0, jj = 0;
 
-            for (int k = 0; k < iter; k++)
+            for (var k = 0; k < iter; k++)
             {
                 A = _S[ii] = RotateLeft(_S[ii] + A + B, 3);
                 B =  L[jj] = RotateLeft( L[jj] + A + B, A+B);
@@ -192,17 +191,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             int     outOff)
         {
             // load A,B,C and D registers from in.
-            int A = BytesToWord(input, inOff);
-            int B = BytesToWord(input, inOff + bytesPerWord);
-            int C = BytesToWord(input, inOff + bytesPerWord*2);
-            int D = BytesToWord(input, inOff + bytesPerWord*3);
+            var A = BytesToWord(input, inOff);
+            var B = BytesToWord(input, inOff + bytesPerWord);
+            var C = BytesToWord(input, inOff + bytesPerWord*2);
+            var D = BytesToWord(input, inOff + bytesPerWord*3);
 
             // Do pseudo-round #0: pre-whitening of B and D
             B += _S[0];
             D += _S[1];
 
             // perform round #1,#2 ... #ROUNDS of encryption
-            for (int i = 1; i <= _noRounds; i++)
+            for (var i = 1; i <= _noRounds; i++)
             {
                 int t = 0,u = 0;
 
@@ -220,7 +219,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                 C = RotateLeft(C,t);
                 C += _S[2*i+1];
 
-                int temp = A;
+                var temp = A;
                 A = B;
                 B = C;
                 C = D;
@@ -246,21 +245,21 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             int     outOff)
         {
             // load A,B,C and D registers from out.
-            int A = BytesToWord(input, inOff);
-            int B = BytesToWord(input, inOff + bytesPerWord);
-            int C = BytesToWord(input, inOff + bytesPerWord*2);
-            int D = BytesToWord(input, inOff + bytesPerWord*3);
+            var A = BytesToWord(input, inOff);
+            var B = BytesToWord(input, inOff + bytesPerWord);
+            var C = BytesToWord(input, inOff + bytesPerWord*2);
+            var D = BytesToWord(input, inOff + bytesPerWord*3);
 
             // Undo pseudo-round #(ROUNDS+1) : post whitening of A and C
             C -= _S[2*_noRounds+3];
             A -= _S[2*_noRounds+2];
 
             // Undo round #ROUNDS, .., #2,#1 of encryption
-            for (int i = _noRounds; i >= 1; i--)
+            for (var i = _noRounds; i >= 1; i--)
             {
                 int t=0,u = 0;
 
-                int temp = D;
+                var temp = D;
                 D = C;
                 C = B;
                 B = A;
@@ -336,9 +335,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]	src,
             int		srcOff)
         {
-            int word = 0;
+            var word = 0;
 
-            for (int i = bytesPerWord - 1; i >= 0; i--)
+            for (var i = bytesPerWord - 1; i >= 0; i--)
             {
                 word = (word << 8) + (src[i + srcOff] & 0xff);
             }
@@ -351,7 +350,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]	dst,
             int		dstOff)
         {
-            for (int i = 0; i < bytesPerWord; i++)
+            for (var i = 0; i < bytesPerWord; i++)
             {
                 dst[i + dstOff] = (byte)word;
                 word = (int) ((uint) word >> 8);

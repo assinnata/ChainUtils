@@ -1,18 +1,14 @@
-﻿using ChainUtils.Crypto;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.Crypto;
 
 namespace ChainUtils
 {
 	public enum ScriptError
 	{
-		OK = 0,
+		Ok = 0,
 		UnknownError,
 		EvalFalse,
 		OpReturn,
@@ -56,7 +52,7 @@ namespace ChainUtils
 	{
 		class CScriptNum
 		{
-			const long nMaxNumSize = 4;
+			const long NMaxNumSize = 4;
 			/**
 			 * Numeric opcodes (OP_1ADD, etc) are restricted to operating on 4-byte integers.
 			 * The semantics are subtle, though: operands must be in the range [-2^31 +1...2^31 -1],
@@ -68,13 +64,13 @@ namespace ChainUtils
 
 			public CScriptNum(long n)
 			{
-				m_value = n;
+				_mValue = n;
 			}
-			private long m_value;
+			private long _mValue;
 
 			public CScriptNum(byte[] vch, bool fRequireMinimal)
 			{
-				if(vch.Length > nMaxNumSize)
+				if(vch.Length > NMaxNumSize)
 				{
 					throw new ArgumentException("script number overflow", "vch");
 				}
@@ -99,95 +95,95 @@ namespace ChainUtils
 						}
 					}
 				}
-				m_value = set_vch(vch);
+				_mValue = set_vch(vch);
 			}
 
 			public override int GetHashCode()
 			{
-				return getint();
+				return Getint();
 			}
 			public override bool Equals(object obj)
 			{
 				if(obj == null || !(obj is CScriptNum))
 					return false;
-				CScriptNum item = (CScriptNum)obj;
-				return m_value == item.m_value;
+				var item = (CScriptNum)obj;
+				return _mValue == item._mValue;
 			}
 			public static bool operator ==(CScriptNum num, long rhs)
 			{
-				return num.m_value == rhs;
+				return num._mValue == rhs;
 			}
 			public static bool operator !=(CScriptNum num, long rhs)
 			{
-				return num.m_value != rhs;
+				return num._mValue != rhs;
 			}
 			public static bool operator <=(CScriptNum num, long rhs)
 			{
-				return num.m_value <= rhs;
+				return num._mValue <= rhs;
 			}
 			public static bool operator <(CScriptNum num, long rhs)
 			{
-				return num.m_value < rhs;
+				return num._mValue < rhs;
 			}
 			public static bool operator >=(CScriptNum num, long rhs)
 			{
-				return num.m_value >= rhs;
+				return num._mValue >= rhs;
 			}
 			public static bool operator >(CScriptNum num, long rhs)
 			{
-				return num.m_value > rhs;
+				return num._mValue > rhs;
 			}
 
 			public static bool operator ==(CScriptNum a, CScriptNum b)
 			{
-				return a.m_value == b.m_value;
+				return a._mValue == b._mValue;
 			}
 			public static bool operator !=(CScriptNum a, CScriptNum b)
 			{
-				return a.m_value != b.m_value;
+				return a._mValue != b._mValue;
 			}
 			public static bool operator <=(CScriptNum a, CScriptNum b)
 			{
-				return a.m_value <= b.m_value;
+				return a._mValue <= b._mValue;
 			}
 			public static bool operator <(CScriptNum a, CScriptNum b)
 			{
-				return a.m_value < b.m_value;
+				return a._mValue < b._mValue;
 			}
 			public static bool operator >=(CScriptNum a, CScriptNum b)
 			{
-				return a.m_value >= b.m_value;
+				return a._mValue >= b._mValue;
 			}
 			public static bool operator >(CScriptNum a, CScriptNum b)
 			{
-				return a.m_value > b.m_value;
+				return a._mValue > b._mValue;
 			}
 
 			public static CScriptNum operator +(CScriptNum num, long rhs)
 			{
-				return new CScriptNum(num.m_value + rhs);
+				return new CScriptNum(num._mValue + rhs);
 			}
 			public static CScriptNum operator -(CScriptNum num, long rhs)
 			{
-				return new CScriptNum(num.m_value - rhs);
+				return new CScriptNum(num._mValue - rhs);
 			}
 			public static CScriptNum operator +(CScriptNum a, CScriptNum b)
 			{
-				return new CScriptNum(a.m_value + b.m_value);
+				return new CScriptNum(a._mValue + b._mValue);
 			}
 			public static CScriptNum operator -(CScriptNum a, CScriptNum b)
 			{
-				return new CScriptNum(a.m_value - b.m_value);
+				return new CScriptNum(a._mValue - b._mValue);
 			}
 
 
 			public static CScriptNum operator -(CScriptNum num)
 			{
-				assert(num.m_value != Int64.MinValue);
-				return new CScriptNum(-num.m_value);
+				Assert(num._mValue != Int64.MinValue);
+				return new CScriptNum(-num._mValue);
 			}
 
-			private static void assert(bool result)
+			private static void Assert(bool result)
 			{
 				if(!result)
 					throw new InvalidOperationException("Assertion fail for CScriptNum");
@@ -201,28 +197,28 @@ namespace ChainUtils
 
 
 
-			public int getint()
+			public int Getint()
 			{
-				if(m_value > int.MaxValue)
+				if(_mValue > int.MaxValue)
 					return int.MaxValue;
-				else if(m_value < int.MinValue)
+				else if(_mValue < int.MinValue)
 					return int.MinValue;
-				return (int)m_value;
+				return (int)_mValue;
 			}
 
-			public byte[] getvch()
+			public byte[] Getvch()
 			{
-				return serialize(m_value);
+				return Serialize(_mValue);
 			}
 
-			static byte[] serialize(long value)
+			static byte[] Serialize(long value)
 			{
 				if(value == 0)
 					return new byte[0];
 
-				List<byte> result = new List<byte>();
-				bool neg = value < 0;
-				long absvalue = neg ? -value : value;
+				var result = new List<byte>();
+				var neg = value < 0;
+				var absvalue = neg ? -value : value;
 
 				while(absvalue != 0)
 				{
@@ -254,7 +250,7 @@ namespace ChainUtils
 					return 0;
 
 				long result = 0;
-				for(int i = 0 ; i != vch.Length ; ++i)
+				for(var i = 0 ; i != vch.Length ; ++i)
 					result |= ((long)(vch[i])) << 8 * i;
 
 				// If the input vector's most significant byte is 0x80, remove it from
@@ -269,19 +265,19 @@ namespace ChainUtils
 			}
 
 		}
-		Stack<byte[]> _Stack = new Stack<byte[]>();
+		Stack<byte[]> _stack = new Stack<byte[]>();
 		public Stack<byte[]> Stack
 		{
 			get
 			{
-				return _Stack;
+				return _stack;
 			}
 		}
 
 		public ScriptEvaluationContext()
 		{
-			ScriptVerify = ChainUtils.ScriptVerify.Standard;
-			SigHash = ChainUtils.SigHash.Undefined;
+			ScriptVerify = ScriptVerify.Standard;
+			SigHash = SigHash.Undefined;
 			Error = ScriptError.UnknownError;
 		}
 		public ScriptVerify ScriptVerify
@@ -307,7 +303,7 @@ namespace ChainUtils
 
 			if(!EvalScript(scriptSig, txTo, nIn))
 				return false;
-			if((ScriptVerify & ScriptVerify.P2SH) != 0)
+			if((ScriptVerify & ScriptVerify.P2Sh) != 0)
 			{
 				evaluationCopy = Clone();
 			}
@@ -318,9 +314,9 @@ namespace ChainUtils
 				return SetError(ScriptError.EvalFalse);
 
 			// Additional validation for spend-to-script-hash transactions:
-			if(((ScriptVerify & ScriptVerify.P2SH) != 0) && scriptPubKey.IsPayToScriptHash)
+			if(((ScriptVerify & ScriptVerify.P2Sh) != 0) && scriptPubKey.IsPayToScriptHash)
 			{
-				this.Load(evaluationCopy);
+				Load(evaluationCopy);
 				evaluationCopy = this;
 				if(!scriptSig.IsPushOnly)
 					return SetError(ScriptError.SigPushOnly);
@@ -331,7 +327,7 @@ namespace ChainUtils
 				if(evaluationCopy.Stack.Count == 0)
 					throw new InvalidOperationException("stackCopy cannot be empty here");
 
-				Script redeem = new Script(evaluationCopy.Stack.Pop());
+				var redeem = new Script(evaluationCopy.Stack.Pop());
 
 				if(!evaluationCopy.EvalScript(redeem, txTo, nIn))
 					return false;
@@ -349,7 +345,7 @@ namespace ChainUtils
 			{
 				// Disallow CLEANSTACK without P2SH, as otherwise a switch CLEANSTACK->P2SH+CLEANSTACK
 				// would be possible, which is not a softfork (and P2SH should be one).
-				if((ScriptVerify & ScriptVerify.P2SH) == 0)
+				if((ScriptVerify & ScriptVerify.P2Sh) == 0)
 					throw new InvalidOperationException("ScriptVerify : CleanStack without P2SH is not allowed");
 				if(Stack.Count != 1)
 				{
@@ -362,30 +358,30 @@ namespace ChainUtils
 		}
 
 
-		static readonly byte[] vchFalse = new byte[] { 0 };
-		static readonly byte[] vchZero = new byte[] { 0 };
-		static readonly byte[] vchTrue = new byte[] { 1 };
+		static readonly byte[] VchFalse = new byte[] { 0 };
+		static readonly byte[] VchZero = new byte[] { 0 };
+		static readonly byte[] VchTrue = new byte[] { 1 };
 
 		public bool EvalScript(Script s, Transaction txTo, int nIn)
 		{
 			var script = s.CreateReader();
-			int pend = (int)script.Inner.Length;
+			var pend = (int)script.Inner.Length;
 
-			int pbegincodehash = 0;
-			Stack<bool> vfExec = new Stack<bool>();
-			Stack<byte[]> altstack = new Stack<byte[]>();
+			var pbegincodehash = 0;
+			var vfExec = new Stack<bool>();
+			var altstack = new Stack<byte[]>();
 			SetError(ScriptError.UnknownError);
 			Op opcode = null;
 			if(s.Length > 10000)
 				return SetError(ScriptError.ScriptSize);
-			int nOpCount = 0;
-			bool fRequireMinimal = (ScriptVerify & ScriptVerify.MinimalData) != 0;
+			var nOpCount = 0;
+			var fRequireMinimal = (ScriptVerify & ScriptVerify.MinimalData) != 0;
 
 			try
 			{
 				while((opcode = script.Read()) != null)
 				{
-					bool fExec = vfExec.All(o => o); //!count(vfExec.begin(), vfExec.end(), false);
+					var fExec = vfExec.All(o => o); //!count(vfExec.begin(), vfExec.end(), false);
 
 					//
 					// Read instruction
@@ -395,63 +391,63 @@ namespace ChainUtils
 						return SetError(ScriptError.PushSize);
 
 					// Note how OP_RESERVED does not count towards the opcode limit.
-					if(opcode.Code > OpcodeType.OP_16 && ++nOpCount > 201)
+					if(opcode.Code > OpcodeType.Op16 && ++nOpCount > 201)
 						return SetError(ScriptError.OpCount);
 
-					if(opcode.Code == OpcodeType.OP_CAT ||
-						opcode.Code == OpcodeType.OP_SUBSTR ||
-						opcode.Code == OpcodeType.OP_LEFT ||
-						opcode.Code == OpcodeType.OP_RIGHT ||
-						opcode.Code == OpcodeType.OP_INVERT ||
-						opcode.Code == OpcodeType.OP_AND ||
-						opcode.Code == OpcodeType.OP_OR ||
-						opcode.Code == OpcodeType.OP_XOR ||
-						opcode.Code == OpcodeType.OP_2MUL ||
-						opcode.Code == OpcodeType.OP_2DIV ||
-						opcode.Code == OpcodeType.OP_MUL ||
-						opcode.Code == OpcodeType.OP_DIV ||
-						opcode.Code == OpcodeType.OP_MOD ||
-						opcode.Code == OpcodeType.OP_LSHIFT ||
-						opcode.Code == OpcodeType.OP_RSHIFT)
+					if(opcode.Code == OpcodeType.OpCat ||
+						opcode.Code == OpcodeType.OpSubstr ||
+						opcode.Code == OpcodeType.OpLeft ||
+						opcode.Code == OpcodeType.OpRight ||
+						opcode.Code == OpcodeType.OpInvert ||
+						opcode.Code == OpcodeType.OpAnd ||
+						opcode.Code == OpcodeType.OpOr ||
+						opcode.Code == OpcodeType.OpXor ||
+						opcode.Code == OpcodeType.Op_2Mul ||
+						opcode.Code == OpcodeType.Op_2Div ||
+						opcode.Code == OpcodeType.OpMul ||
+						opcode.Code == OpcodeType.OpDiv ||
+						opcode.Code == OpcodeType.OpMod ||
+						opcode.Code == OpcodeType.OpLshift ||
+						opcode.Code == OpcodeType.OpRshift)
 						return SetError(ScriptError.DisabledOpCode); // Disabled opcodes.
 
-					if(fExec && 0 <= (int)opcode.Code && (int)opcode.Code <= (int)OpcodeType.OP_PUSHDATA4)
+					if(fExec && 0 <= (int)opcode.Code && (int)opcode.Code <= (int)OpcodeType.OpPushdata4)
 					{
 						if(fRequireMinimal && !CheckMinimalPush(opcode.PushData, opcode.Code))
 						{
 							return SetError(ScriptError.MinimalData);
 						}
-						_Stack.Push(opcode.PushData);
+						_stack.Push(opcode.PushData);
 					}
 					//if(fExec && opcode.PushData != null)
 					//	_Stack.Push(opcode.PushData);
-					else if(fExec || (OpcodeType.OP_IF <= opcode.Code && opcode.Code <= OpcodeType.OP_ENDIF))
+					else if(fExec || (OpcodeType.OpIf <= opcode.Code && opcode.Code <= OpcodeType.OpEndif))
 						switch(opcode.Code)
 						{
 							//
 							// Push value
 							//
-							case OpcodeType.OP_1NEGATE:
-							case OpcodeType.OP_1:
-							case OpcodeType.OP_2:
-							case OpcodeType.OP_3:
-							case OpcodeType.OP_4:
-							case OpcodeType.OP_5:
-							case OpcodeType.OP_6:
-							case OpcodeType.OP_7:
-							case OpcodeType.OP_8:
-							case OpcodeType.OP_9:
-							case OpcodeType.OP_10:
-							case OpcodeType.OP_11:
-							case OpcodeType.OP_12:
-							case OpcodeType.OP_13:
-							case OpcodeType.OP_14:
-							case OpcodeType.OP_15:
-							case OpcodeType.OP_16:
+							case OpcodeType.Op_1Negate:
+							case OpcodeType.Op1:
+							case OpcodeType.Op2:
+							case OpcodeType.Op3:
+							case OpcodeType.Op4:
+							case OpcodeType.Op5:
+							case OpcodeType.Op6:
+							case OpcodeType.Op7:
+							case OpcodeType.Op8:
+							case OpcodeType.Op9:
+							case OpcodeType.Op10:
+							case OpcodeType.Op11:
+							case OpcodeType.Op12:
+							case OpcodeType.Op13:
+							case OpcodeType.Op14:
+							case OpcodeType.Op15:
+							case OpcodeType.Op16:
 								{
 									// ( -- value)
-									CScriptNum bn = new CScriptNum((int)opcode.Code - (int)(OpcodeType.OP_1 - 1));
-									_Stack.Push(bn.getvch());
+									var bn = new CScriptNum((int)opcode.Code - (int)(OpcodeType.Op1 - 1));
+									_stack.Push(bn.Getvch());
 								}
 								break;
 
@@ -459,44 +455,44 @@ namespace ChainUtils
 							//
 							// Control
 							//
-							case OpcodeType.OP_NOP:
+							case OpcodeType.OpNop:
 								break;
-							case OpcodeType.OP_NOP1:
-							case OpcodeType.OP_NOP2:
-							case OpcodeType.OP_NOP3:
-							case OpcodeType.OP_NOP4:
-							case OpcodeType.OP_NOP5:
-							case OpcodeType.OP_NOP6:
-							case OpcodeType.OP_NOP7:
-							case OpcodeType.OP_NOP8:
-							case OpcodeType.OP_NOP9:
-							case OpcodeType.OP_NOP10:
+							case OpcodeType.OpNop1:
+							case OpcodeType.OpNop2:
+							case OpcodeType.OpNop3:
+							case OpcodeType.OpNop4:
+							case OpcodeType.OpNop5:
+							case OpcodeType.OpNop6:
+							case OpcodeType.OpNop7:
+							case OpcodeType.OpNop8:
+							case OpcodeType.OpNop9:
+							case OpcodeType.OpNop10:
 								{
 									if((ScriptVerify & ScriptVerify.DiscourageUpgradableNops) != 0)
 										return SetError(ScriptError.DiscourageUpgradableNops);
 								}
 								break;
 
-							case OpcodeType.OP_IF:
-							case OpcodeType.OP_NOTIF:
+							case OpcodeType.OpIf:
+							case OpcodeType.OpNotif:
 								{
 									// <expression> if [statements] [else [statements]] endif
-									bool fValue = false;
+									var fValue = false;
 									if(fExec)
 									{
-										if(_Stack.Count < 1)
+										if(_stack.Count < 1)
 											return SetError(ScriptError.UnbalancedConditional);
-										var vch = top(_Stack, -1);
+										var vch = Top(_stack, -1);
 										fValue = CastToBool(vch);
-										if(opcode.Code == OpcodeType.OP_NOTIF)
+										if(opcode.Code == OpcodeType.OpNotif)
 											fValue = !fValue;
-										_Stack.Pop();
+										_stack.Pop();
 									}
 									vfExec.Push(fValue);
 								}
 								break;
 
-							case OpcodeType.OP_ELSE:
+							case OpcodeType.OpElse:
 								{
 									if(vfExec.Count == 0)
 										return SetError(ScriptError.UnbalancedConditional);
@@ -506,7 +502,7 @@ namespace ChainUtils
 								}
 								break;
 
-							case OpcodeType.OP_ENDIF:
+							case OpcodeType.OpEndif:
 								{
 									if(vfExec.Count == 0)
 										return SetError(ScriptError.UnbalancedConditional);
@@ -514,21 +510,21 @@ namespace ChainUtils
 								}
 								break;
 
-							case OpcodeType.OP_VERIFY:
+							case OpcodeType.OpVerify:
 								{
 									// (true -- ) or
 									// (false -- false) and return
-									if(_Stack.Count < 1)
+									if(_stack.Count < 1)
 										return SetError(ScriptError.InvalidStackOperation);
-									bool fValue = CastToBool(top(_Stack, -1));
+									var fValue = CastToBool(Top(_stack, -1));
 									if(fValue)
-										_Stack.Pop();
+										_stack.Pop();
 									else
 										return SetError(ScriptError.Verify);
 								}
 								break;
 
-							case OpcodeType.OP_RETURN:
+							case OpcodeType.OpReturn:
 								{
 									return SetError(ScriptError.OpReturn);
 								}
@@ -537,209 +533,209 @@ namespace ChainUtils
 							//
 							// Stack ops
 							//
-							case OpcodeType.OP_TOALTSTACK:
+							case OpcodeType.OpToaltstack:
 								{
-									if(_Stack.Count < 1)
+									if(_stack.Count < 1)
 										return SetError(ScriptError.InvalidAltStackOperation);
-									altstack.Push(top(_Stack, -1));
-									_Stack.Pop();
+									altstack.Push(Top(_stack, -1));
+									_stack.Pop();
 								}
 								break;
 
-							case OpcodeType.OP_FROMALTSTACK:
+							case OpcodeType.OpFromaltstack:
 								{
 									if(altstack.Count < 1)
 										return SetError(ScriptError.InvalidAltStackOperation);
-									_Stack.Push(top(altstack, -1));
+									_stack.Push(Top(altstack, -1));
 									altstack.Pop();
 								}
 								break;
 
-							case OpcodeType.OP_2DROP:
+							case OpcodeType.Op_2Drop:
 								{
 									// (x1 x2 -- )
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
-									_Stack.Pop();
-									_Stack.Pop();
+									_stack.Pop();
+									_stack.Pop();
 								}
 								break;
 
-							case OpcodeType.OP_2DUP:
+							case OpcodeType.Op_2Dup:
 								{
 									// (x1 x2 -- x1 x2 x1 x2)
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch1 = top(_Stack, -2);
-									var vch2 = top(_Stack, -1);
-									_Stack.Push(vch1);
-									_Stack.Push(vch2);
+									var vch1 = Top(_stack, -2);
+									var vch2 = Top(_stack, -1);
+									_stack.Push(vch1);
+									_stack.Push(vch2);
 								}
 								break;
 
-							case OpcodeType.OP_3DUP:
+							case OpcodeType.Op_3Dup:
 								{
 									// (x1 x2 x3 -- x1 x2 x3 x1 x2 x3)
-									if(_Stack.Count < 3)
+									if(_stack.Count < 3)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch1 = top(_Stack, -3);
-									var vch2 = top(_Stack, -2);
-									var vch3 = top(_Stack, -1);
-									_Stack.Push(vch1);
-									_Stack.Push(vch2);
-									_Stack.Push(vch3);
+									var vch1 = Top(_stack, -3);
+									var vch2 = Top(_stack, -2);
+									var vch3 = Top(_stack, -1);
+									_stack.Push(vch1);
+									_stack.Push(vch2);
+									_stack.Push(vch3);
 								}
 								break;
 
-							case OpcodeType.OP_2OVER:
+							case OpcodeType.Op_2Over:
 								{
 									// (x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2)
-									if(_Stack.Count < 4)
+									if(_stack.Count < 4)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch1 = top(_Stack, -4);
-									var vch2 = top(_Stack, -3);
-									_Stack.Push(vch1);
-									_Stack.Push(vch2);
+									var vch1 = Top(_stack, -4);
+									var vch2 = Top(_stack, -3);
+									_stack.Push(vch1);
+									_stack.Push(vch2);
 								}
 								break;
 
-							case OpcodeType.OP_2ROT:
+							case OpcodeType.Op_2Rot:
 								{
 									// (x1 x2 x3 x4 x5 x6 -- x3 x4 x5 x6 x1 x2)
-									if(_Stack.Count < 6)
+									if(_stack.Count < 6)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch1 = top(_Stack, -6);
-									var vch2 = top(_Stack, -5);
-									erase(ref _Stack, _Stack.Count - 6, _Stack.Count - 4);
-									_Stack.Push(vch1);
-									_Stack.Push(vch2);
+									var vch1 = Top(_stack, -6);
+									var vch2 = Top(_stack, -5);
+									erase(ref _stack, _stack.Count - 6, _stack.Count - 4);
+									_stack.Push(vch1);
+									_stack.Push(vch2);
 								}
 								break;
 
-							case OpcodeType.OP_2SWAP:
+							case OpcodeType.Op_2Swap:
 								{
 									// (x1 x2 x3 x4 -- x3 x4 x1 x2)
-									if(_Stack.Count < 4)
+									if(_stack.Count < 4)
 										return SetError(ScriptError.InvalidStackOperation);
-									swap(ref _Stack, -4, -2);
-									swap(ref _Stack, -3, -1);
+									Swap(ref _stack, -4, -2);
+									Swap(ref _stack, -3, -1);
 								}
 								break;
 
-							case OpcodeType.OP_IFDUP:
+							case OpcodeType.OpIfdup:
 								{
 									// (x - 0 | x x)
-									if(_Stack.Count < 1)
+									if(_stack.Count < 1)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch = top(_Stack, -1);
+									var vch = Top(_stack, -1);
 									if(CastToBool(vch))
-										_Stack.Push(vch);
+										_stack.Push(vch);
 								}
 								break;
 
-							case OpcodeType.OP_DEPTH:
+							case OpcodeType.OpDepth:
 								{
 									// -- stacksize
-									CScriptNum bn = new CScriptNum(_Stack.Count);
-									_Stack.Push(bn.getvch());
+									var bn = new CScriptNum(_stack.Count);
+									_stack.Push(bn.Getvch());
 								}
 								break;
 
-							case OpcodeType.OP_DROP:
+							case OpcodeType.OpDrop:
 								{
 									// (x -- )
-									if(_Stack.Count < 1)
+									if(_stack.Count < 1)
 										return SetError(ScriptError.InvalidStackOperation);
-									_Stack.Pop();
+									_stack.Pop();
 								}
 								break;
 
-							case OpcodeType.OP_DUP:
+							case OpcodeType.OpDup:
 								{
 									// (x -- x x)
-									if(_Stack.Count < 1)
+									if(_stack.Count < 1)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch = top(_Stack, -1);
-									_Stack.Push(vch);
+									var vch = Top(_stack, -1);
+									_stack.Push(vch);
 								}
 								break;
 
-							case OpcodeType.OP_NIP:
+							case OpcodeType.OpNip:
 								{
 									// (x1 x2 -- x2)
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
-									erase(ref _Stack, _Stack.Count - 2);
+									erase(ref _stack, _stack.Count - 2);
 								}
 								break;
 
-							case OpcodeType.OP_OVER:
+							case OpcodeType.OpOver:
 								{
 									// (x1 x2 -- x1 x2 x1)
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch = top(_Stack, -2);
-									_Stack.Push(vch);
+									var vch = Top(_stack, -2);
+									_stack.Push(vch);
 								}
 								break;
 
-							case OpcodeType.OP_PICK:
-							case OpcodeType.OP_ROLL:
+							case OpcodeType.OpPick:
+							case OpcodeType.OpRoll:
 								{
 									// (xn ... x2 x1 x0 n - xn ... x2 x1 x0 xn)
 									// (xn ... x2 x1 x0 n - ... x2 x1 x0 xn)
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
-									int n = new CScriptNum(top(_Stack, -1), fRequireMinimal).getint();
-									_Stack.Pop();
-									if(n < 0 || n >= _Stack.Count)
+									var n = new CScriptNum(Top(_stack, -1), fRequireMinimal).Getint();
+									_stack.Pop();
+									if(n < 0 || n >= _stack.Count)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch = top(_Stack, -n - 1);
-									if(opcode.Code == OpcodeType.OP_ROLL)
-										erase(ref _Stack, _Stack.Count - n - 1);
-									_Stack.Push(vch);
+									var vch = Top(_stack, -n - 1);
+									if(opcode.Code == OpcodeType.OpRoll)
+										erase(ref _stack, _stack.Count - n - 1);
+									_stack.Push(vch);
 								}
 								break;
 
-							case OpcodeType.OP_ROT:
+							case OpcodeType.OpRot:
 								{
 									// (x1 x2 x3 -- x2 x3 x1)
 									//  x2 x1 x3  after first swap
 									//  x2 x3 x1  after second swap
-									if(_Stack.Count < 3)
+									if(_stack.Count < 3)
 										return SetError(ScriptError.InvalidStackOperation);
-									swap(ref _Stack, -3, -2);
-									swap(ref _Stack, -2, -1);
+									Swap(ref _stack, -3, -2);
+									Swap(ref _stack, -2, -1);
 								}
 								break;
 
-							case OpcodeType.OP_SWAP:
+							case OpcodeType.OpSwap:
 								{
 									// (x1 x2 -- x2 x1)
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
-									swap(ref _Stack, -2, -1);
+									Swap(ref _stack, -2, -1);
 								}
 								break;
 
-							case OpcodeType.OP_TUCK:
+							case OpcodeType.OpTuck:
 								{
 									// (x1 x2 -- x2 x1 x2)
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch = top(_Stack, -1);
-									insert(ref _Stack, _Stack.Count - 2, vch);
+									var vch = Top(_stack, -1);
+									Insert(ref _stack, _stack.Count - 2, vch);
 								}
 								break;
 
 
-							case OpcodeType.OP_SIZE:
+							case OpcodeType.OpSize:
 								{
 									// (in -- in size)
-									if(_Stack.Count < 1)
+									if(_stack.Count < 1)
 										return SetError(ScriptError.InvalidStackOperation);
-									CScriptNum bn = new CScriptNum(top(_Stack, -1).Length);
-									_Stack.Push(bn.getvch());
+									var bn = new CScriptNum(Top(_stack, -1).Length);
+									_stack.Push(bn.Getvch());
 								}
 								break;
 
@@ -747,28 +743,28 @@ namespace ChainUtils
 							//
 							// Bitwise logic
 							//
-							case OpcodeType.OP_EQUAL:
-							case OpcodeType.OP_EQUALVERIFY:
+							case OpcodeType.OpEqual:
+							case OpcodeType.OpEqualverify:
 								//case OpcodeType.OP_NOTEQUAL: // use OpcodeType.OP_NUMNOTEQUAL
 								{
 									// (x1 x2 - bool)
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch1 = top(_Stack, -2);
-									var vch2 = top(_Stack, -1);
-									bool fEqual = Utils.ArrayEqual(vch1, vch2);
+									var vch1 = Top(_stack, -2);
+									var vch2 = Top(_stack, -1);
+									var fEqual = Utils.ArrayEqual(vch1, vch2);
 									// OpcodeType.OP_NOTEQUAL is disabled because it would be too easy to say
 									// something like n != 1 and have some wiseguy pass in 1 with extra
 									// zero bytes after it (numerically, 0x01 == 0x0001 == 0x000001)
 									//if (opcode == OpcodeType.OP_NOTEQUAL)
 									//    fEqual = !fEqual;
-									_Stack.Pop();
-									_Stack.Pop();
-									_Stack.Push(fEqual ? vchTrue : vchFalse);
-									if(opcode.Code == OpcodeType.OP_EQUALVERIFY)
+									_stack.Pop();
+									_stack.Pop();
+									_stack.Push(fEqual ? VchTrue : VchFalse);
+									if(opcode.Code == OpcodeType.OpEqualverify)
 									{
 										if(fEqual)
-											_Stack.Pop();
+											_stack.Pop();
 										else
 											return SetError(ScriptError.EqualVerify);
 									}
@@ -779,139 +775,139 @@ namespace ChainUtils
 							//
 							// Numeric
 							//
-							case OpcodeType.OP_1ADD:
-							case OpcodeType.OP_1SUB:
-							case OpcodeType.OP_NEGATE:
-							case OpcodeType.OP_ABS:
-							case OpcodeType.OP_NOT:
-							case OpcodeType.OP_0NOTEQUAL:
+							case OpcodeType.Op_1Add:
+							case OpcodeType.Op_1Sub:
+							case OpcodeType.OpNegate:
+							case OpcodeType.OpAbs:
+							case OpcodeType.OpNot:
+							case OpcodeType.Op_0Notequal:
 								{
 									// (in -- out)
-									if(_Stack.Count < 1)
+									if(_stack.Count < 1)
 										return SetError(ScriptError.InvalidStackOperation);
-									var bn = new CScriptNum(top(_Stack, -1), fRequireMinimal);
+									var bn = new CScriptNum(Top(_stack, -1), fRequireMinimal);
 									switch(opcode.Code)
 									{
-										case OpcodeType.OP_1ADD:
+										case OpcodeType.Op_1Add:
 											bn += 1;
 											break;
-										case OpcodeType.OP_1SUB:
+										case OpcodeType.Op_1Sub:
 											bn -= 1;
 											break;
-										case OpcodeType.OP_NEGATE:
+										case OpcodeType.OpNegate:
 											bn = -bn;
 											break;
-										case OpcodeType.OP_ABS:
+										case OpcodeType.OpAbs:
 											if(bn < 0)
 												bn = -bn;
 											break;
-										case OpcodeType.OP_NOT:
+										case OpcodeType.OpNot:
 											bn = bn == 0 ? 1 : 0;
 											break;
-										case OpcodeType.OP_0NOTEQUAL:
+										case OpcodeType.Op_0Notequal:
 											bn = bn != 0 ? 1 : 0;
 											break;
 										default:
 											throw new NotSupportedException("invalid opcode");
 									}
-									_Stack.Pop();
-									_Stack.Push(bn.getvch());
+									_stack.Pop();
+									_stack.Push(bn.Getvch());
 								}
 								break;
 
-							case OpcodeType.OP_ADD:
-							case OpcodeType.OP_SUB:
-							case OpcodeType.OP_BOOLAND:
-							case OpcodeType.OP_BOOLOR:
-							case OpcodeType.OP_NUMEQUAL:
-							case OpcodeType.OP_NUMEQUALVERIFY:
-							case OpcodeType.OP_NUMNOTEQUAL:
-							case OpcodeType.OP_LESSTHAN:
-							case OpcodeType.OP_GREATERTHAN:
-							case OpcodeType.OP_LESSTHANOREQUAL:
-							case OpcodeType.OP_GREATERTHANOREQUAL:
-							case OpcodeType.OP_MIN:
-							case OpcodeType.OP_MAX:
+							case OpcodeType.OpAdd:
+							case OpcodeType.OpSub:
+							case OpcodeType.OpBooland:
+							case OpcodeType.OpBoolor:
+							case OpcodeType.OpNumequal:
+							case OpcodeType.OpNumequalverify:
+							case OpcodeType.OpNumnotequal:
+							case OpcodeType.OpLessthan:
+							case OpcodeType.OpGreaterthan:
+							case OpcodeType.OpLessthanorequal:
+							case OpcodeType.OpGreaterthanorequal:
+							case OpcodeType.OpMin:
+							case OpcodeType.OpMax:
 								{
 									// (x1 x2 -- out)
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
-									var bn1 = new CScriptNum(top(_Stack, -2), fRequireMinimal);
-									var bn2 = new CScriptNum(top(_Stack, -1), fRequireMinimal);
-									CScriptNum bn = new CScriptNum(0);
+									var bn1 = new CScriptNum(Top(_stack, -2), fRequireMinimal);
+									var bn2 = new CScriptNum(Top(_stack, -1), fRequireMinimal);
+									var bn = new CScriptNum(0);
 									switch(opcode.Code)
 									{
-										case OpcodeType.OP_ADD:
+										case OpcodeType.OpAdd:
 											bn = bn1 + bn2;
 											break;
 
-										case OpcodeType.OP_SUB:
+										case OpcodeType.OpSub:
 											bn = bn1 - bn2;
 											break;
 
-										case OpcodeType.OP_BOOLAND:
+										case OpcodeType.OpBooland:
 											bn = bn1 != 0 && bn2 != 0 ? 1 : 0;
 											break;
-										case OpcodeType.OP_BOOLOR:
+										case OpcodeType.OpBoolor:
 											bn = bn1 != 0 || bn2 != 0 ? 1 : 0;
 											break;
-										case OpcodeType.OP_NUMEQUAL:
+										case OpcodeType.OpNumequal:
 											bn = (bn1 == bn2) ? 1 : 0;
 											break;
-										case OpcodeType.OP_NUMEQUALVERIFY:
+										case OpcodeType.OpNumequalverify:
 											bn = (bn1 == bn2) ? 1 : 0;
 											break;
-										case OpcodeType.OP_NUMNOTEQUAL:
+										case OpcodeType.OpNumnotequal:
 											bn = (bn1 != bn2) ? 1 : 0;
 											break;
-										case OpcodeType.OP_LESSTHAN:
+										case OpcodeType.OpLessthan:
 											bn = (bn1 < bn2) ? 1 : 0;
 											break;
-										case OpcodeType.OP_GREATERTHAN:
+										case OpcodeType.OpGreaterthan:
 											bn = (bn1 > bn2) ? 1 : 0;
 											break;
-										case OpcodeType.OP_LESSTHANOREQUAL:
+										case OpcodeType.OpLessthanorequal:
 											bn = (bn1 <= bn2) ? 1 : 0;
 											break;
-										case OpcodeType.OP_GREATERTHANOREQUAL:
+										case OpcodeType.OpGreaterthanorequal:
 											bn = (bn1 >= bn2) ? 1 : 0;
 											break;
-										case OpcodeType.OP_MIN:
+										case OpcodeType.OpMin:
 											bn = (bn1 < bn2 ? bn1 : bn2);
 											break;
-										case OpcodeType.OP_MAX:
+										case OpcodeType.OpMax:
 											bn = (bn1 > bn2 ? bn1 : bn2);
 											break;
 										default:
 											throw new NotSupportedException("invalid opcode");
 									}
-									_Stack.Pop();
-									_Stack.Pop();
-									_Stack.Push(bn.getvch());
+									_stack.Pop();
+									_stack.Pop();
+									_stack.Push(bn.Getvch());
 
-									if(opcode.Code == OpcodeType.OP_NUMEQUALVERIFY)
+									if(opcode.Code == OpcodeType.OpNumequalverify)
 									{
-										if(CastToBool(top(_Stack, -1)))
-											_Stack.Pop();
+										if(CastToBool(Top(_stack, -1)))
+											_stack.Pop();
 										else
 											return SetError(ScriptError.NumEqualVerify);
 									}
 								}
 								break;
 
-							case OpcodeType.OP_WITHIN:
+							case OpcodeType.OpWithin:
 								{
 									// (x min max -- out)
-									if(_Stack.Count < 3)
+									if(_stack.Count < 3)
 										return SetError(ScriptError.InvalidStackOperation);
-									var bn1 = new CScriptNum(top(_Stack, -3), fRequireMinimal);
-									var bn2 = new CScriptNum(top(_Stack, -2), fRequireMinimal);
-									var bn3 = new CScriptNum(top(_Stack, -1), fRequireMinimal);
-									bool fValue = (bn2 <= bn1 && bn1 < bn3);
-									_Stack.Pop();
-									_Stack.Pop();
-									_Stack.Pop();
-									_Stack.Push(fValue ? vchTrue : vchFalse);
+									var bn1 = new CScriptNum(Top(_stack, -3), fRequireMinimal);
+									var bn2 = new CScriptNum(Top(_stack, -2), fRequireMinimal);
+									var bn3 = new CScriptNum(Top(_stack, -1), fRequireMinimal);
+									var fValue = (bn2 <= bn1 && bn1 < bn3);
+									_stack.Pop();
+									_stack.Pop();
+									_stack.Pop();
+									_stack.Push(fValue ? VchTrue : VchFalse);
 								}
 								break;
 
@@ -919,48 +915,48 @@ namespace ChainUtils
 							//
 							// Crypto
 							//
-							case OpcodeType.OP_RIPEMD160:
-							case OpcodeType.OP_SHA1:
-							case OpcodeType.OP_SHA256:
-							case OpcodeType.OP_HASH160:
-							case OpcodeType.OP_HASH256:
+							case OpcodeType.OpRipemd160:
+							case OpcodeType.OpSha1:
+							case OpcodeType.OpSha256:
+							case OpcodeType.OpHash160:
+							case OpcodeType.OpHash256:
 								{
 									// (in -- hash)
-									if(_Stack.Count < 1)
+									if(_stack.Count < 1)
 										return SetError(ScriptError.InvalidStackOperation);
-									var vch = top(_Stack, -1);
+									var vch = Top(_stack, -1);
 									byte[] vchHash = null;//((opcode == OpcodeType.OP_RIPEMD160 || opcode == OpcodeType.OP_SHA1 || opcode == OpcodeType.OP_HASH160) ? 20 : 32);
-									if(opcode.Code == OpcodeType.OP_RIPEMD160)
+									if(opcode.Code == OpcodeType.OpRipemd160)
 										vchHash = Hashes.RIPEMD160(vch, vch.Length);
-									else if(opcode.Code == OpcodeType.OP_SHA1)
-										vchHash = Hashes.SHA1(vch, vch.Length);
-									else if(opcode.Code == OpcodeType.OP_SHA256)
+									else if(opcode.Code == OpcodeType.OpSha1)
+										vchHash = Hashes.Sha1(vch, vch.Length);
+									else if(opcode.Code == OpcodeType.OpSha256)
 										vchHash = Hashes.SHA256(vch, vch.Length);
-									else if(opcode.Code == OpcodeType.OP_HASH160)
+									else if(opcode.Code == OpcodeType.OpHash160)
 										vchHash = Hashes.Hash160(vch, vch.Length).ToBytes();
-									else if(opcode.Code == OpcodeType.OP_HASH256)
+									else if(opcode.Code == OpcodeType.OpHash256)
 										vchHash = Hashes.Hash256(vch, vch.Length).ToBytes();
-									_Stack.Pop();
-									_Stack.Push(vchHash);
+									_stack.Pop();
+									_stack.Push(vchHash);
 								}
 								break;
 
-							case OpcodeType.OP_CODESEPARATOR:
+							case OpcodeType.OpCodeseparator:
 								{
 									// Hash starts after the code separator
 									pbegincodehash = (int)script.Inner.Position;
 								}
 								break;
 
-							case OpcodeType.OP_CHECKSIG:
-							case OpcodeType.OP_CHECKSIGVERIFY:
+							case OpcodeType.OpChecksig:
+							case OpcodeType.OpChecksigverify:
 								{
 									// (sig pubkey -- bool)
-									if(_Stack.Count < 2)
+									if(_stack.Count < 2)
 										return SetError(ScriptError.InvalidStackOperation);
 
-									var vchSig = top(_Stack, -2);
-									var vchPubKey = top(_Stack, -1);
+									var vchSig = Top(_stack, -2);
+									var vchPubKey = Top(_stack, -1);
 
 									////// debug print
 									//PrintHex(vchSig.begin(), vchSig.end(), "sig: %s\n");
@@ -977,63 +973,63 @@ namespace ChainUtils
 										return false;
 									}
 
-									bool fSuccess = CheckSig(vchSig, vchPubKey, scriptCode, txTo, nIn);
+									var fSuccess = CheckSig(vchSig, vchPubKey, scriptCode, txTo, nIn);
 
-									_Stack.Pop();
-									_Stack.Pop();
-									_Stack.Push(fSuccess ? vchTrue : vchFalse);
-									if(opcode.Code == OpcodeType.OP_CHECKSIGVERIFY)
+									_stack.Pop();
+									_stack.Pop();
+									_stack.Push(fSuccess ? VchTrue : VchFalse);
+									if(opcode.Code == OpcodeType.OpChecksigverify)
 									{
 										if(fSuccess)
-											_Stack.Pop();
+											_stack.Pop();
 										else
 											return SetError(ScriptError.CheckSigVerify);
 									}
 								}
 								break;
 
-							case OpcodeType.OP_CHECKMULTISIG:
-							case OpcodeType.OP_CHECKMULTISIGVERIFY:
+							case OpcodeType.OpCheckmultisig:
+							case OpcodeType.OpCheckmultisigverify:
 								{
 									// ([sig ...] num_of_signatures [pubkey ...] num_of_pubkeys -- bool)
 
-									int i = 1;
-									if((int)_Stack.Count < i)
+									var i = 1;
+									if((int)_stack.Count < i)
 										return SetError(ScriptError.InvalidStackOperation);
 
-									int nKeysCount = new CScriptNum(top(_Stack, -i), fRequireMinimal).getint();
+									var nKeysCount = new CScriptNum(Top(_stack, -i), fRequireMinimal).Getint();
 									if(nKeysCount < 0 || nKeysCount > 20)
 										return SetError(ScriptError.PubkeyCount);
 									nOpCount += nKeysCount;
 									if(nOpCount > 201)
 										return SetError(ScriptError.OpCount);
-									int ikey = ++i;
+									var ikey = ++i;
 									i += nKeysCount;
-									if((int)_Stack.Count < i)
+									if((int)_stack.Count < i)
 										return SetError(ScriptError.InvalidStackOperation);
 
-									int nSigsCount = new CScriptNum(top(_Stack, -i), fRequireMinimal).getint();
+									var nSigsCount = new CScriptNum(Top(_stack, -i), fRequireMinimal).Getint();
 									if(nSigsCount < 0 || nSigsCount > nKeysCount)
 										return SetError(ScriptError.SigCount);
-									int isig = ++i;
+									var isig = ++i;
 									i += nSigsCount;
-									if((int)_Stack.Count < i)
+									if((int)_stack.Count < i)
 										return SetError(ScriptError.InvalidStackOperation);
 
 									// Subset of script starting at the most recent codeseparator
-									Script scriptCode = new Script(s._Script.Skip(pbegincodehash).ToArray());
+									var scriptCode = new Script(s._Script.Skip(pbegincodehash).ToArray());
 									// Drop the signatures, since there's no way for a signature to sign itself
-									for(int k = 0 ; k < nSigsCount ; k++)
+									for(var k = 0 ; k < nSigsCount ; k++)
 									{
-										var vchSig = top(_Stack, -isig - k);
+										var vchSig = Top(_stack, -isig - k);
 										scriptCode.FindAndDelete(vchSig);
 									}
 
-									bool fSuccess = true;
+									var fSuccess = true;
 									while(fSuccess && nSigsCount > 0)
 									{
-										var vchSig = top(_Stack, -isig);
-										var vchPubKey = top(_Stack, -ikey);
+										var vchSig = Top(_stack, -isig);
+										var vchPubKey = Top(_stack, -ikey);
 
 
 										// Note how this makes the exact order of pubkey/signature evaluation
@@ -1045,7 +1041,7 @@ namespace ChainUtils
 											return false;
 										}
 
-										bool fOk = CheckSig(vchSig, vchPubKey, scriptCode, txTo, nIn);
+										var fOk = CheckSig(vchSig, vchPubKey, scriptCode, txTo, nIn);
 
 										if(fOk)
 										{
@@ -1062,7 +1058,7 @@ namespace ChainUtils
 									}
 
 									while(i-- > 1)
-										_Stack.Pop();
+										_stack.Pop();
 
 									// A bug causes CHECKMULTISIG to consume one extra argument
 									// whose contents were not checked in any way.
@@ -1070,18 +1066,18 @@ namespace ChainUtils
 									// Unfortunately this is a potential source of mutability,
 									// so optionally verify it is exactly equal to zero prior
 									// to removing it from the stack.
-									if(_Stack.Count < 1)
+									if(_stack.Count < 1)
 										return SetError(ScriptError.InvalidStackOperation);
-									if(((ScriptVerify & ScriptVerify.NullDummy) != 0) && top(_Stack, -1).Length != 0)
+									if(((ScriptVerify & ScriptVerify.NullDummy) != 0) && Top(_stack, -1).Length != 0)
 										return SetError(ScriptError.SigNullDummy);
-									_Stack.Pop();
+									_stack.Pop();
 
-									_Stack.Push(fSuccess ? vchTrue : vchFalse);
+									_stack.Push(fSuccess ? VchTrue : VchFalse);
 
-									if(opcode.Code == OpcodeType.OP_CHECKMULTISIGVERIFY)
+									if(opcode.Code == OpcodeType.OpCheckmultisigverify)
 									{
 										if(fSuccess)
-											_Stack.Pop();
+											_stack.Pop();
 										else
 											return SetError(ScriptError.CheckMultiSigVerify);
 									}
@@ -1093,7 +1089,7 @@ namespace ChainUtils
 						}
 
 					// Size limits
-					if(_Stack.Count + altstack.Count > 1000)
+					if(_stack.Count + altstack.Count > 1000)
 						return SetError(ScriptError.StackSize);
 
 				}
@@ -1108,12 +1104,12 @@ namespace ChainUtils
 			if(vfExec.Count != 0)
 				return SetError(ScriptError.UnbalancedConditional);
 
-			return SetSuccess(ScriptError.OK);
+			return SetSuccess(ScriptError.Ok);
 		}
 
 		private bool SetSuccess(ScriptError scriptError)
 		{
-			Error = ScriptError.OK;
+			Error = ScriptError.Ok;
 			return true;
 		}
 
@@ -1156,11 +1152,11 @@ namespace ChainUtils
 			{
 				return true;
 			}
-			if((ScriptVerify & (ScriptVerify.DerSig | ScriptVerify.LowS | ScriptVerify.StrictEnc)) != 0 && !IsDERSignature(vchSig))
+			if((ScriptVerify & (ScriptVerify.DerSig | ScriptVerify.LowS | ScriptVerify.StrictEnc)) != 0 && !IsDerSignature(vchSig))
 			{
 				return SetError(ScriptError.SigDer);
 			}
-			else if((ScriptVerify & ScriptVerify.LowS) != 0 && !IsLowDERSignature(vchSig))
+			else if((ScriptVerify & ScriptVerify.LowS) != 0 && !IsLowDerSignature(vchSig))
 			{
 				// serror is set
 				return false;
@@ -1189,26 +1185,26 @@ namespace ChainUtils
 			}
 
 			var temp = ~(SigHash.AnyoneCanPay);
-			byte nHashType = (byte)(vchSig[vchSig.Length - 1] & (byte)temp);
+			var nHashType = (byte)(vchSig[vchSig.Length - 1] & (byte)temp);
 			if(nHashType < (byte)SigHash.All || nHashType > (byte)SigHash.Single)
 				return false;
 
 			return true;
 		}
 
-		private bool IsLowDERSignature(byte[] vchSig)
+		private bool IsLowDerSignature(byte[] vchSig)
 		{
-			if(!IsDERSignature(vchSig))
+			if(!IsDerSignature(vchSig))
 			{
 				return SetError(ScriptError.SigDer);
 			}
 			int nLenR = vchSig[3];
 			int nLenS = vchSig[5 + nLenR];
-			var S = 6 + nLenR;
+			var s = 6 + nLenR;
 			// If the S value is above the order of the curve divided by two, its
 			// complement modulo the order could have been used instead, which is
 			// one byte shorter when encoded correctly.
-			if(!CheckSignatureElement(vchSig, S, nLenS, true))
+			if(!CheckSignatureElement(vchSig, s, nLenS, true))
 				return SetError(ScriptError.SigHighS);
 
 			return true;
@@ -1226,14 +1222,14 @@ namespace ChainUtils
 			return false;
 		}
 
-		static byte[] vchMaxModOrder = new byte[]{
+		static byte[] _vchMaxModOrder = new byte[]{
 0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
  0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFE,
  0xBA,0xAE,0xDC,0xE6,0xAF,0x48,0xA0,0x3B,
 0xBF,0xD2,0x5E,0x8C,0xD0,0x36,0x41,0x40
 };
 
-		static byte[] vchMaxModHalfOrder = new byte[]{
+		static byte[] _vchMaxModHalfOrder = new byte[]{
  0x7F,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
  0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
  0x5D,0x57,0x6E,0x73,0x57,0xA4,0x50,0x1D,
@@ -1244,28 +1240,28 @@ namespace ChainUtils
 		{
 			return vchSig != null
 						&&
-						 CompareBigEndian(vchSig, i, len, vchZero, 0) > 0 &&
-						 CompareBigEndian(vchSig, i, len, half ? vchMaxModHalfOrder : vchMaxModOrder, 32) <= 0;
+						 CompareBigEndian(vchSig, i, len, VchZero, 0) > 0 &&
+						 CompareBigEndian(vchSig, i, len, half ? _vchMaxModHalfOrder : _vchMaxModOrder, 32) <= 0;
 		}
 
-		private int CompareBigEndian(byte[] c1, int ic1, int c1len, byte[] c2, int c2len)
+		private int CompareBigEndian(byte[] c1, int ic1, int c1Len, byte[] c2, int c2Len)
 		{
-			int ic2 = 0;
-			while(c1len > c2len)
+			var ic2 = 0;
+			while(c1Len > c2Len)
 			{
 				if(c1[ic1] != 0)
 					return 1;
 				ic1++;
-				c1len--;
+				c1Len--;
 			}
-			while(c2len > c1len)
+			while(c2Len > c1Len)
 			{
 				if(c2[ic2] != 0)
 					return -1;
 				ic2++;
-				c2len--;
+				c2Len--;
 			}
-			while(c1len > 0)
+			while(c1Len > 0)
 			{
 				if(c1[ic1] > c2[ic2])
 					return 1;
@@ -1273,14 +1269,14 @@ namespace ChainUtils
 					return -1;
 				ic1++;
 				ic2++;
-				c1len--;
+				c1Len--;
 			}
 			return 0;
 		}
 
 
 
-		private bool IsDERSignature(byte[] vchSig)
+		private bool IsDerSignature(byte[] vchSig)
 		{
 			if(vchSig.Length < 9)
 			{
@@ -1315,8 +1311,8 @@ namespace ChainUtils
 				return false;
 			}
 
-			var R = 4;
-			if(vchSig[R + -2] != 0x02)
+			var r = 4;
+			if(vchSig[r + -2] != 0x02)
 			{
 				//  Non-canonical signature: R value type mismatch
 				return false;
@@ -1326,19 +1322,19 @@ namespace ChainUtils
 				//  Non-canonical signature: R length is zero
 				return false;
 			}
-			if((vchSig[R] & 0x80) != 0)
+			if((vchSig[r] & 0x80) != 0)
 			{
 				//  Non-canonical signature: R value negative
 				return false;
 			}
-			if(nLenR > 1 && (vchSig[R] == 0x00) && !((vchSig[R + 1] & 0x80) != 0))
+			if(nLenR > 1 && (vchSig[r] == 0x00) && !((vchSig[r + 1] & 0x80) != 0))
 			{
 				//  Non-canonical signature: R value excessively padded
 				return false;
 			}
 
-			var S = 6 + nLenR;
-			if(vchSig[S + -2] != 0x02)
+			var s = 6 + nLenR;
+			if(vchSig[s + -2] != 0x02)
 			{
 				//  Non-canonical signature: S value type mismatch
 				return false;
@@ -1348,12 +1344,12 @@ namespace ChainUtils
 				//  Non-canonical signature: S length is zero
 				return false;
 			}
-			if((vchSig[S] & 0x80) != 0)
+			if((vchSig[s] & 0x80) != 0)
 			{
 				//  Non-canonical signature: S value negative
 				return false;
 			}
-			if(nLenS > 1 && (vchSig[S] == 0x00) && !((vchSig[S + 1] & 0x80) != 0))
+			if(nLenS > 1 && (vchSig[s] == 0x00) && !((vchSig[s + 1] & 0x80) != 0))
 			{
 				//  Non-canonical signature: S value excessively padded
 				return false;
@@ -1361,12 +1357,12 @@ namespace ChainUtils
 			return true;
 		}
 
-		private void insert(ref Stack<byte[]> stack, int i, byte[] vch)
+		private void Insert(ref Stack<byte[]> stack, int i, byte[] vch)
 		{
 			var newStack = new Stack<byte[]>();
 			var count = stack.Count;
 			stack = new Stack<byte[]>(stack); //Reverse the stack
-			for(int y = 0 ; y < count + 1 ; y++)
+			for(var y = 0 ; y < count + 1 ; y++)
 			{
 				if(y == i)
 					newStack.Push(vch);
@@ -1381,17 +1377,17 @@ namespace ChainUtils
 			if(data.Length == 0)
 			{
 				// Could have used OP_0.
-				return opcode == OpcodeType.OP_0;
+				return opcode == OpcodeType.Op0;
 			}
 			else if(data.Length == 1 && data[0] >= 1 && data[0] <= 16)
 			{
 				// Could have used OP_1 .. OP_16.
-				return (int)opcode == ((int)OpcodeType.OP_1) + (data[0] - 1);
+				return (int)opcode == ((int)OpcodeType.Op1) + (data[0] - 1);
 			}
 			else if(data.Length == 1 && data[0] == 0x81)
 			{
 				// Could have used OP_1NEGATE.
-				return opcode == OpcodeType.OP_1NEGATE;
+				return opcode == OpcodeType.Op_1Negate;
 			}
 			else if(data.Length <= 75)
 			{
@@ -1401,12 +1397,12 @@ namespace ChainUtils
 			else if(data.Length <= 255)
 			{
 				// Could have used OP_PUSHDATA.
-				return opcode == OpcodeType.OP_PUSHDATA1;
+				return opcode == OpcodeType.OpPushdata1;
 			}
 			else if(data.Length <= 65535)
 			{
 				// Could have used OP_PUSHDATA2.
-				return opcode == OpcodeType.OP_PUSHDATA2;
+				return opcode == OpcodeType.OpPushdata2;
 			}
 			return true;
 		}
@@ -1431,7 +1427,7 @@ namespace ChainUtils
 			return false;
 		}
 
-		static void swap<T>(ref Stack<T> stack, int i, int i2)
+		static void Swap<T>(ref Stack<T> stack, int i, int i2)
 		{
 			var values = stack.ToArray();
 			Array.Reverse(values);
@@ -1446,7 +1442,7 @@ namespace ChainUtils
 			var values = stack.ToArray();
 			Array.Reverse(values);
 			stack = new Stack<byte[]>();
-			for(int i = 0 ; i < values.Length ; i++)
+			for(var i = 0 ; i < values.Length ; i++)
 			{
 				if(from <= i && i < to)
 					continue;
@@ -1457,7 +1453,7 @@ namespace ChainUtils
 		{
 			erase(ref stack, i, i + 1);
 		}
-		static T top<T>(Stack<T> stack, int i)
+		static T Top<T>(Stack<T> stack, int i)
 		{
 			var array = stack.ToArray();
 			Array.Reverse(array);
@@ -1507,7 +1503,7 @@ namespace ChainUtils
 			if(!IsAllowedSignature(scriptSig.SigHash))
 				return false;
 
-			uint256 sighash = scriptCode.SignatureHash(txTo, nIn, scriptSig.SigHash);
+			var sighash = scriptCode.SignatureHash(txTo, nIn, scriptSig.SigHash);
 
 			if(!pubkey.Verify(sighash, scriptSig.Signature))
 			{
@@ -1517,11 +1513,11 @@ namespace ChainUtils
 				//Replicate OpenSSL bug on 23b397edccd3740a74adb603c9756370fafcde9bcc4483eb271ecad09a94dd63 (http://r6.ca/blog/20111119T211504Z.html)
 				var nLenR = vchSig[3];
 				var nLenS = vchSig[5 + nLenR];
-				var R = 4;
-				var S = 6 + nLenR;
-				var newS = new ChainUtils.BouncyCastle.Math.BigInteger(1, vchSig, S, nLenS);
-				var newR = new ChainUtils.BouncyCastle.Math.BigInteger(1, vchSig, R, nLenR);
-				var sig2 = new ECDSASignature(newR, newS);
+				var r = 4;
+				var s = 6 + nLenR;
+				var newS = new BouncyCastle.Math.BigInteger(1, vchSig, s, nLenS);
+				var newR = new BouncyCastle.Math.BigInteger(1, vchSig, r, nLenR);
+				var sig2 = new EcdsaSignature(newR, newS);
 				if(sig2.R != scriptSig.Signature.R || sig2.S != scriptSig.Signature.S)
 				{
 					if(!pubkey.Verify(sighash, sig2))
@@ -1535,7 +1531,7 @@ namespace ChainUtils
 
 		public bool IsAllowedSignature(SigHash sigHash)
 		{
-			if(SigHash == ChainUtils.SigHash.Undefined)
+			if(SigHash == SigHash.Undefined)
 				return true;
 			else
 				return SigHash == sigHash;
@@ -1544,7 +1540,7 @@ namespace ChainUtils
 
 		private void Load(ScriptEvaluationContext other)
 		{
-			_Stack = Clone(other._Stack);
+			_stack = Clone(other._stack);
 			ScriptVerify = other.ScriptVerify;
 			SigHash = other.SigHash;
 		}
@@ -1553,7 +1549,7 @@ namespace ChainUtils
 		{
 			return new ScriptEvaluationContext()
 			{
-				_Stack = Clone(_Stack),
+				_stack = Clone(_stack),
 				ScriptVerify = ScriptVerify,
 				SigHash = SigHash
 			};

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 {
@@ -16,7 +15,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static void Add(uint[] x, uint[] y, uint[] z)
         {
-            uint c = Nat192.Add(x, y, z);
+            var c = Nat192.Add(x, y, z);
             if (c != 0 || (z[5] == P5 && Nat192.Gte(z, P)))
             {
                 AddPInvTo(z);
@@ -25,7 +24,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static void AddExt(uint[] xx, uint[] yy, uint[] zz)
         {
-            uint c = Nat.Add(12, xx, yy, zz);
+            var c = Nat.Add(12, xx, yy, zz);
             if (c != 0 || (zz[11] == PExt11 && Nat.Gte(12, zz, PExt)))
             {
                 if (Nat.AddTo(PExtInv.Length, PExtInv, zz) != 0)
@@ -37,7 +36,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static void AddOne(uint[] x, uint[] z)
         {
-            uint c = Nat.Inc(6, x, z);
+            var c = Nat.Inc(6, x, z);
             if (c != 0 || (z[5] == P5 && Nat192.Gte(z, P)))
             {
                 AddPInvTo(z);
@@ -46,7 +45,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static uint[] FromBigInteger(BigInteger x)
         {
-            uint[] z = Nat192.FromBigInteger(x);
+            var z = Nat192.FromBigInteger(x);
             if (z[5] == P5 && Nat192.Gte(z, P))
             {
                 Nat192.SubFrom(P, z);
@@ -62,21 +61,21 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             }
             else
             {
-                uint c = Nat192.Add(x, P, z);
+                var c = Nat192.Add(x, P, z);
                 Nat.ShiftDownBit(6, z, c);
             }
         }
 
         public static void Multiply(uint[] x, uint[] y, uint[] z)
         {
-            uint[] tt = Nat192.CreateExt();
+            var tt = Nat192.CreateExt();
             Nat192.Mul(x, y, tt);
             Reduce(tt, z);
         }
 
         public static void MultiplyAddToExt(uint[] x, uint[] y, uint[] zz)
         {
-            uint c = Nat192.MulAddTo(x, y, zz);
+            var c = Nat192.MulAddTo(x, y, zz);
             if (c != 0 || (zz[11] == PExt11 && Nat.Gte(12, zz, PExt)))
             {
                 if (Nat.AddTo(PExtInv.Length, PExtInv, zz) != 0)
@@ -103,12 +102,12 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             ulong xx06 = xx[6], xx07 = xx[7], xx08 = xx[8];
             ulong xx09 = xx[9], xx10 = xx[10], xx11 = xx[11];
 
-            ulong t0 = xx06 + xx10;
-            ulong t1 = xx07 + xx11;
+            var t0 = xx06 + xx10;
+            var t1 = xx07 + xx11;
 
             ulong cc = 0;
             cc += (ulong)xx[0] + t0;
-            uint z0 = (uint)cc;
+            var z0 = (uint)cc;
             cc >>= 32;
             cc += (ulong)xx[1] + t1;
             z[1] = (uint)cc;
@@ -188,7 +187,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static void Square(uint[] x, uint[] z)
         {
-            uint[] tt = Nat192.CreateExt();
+            var tt = Nat192.CreateExt();
             Nat192.Square(x, tt);
             Reduce(tt, z);
         }
@@ -197,7 +196,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         {
             Debug.Assert(n > 0);
 
-            uint[] tt = Nat192.CreateExt();
+            var tt = Nat192.CreateExt();
             Nat192.Square(x, tt);
             Reduce(tt, z);
 
@@ -210,7 +209,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static void Subtract(uint[] x, uint[] y, uint[] z)
         {
-            int c = Nat192.Sub(x, y, z);
+            var c = Nat192.Sub(x, y, z);
             if (c != 0)
             {
                 SubPInvFrom(z);
@@ -219,7 +218,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static void SubtractExt(uint[] xx, uint[] yy, uint[] zz)
         {
-            int c = Nat.Sub(12, xx, yy, zz);
+            var c = Nat.Sub(12, xx, yy, zz);
             if (c != 0)
             {
                 if (Nat.SubFrom(PExtInv.Length, PExtInv, zz) != 0)
@@ -231,7 +230,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static void Twice(uint[] x, uint[] z)
         {
-            uint c = Nat.ShiftUpBit(6, x, 0, z);
+            var c = Nat.ShiftUpBit(6, x, 0, z);
             if (c != 0 || (z[5] == P5 && Nat192.Gte(z, P)))
             {
                 AddPInvTo(z);
@@ -240,7 +239,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         private static void AddPInvTo(uint[] z)
         {
-            long c = (long)z[0] + 1;
+            var c = (long)z[0] + 1;
             z[0] = (uint)c;
             c >>= 32;
             if (c != 0)
@@ -260,7 +259,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         private static void SubPInvFrom(uint[] z)
         {
-            long c = (long)z[0] - 1;
+            var c = (long)z[0] - 1;
             z[0] = (uint)c;
             c >>= 32;
             if (c != 0)

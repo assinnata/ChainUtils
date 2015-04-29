@@ -8,7 +8,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Collections
     {
         public static void AddRange(IList to, IEnumerable range)
         {
-            foreach (object o in range)
+            foreach (var o in range)
             {
                 to.Add(o);
             }
@@ -16,7 +16,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Collections
 
         public static bool CheckElementsAreOfType(IEnumerable e, Type t)
         {
-            foreach (object o in e)
+            foreach (var o in e)
             {
                 if (!t.IsInstanceOfType(o))
                     return false;
@@ -41,9 +41,9 @@ namespace ChainUtils.BouncyCastle.Utilities.Collections
 
         public static string ToString(IEnumerable c)
         {
-            StringBuilder sb = new StringBuilder("[");
+            var sb = new StringBuilder("[");
 
-            IEnumerator e = c.GetEnumerator();
+            var e = c.GetEnumerator();
 
             if (e.MoveNext())
             {

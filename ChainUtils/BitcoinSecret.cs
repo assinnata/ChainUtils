@@ -1,9 +1,6 @@
-﻿using ChainUtils.DataEncoders;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils
 {
@@ -38,7 +35,7 @@ namespace ChainUtils
 		}
 
 		[Obsolete("Use PubKeyHash instead")]
-		public virtual KeyId ID
+		public virtual KeyId Id
 		{
 			get
 			{
@@ -71,14 +68,14 @@ namespace ChainUtils
 		}
 
 		#region ISecret Members
-		Key _Key;
+		Key _key;
 		public Key PrivateKey
 		{
 			get
 			{
-				if(_Key == null)
-					_Key = new Key(vchData, 32, IsCompressed);
-				return _Key;
+				if(_key == null)
+					_key = new Key(VchData, 32, IsCompressed);
+				return _key;
 			}
 		}
 		#endregion
@@ -87,12 +84,12 @@ namespace ChainUtils
 		{
 			get
 			{
-				if(vchData.Length != 33 && vchData.Length != 32)
+				if(VchData.Length != 33 && VchData.Length != 32)
 					return false;
 
-				if(vchData.Length == 33 && IsCompressed)
+				if(VchData.Length == 33 && IsCompressed)
 					return true;
-				if(vchData.Length == 32 && !IsCompressed)
+				if(VchData.Length == 32 && !IsCompressed)
 					return true;
 				return false;
 			}
@@ -111,11 +108,11 @@ namespace ChainUtils
 
 			if(compressed.Value && IsCompressed)
 			{
-				return new BitcoinSecret(wifData, Network);
+				return new BitcoinSecret(WifData, Network);
 			}
 			else
 			{
-				byte[] result = Encoders.Base58Check.DecodeData(wifData);
+				var result = Encoders.Base58Check.DecodeData(WifData);
 				var resultList = result.ToList();
 
 				if(compressed.Value)
@@ -134,7 +131,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return vchData.Length > 32 && vchData[32] == 1;
+				return VchData.Length > 32 && VchData[32] == 1;
 			}
 		}
 
@@ -142,7 +139,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return Base58Type.SECRET_KEY;
+				return Base58Type.SecretKey;
 			}
 		}
 

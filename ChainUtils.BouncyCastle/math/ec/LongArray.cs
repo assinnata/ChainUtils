@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math.EC
@@ -331,9 +330,9 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 return;
             }
 
-            byte[] barr = bigInt.ToByteArray();
-            int barrLen = barr.Length;
-            int barrStart = 0;
+            var barr = bigInt.ToByteArray();
+            var barrLen = barr.Length;
+            var barrStart = 0;
             if (barr[0] == 0)
             {
                 // First byte is 0 to enforce highest (=sign) bit is zero.
@@ -341,13 +340,13 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 barrLen--;
                 barrStart = 1;
             }
-            int intLen = (barrLen + 7) / 8;
+            var intLen = (barrLen + 7) / 8;
             m_ints = new long[intLen];
 
-            int iarrJ = intLen - 1;
-            int rem = barrLen % 8 + barrStart;
+            var iarrJ = intLen - 1;
+            var rem = barrLen % 8 + barrStart;
             long temp = 0;
-            int barrI = barrStart;
+            var barrI = barrStart;
             if (barrStart < rem)
             {
                 for (; barrI < rem; barrI++)
@@ -362,7 +361,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             for (; iarrJ >= 0; iarrJ--)
             {
                 temp = 0;
-                for (int i = 0; i < 8; i++)
+                for (var i = 0; i < 8; i++)
                 {
                     temp <<= 8;
                     uint barrBarrI = barr[barrI++];
@@ -374,12 +373,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public bool IsOne()
         {
-            long[] a = m_ints;
+            var a = m_ints;
             if (a[0] != 1L)
             {
                 return false;
             }
-            for (int i = 1; i < a.Length; ++i)
+            for (var i = 1; i < a.Length; ++i)
             {
                 if (a[i] != 0L)
                 {
@@ -391,8 +390,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public bool IsZero()
         {
-            long[] a = m_ints;
-            for (int i = 0; i < a.Length; ++i)
+            var a = m_ints;
+            for (var i = 0; i < a.Length; ++i)
             {
                 if (a[i] != 0L)
                 {
@@ -409,7 +408,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public int GetUsedLengthFrom(int from)
         {
-            long[] a = m_ints;
+            var a = m_ints;
             from = System.Math.Min(from, a.Length);
 
             if (from < 1)
@@ -440,7 +439,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public int Degree()
         {
-            int i = m_ints.Length;
+            var i = m_ints.Length;
             long w;
             do
             {
@@ -457,7 +456,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private int DegreeFrom(int limit)
         {
-            int i = (int)(((uint)limit + 62) >> 6);
+            var i = (int)(((uint)limit + 62) >> 6);
             long w;
             do
             {
@@ -517,7 +516,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
             else
             {
-                int v = (int)((uint)t >> 8);
+                var v = (int)((uint)t >> 8);
                 k = (v == 0) ? 16 + BitLengths[t] : 24 + BitLengths[v];
             }
 
@@ -526,26 +525,26 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private long[] ResizedInts(int newLen)
         {
-            long[] newInts = new long[newLen];
+            var newInts = new long[newLen];
             Array.Copy(m_ints, 0, newInts, 0, System.Math.Min(m_ints.Length, newLen));
             return newInts;
         }
 
         public BigInteger ToBigInteger()
         {
-            int usedLen = GetUsedLength();
+            var usedLen = GetUsedLength();
             if (usedLen == 0)
             {
                 return BigInteger.Zero;
             }
 
-            long highestInt = m_ints[usedLen - 1];
-            byte[] temp = new byte[8];
-            int barrI = 0;
-            bool trailingZeroBytesDone = false;
-            for (int j = 7; j >= 0; j--)
+            var highestInt = m_ints[usedLen - 1];
+            var temp = new byte[8];
+            var barrI = 0;
+            var trailingZeroBytesDone = false;
+            for (var j = 7; j >= 0; j--)
             {
-                byte thisByte = (byte)((ulong)highestInt >> (8 * j));
+                var thisByte = (byte)((ulong)highestInt >> (8 * j));
                 if (trailingZeroBytesDone || (thisByte != 0))
                 {
                     trailingZeroBytesDone = true;
@@ -553,18 +552,18 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 }
             }
 
-            int barrLen = 8 * (usedLen - 1) + barrI;
-            byte[] barr = new byte[barrLen];
-            for (int j = 0; j < barrI; j++)
+            var barrLen = 8 * (usedLen - 1) + barrI;
+            var barr = new byte[barrLen];
+            for (var j = 0; j < barrI; j++)
             {
                 barr[j] = temp[j];
             }
             // Highest value int is done now
 
-            for (int iarrJ = usedLen - 2; iarrJ >= 0; iarrJ--)
+            for (var iarrJ = usedLen - 2; iarrJ >= 0; iarrJ--)
             {
-                long mi = m_ints[iarrJ];
-                for (int j = 7; j >= 0; j--)
+                var mi = m_ints[iarrJ];
+                for (var j = 7; j >= 0; j--)
                 {
                     barr[barrI++] = (byte)((ulong)mi >> (8 * j));
                 }
@@ -586,11 +585,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static long ShiftUp(long[] x, int xOff, int count, int shift)
         {
-            int shiftInv = 64 - shift;
+            var shiftInv = 64 - shift;
             long prev = 0;
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
-                long next = x[xOff + i];
+                var next = x[xOff + i];
                 x[xOff + i] = (next << shift) | prev;
                 prev = (long)((ulong)next >> shiftInv);
             }
@@ -599,11 +598,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static long ShiftUp(long[] x, int xOff, long[] z, int zOff, int count, int shift)
         {
-            int shiftInv = 64 - shift;
+            var shiftInv = 64 - shift;
             long prev = 0;
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
-                long next = x[xOff + i];
+                var next = x[xOff + i];
                 z[zOff + i] = (next << shift) | prev;
                 prev = (long)((ulong)next >> shiftInv);
             }
@@ -617,8 +616,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 return new LongArray(new long[]{ 1L });
             }
 
-            int resultLen = System.Math.Max(1, GetUsedLength());
-            long[] ints = ResizedInts(resultLen);
+            var resultLen = System.Math.Max(1, GetUsedLength());
+            var ints = ResizedInts(resultLen);
             ints[0] ^= 1L;
             return new LongArray(ints);
         }
@@ -652,10 +651,10 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private void AddShiftedByBitsSafe(LongArray other, int otherDegree, int bits)
         {
-            int otherLen = (int)((uint)(otherDegree + 63) >> 6);
+            var otherLen = (int)((uint)(otherDegree + 63) >> 6);
 
-            int words = (int)((uint)bits >> 6);
-            int shift = bits & 0x3F;
+            var words = (int)((uint)bits >> 6);
+            var shift = bits & 0x3F;
 
             if (shift == 0)
             {
@@ -663,7 +662,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 return;
             }
 
-            long carry = AddShiftedUp(m_ints, words, other.m_ints, 0, otherLen, shift);
+            var carry = AddShiftedUp(m_ints, words, other.m_ints, 0, otherLen, shift);
             if (carry != 0L)
             {
                 m_ints[otherLen + words] ^= carry;
@@ -672,11 +671,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static long AddShiftedUp(long[] x, int xOff, long[] y, int yOff, int count, int shift)
         {
-            int shiftInv = 64 - shift;
+            var shiftInv = 64 - shift;
             long prev = 0;
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
-                long next = y[yOff + i];
+                var next = y[yOff + i];
                 x[xOff + i] ^= (next << shift) | prev;
                 prev = (long)((ulong)next >> shiftInv);
             }
@@ -685,12 +684,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static long AddShiftedDown(long[] x, int xOff, long[] y, int yOff, int count, int shift)
         {
-            int shiftInv = 64 - shift;
+            var shiftInv = 64 - shift;
             long prev = 0;
-            int i = count;
+            var i = count;
             while (--i >= 0)
             {
-                long next = y[yOff + i];
+                var next = y[yOff + i];
                 x[xOff + i] ^= (long)((ulong)next >> shift) | prev;
                 prev = next << shiftInv;
             }
@@ -699,13 +698,13 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public void AddShiftedByWords(LongArray other, int words)
         {
-            int otherUsedLen = other.GetUsedLength();
+            var otherUsedLen = other.GetUsedLength();
             if (otherUsedLen == 0)
             {
                 return;
             }
 
-            int minLen = otherUsedLen + words;
+            var minLen = otherUsedLen + words;
             if (minLen > m_ints.Length)
             {
                 m_ints = ResizedInts(minLen);
@@ -716,7 +715,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void Add(long[] x, int xOff, long[] y, int yOff, int count)
         {
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 x[xOff + i] ^= y[yOff + i];
             }
@@ -724,7 +723,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void Add(long[] x, int xOff, long[] y, int yOff, long[] z, int zOff, int count)
         {
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 z[zOff + i] = x[xOff + i] ^ y[yOff + i];
             }
@@ -732,7 +731,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void AddBoth(long[] x, int xOff, long[] y1, int y1Off, long[] y2, int y2Off, int count)
         {
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 x[xOff + i] ^= y1[y1Off + i] ^ y2[y2Off + i];
             }
@@ -740,9 +739,9 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void Distribute(long[] x, int src, int dst1, int dst2, int count)
         {
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
-                long v = x[src + i];
+                var v = x[src + i];
                 x[dst1 + i] ^= v;
                 x[dst2 + i] ^= v;
             }
@@ -755,8 +754,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void FlipWord(long[] buf, int off, int bit, long word)
         {
-            int n = off + (int)((uint)bit >> 6);
-            int shift = bit & 0x3F;
+            var n = off + (int)((uint)bit >> 6);
+            var shift = bit & 0x3F;
             if (shift == 0)
             {
                 buf[n] ^= word;
@@ -796,20 +795,20 @@ namespace ChainUtils.BouncyCastle.Math.EC
         private static bool TestBit(long[] buf, int off, int n)
         {
             // theInt = n / 64
-            int theInt = (int)((uint)n >> 6);
+            var theInt = (int)((uint)n >> 6);
             // theBit = n % 64
-            int theBit = n & 0x3F;
-            long tester = 1L << theBit;
+            var theBit = n & 0x3F;
+            var tester = 1L << theBit;
             return (buf[off + theInt] & tester) != 0;
         }
 
         private static void FlipBit(long[] buf, int off, int n)
         {
             // theInt = n / 64
-            int theInt = (int)((uint)n >> 6);
+            var theInt = (int)((uint)n >> 6);
             // theBit = n % 64
-            int theBit = n & 0x3F;
-            long flipper = 1L << theBit;
+            var theBit = n & 0x3F;
+            var flipper = 1L << theBit;
             buf[off + theInt] ^= flipper;
         }
 
@@ -839,12 +838,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
             {
                 Add(c, cOff, b, 0, bLen);
             }
-            int k = 1;
+            var k = 1;
             while ((a = (long)((ulong)a >> 1)) != 0L)
             {
                 if ((a & 1L) != 0L)
                 {
-                    long carry = AddShiftedUp(c, cOff, b, 0, bLen, k);
+                    var carry = AddShiftedUp(c, cOff, b, 0, bLen, k);
                     if (carry != 0L)
                     {
                         c[cOff + bLen] ^= carry;
@@ -859,12 +858,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Find out the degree of each argument and handle the zero cases
              */
-            int aDeg = Degree();
+            var aDeg = Degree();
             if (aDeg == 0)
             {
                 return this;
             }
-            int bDeg = other.Degree();
+            var bDeg = other.Degree();
             if (bDeg == 0)
             {
                 return other;
@@ -877,19 +876,19 @@ namespace ChainUtils.BouncyCastle.Math.EC
             if (aDeg > bDeg)
             {
                 A = other; B = this;
-                int tmp = aDeg; aDeg = bDeg; bDeg = tmp;
+                var tmp = aDeg; aDeg = bDeg; bDeg = tmp;
             }
 
             /*
              * Establish the word lengths of the arguments and result
              */
-            int aLen = (int)((uint)(aDeg + 63) >> 6);
-            int bLen = (int)((uint)(bDeg + 63) >> 6);
-            int cLen = (int)((uint)(aDeg + bDeg + 62) >> 6);
+            var aLen = (int)((uint)(aDeg + 63) >> 6);
+            var bLen = (int)((uint)(bDeg + 63) >> 6);
+            var cLen = (int)((uint)(aDeg + bDeg + 62) >> 6);
 
             if (aLen == 1)
             {
-                long a0 = A.m_ints[0];
+                var a0 = A.m_ints[0];
                 if (a0 == 1L)
                 {
                     return B;
@@ -898,7 +897,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 /*
                  * Fast path for small A, with performance dependent only on the number of set bits
                  */
-                long[] c0 = new long[cLen];
+                var c0 = new long[cLen];
                 MultiplyWord(a0, B.m_ints, bLen, c0, 0);
 
                 /*
@@ -910,21 +909,21 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Determine if B will get bigger during shifting
              */
-            int bMax = (int)((uint)(bDeg + 7 + 63) >> 6);
+            var bMax = (int)((uint)(bDeg + 7 + 63) >> 6);
 
             /*
              * Lookup table for the offset of each B in the tables
              */
-            int[] ti = new int[16];
+            var ti = new int[16];
 
             /*
              * Precompute table of all 4-bit products of B
              */
-            long[] T0 = new long[bMax << 4];
-            int tOff = bMax;
+            var T0 = new long[bMax << 4];
+            var tOff = bMax;
             ti[1] = tOff;
             Array.Copy(B.m_ints, 0, T0, tOff, bLen);
-            for (int i = 2; i < 16; ++i)
+            for (var i = 2; i < 16; ++i)
             {
                 ti[i] = (tOff += bMax);
                 if ((i & 1) == 0)
@@ -940,38 +939,38 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Second table with all 4-bit products of B shifted 4 bits
              */
-            long[] T1 = new long[T0.Length];
+            var T1 = new long[T0.Length];
             ShiftUp(T0, 0, T1, 0, T0.Length, 4);
     //        shiftUp(T0, bMax, T1, bMax, tOff, 4);
 
-            long[] a = A.m_ints;
-            long[] c = new long[cLen];
+            var a = A.m_ints;
+            var c = new long[cLen];
 
-            int MASK = 0xF;
+            var MASK = 0xF;
 
             /*
              * Lopez-Dahab algorithm
              */
 
-            for (int k = 56; k >= 0; k -= 8)
+            for (var k = 56; k >= 0; k -= 8)
             {
-                for (int j = 1; j < aLen; j += 2)
+                for (var j = 1; j < aLen; j += 2)
                 {
-                    int aVal = (int)((ulong)a[j] >> k);
-                    int u = aVal & MASK;
-                    int v = (int)((uint)aVal >> 4) & MASK;
+                    var aVal = (int)((ulong)a[j] >> k);
+                    var u = aVal & MASK;
+                    var v = (int)((uint)aVal >> 4) & MASK;
                     AddBoth(c, j - 1, T0, ti[u], T1, ti[v], bMax);
                 }
                 ShiftUp(c, 0, cLen, 8);
             }
 
-            for (int k = 56; k >= 0; k -= 8)
+            for (var k = 56; k >= 0; k -= 8)
             {
-                for (int j = 0; j < aLen; j += 2)
+                for (var j = 0; j < aLen; j += 2)
                 {
-                    int aVal = (int)((ulong)a[j] >> k);
-                    int u = aVal & MASK;
-                    int v = (int)((uint)aVal >> 4) & MASK;
+                    var aVal = (int)((ulong)a[j] >> k);
+                    var u = aVal & MASK;
+                    var v = (int)((uint)aVal >> 4) & MASK;
                     AddBoth(c, j, T0, ti[u], T1, ti[v], bMax);
                 }
                 if (k > 0)
@@ -991,12 +990,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Find out the degree of each argument and handle the zero cases
              */
-            int aDeg = Degree();
+            var aDeg = Degree();
             if (aDeg == 0)
             {
                 return this;
             }
-            int bDeg = other.Degree();
+            var bDeg = other.Degree();
             if (bDeg == 0)
             {
                 return other;
@@ -1009,19 +1008,19 @@ namespace ChainUtils.BouncyCastle.Math.EC
             if (aDeg > bDeg)
             {
                 A = other; B = this;
-                int tmp = aDeg; aDeg = bDeg; bDeg = tmp;
+                var tmp = aDeg; aDeg = bDeg; bDeg = tmp;
             }
 
             /*
              * Establish the word lengths of the arguments and result
              */
-            int aLen = (int)((uint)(aDeg + 63) >> 6);
-            int bLen = (int)((uint)(bDeg + 63) >> 6);
-            int cLen = (int)((uint)(aDeg + bDeg + 62) >> 6);
+            var aLen = (int)((uint)(aDeg + 63) >> 6);
+            var bLen = (int)((uint)(bDeg + 63) >> 6);
+            var cLen = (int)((uint)(aDeg + bDeg + 62) >> 6);
 
             if (aLen == 1)
             {
-                long a0 = A.m_ints[0];
+                var a0 = A.m_ints[0];
                 if (a0 == 1L)
                 {
                     return B;
@@ -1030,7 +1029,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 /*
                  * Fast path for small A, with performance dependent only on the number of set bits
                  */
-                long[] c0 = new long[cLen];
+                var c0 = new long[cLen];
                 MultiplyWord(a0, B.m_ints, bLen, c0, 0);
 
                 /*
@@ -1042,21 +1041,21 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Determine if B will get bigger during shifting
              */
-            int bMax = (int)((uint)(bDeg + 7 + 63) >> 6);
+            var bMax = (int)((uint)(bDeg + 7 + 63) >> 6);
 
             /*
              * Lookup table for the offset of each B in the tables
              */
-            int[] ti = new int[16];
+            var ti = new int[16];
 
             /*
              * Precompute table of all 4-bit products of B
              */
-            long[] T0 = new long[bMax << 4];
-            int tOff = bMax;
+            var T0 = new long[bMax << 4];
+            var tOff = bMax;
             ti[1] = tOff;
             Array.Copy(B.m_ints, 0, T0, tOff, bLen);
-            for (int i = 2; i < 16; ++i)
+            for (var i = 2; i < 16; ++i)
             {
                 ti[i] = (tOff += bMax);
                 if ((i & 1) == 0)
@@ -1072,28 +1071,28 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Second table with all 4-bit products of B shifted 4 bits
              */
-            long[] T1 = new long[T0.Length];
+            var T1 = new long[T0.Length];
             ShiftUp(T0, 0, T1, 0, T0.Length, 4);
     //        ShiftUp(T0, bMax, T1, bMax, tOff, 4);
 
-            long[] a = A.m_ints;
-            long[] c = new long[cLen << 3];
+            var a = A.m_ints;
+            var c = new long[cLen << 3];
 
-            int MASK = 0xF;
+            var MASK = 0xF;
 
             /*
              * Lopez-Dahab (Modified) algorithm
              */
 
-            for (int aPos = 0; aPos < aLen; ++aPos)
+            for (var aPos = 0; aPos < aLen; ++aPos)
             {
-                long aVal = a[aPos];
-                int cOff = aPos;
+                var aVal = a[aPos];
+                var cOff = aPos;
                 for (;;)
                 {
-                    int u = (int)aVal & MASK;
+                    var u = (int)aVal & MASK;
                     aVal = (long)((ulong)aVal >> 4);
-                    int v = (int)aVal & MASK;
+                    var v = (int)aVal & MASK;
                     AddBoth(c, cOff, T0, ti[u], T1, ti[v], bMax);
                     aVal = (long)((ulong)aVal >> 4);
                     if (aVal == 0L)
@@ -1105,7 +1104,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
 
             {
-                int cOff = c.Length;
+                var cOff = c.Length;
                 while ((cOff -= cLen) != 0)
                 {
                     AddShiftedUp(c, cOff - cLen, c, cOff, cLen, 8);
@@ -1123,12 +1122,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Find out the degree of each argument and handle the zero cases
              */
-            int aDeg = Degree();
+            var aDeg = Degree();
             if (aDeg == 0)
             {
                 return this;
             }
-            int bDeg = other.Degree();
+            var bDeg = other.Degree();
             if (bDeg == 0)
             {
                 return other;
@@ -1141,19 +1140,19 @@ namespace ChainUtils.BouncyCastle.Math.EC
             if (aDeg > bDeg)
             {
                 A = other; B = this;
-                int tmp = aDeg; aDeg = bDeg; bDeg = tmp;
+                var tmp = aDeg; aDeg = bDeg; bDeg = tmp;
             }
 
             /*
              * Establish the word lengths of the arguments and result
              */
-            int aLen = (int)((uint)(aDeg + 63) >> 6);
-            int bLen = (int)((uint)(bDeg + 63) >> 6);
-            int cLen = (int)((uint)(aDeg + bDeg + 62) >> 6);
+            var aLen = (int)((uint)(aDeg + 63) >> 6);
+            var bLen = (int)((uint)(bDeg + 63) >> 6);
+            var cLen = (int)((uint)(aDeg + bDeg + 62) >> 6);
 
             if (aLen == 1)
             {
-                long a0 = A.m_ints[0];
+                var a0 = A.m_ints[0];
                 if (a0 == 1L)
                 {
                     return B;
@@ -1162,7 +1161,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 /*
                  * Fast path for small A, with performance dependent only on the number of set bits
                  */
-                long[] c0 = new long[cLen];
+                var c0 = new long[cLen];
                 MultiplyWord(a0, B.m_ints, bLen, c0, 0);
 
                 /*
@@ -1212,21 +1211,21 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Determine if B will get bigger during shifting
              */
-            int shifts = top < 64 ? positions : positions - 1;
-            int bMax = (int)((uint)(bDeg + shifts + 63) >> 6);
+            var shifts = top < 64 ? positions : positions - 1;
+            var bMax = (int)((uint)(bDeg + shifts + 63) >> 6);
 
             int bTotal = bMax * banks, stride = width * banks;
 
             /*
              * Create a single temporary buffer, with an offset table to find the positions of things in it 
              */
-            int[] ci = new int[1 << width];
-            int cTotal = aLen;
+            var ci = new int[1 << width];
+            var cTotal = aLen;
             {
                 ci[0] = cTotal;
                 cTotal += bTotal;
                 ci[1] = cTotal;
-                for (int i = 2; i < ci.Length; ++i)
+                for (var i = 2; i < ci.Length; ++i)
                 {
                     cTotal += cLen;
                     ci[i] = cTotal;
@@ -1236,16 +1235,16 @@ namespace ChainUtils.BouncyCastle.Math.EC
             // NOTE: Provide a safe dump for "high zeroes" since we are adding 'bMax' and not 'bLen'
             ++cTotal;
 
-            long[] c = new long[cTotal];
+            var c = new long[cTotal];
 
             // Prepare A in Interleaved form, according to the chosen width
             Interleave(A.m_ints, 0, c, 0, aLen, width);
 
             // Make a working copy of B, since we will be shifting it
             {
-                int bOff = aLen;
+                var bOff = aLen;
                 Array.Copy(B.m_ints, 0, c, bOff, bLen);
-                for (int bank = 1; bank < banks; ++bank)
+                for (var bank = 1; bank < banks; ++bank)
                 {
                     ShiftUp(c, aLen, c, bOff += bMax, bMax, bank);
                 }
@@ -1257,19 +1256,19 @@ namespace ChainUtils.BouncyCastle.Math.EC
              * breadth-first, checking the lowest window in each word, then looping again for the
              * next higher window position.
              */
-            int MASK = (1 << width) - 1;
+            var MASK = (1 << width) - 1;
 
-            int k = 0;
+            var k = 0;
             for (;;)
             {
-                int aPos = 0;
+                var aPos = 0;
                 do
                 {
-                    long aVal = (long)((ulong)c[aPos] >> k);
+                    var aVal = (long)((ulong)c[aPos] >> k);
                     int bank = 0, bOff = aLen;
                     for (;;)
                     {
-                        int index = (int)(aVal) & MASK;
+                        var index = (int)(aVal) & MASK;
                         if (index != 0)
                         {
                             /*
@@ -1310,7 +1309,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 ShiftUp(c, aLen, bTotal, banks);
             }
 
-            int ciPos = ci.Length;
+            var ciPos = ci.Length;
             while (--ciPos > 1)
             {
                 if ((ciPos & 1L) == 0L)
@@ -1337,8 +1336,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public LongArray ModReduce(int m, int[] ks)
         {
-            long[] buf = Arrays.Clone(m_ints);
-            int rLen = ReduceInPlace(buf, 0, buf.Length, m, ks);
+            var buf = Arrays.Clone(m_ints);
+            var rLen = ReduceInPlace(buf, 0, buf.Length, m, ks);
             return new LongArray(buf, 0, rLen);
         }
 
@@ -1347,12 +1346,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Find out the degree of each argument and handle the zero cases
              */
-            int aDeg = Degree();
+            var aDeg = Degree();
             if (aDeg == 0)
             {
                 return this;
             }
-            int bDeg = other.Degree();
+            var bDeg = other.Degree();
             if (bDeg == 0)
             {
                 return other;
@@ -1365,19 +1364,19 @@ namespace ChainUtils.BouncyCastle.Math.EC
             if (aDeg > bDeg)
             {
                 A = other; B = this;
-                int tmp = aDeg; aDeg = bDeg; bDeg = tmp;
+                var tmp = aDeg; aDeg = bDeg; bDeg = tmp;
             }
 
             /*
              * Establish the word lengths of the arguments and result
              */
-            int aLen = (int)((uint)(aDeg + 63) >> 6);
-            int bLen = (int)((uint)(bDeg + 63) >> 6);
-            int cLen = (int)((uint)(aDeg + bDeg + 62) >> 6);
+            var aLen = (int)((uint)(aDeg + 63) >> 6);
+            var bLen = (int)((uint)(bDeg + 63) >> 6);
+            var cLen = (int)((uint)(aDeg + bDeg + 62) >> 6);
 
             if (aLen == 1)
             {
-                long a0 = A.m_ints[0];
+                var a0 = A.m_ints[0];
                 if (a0 == 1L)
                 {
                     return B;
@@ -1386,7 +1385,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 /*
                  * Fast path for small A, with performance dependent only on the number of set bits
                  */
-                long[] c0 = new long[cLen];
+                var c0 = new long[cLen];
                 MultiplyWord(a0, B.m_ints, bLen, c0, 0);
 
                 /*
@@ -1399,21 +1398,21 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Determine if B will get bigger during shifting
              */
-            int bMax = (int)((uint)(bDeg + 7 + 63) >> 6);
+            var bMax = (int)((uint)(bDeg + 7 + 63) >> 6);
 
             /*
              * Lookup table for the offset of each B in the tables
              */
-            int[] ti = new int[16];
+            var ti = new int[16];
 
             /*
              * Precompute table of all 4-bit products of B
              */
-            long[] T0 = new long[bMax << 4];
-            int tOff = bMax;
+            var T0 = new long[bMax << 4];
+            var tOff = bMax;
             ti[1] = tOff;
             Array.Copy(B.m_ints, 0, T0, tOff, bLen);
-            for (int i = 2; i < 16; ++i)
+            for (var i = 2; i < 16; ++i)
             {
                 ti[i] = (tOff += bMax);
                 if ((i & 1) == 0)
@@ -1429,28 +1428,28 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Second table with all 4-bit products of B shifted 4 bits
              */
-            long[] T1 = new long[T0.Length];
+            var T1 = new long[T0.Length];
             ShiftUp(T0, 0, T1, 0, T0.Length, 4);
             //        ShiftUp(T0, bMax, T1, bMax, tOff, 4);
 
-            long[] a = A.m_ints;
-            long[] c = new long[cLen << 3];
+            var a = A.m_ints;
+            var c = new long[cLen << 3];
 
-            int MASK = 0xF;
+            var MASK = 0xF;
 
             /*
              * Lopez-Dahab (Modified) algorithm
              */
 
-            for (int aPos = 0; aPos < aLen; ++aPos)
+            for (var aPos = 0; aPos < aLen; ++aPos)
             {
-                long aVal = a[aPos];
-                int cOff = aPos;
+                var aVal = a[aPos];
+                var cOff = aPos;
                 for (; ; )
                 {
-                    int u = (int)aVal & MASK;
+                    var u = (int)aVal & MASK;
                     aVal = (long)((ulong)aVal >> 4);
-                    int v = (int)aVal & MASK;
+                    var v = (int)aVal & MASK;
                     AddBoth(c, cOff, T0, ti[u], T1, ti[v], bMax);
                     aVal = (long)((ulong)aVal >> 4);
                     if (aVal == 0L)
@@ -1462,7 +1461,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
 
             {
-                int cOff = c.Length;
+                var cOff = c.Length;
                 while ((cOff -= cLen) != 0)
                 {
                     AddShiftedUp(c, cOff - cLen, c, cOff, cLen, 8);
@@ -1478,8 +1477,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public void Reduce(int m, int[] ks)
         {
-            long[] buf = m_ints;
-            int rLen = ReduceInPlace(buf, 0, buf.Length, m, ks);
+            var buf = m_ints;
+            var rLen = ReduceInPlace(buf, 0, buf.Length, m, ks);
             if (rLen < buf.Length)
             {
                 m_ints = new long[rLen];
@@ -1489,7 +1488,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static LongArray ReduceResult(long[] buf, int off, int len, int m, int[] ks)
         {
-            int rLen = ReduceInPlace(buf, off, len, m, ks);
+            var rLen = ReduceInPlace(buf, off, len, m, ks);
             return new LongArray(buf, off, rLen);
         }
 
@@ -1522,14 +1521,14 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static int ReduceInPlace(long[] buf, int off, int len, int m, int[] ks)
         {
-            int mLen = (m + 63) >> 6;
+            var mLen = (m + 63) >> 6;
             if (len < mLen)
             {
                 return len;
             }
 
-            int numBits = System.Math.Min(len << 6, (m << 1) - 1); // TODO use actual degree?
-            int excessBits = (len << 6) - numBits;
+            var numBits = System.Math.Min(len << 6, (m << 1) - 1); // TODO use actual degree?
+            var excessBits = (len << 6) - numBits;
             while (excessBits >= 64)
             {
                 --len;
@@ -1537,11 +1536,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
 
             int kLen = ks.Length, kMax = ks[kLen - 1], kNext = kLen > 1 ? ks[kLen - 2] : 0;
-            int wordWiseLimit = System.Math.Max(m, kMax + 64);
-            int vectorableWords = (excessBits + System.Math.Min(numBits - wordWiseLimit, m - kNext)) >> 6;
+            var wordWiseLimit = System.Math.Max(m, kMax + 64);
+            var vectorableWords = (excessBits + System.Math.Min(numBits - wordWiseLimit, m - kNext)) >> 6;
             if (vectorableWords > 1)
             {
-                int vectorWiseWords = len - vectorableWords;
+                var vectorWiseWords = len - vectorableWords;
                 ReduceVectorWise(buf, off, len, vectorWiseWords, m, ks);
                 while (len > vectorWiseWords)
                 {
@@ -1578,8 +1577,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
         private static void ReduceBit(long[] buf, int off, int bit, int m, int[] ks)
         {
             FlipBit(buf, off, bit);
-            int n = bit - m;
-            int j = ks.Length;
+            var n = bit - m;
+            var j = ks.Length;
             while (--j >= 0)
             {
                 FlipBit(buf, off, ks[j] + n);
@@ -1589,11 +1588,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void ReduceWordWise(long[] buf, int off, int len, int toBit, int m, int[] ks)
         {
-            int toPos = (int)((uint)toBit >> 6);
+            var toPos = (int)((uint)toBit >> 6);
 
             while (--len > toPos)
             {
-                long word = buf[off + len];
+                var word = buf[off + len];
                 if (word != 0)
                 {
                     buf[off + len] = 0;
@@ -1602,8 +1601,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
 
             {
-                int partial = toBit & 0x3F;
-                long word = (long)((ulong)buf[off + toPos] >> partial);
+                var partial = toBit & 0x3F;
+                var word = (long)((ulong)buf[off + toPos] >> partial);
                 if (word != 0)
                 {
                     buf[off + toPos] ^= word << partial;
@@ -1614,8 +1613,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void ReduceWord(long[] buf, int off, int bit, long word, int m, int[] ks)
         {
-            int offset = bit - m;
-            int j = ks.Length;
+            var offset = bit - m;
+            var j = ks.Length;
             while (--j >= 0)
             {
                 FlipWord(buf, off, offset + ks[j], word);
@@ -1630,8 +1629,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
              * one (only) we allow the ranges to partially overlap, and therefore any changes must take
              * effect for the subsequent lower coefficients.
              */
-            int baseBit = (words << 6) - m;
-            int j = ks.Length;
+            var baseBit = (words << 6) - m;
+            var j = ks.Length;
             while (--j >= 0)
             {
                 FlipVector(buf, off, buf, off + words, len - words, baseBit + ks[j]);
@@ -1650,26 +1649,26 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
             else
             {
-                long carry = AddShiftedDown(x, xOff + 1, y, yOff, yLen, 64 - bits);
+                var carry = AddShiftedDown(x, xOff + 1, y, yOff, yLen, 64 - bits);
                 x[xOff] ^= carry;
             }
         }
 
         public LongArray ModSquare(int m, int[] ks)
         {
-            int len = GetUsedLength();
+            var len = GetUsedLength();
             if (len == 0)
             {
                 return this;
             }
 
-            int _2len = len << 1;
-            long[] r = new long[_2len];
+            var _2len = len << 1;
+            var r = new long[_2len];
 
-            int pos = 0;
+            var pos = 0;
             while (pos < _2len)
             {
-                long mi = m_ints[(uint)pos >> 1];
+                var mi = m_ints[(uint)pos >> 1];
                 r[pos++] = Interleave2_32to64((int)mi);
                 r[pos++] = Interleave2_32to64((int)((ulong)mi >> 32));
             }
@@ -1679,14 +1678,14 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public LongArray ModSquareN(int n, int m, int[] ks)
         {
-            int len = GetUsedLength();
+            var len = GetUsedLength();
             if (len == 0)
             {
                 return this;
             }
     
-            int mLen = (m + 63) >> 6;
-            long[] r = new long[mLen << 1];
+            var mLen = (m + 63) >> 6;
+            var r = new long[mLen << 1];
             Array.Copy(m_ints, 0, r, 0, len);
     
             while (--n >= 0)
@@ -1700,19 +1699,19 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public LongArray Square(int m, int[] ks)
         {
-            int len = GetUsedLength();
+            var len = GetUsedLength();
             if (len == 0)
             {
                 return this;
             }
 
-            int _2len = len << 1;
-            long[] r = new long[_2len];
+            var _2len = len << 1;
+            var r = new long[_2len];
 
-            int pos = 0;
+            var pos = 0;
             while (pos < _2len)
             {
-                long mi = m_ints[(uint)pos >> 1];
+                var mi = m_ints[(uint)pos >> 1];
                 r[pos++] = Interleave2_32to64((int)mi);
                 r[pos++] = Interleave2_32to64((int)((ulong)mi >> 32));
             }
@@ -1722,10 +1721,10 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void SquareInPlace(long[] x, int xLen, int m, int[] ks)
         {
-            int pos = xLen << 1;
+            var pos = xLen << 1;
             while (--xLen >= 0)
             {
-                long xVal = x[xLen];
+                var xVal = x[xLen];
                 x[--pos] = Interleave2_32to64((int)((ulong)xVal >> 32));
                 x[--pos] = Interleave2_32to64((int)xVal);
             }
@@ -1752,7 +1751,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void Interleave3(long[] x, int xOff, long[] z, int zOff, int count)
         {
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 z[zOff + i] = Interleave3(x[xOff + i]);
             }
@@ -1760,7 +1759,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static long Interleave3(long x)
         {
-            long z = x & (1L << 63);
+            var z = x & (1L << 63);
             return z
                 | Interleave3_21to63((int)x & 0x1FFFFF)
                 | Interleave3_21to63((int)((ulong)x >> 21) & 0x1FFFFF) << 1
@@ -1784,15 +1783,15 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static long Interleave3_21to63(int x)
         {
-            int r00 = INTERLEAVE3_TABLE[x & 0x7F];
-            int r21 = INTERLEAVE3_TABLE[((uint)x >> 7) & 0x7F];
-            int r42 = INTERLEAVE3_TABLE[(uint)x >> 14];
+            var r00 = INTERLEAVE3_TABLE[x & 0x7F];
+            var r21 = INTERLEAVE3_TABLE[((uint)x >> 7) & 0x7F];
+            var r42 = INTERLEAVE3_TABLE[(uint)x >> 14];
             return (r42 & 0xFFFFFFFFL) << 42 | (r21 & 0xFFFFFFFFL) << 21 | (r00 & 0xFFFFFFFFL);
         }
 
         private static void Interleave5(long[] x, int xOff, long[] z, int zOff, int count)
         {
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 z[zOff + i] = Interleave5(x[xOff + i]);
             }
@@ -1824,14 +1823,14 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static long Interleave3_13to65(int x)
         {
-            int r00 = INTERLEAVE5_TABLE[x & 0x7F];
-            int r35 = INTERLEAVE5_TABLE[(uint)x >> 7];
+            var r00 = INTERLEAVE5_TABLE[x & 0x7F];
+            var r35 = INTERLEAVE5_TABLE[(uint)x >> 7];
             return (r35 & 0xFFFFFFFFL) << 35 | (r00 & 0xFFFFFFFFL);
         }
 
         private static void Interleave7(long[] x, int xOff, long[] z, int zOff, int count)
         {
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 z[zOff + i] = Interleave7(x[xOff + i]);
             }
@@ -1839,7 +1838,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static long Interleave7(long x)
         {
-            long z = x & (1L << 63);
+            var z = x & (1L << 63);
             return z
                 | INTERLEAVE7_TABLE[(int)x & 0x1FF]
                 | INTERLEAVE7_TABLE[(int)((ulong)x >> 9) & 0x1FF] << 1
@@ -1866,7 +1865,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static void Interleave2_n(long[] x, int xOff, long[] z, int zOff, int count, int rounds)
         {
-            for (int i = 0; i < count; ++i)
+            for (var i = 0; i < count; ++i)
             {
                 z[zOff + i] = Interleave2_n(x[xOff + i], rounds);
             }
@@ -1891,15 +1890,15 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         private static long Interleave4_16to64(int x)
         {
-            int r00 = INTERLEAVE4_TABLE[x & 0xFF];
-            int r32 = INTERLEAVE4_TABLE[(uint)x >> 8];
+            var r00 = INTERLEAVE4_TABLE[x & 0xFF];
+            var r32 = INTERLEAVE4_TABLE[(uint)x >> 8];
             return (r32 & 0xFFFFFFFFL) << 32 | (r00 & 0xFFFFFFFFL);
         }
 
         private static long Interleave2_32to64(int x)
         {
-            int r00 = INTERLEAVE2_TABLE[x & 0xFF] | INTERLEAVE2_TABLE[((uint)x >> 8) & 0xFF] << 16;
-            int r32 = INTERLEAVE2_TABLE[((uint)x >> 16) & 0xFF] | INTERLEAVE2_TABLE[(uint)x >> 24] << 16;
+            var r00 = INTERLEAVE2_TABLE[x & 0xFF] | INTERLEAVE2_TABLE[((uint)x >> 8) & 0xFF] << 16;
+            var r32 = INTERLEAVE2_TABLE[((uint)x >> 16) & 0xFF] | INTERLEAVE2_TABLE[(uint)x >> 24] << 16;
             return (r32 & 0xFFFFFFFFL) << 32 | (r00 & 0xFFFFFFFFL);
         }
 
@@ -2052,7 +2051,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
              * Input: A nonzero polynomial a(z) of degree at most m-1
              * Output: a(z)^(-1) mod f(z)
              */
-            int uzDegree = Degree();
+            var uzDegree = Degree();
             if (uzDegree == 0)
             {
                 throw new InvalidOperationException();
@@ -2063,29 +2062,29 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
 
             // u(z) := a(z)
-            LongArray uz = (LongArray)Copy();
+            var uz = (LongArray)Copy();
 
-            int t = (m + 63) >> 6;
+            var t = (m + 63) >> 6;
 
             // v(z) := f(z)
-            LongArray vz = new LongArray(t);
+            var vz = new LongArray(t);
             ReduceBit(vz.m_ints, 0, m, m, ks);
 
             // g1(z) := 1, g2(z) := 0
-            LongArray g1z = new LongArray(t);
+            var g1z = new LongArray(t);
             g1z.m_ints[0] = 1L;
-            LongArray g2z = new LongArray(t);
+            var g2z = new LongArray(t);
 
-            int[] uvDeg = new int[]{ uzDegree, m + 1 };
-            LongArray[] uv = new LongArray[]{ uz, vz };
+            var uvDeg = new int[]{ uzDegree, m + 1 };
+            var uv = new LongArray[]{ uz, vz };
 
-            int[] ggDeg = new int[]{ 1, 0 };
-            LongArray[] gg = new LongArray[]{ g1z, g2z };
+            var ggDeg = new int[]{ 1, 0 };
+            var gg = new LongArray[]{ g1z, g2z };
 
-            int b = 1;
-            int duv1 = uvDeg[b];
-            int dgg1 = ggDeg[b];
-            int j = duv1 - uvDeg[1 - b];
+            var b = 1;
+            var duv1 = uvDeg[b];
+            var dgg1 = ggDeg[b];
+            var j = duv1 - uvDeg[1 - b];
 
             for (;;)
             {
@@ -2101,14 +2100,14 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
                 uv[b].AddShiftedByBitsSafe(uv[1 - b], uvDeg[1 - b], j);
 
-                int duv2 = uv[b].DegreeFrom(duv1);
+                var duv2 = uv[b].DegreeFrom(duv1);
                 if (duv2 == 0)
                 {
                     return gg[1 - b];
                 }
 
                 {
-                    int dgg2 = ggDeg[1 - b];
+                    var dgg2 = ggDeg[1 - b];
                     gg[b].AddShiftedByBitsSafe(gg[1 - b], dgg2, j);
                     dgg2 += j;
 
@@ -2138,12 +2137,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 return true;
             if (null == other)
                 return false;
-            int usedLen = GetUsedLength();
+            var usedLen = GetUsedLength();
             if (other.GetUsedLength() != usedLen)
             {
                 return false;
             }
-            for (int i = 0; i < usedLen; i++)
+            for (var i = 0; i < usedLen; i++)
             {
                 if (m_ints[i] != other.m_ints[i])
                 {
@@ -2155,11 +2154,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public override int GetHashCode()
         {
-            int usedLen = GetUsedLength();
-            int hash = 1;
-            for (int i = 0; i < usedLen; i++)
+            var usedLen = GetUsedLength();
+            var hash = 1;
+            for (var i = 0; i < usedLen; i++)
             {
-                long mi = m_ints[i];
+                var mi = m_ints[i];
                 hash *= 31;
                 hash ^= (int)mi;
                 hash *= 31;
@@ -2175,19 +2174,19 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public override string ToString()
         {
-            int i = GetUsedLength();
+            var i = GetUsedLength();
             if (i == 0)
             {
                 return "0";
             }
 
-            StringBuilder sb = new StringBuilder(Convert.ToString(m_ints[--i], 2));
+            var sb = new StringBuilder(Convert.ToString(m_ints[--i], 2));
             while (--i >= 0)
             {
-                string s = Convert.ToString(m_ints[i], 2);
+                var s = Convert.ToString(m_ints[i], 2);
 
                 // Add leading zeroes, except for highest significant word
-                int len = s.Length;
+                var len = s.Length;
                 if (len < 64)
                 {
                     sb.Append(ZEROES.Substring(len));

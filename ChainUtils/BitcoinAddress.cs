@@ -1,10 +1,4 @@
-﻿using ChainUtils.BouncyCastle.Math;
-using ChainUtils.BouncyCastle.Math.EC;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace ChainUtils
 {
@@ -22,7 +16,7 @@ namespace ChainUtils
 		}
 
 		[Obsolete("Use Hash instead")]
-		public override TxDestination ID
+		public override TxDestination Id
 		{
 			get
 			{
@@ -34,7 +28,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return new ScriptId(vchData);
+				return new ScriptId(VchData);
 			}
 		}
 
@@ -43,7 +37,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return Base58Type.SCRIPT_ADDRESS;
+				return Base58Type.ScriptAddress;
 			}
 		}
 
@@ -78,23 +72,23 @@ namespace ChainUtils
 		{
 			get
 			{
-				return vchData.Length <= 20;
+				return VchData.Length <= 20;
 			}
 		}
 
 		[Obsolete("Use Hash instead")]
-		public virtual TxDestination ID
+		public virtual TxDestination Id
 		{
 			get
 			{
-				return new KeyId(vchData);
+				return new KeyId(VchData);
 			}
 		}
 		public virtual TxDestination Hash
 		{
 			get
 			{
-				return new KeyId(vchData);
+				return new KeyId(VchData);
 			}
 		}
 
@@ -107,16 +101,16 @@ namespace ChainUtils
 			}
 		}
 
-		Script _ScriptPubKey;
+		Script _scriptPubKey;
 		public Script ScriptPubKey
 		{
 			get
 			{
-				if(_ScriptPubKey == null)
+				if(_scriptPubKey == null)
 				{
-					_ScriptPubKey = GeneratePaymentScript();
+					_scriptPubKey = GeneratePaymentScript();
 				}
-				return _ScriptPubKey;
+				return _scriptPubKey;
 			}
 		}
 
@@ -133,7 +127,7 @@ namespace ChainUtils
 
 		protected virtual Script GeneratePaymentScript()
 		{
-			return PayToPubkeyHashTemplate.Instance.GenerateScriptPubKey((KeyId)this.Hash);
+			return PayToPubkeyHashTemplate.Instance.GenerateScriptPubKey((KeyId)Hash);
 		}
 
 		public bool VerifyMessage(string message, string signature)
@@ -146,7 +140,7 @@ namespace ChainUtils
 		{
 			get
 			{
-				return Base58Type.PUBKEY_ADDRESS;
+				return Base58Type.PubkeyAddress;
 			}
 		}
 

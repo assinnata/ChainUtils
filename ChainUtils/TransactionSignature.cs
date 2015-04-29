@@ -1,16 +1,13 @@
-﻿using ChainUtils.Crypto;
+﻿using System;
+using ChainUtils.BouncyCastle.Math;
+using ChainUtils.Crypto;
 using ChainUtils.DataEncoders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public class TransactionSignature
 	{
-		static readonly TransactionSignature _Empty = new TransactionSignature(new ECDSASignature(ChainUtils.BouncyCastle.Math.BigInteger.ValueOf(0), ChainUtils.BouncyCastle.Math.BigInteger.ValueOf(0)), SigHash.All);
+		static readonly TransactionSignature _Empty = new TransactionSignature(new EcdsaSignature(BigInteger.ValueOf(0), BigInteger.ValueOf(0)), SigHash.All);
 		public static TransactionSignature Empty
 		{
 			get
@@ -18,52 +15,52 @@ namespace ChainUtils
 				return _Empty;
 			}
 		}
-		public TransactionSignature(ECDSASignature signature, SigHash sigHash)
+		public TransactionSignature(EcdsaSignature signature, SigHash sigHash)
 		{
 			if(sigHash == SigHash.Undefined)
 				throw new ArgumentException("sigHash should not be Undefined");
-			_SigHash = sigHash;
-			_Signature = signature.MakeCanonical();
+			_sigHash = sigHash;
+			_signature = signature.MakeCanonical();
 		}
-		public TransactionSignature(ECDSASignature signature)
+		public TransactionSignature(EcdsaSignature signature)
 			: this(signature, SigHash.All)
 		{
 
 		}
 		public TransactionSignature(byte[] sigSigHash)
 		{
-			_Signature = ECDSASignature.FromDER(sigSigHash).MakeCanonical();
-			_SigHash = (SigHash)sigSigHash[sigSigHash.Length - 1];
+			_signature = EcdsaSignature.FromDer(sigSigHash).MakeCanonical();
+			_sigHash = (SigHash)sigSigHash[sigSigHash.Length - 1];
 		}
 		public TransactionSignature(byte[] sig, SigHash sigHash)
 		{
-			_Signature = ECDSASignature.FromDER(sig).MakeCanonical();
-			_SigHash = sigHash;
+			_signature = EcdsaSignature.FromDer(sig).MakeCanonical();
+			_sigHash = sigHash;
 		}
 
-		private readonly ECDSASignature _Signature;
-		public ECDSASignature Signature
+		private readonly EcdsaSignature _signature;
+		public EcdsaSignature Signature
 		{
 			get
 			{
-				return _Signature;
+				return _signature;
 			}
 		}
-		private readonly SigHash _SigHash;
+		private readonly SigHash _sigHash;
 		public SigHash SigHash
 		{
 			get
 			{
-				return _SigHash;
+				return _sigHash;
 			}
 		}
 
 		public byte[] ToBytes()
 		{
-			var sig = _Signature.ToDER();
+			var sig = _signature.ToDer();
 			var result = new byte[sig.Length + 1];
 			Array.Copy(sig, 0, result, 0, sig.Length);
-			result[result.Length - 1] = (byte)_SigHash;
+			result[result.Length - 1] = (byte)_sigHash;
 			return result;
 		}
 
@@ -86,27 +83,27 @@ namespace ChainUtils
 			}.CheckSig(this, pubKey, scriptPubKey, tx, nIndex);
 		}
 
-		string _Id;
+		string _id;
 		private string Id
 		{
 			get
 			{
-				if(_Id == null)
-					_Id = Encoders.Hex.EncodeData(ToBytes());
-				return _Id;
+				if(_id == null)
+					_id = Encoders.Hex.EncodeData(ToBytes());
+				return _id;
 			}
 		}
 
 		public override bool Equals(object obj)
 		{
-			TransactionSignature item = obj as TransactionSignature;
+			var item = obj as TransactionSignature;
 			if(item == null)
 				return false;
 			return Id.Equals(item.Id);
 		}
 		public static bool operator ==(TransactionSignature a, TransactionSignature b)
 		{
-			if(System.Object.ReferenceEquals(a, b))
+			if(ReferenceEquals(a, b))
 				return true;
 			if(((object)a == null) || ((object)b == null))
 				return false;

@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Modes;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Macs
 {
@@ -57,10 +53,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
         {
             if (parameters is ParametersWithIV)
             {
-                ParametersWithIV param = (ParametersWithIV)parameters;
+                var param = (ParametersWithIV)parameters;
 
-                byte[] iv = param.GetIV();
-                KeyParameter keyParam = (KeyParameter)param.Parameters;
+                var iv = param.GetIV();
+                var keyParam = (KeyParameter)param.Parameters;
 
                 // GCM is always operated in encrypt mode to calculate MAC
                 cipher.Init(true, new AeadParameters(keyParam, macSizeBits, iv));

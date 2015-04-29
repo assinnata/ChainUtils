@@ -2,52 +2,50 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils.Payment
 {
-	public class PaymentACK
+	public class PaymentAck
 	{
 		public const int MaxLength = 60000;
-		public static PaymentACK Load(byte[] data)
+		public static PaymentAck Load(byte[] data)
 		{
 			return Load(new MemoryStream(data));
 		}
 
-		public static PaymentACK Load(Stream source)
+		public static PaymentAck Load(Stream source)
 		{
 			if(source.CanSeek && source.Length > MaxLength)
 				throw new ArgumentException("PaymentACK messages larger than " + MaxLength + " bytes should be rejected", "source");
-			var data = PaymentRequest.Serializer.Deserialize<Proto.PaymentACK>(source);
-			return new PaymentACK(data);
+			var data = PaymentRequest.Serializer.Deserialize<Proto.PaymentAck>(source);
+			return new PaymentAck(data);
 		}
-		public PaymentACK()
+		public PaymentAck()
 		{
 
 		}
-		public PaymentACK(PaymentMessage payment)
+		public PaymentAck(PaymentMessage payment)
 		{
-			_Payment = payment;
+			_payment = payment;
 		}
-		internal PaymentACK(Proto.PaymentACK data)
+		internal PaymentAck(Proto.PaymentAck data)
 		{
-			_Payment = new PaymentMessage(data.payment);
-			Memo = data.memoSpecified ? data.memo : null;
+			_payment = new PaymentMessage(data.Payment);
+			Memo = data.MemoSpecified ? data.Memo : null;
 			OriginalData = data;
 		}
 
-		private readonly PaymentMessage _Payment = new PaymentMessage();
+		private readonly PaymentMessage _payment = new PaymentMessage();
 		public readonly static string MediaType = "application/bitcoin-paymentack";
 		public PaymentMessage Payment
 		{
 			get
 			{
-				return _Payment;
+				return _payment;
 			}
 		}
 
@@ -57,7 +55,7 @@ namespace ChainUtils.Payment
 			set;
 		}
 
-		internal Proto.PaymentACK OriginalData
+		internal Proto.PaymentAck OriginalData
 		{
 			get;
 			set;
@@ -65,16 +63,16 @@ namespace ChainUtils.Payment
 
 		public byte[] ToBytes()
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			WriteTo(ms);
 			return ms.ToArray();
 		}
 
 		public void WriteTo(Stream output)
 		{
-			var data = OriginalData == null ? new Proto.PaymentACK() : (Proto.PaymentACK)PaymentRequest.Serializer.DeepClone(OriginalData);
-			data.memo = Memo;
-			data.payment = Payment.ToData();
+			var data = OriginalData == null ? new Proto.PaymentAck() : (Proto.PaymentAck)PaymentRequest.Serializer.DeepClone(OriginalData);
+			data.Memo = Memo;
+			data.Payment = Payment.ToData();
 			PaymentRequest.Serializer.Serialize(output, data);
 		}
 	}
@@ -86,9 +84,9 @@ namespace ChainUtils.Payment
 			return Load(new MemoryStream(data));
 		}
 
-		public PaymentACK CreateACK(string memo = null)
+		public PaymentAck CreateAck(string memo = null)
 		{
-			return new PaymentACK(this)
+			return new PaymentAck(this)
 			{
 				Memo = memo
 			};
@@ -113,16 +111,16 @@ namespace ChainUtils.Payment
 			set;
 		}
 
-		private readonly List<PaymentOutput> _RefundTo = new List<PaymentOutput>();
+		private readonly List<PaymentOutput> _refundTo = new List<PaymentOutput>();
 		public List<PaymentOutput> RefundTo
 		{
 			get
 			{
-				return _RefundTo;
+				return _refundTo;
 			}
 		}
 
-		private readonly List<Transaction> _Transactions = new List<Transaction>();
+		private readonly List<Transaction> _transactions = new List<Transaction>();
 		public readonly static string MediaType = "application/bitcoin-payment";
 		public PaymentMessage()
 		{
@@ -130,13 +128,13 @@ namespace ChainUtils.Payment
 		}
 		internal PaymentMessage(Proto.Payment data)
 		{
-			Memo = data.memoSpecified ? data.memo : null;
-			MerchantData = data.merchant_data;
-			foreach(var tx in data.transactions)
+			Memo = data.MemoSpecified ? data.Memo : null;
+			MerchantData = data.MerchantData;
+			foreach(var tx in data.Transactions)
 			{
 				Transactions.Add(new Transaction(tx));
 			}
-			foreach(var refund in data.refund_to)
+			foreach(var refund in data.RefundTo)
 			{
 				RefundTo.Add(new PaymentOutput(refund));
 			}
@@ -145,13 +143,13 @@ namespace ChainUtils.Payment
 
 		public PaymentMessage(PaymentRequest request)
 		{
-			this.MerchantData = request.Details.MerchantData;
+			MerchantData = request.Details.MerchantData;
 		}
 		public List<Transaction> Transactions
 		{
 			get
 			{
-				return _Transactions;
+				return _transactions;
 			}
 		}
 
@@ -169,29 +167,29 @@ namespace ChainUtils.Payment
 
 		public byte[] ToBytes()
 		{
-			MemoryStream ms = new MemoryStream();
+			var ms = new MemoryStream();
 			WriteTo(ms);
 			return ms.ToArray();
 		}
 
 		public void WriteTo(Stream output)
 		{
-			PaymentRequest.Serializer.Serialize(output, this.ToData());
+			PaymentRequest.Serializer.Serialize(output, ToData());
 		}
 
 		internal Proto.Payment ToData()
 		{
 			var data = OriginalData == null ? new Proto.Payment() : (Proto.Payment)PaymentRequest.Serializer.DeepClone(OriginalData);
-			data.memo = Memo;
-			data.merchant_data = MerchantData;
+			data.Memo = Memo;
+			data.MerchantData = MerchantData;
 
 			foreach(var refund in RefundTo)
 			{
-				data.refund_to.Add(refund.ToData());
+				data.RefundTo.Add(refund.ToData());
 			}
 			foreach(var transaction in Transactions)
 			{
-				data.transactions.Add(transaction.ToBytes());
+				data.Transactions.Add(transaction.ToBytes());
 			}
 
 			return data;
@@ -202,7 +200,7 @@ namespace ChainUtils.Payment
 		/// </summary>
 		/// <param name="paymentUrl">ImplicitPaymentUrl if null</param>
 		/// <returns>The PaymentACK</returns>
-		public PaymentACK SubmitPayment(Uri paymentUrl = null)
+		public PaymentAck SubmitPayment(Uri paymentUrl = null)
 		{
 			if(paymentUrl == null)
 				paymentUrl = ImplicitPaymentUrl;
@@ -218,9 +216,9 @@ namespace ChainUtils.Payment
 			}
 		}
 
-		public async Task<PaymentACK> SubmitPaymentAsync(Uri paymentUrl, HttpClient httpClient)
+		public async Task<PaymentAck> SubmitPaymentAsync(Uri paymentUrl, HttpClient httpClient)
 		{
-			bool own = false;
+			var own = false;
 			if(paymentUrl == null)
 				paymentUrl = ImplicitPaymentUrl;
 			if(paymentUrl == null)
@@ -235,20 +233,20 @@ namespace ChainUtils.Payment
 			{
 				var request = new HttpRequestMessage(HttpMethod.Post, paymentUrl.OriginalString);
 				request.Headers.Clear();
-				request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(PaymentACK.MediaType));
-				request.Content = new ByteArrayContent(this.ToBytes());
-				request.Content.Headers.ContentType = new MediaTypeHeaderValue(PaymentMessage.MediaType);
+				request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(PaymentAck.MediaType));
+				request.Content = new ByteArrayContent(ToBytes());
+				request.Content.Headers.ContentType = new MediaTypeHeaderValue(MediaType);
 
 				var result = await httpClient.SendAsync(request).ConfigureAwait(false);
 				if(!result.IsSuccessStatusCode)
 					throw new WebException(result.StatusCode + "(" + (int)result.StatusCode + ")");
 
-				if(result.Content.Headers.ContentType == null || !result.Content.Headers.ContentType.MediaType.Equals(PaymentACK.MediaType, StringComparison.InvariantCultureIgnoreCase))
+				if(result.Content.Headers.ContentType == null || !result.Content.Headers.ContentType.MediaType.Equals(PaymentAck.MediaType, StringComparison.InvariantCultureIgnoreCase))
 				{
-					throw new WebException("Invalid contenttype received, expecting " + PaymentACK.MediaType + ", but got " + result.Content.Headers.ContentType);
+					throw new WebException("Invalid contenttype received, expecting " + PaymentAck.MediaType + ", but got " + result.Content.Headers.ContentType);
 				}
 				var response = await result.Content.ReadAsStreamAsync().ConfigureAwait(false);
-				return PaymentACK.Load(response);
+				return PaymentAck.Load(response);
 			}
 			finally
 			{

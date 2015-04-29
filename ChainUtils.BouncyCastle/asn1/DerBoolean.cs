@@ -48,7 +48,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				isExplicit)
         {
-            Asn1Object o = obj.GetObject();
+            var o = obj.GetObject();
 
             if (isExplicit || o is DerBoolean)
             {
@@ -65,7 +65,7 @@ namespace ChainUtils.BouncyCastle.Asn1
                 throw new ArgumentException("byte value should have 1 byte in it", "val");
 
             // TODO Are there any constraints on the possible byte values?
-            this.value = val[0];
+            value = val[0];
         }
 
         private DerBoolean(
@@ -89,7 +89,7 @@ namespace ChainUtils.BouncyCastle.Asn1
         protected override bool Asn1Equals(
             Asn1Object asn1Object)
         {
-            DerBoolean other = asn1Object as DerBoolean;
+            var other = asn1Object as DerBoolean;
 
             if (other == null)
                 return false;
@@ -114,7 +114,7 @@ namespace ChainUtils.BouncyCastle.Asn1
                 throw new ArgumentException("BOOLEAN value should have 1 byte in it", "value");
             }
 
-            byte b = value[0];
+            var b = value[0];
 
             return b == 0 ? False : b == 0xFF ? True : new DerBoolean(value);
         }

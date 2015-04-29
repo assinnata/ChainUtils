@@ -46,17 +46,17 @@ namespace Mono.Nat.Upnp
 
         protected WebRequest CreateRequest(string upnpMethod, string methodParameters, out byte[] body)
         {
-            string ss = "http://" + this.device.HostEndPoint.ToString() + this.device.ControlUrl;
+            var ss = "http://" + this.device.HostEndPoint.ToString() + this.device.ControlUrl;
             NatUtility.Log("Initiating request to: {0}", ss);
-            Uri location = new Uri(ss);
+            var location = new Uri(ss);
 
-            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(location);
+            var req = (HttpWebRequest)HttpWebRequest.Create(location);
             req.KeepAlive = false;
             req.Method = "POST";
             req.ContentType = "text/xml; charset=\"utf-8\"";
             req.Headers.Add("SOAPACTION", "\"" + device.ServiceType + "#" + upnpMethod + "\"");
 
-            string bodyString = "<s:Envelope "
+            var bodyString = "<s:Envelope "
                + "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
                + "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
                + "<s:Body>"
@@ -74,10 +74,10 @@ namespace Mono.Nat.Upnp
         public static MessageBase Decode(UpnpNatDevice device, string message)
         {
             XmlNode node = null;
-            System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+            var doc = new System.Xml.XmlDocument();
             doc.LoadXml(message);
 
-            XmlNamespaceManager nsm = new XmlNamespaceManager(doc.NameTable);
+            var nsm = new XmlNamespaceManager(doc.NameTable);
 
             // Error messages should be found under this namespace
             nsm.AddNamespace("errorNs", "urn:schemas-upnp-org:control-1-0");
@@ -119,7 +119,7 @@ namespace Mono.Nat.Upnp
 
         internal static XmlWriter CreateWriter(StringBuilder sb)
         {
-            XmlWriterSettings settings = new XmlWriterSettings();
+            var settings = new XmlWriterSettings();
             settings.ConformanceLevel = ConformanceLevel.Fragment;
             return XmlWriter.Create(sb, settings);
         }

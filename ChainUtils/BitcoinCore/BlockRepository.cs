@@ -1,17 +1,12 @@
 ﻿#if !NOFILEIO
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
 	public class BlockRepository
 	{
-		IndexedBlockStore _BlockStore;
-		IndexedBlockStore _HeaderStore;
+		IndexedBlockStore _blockStore;
+		IndexedBlockStore _headerStore;
 		public BlockRepository(IndexedBlockStore blockStore, 
 							   IndexedBlockStore headerStore)
 		{
@@ -21,25 +16,25 @@ namespace ChainUtils.BitcoinCore
 				throw new ArgumentNullException("headerStore");
 			if(blockStore == headerStore)
 				throw new ArgumentException("The two stores should be different");
-			_BlockStore = blockStore;
-			_HeaderStore = headerStore;
+			_blockStore = blockStore;
+			_headerStore = headerStore;
 		}
 
 
 		public void WriteBlock(Block block)
 		{
 			WriteBlockHeader(block.Header);
-			_BlockStore.Put(block);
+			_blockStore.Put(block);
 		}
 		public void WriteBlockHeader(BlockHeader header)
 		{
-			Block block = new Block(header);
-			_HeaderStore.Put(block);
+			var block = new Block(header);
+			_headerStore.Put(block);
 		}
 
-		public Block GetBlock(uint256 hash)
+		public Block GetBlock(Uint256 hash)
 		{
-			return _BlockStore.Get(hash) ?? _HeaderStore.Get(hash);
+			return _blockStore.Get(hash) ?? _headerStore.Get(hash);
 		}
 
 		

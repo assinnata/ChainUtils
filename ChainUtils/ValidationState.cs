@@ -1,46 +1,42 @@
-﻿using ChainUtils.Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.Protocol;
 
 namespace ChainUtils
 {
 	public class ValidationState
 	{
-		static readonly uint MAX_BLOCK_SIZE = 1000000;
-		static readonly ulong MAX_MONEY = (ulong)21000000 * (ulong)Money.COIN;
-		internal static readonly uint MAX_BLOCK_SIGOPS = MAX_BLOCK_SIZE / 50;
-		enum mode_state
+		static readonly uint MaxBlockSize = 1000000;
+		static readonly ulong MaxMoney = (ulong)21000000 * (ulong)Money.Coin;
+		internal static readonly uint MaxBlockSigops = MaxBlockSize / 50;
+		enum ModeState
 		{
-			MODE_VALID,   // everything ok
-			MODE_INVALID, // network rule violation (DoS value may be set)
-			MODE_ERROR,   // run-time error
+			ModeValid,   // everything ok
+			ModeInvalid, // network rule violation (DoS value may be set)
+			ModeError,   // run-time error
 		};
 
 
-		mode_state mode;
-		int nDoS;
-		string strRejectReason;
-		RejectCode chRejectCode;
-		bool corruptionPossible;
+		ModeState _mode;
+		int _nDoS;
+		string _strRejectReason;
+		RejectCode _chRejectCode;
+		bool _corruptionPossible;
 
-		private readonly Network _Network;
+		private readonly Network _network;
 		public Network Network
 		{
 			get
 			{
-				return _Network;
+				return _network;
 			}
 		}
 		public ValidationState(Network network)
 		{
-			_Network = network;
-			mode = mode_state.MODE_VALID;
-			nDoS = 0;
-			corruptionPossible = false;
+			_network = network;
+			_mode = ModeState.ModeValid;
+			_nDoS = 0;
+			_corruptionPossible = false;
 			CheckProofOfWork = true;
 			CheckMerkleRoot = true;
 		}
@@ -60,13 +56,13 @@ namespace ChainUtils
 			 RejectCode chRejectCodeIn = 0, string strRejectReasonIn = "",
 			 bool corruptionIn = false)
 		{
-			chRejectCode = chRejectCodeIn;
-			strRejectReason = strRejectReasonIn;
-			corruptionPossible = corruptionIn;
-			if(mode == mode_state.MODE_ERROR)
+			_chRejectCode = chRejectCodeIn;
+			_strRejectReason = strRejectReasonIn;
+			_corruptionPossible = corruptionIn;
+			if(_mode == ModeState.ModeError)
 				return ret;
-			nDoS += level;
-			mode = mode_state.MODE_INVALID;
+			_nDoS += level;
+			_mode = ModeState.ModeInvalid;
 			return ret;
 		}
 
@@ -77,9 +73,9 @@ namespace ChainUtils
 		}
 		public bool Error(string strRejectReasonIn = "")
 		{
-			if(mode == mode_state.MODE_VALID)
-				strRejectReason = strRejectReasonIn;
-			mode = mode_state.MODE_ERROR;
+			if(_mode == ModeState.ModeValid)
+				_strRejectReason = strRejectReasonIn;
+			_mode = ModeState.ModeError;
 			return false;
 		}
 
@@ -87,41 +83,41 @@ namespace ChainUtils
 		{
 			get
 			{
-				return mode == mode_state.MODE_VALID;
+				return _mode == ModeState.ModeValid;
 			}
 		}
 		public bool IsInvalid
 		{
 			get
 			{
-				return mode == mode_state.MODE_INVALID;
+				return _mode == ModeState.ModeInvalid;
 			}
 		}
 		public bool IsError
 		{
 			get
 			{
-				return mode == mode_state.MODE_ERROR;
+				return _mode == ModeState.ModeError;
 			}
 		}
 		public bool IsInvalidEx(ref int nDoSOut)
 		{
 			if(IsInvalid)
 			{
-				nDoSOut = nDoS;
+				nDoSOut = _nDoS;
 				return true;
 			}
 			return false;
 		}
 		public bool CorruptionPossible()
 		{
-			return corruptionPossible;
+			return _corruptionPossible;
 		}
 		public RejectCode RejectCode
 		{
 			get
 			{
-				return chRejectCode;
+				return _chRejectCode;
 			}
 		}
 		//struct GetRejectReason()  { return strRejectReason; }
@@ -131,14 +127,14 @@ namespace ChainUtils
 			// Basic checks that don't depend on any context
 			if(tx.Inputs.Count == 0)
 				return DoS(10, Utils.error("CheckTransaction() : vin empty"),
-								 RejectCode.INVALID, "bad-txns-vin-empty");
+								 RejectCode.Invalid, "bad-txns-vin-empty");
 			if(tx.Outputs.Count == 0)
 				return DoS(10, Utils.error("CheckTransaction() : vout empty"),
-								 RejectCode.INVALID, "bad-txns-vout-empty");
+								 RejectCode.Invalid, "bad-txns-vout-empty");
 			// Size limits
-			if(tx.ToBytes().Length > MAX_BLOCK_SIZE)
+			if(tx.ToBytes().Length > MaxBlockSize)
 				return DoS(100, Utils.error("CheckTransaction() : size limits failed"),
-								 RejectCode.INVALID, "bad-txns-oversize");
+								 RejectCode.Invalid, "bad-txns-oversize");
 
 			// Check for negative or overflow output values
 			long nValueOut = 0;
@@ -146,23 +142,23 @@ namespace ChainUtils
 			{
 				if(txout.Value < 0)
 					return DoS(100, Utils.error("CheckTransaction() : txout.nValue negative"),
-									 RejectCode.INVALID, "bad-txns-vout-negative");
-				if(txout.Value > MAX_MONEY)
+									 RejectCode.Invalid, "bad-txns-vout-negative");
+				if(txout.Value > MaxMoney)
 					return DoS(100, Utils.error("CheckTransaction() : txout.nValue too high"),
-									 RejectCode.INVALID, "bad-txns-vout-toolarge");
+									 RejectCode.Invalid, "bad-txns-vout-toolarge");
 				nValueOut += (long)txout.Value;
-				if(!((nValueOut >= 0 && nValueOut <= (long)MAX_MONEY)))
+				if(!((nValueOut >= 0 && nValueOut <= (long)MaxMoney)))
 					return DoS(100, Utils.error("CheckTransaction() : txout total out of range"),
-									 RejectCode.INVALID, "bad-txns-txouttotal-toolarge");
+									 RejectCode.Invalid, "bad-txns-txouttotal-toolarge");
 			}
 
 			// Check for duplicate inputs
-			HashSet<OutPoint> vInOutPoints = new HashSet<OutPoint>();
+			var vInOutPoints = new HashSet<OutPoint>();
 			foreach(var txin in tx.Inputs)
 			{
 				if(vInOutPoints.Contains(txin.PrevOut))
 					return DoS(100, Utils.error("CheckTransaction() : duplicate inputs"),
-									 RejectCode.INVALID, "bad-txns-inputs-duplicate");
+									 RejectCode.Invalid, "bad-txns-inputs-duplicate");
 				vInOutPoints.Add(txin.PrevOut);
 			}
 
@@ -170,14 +166,14 @@ namespace ChainUtils
 			{
 				if(tx.Inputs[0].ScriptSig.Length < 2 || tx.Inputs[0].ScriptSig.Length > 100)
 					return DoS(100, Utils.error("CheckTransaction() : coinbase script size"),
-									 RejectCode.INVALID, "bad-cb-length");
+									 RejectCode.Invalid, "bad-cb-length");
 			}
 			else
 			{
 				foreach(var txin in tx.Inputs)
 					if(txin.PrevOut.IsNull)
 						return DoS(10, Utils.error("CheckTransaction() : prevout is null"),
-										 RejectCode.INVALID, "bad-txns-prevout-null");
+										 RejectCode.Invalid, "bad-txns-prevout-null");
 			}
 
 			return true;
@@ -193,28 +189,28 @@ namespace ChainUtils
 
 			var root = block.GetMerkleRoot();
 
-			if(block.Transactions.Count == 0 || block.Transactions.Count > MAX_BLOCK_SIZE || block.Length > MAX_BLOCK_SIZE)
+			if(block.Transactions.Count == 0 || block.Transactions.Count > MaxBlockSize || block.Length > MaxBlockSize)
 				return DoS(100, Error("CheckBlock() : size limits failed"),
-								 RejectCode.INVALID, "bad-blk-length");
+								 RejectCode.Invalid, "bad-blk-length");
 
 			// Check proof of work matches claimed amount
 			if(CheckProofOfWork && !CheckProofOfWorkCore(block))
 				return DoS(50, Error("CheckBlock() : proof of work failed"),
-								 RejectCode.INVALID, "high-hash");
+								 RejectCode.Invalid, "high-hash");
 
 			// Check timestamp
 			if(block.Header.BlockTime > Now + TimeSpan.FromSeconds(2 * 60 * 60))
 				return Invalid(Error("CheckBlock() : block timestamp too far in the future"),
-									 RejectCode.INVALID, "time-too-new");
+									 RejectCode.Invalid, "time-too-new");
 
 			// First transaction must be coinbase, the rest must not be
 			if(block.Transactions.Count == 0 || !block.Transactions[0].IsCoinBase)
 				return DoS(100, Error("CheckBlock() : first tx is not coinbase"),
-								 RejectCode.INVALID, "bad-cb-missing");
-			for(int i = 1 ; i < block.Transactions.Count ; i++)
+								 RejectCode.Invalid, "bad-cb-missing");
+			for(var i = 1 ; i < block.Transactions.Count ; i++)
 				if(block.Transactions[i].IsCoinBase)
 					return DoS(100, Error("CheckBlock() : more than one coinbase"),
-									 RejectCode.INVALID, "bad-cb-multiple");
+									 RejectCode.Invalid, "bad-cb-multiple");
 
 			// Check transactions
 			foreach(var tx in block.Transactions)
@@ -224,28 +220,28 @@ namespace ChainUtils
 		
 			// Check for duplicate txids. This is caught by ConnectInputs(),
 			// but catching it earlier avoids a potential DoS attack:
-			HashSet<uint256> uniqueTx = new HashSet<uint256>();
-			for(int i = 0 ; i < block.Transactions.Count ; i++)
+			var uniqueTx = new HashSet<Uint256>();
+			for(var i = 0 ; i < block.Transactions.Count ; i++)
 			{
 				uniqueTx.Add(root.GetLeaf(i).Hash);
 			}
 			if(uniqueTx.Count != block.Transactions.Count)
 				return DoS(100, Error("CheckBlock() : duplicate transaction"),
-								 RejectCode.INVALID, "bad-txns-duplicate", true);
+								 RejectCode.Invalid, "bad-txns-duplicate", true);
 
-			int nSigOps = 0;
+			var nSigOps = 0;
 			foreach(var tx in block.Transactions)
 			{
 				nSigOps += GetLegacySigOpCount(tx);
 			}
-			if(nSigOps > MAX_BLOCK_SIGOPS)
+			if(nSigOps > MaxBlockSigops)
 				return DoS(100, Error("CheckBlock() : out-of-bounds SigOpCount"),
-								 RejectCode.INVALID, "bad-blk-sigops", true);
+								 RejectCode.Invalid, "bad-blk-sigops", true);
 
 			// Check merkle root
 			if(CheckMerkleRoot && block.Header.HashMerkleRoot != root.Hash)
 				return DoS(100, Error("CheckBlock() : hashMerkleRoot mismatch"),
-								 RejectCode.INVALID, "bad-txnmrklroot", true);
+								 RejectCode.Invalid, "bad-txnmrklroot", true);
 
 			return true;
 		}
@@ -280,18 +276,18 @@ namespace ChainUtils
 
 
 
-		DateTimeOffset _Now;
+		DateTimeOffset _now;
 		public DateTimeOffset Now
 		{
 			get
 			{
-				if(_Now == default(DateTimeOffset))
+				if(_now == default(DateTimeOffset))
 					return DateTimeOffset.UtcNow;
-				return _Now;
+				return _now;
 			}
 			set
 			{
-				_Now = value;
+				_now = value;
 			}
 		}
 	}

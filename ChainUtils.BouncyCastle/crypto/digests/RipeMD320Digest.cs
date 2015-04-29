@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Digests
@@ -136,7 +135,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
             xOff = 0;
 
-            for (int i = 0; i != X.Length; i++)
+            for (var i = 0; i != X.Length; i++)
             {
                 X[i] = 0;
             }
@@ -437,7 +436,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             // reset the offset and clean out the word buffer.
             //
             xOff = 0;
-            for (int i = 0; i != X.Length; i++)
+            for (var i = 0; i != X.Length; i++)
             {
                 X[i] = 0;
             }
@@ -450,7 +449,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public override void Reset(IMemoable other)
 		{
-			RipeMD320Digest d = (RipeMD320Digest)other;
+			var d = (RipeMD320Digest)other;
 
 			CopyIn(d);
 		}

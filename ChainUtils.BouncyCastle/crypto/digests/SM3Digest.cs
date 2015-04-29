@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -38,14 +37,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		static SM3Digest()
 		{
-			for (int i = 0; i < 16; ++i)
+			for (var i = 0; i < 16; ++i)
 			{
 				uint t = 0x79CC4519;
 				T[i] = (t << i) | (t >> (32 - i));
 			}
-			for (int i = 16; i < 64; ++i)
+			for (var i = 16; i < 64; ++i)
 			{
-				int n = i % 32;
+				var n = i % 32;
 				uint t = 0x7A879D8A;
 				T[i] = (t << n) | (t >> (32 - n));
 			}
@@ -72,8 +71,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private void CopyIn(SM3Digest t)
 		{
-			Array.Copy(t.V, 0, this.V, 0, this.V.Length);
-			Array.Copy(t.inwords, 0, this.inwords, 0, this.inwords.Length);
+			Array.Copy(t.V, 0, V, 0, V.Length);
+			Array.Copy(t.inwords, 0, inwords, 0, inwords.Length);
 			xOff = t.xOff;
 		}
 
@@ -94,7 +93,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public override void Reset(IMemoable other)
 		{
-			SM3Digest d = (SM3Digest)other;
+			var d = (SM3Digest)other;
 
 			base.CopyIn(d);
 			CopyIn(d);
@@ -107,16 +106,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 		{
 			base.Reset();
 
-			this.V[0] = 0x7380166F;
-			this.V[1] = 0x4914B2B9;
-			this.V[2] = 0x172442D7;
-			this.V[3] = 0xDA8A0600;
-			this.V[4] = 0xA96F30BC;
-			this.V[5] = 0x163138AA;
-			this.V[6] = 0xE38DEE4D;
-			this.V[7] = 0xB0FB0E4E;
+			V[0] = 0x7380166F;
+			V[1] = 0x4914B2B9;
+			V[2] = 0x172442D7;
+			V[3] = 0xDA8A0600;
+			V[4] = 0xA96F30BC;
+			V[5] = 0x163138AA;
+			V[6] = 0xE38DEE4D;
+			V[7] = 0xB0FB0E4E;
 
-			this.xOff = 0;
+			xOff = 0;
 		}
 
 
@@ -124,14 +123,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 		{
 			Finish();
 
-			Pack.UInt32_To_BE(this.V[0], output, outOff + 0);
-			Pack.UInt32_To_BE(this.V[1], output, outOff + 4);
-			Pack.UInt32_To_BE(this.V[2], output, outOff + 8);
-			Pack.UInt32_To_BE(this.V[3], output, outOff + 12);
-			Pack.UInt32_To_BE(this.V[4], output, outOff + 16);
-			Pack.UInt32_To_BE(this.V[5], output, outOff + 20);
-			Pack.UInt32_To_BE(this.V[6], output, outOff + 24);
-			Pack.UInt32_To_BE(this.V[7], output, outOff + 28);
+			Pack.UInt32_To_BE(V[0], output, outOff + 0);
+			Pack.UInt32_To_BE(V[1], output, outOff + 4);
+			Pack.UInt32_To_BE(V[2], output, outOff + 8);
+			Pack.UInt32_To_BE(V[3], output, outOff + 12);
+			Pack.UInt32_To_BE(V[4], output, outOff + 16);
+			Pack.UInt32_To_BE(V[5], output, outOff + 20);
+			Pack.UInt32_To_BE(V[6], output, outOff + 24);
+			Pack.UInt32_To_BE(V[7], output, outOff + 28);
 
 			Reset();
 
@@ -142,11 +141,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 		internal override void ProcessWord(byte[] input,
 		                                   int inOff)
 		{
-			uint n = Pack.BE_To_UInt32(input, inOff);
-			this.inwords[this.xOff] = n;
-			++this.xOff;
+			var n = Pack.BE_To_UInt32(input, inOff);
+			inwords[xOff] = n;
+			++xOff;
 
-			if (this.xOff >= 16)
+			if (xOff >= 16)
 			{
 				ProcessBlock();
 			}
@@ -154,24 +153,24 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		internal override void ProcessLength(long bitLength)
 		{
-			if (this.xOff > (BLOCK_SIZE - 2))
+			if (xOff > (BLOCK_SIZE - 2))
 			{
 				// xOff == 15  --> can't fit the 64 bit length field at tail..
-				this.inwords[this.xOff] = 0; // fill with zero
-				++this.xOff;
+				inwords[xOff] = 0; // fill with zero
+				++xOff;
 
 				ProcessBlock();
 			}
 			// Fill with zero words, until reach 2nd to last slot
-			while (this.xOff < (BLOCK_SIZE - 2))
+			while (xOff < (BLOCK_SIZE - 2))
 			{
-				this.inwords[this.xOff] = 0;
-				++this.xOff;
+				inwords[xOff] = 0;
+				++xOff;
 			}
 
 			// Store input data length in BITS
-			this.inwords[this.xOff++] = (uint)(bitLength >> 32);
-			this.inwords[this.xOff++] = (uint)(bitLength);
+			inwords[xOff++] = (uint)(bitLength >> 32);
+			inwords[xOff++] = (uint)(bitLength);
 		}
 
 		/*
@@ -214,15 +213,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private uint P0(uint x)
 		{
-			uint r9 = ((x << 9) | (x >> (32 - 9)));
-			uint r17 = ((x << 17) | (x >> (32 - 17)));
+			var r9 = ((x << 9) | (x >> (32 - 9)));
+			var r17 = ((x << 17) | (x >> (32 - 17)));
 			return (x ^ r9 ^ r17);
 		}
 
 		private uint P1(uint x)
 		{
-			uint r15 = ((x << 15) | (x >> (32 - 15)));
-			uint r23 = ((x << 23) | (x >> (32 - 23)));
+			var r15 = ((x << 15) | (x >> (32 - 15)));
+			var r23 = ((x << 23) | (x >> (32 - 23)));
 			return (x ^ r15 ^ r23);
 		}
 
@@ -249,41 +248,41 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		internal override void ProcessBlock()
 		{
-			for (int j = 0; j < 16; ++j)
+			for (var j = 0; j < 16; ++j)
 			{
-				this.W[j] = this.inwords[j];
+				W[j] = inwords[j];
 			}
-			for (int j = 16; j < 68; ++j)
+			for (var j = 16; j < 68; ++j)
 			{
-				uint wj3 = this.W[j - 3];
-				uint r15 = ((wj3 << 15) | (wj3 >> (32 - 15)));
-				uint wj13 = this.W[j - 13];
-				uint r7 = ((wj13 << 7) | (wj13 >> (32 - 7)));
-				this.W[j] = P1(this.W[j - 16] ^ this.W[j - 9] ^ r15) ^ r7 ^ this.W[j - 6];
+				var wj3 = W[j - 3];
+				var r15 = ((wj3 << 15) | (wj3 >> (32 - 15)));
+				var wj13 = W[j - 13];
+				var r7 = ((wj13 << 7) | (wj13 >> (32 - 7)));
+				W[j] = P1(W[j - 16] ^ W[j - 9] ^ r15) ^ r7 ^ W[j - 6];
 			}
-			for (int j = 0; j < 64; ++j)
+			for (var j = 0; j < 64; ++j)
 			{
-				this.W1[j] = this.W[j] ^ this.W[j + 4];
+				W1[j] = W[j] ^ W[j + 4];
 			}
 
-			uint A = this.V[0];
-			uint B = this.V[1];
-			uint C = this.V[2];
-			uint D = this.V[3];
-			uint E = this.V[4];
-			uint F = this.V[5];
-			uint G = this.V[6];
-			uint H = this.V[7];
+			var A = V[0];
+			var B = V[1];
+			var C = V[2];
+			var D = V[3];
+			var E = V[4];
+			var F = V[5];
+			var G = V[6];
+			var H = V[7];
 
 
-			for (int j = 0; j < 16; ++j)
+			for (var j = 0; j < 16; ++j)
 			{
-				uint a12 = ((A << 12) | (A >> (32 - 12)));
-				uint s1_ = a12 + E + T[j];
-				uint SS1 = ((s1_ << 7) | (s1_ >> (32 - 7)));
-				uint SS2 = SS1 ^ a12;
-				uint TT1 = FF0(A, B, C) + D + SS2 + this.W1[j];
-				uint TT2 = GG0(E, F, G) + H + SS1 + this.W[j];
+				var a12 = ((A << 12) | (A >> (32 - 12)));
+				var s1_ = a12 + E + T[j];
+				var SS1 = ((s1_ << 7) | (s1_ >> (32 - 7)));
+				var SS2 = SS1 ^ a12;
+				var TT1 = FF0(A, B, C) + D + SS2 + W1[j];
+				var TT2 = GG0(E, F, G) + H + SS1 + W[j];
 				D = C;
 				C = ((B << 9) | (B >> (32 - 9)));
 				B = A;
@@ -295,14 +294,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 			}
 
 			// Different FF,GG functions on rounds 16..63
-			for (int j = 16; j < 64; ++j)
+			for (var j = 16; j < 64; ++j)
 			{
-				uint a12 = ((A << 12) | (A >> (32 - 12)));
-				uint s1_ = a12 + E + T[j];
-				uint SS1 = ((s1_ << 7) | (s1_ >> (32 - 7)));
-				uint SS2 = SS1 ^ a12;
-				uint TT1 = FF1(A, B, C) + D + SS2 + this.W1[j];
-				uint TT2 = GG1(E, F, G) + H + SS1 + this.W[j];
+				var a12 = ((A << 12) | (A >> (32 - 12)));
+				var s1_ = a12 + E + T[j];
+				var SS1 = ((s1_ << 7) | (s1_ >> (32 - 7)));
+				var SS2 = SS1 ^ a12;
+				var TT1 = FF1(A, B, C) + D + SS2 + W1[j];
+				var TT2 = GG1(E, F, G) + H + SS1 + W[j];
 				D = C;
 				C = ((B << 9) | (B >> (32 - 9)));
 				B = A;
@@ -313,16 +312,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 				E = P0(TT2);
 			}
 
-			this.V[0] ^= A;
-			this.V[1] ^= B;
-			this.V[2] ^= C;
-			this.V[3] ^= D;
-			this.V[4] ^= E;
-			this.V[5] ^= F;
-			this.V[6] ^= G;
-			this.V[7] ^= H;
+			V[0] ^= A;
+			V[1] ^= B;
+			V[2] ^= C;
+			V[3] ^= D;
+			V[4] ^= E;
+			V[5] ^= F;
+			V[6] ^= G;
+			V[7] ^= H;
 
-			this.xOff = 0;
+			xOff = 0;
 		}
 	}
 }

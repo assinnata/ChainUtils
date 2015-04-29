@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.Icao
 {
 	public abstract class IcaoObjectIdentifiers

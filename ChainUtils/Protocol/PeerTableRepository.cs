@@ -1,20 +1,15 @@
 ﻿#if !NOSOCKET
 using System;
 using System.Collections.Generic;
-#if !NOSQLITE
-using System.Data;
-using System.Data.SqlClient;
-using System.Data.SQLite;
-#endif
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading.Tasks;
+#if !NOSQLITE
+using System.Data;
+using System.Data.SQLite;
+#endif
 
 namespace ChainUtils.Protocol
 {
@@ -36,18 +31,18 @@ namespace ChainUtils.Protocol
 		public abstract void WritePeers(IEnumerable<Peer> peer);
 		public void WritePeer(Peer peer)
 		{
-			WritePeers(new Peer[] { peer });
+			WritePeers(new[] { peer });
 		}
 	}
 
 	public class InMemoryPeerTableRepository : PeerTableRepository
 	{
-		protected Dictionary<string, Peer> _Peers = new Dictionary<string, Peer>();
+		protected Dictionary<string, Peer> Peers = new Dictionary<string, Peer>();
 		public override IEnumerable<Peer> GetPeers()
 		{
 			ClearTable();
-			List<Peer> result = new List<Peer>();
-			foreach(var p in _Peers.ToArray())
+			var result = new List<Peer>();
+			foreach(var p in Peers.ToArray())
 			{
 				result.Add(p.Value);
 			}
@@ -56,12 +51,12 @@ namespace ChainUtils.Protocol
 
 		private void ClearTable()
 		{
-			foreach(var p in _Peers.ToArray())
+			foreach(var p in Peers.ToArray())
 			{
 				var ago = p.Value.NetworkAddress.Ago;
 				if(ValiditySpan < ago || ago < TimeSpan.FromMinutes(-30))
 				{
-					_Peers.Remove(p.Key);
+					Peers.Remove(p.Key);
 				}
 			}
 		}
@@ -70,7 +65,7 @@ namespace ChainUtils.Protocol
 		{
 			foreach(var peer in peers)
 			{
-				_Peers.AddOrReplace(peer.NetworkAddress.Endpoint.ToString(), peer);
+				Peers.AddOrReplace(peer.NetworkAddress.Endpoint.ToString(), peer);
 			}
 			ClearTable();
 		}
@@ -127,28 +122,28 @@ namespace ChainUtils.Protocol
 			}
 		}
 
-		private readonly SQLiteConnection _Connection;
+		private readonly SQLiteConnection _connection;
 		public SqLitePeerTableRepository(string fileName)
 		{
 			ValiditySpan = TimeSpan.FromDays(1.0);
 
-			SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder();
+			var builder = new SQLiteConnectionStringBuilder();
 			builder.DataSource = fileName;
 
 			if(!File.Exists(fileName))
 			{
 				SQLiteConnection.CreateFile(fileName);
-				_Connection = new SQLiteConnection(builder.ToString());
-				_Connection.Open();
+				_connection = new SQLiteConnection(builder.ToString());
+				_connection.Open();
 
-				var command = _Connection.CreateCommand();
+				var command = _connection.CreateCommand();
 				command.CommandText = "Create Table PeerTable(Endpoint TEXT UNIQUE,LastSeen UNSIGNED INTEGER, Data TEXT)";
 				command.ExecuteNonQuery();
 			}
 			else
 			{
-				_Connection = new SQLiteConnection(builder.ToString());
-				_Connection.Open();
+				_connection = new SQLiteConnection(builder.ToString());
+				_connection.Open();
 			}
 
 		}
@@ -157,7 +152,7 @@ namespace ChainUtils.Protocol
 		{
 			ClearTable();
 
-			var command = _Connection.CreateCommand();
+			var command = _connection.CreateCommand();
 			command.CommandText = "Select * from PeerTable";
 			var reader = command.ExecuteReader();
 			while(reader.Read())
@@ -168,7 +163,7 @@ namespace ChainUtils.Protocol
 
 		private void ClearTable()
 		{
-			var command = _Connection.CreateCommand();
+			var command = _connection.CreateCommand();
 			command.CommandText = "Delete from PeerTable Where LastSeen < @d";
 			command.Parameters.Add("@d", DbType.UInt64).Value = Utils.DateTimeToUnixTime(DateTimeOffset.UtcNow - ValiditySpan);
 			command.ExecuteNonQuery();
@@ -176,9 +171,9 @@ namespace ChainUtils.Protocol
 
 		public override void WritePeers(IEnumerable<Peer> peers)
 		{
-			var command = _Connection.CreateCommand();
-			StringBuilder builder = new StringBuilder();
-			int i = 0;
+			var command = _connection.CreateCommand();
+			var builder = new StringBuilder();
+			var i = 0;
 			foreach(var peer in peers)
 			{
 				builder.AppendLine("Insert Or Replace INTO PeerTable(Endpoint, LastSeen,Data) Values(@a" + i + ",@b" + i + ",@c" + i + ");");
@@ -196,8 +191,8 @@ namespace ChainUtils.Protocol
 
 		public static string Serialize<T>(T obj)
 		{
-			DataContractSerializer seria = new DataContractSerializer(typeof(T));
-			MemoryStream ms = new MemoryStream();
+			var seria = new DataContractSerializer(typeof(T));
+			var ms = new MemoryStream();
 			seria.WriteObject(ms, obj);
 			ms.Position = 0;
 			return new StreamReader(ms).ReadToEnd();
@@ -205,9 +200,9 @@ namespace ChainUtils.Protocol
 
 		public static T Deserialize<T>(string str)
 		{
-			DataContractSerializer seria = new DataContractSerializer(typeof(T));
-			MemoryStream ms = new MemoryStream();
-			StreamWriter writer = new StreamWriter(ms);
+			var seria = new DataContractSerializer(typeof(T));
+			var ms = new MemoryStream();
+			var writer = new StreamWriter(ms);
 			writer.Write(str);
 			writer.Flush();
 			ms.Position = 0;
@@ -218,7 +213,7 @@ namespace ChainUtils.Protocol
 
 		public void Dispose()
 		{
-			_Connection.Close();
+			_connection.Close();
 		}
 
 		#endregion

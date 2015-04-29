@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math.EC
@@ -81,7 +80,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public override string ToString()
         {
-            return this.ToBigInteger().ToString(16);
+            return ToBigInteger().ToString(16);
         }
 
         public virtual byte[] GetEncoded()
@@ -97,10 +96,10 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         internal static BigInteger CalculateResidue(BigInteger p)
         {
-            int bitLength = p.BitLength;
+            var bitLength = p.BitLength;
             if (bitLength >= 96)
             {
-                BigInteger firstWord = p.ShiftRight(bitLength - 64);
+                var firstWord = p.ShiftRight(bitLength - 64);
                 if (firstWord.LongValue == -1L)
                 {
                     return BigInteger.One.ShiftLeft(bitLength).Subtract(p);
@@ -161,7 +160,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public override ECFieldElement AddOne()
         {
-            BigInteger x2 = x.Add(BigInteger.One);
+            var x2 = x.Add(BigInteger.One);
             if (x2.CompareTo(q) == 0)
             {
                 x2 = BigInteger.Zero;
@@ -184,17 +183,17 @@ namespace ChainUtils.BouncyCastle.Math.EC
         public override ECFieldElement MultiplyMinusProduct(ECFieldElement b, ECFieldElement x, ECFieldElement y)
         {
             BigInteger ax = this.x, bx = b.ToBigInteger(), xx = x.ToBigInteger(), yx = y.ToBigInteger();
-            BigInteger ab = ax.Multiply(bx);
-            BigInteger xy = xx.Multiply(yx);
+            var ab = ax.Multiply(bx);
+            var xy = xx.Multiply(yx);
             return new FpFieldElement(q, r, ModReduce(ab.Subtract(xy)));
         }
 
         public override ECFieldElement MultiplyPlusProduct(ECFieldElement b, ECFieldElement x, ECFieldElement y)
         {
             BigInteger ax = this.x, bx = b.ToBigInteger(), xx = x.ToBigInteger(), yx = y.ToBigInteger();
-            BigInteger ab = ax.Multiply(bx);
-            BigInteger xy = xx.Multiply(yx);
-            BigInteger sum = ab.Add(xy);
+            var ab = ax.Multiply(bx);
+            var xy = xx.Multiply(yx);
+            var sum = ab.Add(xy);
             if (r != null && r.SignValue < 0 && sum.BitLength > (q.BitLength << 1))
             {
                 sum = sum.Subtract(q.ShiftLeft(q.BitLength));
@@ -221,17 +220,17 @@ namespace ChainUtils.BouncyCastle.Math.EC
         public override ECFieldElement SquareMinusProduct(ECFieldElement x, ECFieldElement y)
         {
             BigInteger ax = this.x, xx = x.ToBigInteger(), yx = y.ToBigInteger();
-            BigInteger aa = ax.Multiply(ax);
-            BigInteger xy = xx.Multiply(yx);
+            var aa = ax.Multiply(ax);
+            var xy = xx.Multiply(yx);
             return new FpFieldElement(q, r, ModReduce(aa.Subtract(xy)));
         }
 
         public override ECFieldElement SquarePlusProduct(ECFieldElement x, ECFieldElement y)
         {
             BigInteger ax = this.x, xx = x.ToBigInteger(), yx = y.ToBigInteger();
-            BigInteger aa = ax.Multiply(ax);
-            BigInteger xy = xx.Multiply(yx);
-            BigInteger sum = aa.Add(xy);
+            var aa = ax.Multiply(ax);
+            var xy = xx.Multiply(yx);
+            var sum = aa.Add(xy);
             if (r != null && r.SignValue < 0 && sum.BitLength > (q.BitLength << 1))
             {
                 sum = sum.Subtract(q.ShiftLeft(q.BitLength));
@@ -259,15 +258,15 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
             if (q.TestBit(1)) // q == 4m + 3
             {
-                BigInteger e = q.ShiftRight(2).Add(BigInteger.One);
+                var e = q.ShiftRight(2).Add(BigInteger.One);
                 return CheckSqrt(new FpFieldElement(q, r, x.ModPow(e, q)));
             }
 
             if (q.TestBit(2)) // q == 8m + 5
             {
-                BigInteger t1 = x.ModPow(q.ShiftRight(3), q);
-                BigInteger t2 = ModMult(t1, x);
-                BigInteger t3 = ModMult(t2, t1);
+                var t1 = x.ModPow(q.ShiftRight(3), q);
+                var t2 = ModMult(t1, x);
+                var t3 = ModMult(t2, t1);
 
                 if (t3.Equals(BigInteger.One))
                 {
@@ -275,26 +274,26 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 }
 
                 // TODO This is constant and could be precomputed
-                BigInteger t4 = BigInteger.Two.ModPow(q.ShiftRight(2), q);
+                var t4 = BigInteger.Two.ModPow(q.ShiftRight(2), q);
 
-                BigInteger y = ModMult(t2, t4);
+                var y = ModMult(t2, t4);
 
                 return CheckSqrt(new FpFieldElement(q, r, y));
             }
 
             // q == 8m + 1
 
-            BigInteger legendreExponent = q.ShiftRight(1);
+            var legendreExponent = q.ShiftRight(1);
             if (!(x.ModPow(legendreExponent, q).Equals(BigInteger.One)))
                 return null;
 
-            BigInteger X = this.x;
-            BigInteger fourX = ModDouble(ModDouble(X)); ;
+            var X = x;
+            var fourX = ModDouble(ModDouble(X)); ;
 
             BigInteger k = legendreExponent.Add(BigInteger.One), qMinusOne = q.Subtract(BigInteger.One);
 
             BigInteger U, V;
-            Random rand = new Random();
+            var rand = new Random();
             do
             {
                 BigInteger P;
@@ -305,7 +304,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 while (P.CompareTo(q) >= 0
                     || !ModReduce(P.Multiply(P).Subtract(fourX)).ModPow(legendreExponent, q).Equals(qMinusOne));
 
-                BigInteger[] result = LucasSequence(P, X, k);
+                var result = LucasSequence(P, X, k);
                 U = result[0];
                 V = result[1];
 
@@ -331,18 +330,18 @@ namespace ChainUtils.BouncyCastle.Math.EC
         {
             // TODO Research and apply "common-multiplicand multiplication here"
 
-            int n = k.BitLength;
-            int s = k.GetLowestSetBit();
+            var n = k.BitLength;
+            var s = k.GetLowestSetBit();
 
             Debug.Assert(k.TestBit(s));
 
-            BigInteger Uh = BigInteger.One;
-            BigInteger Vl = BigInteger.Two;
-            BigInteger Vh = P;
-            BigInteger Ql = BigInteger.One;
-            BigInteger Qh = BigInteger.One;
+            var Uh = BigInteger.One;
+            var Vl = BigInteger.Two;
+            var Vh = P;
+            var Ql = BigInteger.One;
+            var Qh = BigInteger.One;
 
-            for (int j = n - 1; j >= s + 1; --j)
+            for (var j = n - 1; j >= s + 1; --j)
             {
                 Ql = ModMult(Ql, Qh);
 
@@ -368,7 +367,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             Vl = ModReduce(Vh.Multiply(Vl).Subtract(P.Multiply(Ql)));
             Ql = ModMult(Ql, Qh);
 
-            for (int j = 1; j <= s; ++j)
+            for (var j = 1; j <= s; ++j)
             {
                 Uh = ModMult(Uh, Vl);
                 Vl = ModReduce(Vl.Multiply(Vl).Subtract(Ql.ShiftLeft(1)));
@@ -380,7 +379,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         protected virtual BigInteger ModAdd(BigInteger x1, BigInteger x2)
         {
-            BigInteger x3 = x1.Add(x2);
+            var x3 = x1.Add(x2);
             if (x3.CompareTo(q) >= 0)
             {
                 x3 = x3.Subtract(q);
@@ -390,7 +389,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         protected virtual BigInteger ModDouble(BigInteger x)
         {
-            BigInteger _2x = x.ShiftLeft(1);
+            var _2x = x.ShiftLeft(1);
             if (_2x.CompareTo(q) >= 0)
             {
                 _2x = _2x.Subtract(q);
@@ -418,11 +417,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         protected virtual BigInteger ModInverse(BigInteger x)
         {
-            int bits = FieldSize;
-            int len = (bits + 31) >> 5;
-            uint[] p = Nat.FromBigInteger(bits, q);
-            uint[] n = Nat.FromBigInteger(bits, x);
-            uint[] z = Nat.Create(len);
+            var bits = FieldSize;
+            var len = (bits + 31) >> 5;
+            var p = Nat.FromBigInteger(bits, q);
+            var n = Nat.FromBigInteger(bits, x);
+            var z = Nat.Create(len);
             Mod.Invert(p, n, z);
             return Nat.ToBigInteger(len, z);
         }
@@ -440,20 +439,20 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
             else
             {
-                bool negative = x.SignValue < 0;
+                var negative = x.SignValue < 0;
                 if (negative)
                 {
                     x = x.Abs();
                 }
-                int qLen = q.BitLength;
+                var qLen = q.BitLength;
                 if (r.SignValue > 0)
                 {
-                    BigInteger qMod = BigInteger.One.ShiftLeft(qLen);
-                    bool rIsOne = r.Equals(BigInteger.One);
+                    var qMod = BigInteger.One.ShiftLeft(qLen);
+                    var rIsOne = r.Equals(BigInteger.One);
                     while (x.BitLength > (qLen + 1))
                     {
-                        BigInteger u = x.ShiftRight(qLen);
-                        BigInteger v = x.Remainder(qMod);
+                        var u = x.ShiftRight(qLen);
+                        var v = x.Remainder(qMod);
                         if (!rIsOne)
                         {
                             u = u.Multiply(r);
@@ -463,12 +462,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 }
                 else
                 {
-                    int d = ((qLen - 1) & 31) + 1;
-                    BigInteger mu = r.Negate();
-                    BigInteger u = mu.Multiply(x.ShiftRight(qLen - d));
-                    BigInteger quot = u.ShiftRight(qLen + d);
-                    BigInteger v = quot.Multiply(q);
-                    BigInteger bk1 = BigInteger.One.ShiftLeft(qLen + d);
+                    var d = ((qLen - 1) & 31) + 1;
+                    var mu = r.Negate();
+                    var u = mu.Multiply(x.ShiftRight(qLen - d));
+                    var quot = u.ShiftRight(qLen + d);
+                    var v = quot.Multiply(q);
+                    var bk1 = BigInteger.One.ShiftLeft(qLen + d);
                     v = v.Remainder(bk1);
                     x = x.Remainder(bk1);
                     x = x.Subtract(v);
@@ -491,7 +490,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         protected virtual BigInteger ModSubtract(BigInteger x1, BigInteger x2)
         {
-            BigInteger x3 = x1.Subtract(x2);
+            var x3 = x1.Subtract(x2);
             if (x3.SignValue < 0)
             {
                 x3 = x3.Add(q);
@@ -505,7 +504,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             if (obj == this)
                 return true;
 
-            FpFieldElement other = obj as FpFieldElement;
+            var other = obj as FpFieldElement;
 
             if (other == null)
                 return false;
@@ -594,8 +593,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
         {
             if ((k2 == 0) && (k3 == 0))
             {
-                this.representation = Tpb;
-                this.ks = new int[] { k1 };
+                representation = Tpb;
+                ks = new int[] { k1 };
             }
             else
             {
@@ -604,8 +603,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 if (k2 <= 0)
                     throw new ArgumentException("k2 must be larger than 0");
 
-                this.representation = Ppb;
-                this.ks = new int[] { k1, k2, k3 };
+                representation = Ppb;
+                ks = new int[] { k1, k2, k3 };
             }
 
             this.m = m;
@@ -633,7 +632,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
         private F2mFieldElement(int m, int[] ks, LongArray x)
         {
             this.m = m;
-            this.representation = (ks.Length == 1) ? Tpb : Ppb;
+            representation = (ks.Length == 1) ? Tpb : Ppb;
             this.ks = ks;
             this.x = x;
         }
@@ -694,8 +693,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
                     + "both instances of F2mFieldElement");
             }
 
-            F2mFieldElement aF2m = (F2mFieldElement)a;
-            F2mFieldElement bF2m = (F2mFieldElement)b;
+            var aF2m = (F2mFieldElement)a;
+            var bF2m = (F2mFieldElement)b;
 
             if (aF2m.representation != bF2m.representation)
             {
@@ -715,8 +714,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
             // No check performed here for performance reasons. Instead the
             // elements involved are checked in ECPoint.F2m
             // checkFieldElements(this, b);
-            LongArray iarrClone = this.x.Copy();
-            F2mFieldElement bF2m = (F2mFieldElement)b;
+            var iarrClone = x.Copy();
+            var bF2m = (F2mFieldElement)b;
             iarrClone.AddShiftedByWords(bF2m.x, 0);
             return new F2mFieldElement(m, ks, iarrClone);
         }
@@ -755,8 +754,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
         {
             LongArray ax = this.x, bx = ((F2mFieldElement)b).x, xx = ((F2mFieldElement)x).x, yx = ((F2mFieldElement)y).x;
 
-            LongArray ab = ax.Multiply(bx, m, ks);
-            LongArray xy = xx.Multiply(yx, m, ks);
+            var ab = ax.Multiply(bx, m, ks);
+            var xy = xx.Multiply(yx, m, ks);
 
             if (ab == ax || ab == bx)
             {
@@ -773,7 +772,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             ECFieldElement b)
         {
             // There may be more efficient implementations
-            ECFieldElement bInv = b.Invert();
+            var bInv = b.Invert();
             return Multiply(bInv);
         }
 
@@ -797,8 +796,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
         {
             LongArray ax = this.x, xx = ((F2mFieldElement)x).x, yx = ((F2mFieldElement)y).x;
 
-            LongArray aa = ax.Square(m, ks);
-            LongArray xy = xx.Multiply(yx, m, ks);
+            var aa = ax.Square(m, ks);
+            var xy = xx.Multiply(yx, m, ks);
 
             if (aa == ax)
             {
@@ -813,18 +812,18 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public override ECFieldElement Invert()
         {
-            return new F2mFieldElement(this.m, this.ks, this.x.ModInverse(m, ks));
+            return new F2mFieldElement(m, ks, x.ModInverse(m, ks));
         }
 
         public override ECFieldElement Sqrt()
         {
-            LongArray x1 = this.x;
+            var x1 = x;
             if (x1.IsOne() || x1.IsZero())
             {
                 return this;
             }
 
-            LongArray x2 = x1.ModSquareN(m - 1, m, ks);
+            var x2 = x1.ModSquareN(m - 1, m, ks);
             return new F2mFieldElement(m, ks, x2);
         }
 
@@ -838,7 +837,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             */
         public int Representation
         {
-            get { return this.representation; }
+            get { return representation; }
         }
 
         /**
@@ -847,7 +846,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             */
         public int M
         {
-            get { return this.m; }
+            get { return m; }
         }
 
         /**
@@ -860,7 +859,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             */
         public int K1
         {
-            get { return this.ks[0]; }
+            get { return ks[0]; }
         }
 
         /**
@@ -871,7 +870,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             */
         public int K2
         {
-            get { return this.ks.Length >= 2 ? this.ks[1] : 0; }
+            get { return ks.Length >= 2 ? ks[1] : 0; }
         }
 
         /**
@@ -882,7 +881,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             */
         public int K3
         {
-            get { return this.ks.Length >= 3 ? this.ks[2] : 0; }
+            get { return ks.Length >= 3 ? ks[2] : 0; }
         }
 
         public override bool Equals(
@@ -891,7 +890,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             if (obj == this)
                 return true;
 
-            F2mFieldElement other = obj as F2mFieldElement;
+            var other = obj as F2mFieldElement;
 
             if (other == null)
                 return false;
@@ -902,10 +901,10 @@ namespace ChainUtils.BouncyCastle.Math.EC
         public virtual bool Equals(
             F2mFieldElement other)
         {
-            return ((this.m == other.m)
-                && (this.representation == other.representation)
-                && Arrays.AreEqual(this.ks, other.ks)
-                && (this.x.Equals(other.x)));
+            return ((m == other.m)
+                && (representation == other.representation)
+                && Arrays.AreEqual(ks, other.ks)
+                && (x.Equals(other.x)));
         }
 
         public override int GetHashCode()

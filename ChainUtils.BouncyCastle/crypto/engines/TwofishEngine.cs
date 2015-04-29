@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -223,12 +222,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         public TwofishEngine()
         {
             // calculate the MDS matrix
-            int[] m1 = new int[2];
-            int[] mX = new int[2];
-            int[] mY = new int[2];
+            var m1 = new int[2];
+            var mX = new int[2];
+            var mY = new int[2];
             int j;
 
-            for (int i=0; i< MAX_KEY_BITS ; i++)
+            for (var i=0; i< MAX_KEY_BITS ; i++)
             {
                 j = P[0,i] & 0xff;
                 m1[0] = j;
@@ -269,10 +268,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             if (!(parameters is KeyParameter))
 				throw new ArgumentException("invalid parameter passed to Twofish init - " + parameters.GetType().ToString());
 
-			this.encrypting = forEncryption;
-			this.workingKey = ((KeyParameter)parameters).GetKey();
-			this.k64Cnt = (this.workingKey.Length / 8); // pre-padded ?
-			SetKey(this.workingKey);
+			encrypting = forEncryption;
+			workingKey = ((KeyParameter)parameters).GetKey();
+			k64Cnt = (workingKey.Length / 8); // pre-padded ?
+			SetKey(workingKey);
         }
 
 		public string AlgorithmName
@@ -312,9 +311,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
         public void Reset()
         {
-            if (this.workingKey != null)
+            if (workingKey != null)
             {
-                SetKey(this.workingKey);
+                SetKey(workingKey);
             }
         }
 
@@ -329,10 +328,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
         private void SetKey(byte[] key)
         {
-            int[] k32e = new int[MAX_KEY_BITS/64]; // 4
-            int[] k32o = new int[MAX_KEY_BITS/64]; // 4
+            var k32e = new int[MAX_KEY_BITS/64]; // 4
+            var k32o = new int[MAX_KEY_BITS/64]; // 4
 
-            int[] sBoxKeys = new int[MAX_KEY_BITS/64]; // 4
+            var sBoxKeys = new int[MAX_KEY_BITS/64]; // 4
             gSubKeys = new int[TOTAL_SUBKEYS];
 
             if (k64Cnt < 1)
@@ -362,7 +361,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             }
 
             int q,A,B;
-            for (int i=0; i < TOTAL_SUBKEYS / 2 ; i++)
+            for (var i=0; i < TOTAL_SUBKEYS / 2 ; i++)
             {
                 q = i*SK_STEP;
                 A = F32(q,         k32e);
@@ -377,13 +376,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             /*
             * fully expand the table for speed
             */
-            int k0 = sBoxKeys[0];
-            int k1 = sBoxKeys[1];
-            int k2 = sBoxKeys[2];
-            int k3 = sBoxKeys[3];
+            var k0 = sBoxKeys[0];
+            var k1 = sBoxKeys[1];
+            var k2 = sBoxKeys[2];
+            var k3 = sBoxKeys[3];
             int b0, b1, b2, b3;
             gSBox = new int[4*MAX_KEY_BITS];
-            for (int i=0; i<MAX_KEY_BITS; i++)
+            for (var i=0; i<MAX_KEY_BITS; i++)
             {
                 b0 = b1 = b2 = b3 = i;
                 switch (k64Cnt & 3)
@@ -437,14 +436,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[] dst,
             int dstIndex)
         {
-            int x0 = BytesTo32Bits(src, srcIndex) ^ gSubKeys[INPUT_WHITEN];
-            int x1 = BytesTo32Bits(src, srcIndex + 4) ^ gSubKeys[INPUT_WHITEN + 1];
-            int x2 = BytesTo32Bits(src, srcIndex + 8) ^ gSubKeys[INPUT_WHITEN + 2];
-            int x3 = BytesTo32Bits(src, srcIndex + 12) ^ gSubKeys[INPUT_WHITEN + 3];
+            var x0 = BytesTo32Bits(src, srcIndex) ^ gSubKeys[INPUT_WHITEN];
+            var x1 = BytesTo32Bits(src, srcIndex + 4) ^ gSubKeys[INPUT_WHITEN + 1];
+            var x2 = BytesTo32Bits(src, srcIndex + 8) ^ gSubKeys[INPUT_WHITEN + 2];
+            var x3 = BytesTo32Bits(src, srcIndex + 12) ^ gSubKeys[INPUT_WHITEN + 3];
 
-            int k = ROUND_SUBKEYS;
+            var k = ROUND_SUBKEYS;
             int t0, t1;
-            for (int r = 0; r < ROUNDS; r +=2)
+            for (var r = 0; r < ROUNDS; r +=2)
             {
                 t0 = Fe32_0(x0);
                 t1 = Fe32_3(x1);
@@ -476,14 +475,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[] dst,
             int dstIndex)
         {
-            int x2 = BytesTo32Bits(src, srcIndex) ^ gSubKeys[OUTPUT_WHITEN];
-            int x3 = BytesTo32Bits(src, srcIndex+4) ^ gSubKeys[OUTPUT_WHITEN + 1];
-            int x0 = BytesTo32Bits(src, srcIndex+8) ^ gSubKeys[OUTPUT_WHITEN + 2];
-            int x1 = BytesTo32Bits(src, srcIndex+12) ^ gSubKeys[OUTPUT_WHITEN + 3];
+            var x2 = BytesTo32Bits(src, srcIndex) ^ gSubKeys[OUTPUT_WHITEN];
+            var x3 = BytesTo32Bits(src, srcIndex+4) ^ gSubKeys[OUTPUT_WHITEN + 1];
+            var x0 = BytesTo32Bits(src, srcIndex+8) ^ gSubKeys[OUTPUT_WHITEN + 2];
+            var x1 = BytesTo32Bits(src, srcIndex+12) ^ gSubKeys[OUTPUT_WHITEN + 3];
 
-            int k = ROUND_SUBKEYS + 2 * ROUNDS -1 ;
+            var k = ROUND_SUBKEYS + 2 * ROUNDS -1 ;
             int t0, t1;
-            for (int r = 0; r< ROUNDS ; r +=2)
+            for (var r = 0; r< ROUNDS ; r +=2)
             {
                 t0 = Fe32_0(x2);
                 t1 = Fe32_3(x3);
@@ -511,16 +510,16 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private  int F32(int x, int[] k32)
         {
-            int b0 = M_b0(x);
-            int b1 = M_b1(x);
-            int b2 = M_b2(x);
-            int b3 = M_b3(x);
-            int k0 = k32[0];
-            int k1 = k32[1];
-            int k2 = k32[2];
-            int k3 = k32[3];
+            var b0 = M_b0(x);
+            var b1 = M_b1(x);
+            var b2 = M_b2(x);
+            var b3 = M_b3(x);
+            var k0 = k32[0];
+            var k1 = k32[1];
+            var k2 = k32[2];
+            var k3 = k32[3];
 
-            int result = 0;
+            var result = 0;
             switch (k64Cnt & 3)
             {
                 case 1:
@@ -563,13 +562,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private  int RS_MDS_Encode(int k0, int k1)
         {
-            int r = k1;
-            for (int i = 0 ; i < 4 ; i++) // shift 1 byte at a time
+            var r = k1;
+            for (var i = 0 ; i < 4 ; i++) // shift 1 byte at a time
             {
                 r = RS_rem(r);
             }
             r ^= k0;
-            for (int i=0 ; i < 4 ; i++)
+            for (var i=0 ; i < 4 ; i++)
             {
                 r = RS_rem(r);
             }
@@ -588,10 +587,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private  int RS_rem(int x)
         {
-            int b = (int) (((uint)x >> 24) & 0xff);
-            int g2 = ((b << 1) ^
+            var b = (int) (((uint)x >> 24) & 0xff);
+            var g2 = ((b << 1) ^
                     ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-            int g3 = ( (int)((uint)b >> 1) ^
+            var g3 = ( (int)((uint)b >> 1) ^
                     ((b & 0x01) != 0 ? (int)((uint)RS_GF_FDBK >> 1) : 0)) ^ g2 ;
             return ((x << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
         }

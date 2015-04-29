@@ -1,15 +1,14 @@
 ﻿#if !NOSOCKET
 #if !NOUPNP
-using Mono.Nat;
+using System;
+using System.Linq;
 #endif
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,20 +20,20 @@ namespace ChainUtils.Protocol
 	public delegate void NodeServerMessageEventHandler(NodeServer sender, IncomingMessage message);
 	public class NodeServer : IDisposable
 	{
-		private readonly Network _Network;
+		private readonly Network _network;
 		public Network Network
 		{
 			get
 			{
-				return _Network;
+				return _network;
 			}
 		}
-		private readonly ProtocolVersion _Version;
+		private readonly ProtocolVersion _version;
 		public ProtocolVersion Version
 		{
 			get
 			{
-				return _Version;
+				return _version;
 			}
 		}
 		public bool AdvertizeMyself
@@ -48,19 +47,19 @@ namespace ChainUtils.Protocol
 		{
 			AdvertizeMyself = false;
 			internalPort = internalPort == -1 ? network.DefaultPort : internalPort;
-			_LocalEndpoint = new IPEndPoint(IPAddress.Parse("0.0.0.0").MapToIPv6(), internalPort);
-			_Network = network;
-			_ExternalEndpoint = new IPEndPoint(_LocalEndpoint.Address, Network.DefaultPort);
-			_Version = version;
+			_localEndpoint = new IPEndPoint(IPAddress.Parse("0.0.0.0").MapToIPv6(), internalPort);
+			_network = network;
+			_externalEndpoint = new IPEndPoint(_localEndpoint.Address, Network.DefaultPort);
+			_version = version;
 			var listener = new EventLoopMessageListener<IncomingMessage>(ProcessMessage);
-			_MessageProducer.AddMessageListener(listener);
+			MessageProducer.AddMessageListener(listener);
 			OwnResource(listener);
-			RegisterPeerTableRepository(_PeerTable);
-			_Nodes = new NodeSet();
-			_Nodes.NodeAdded += _Nodes_NodeAdded;
-			_Nodes.NodeRemoved += _Nodes_NodeRemoved;
-			_Nodes.MessageProducer.AddMessageListener(listener);
-			_Trace = new TraceCorrelation(NodeServerTrace.Trace, "Node server listening on " + LocalEndpoint);
+			RegisterPeerTableRepository(_peerTable);
+			_nodes = new NodeSet();
+			_nodes.NodeAdded += _Nodes_NodeAdded;
+			_nodes.NodeRemoved += _Nodes_NodeRemoved;
+			_nodes.MessageProducer.AddMessageListener(listener);
+			_trace = new TraceCorrelation(NodeServerTrace.Trace, "Node server listening on " + LocalEndpoint);
 		}
 
 
@@ -83,63 +82,63 @@ namespace ChainUtils.Protocol
 		}
 
 
-		int[] bitcoinPorts;
+		int[] _bitcoinPorts;
 		int[] BitcoinPorts
 		{
 			get
 			{
-				if(bitcoinPorts == null)
+				if(_bitcoinPorts == null)
 				{
-					bitcoinPorts = Enumerable.Range(Network.DefaultPort, 10).ToArray();
+					_bitcoinPorts = Enumerable.Range(Network.DefaultPort, 10).ToArray();
 				}
-				return bitcoinPorts;
+				return _bitcoinPorts;
 			}
 		}
 
-		TimeSpan _NATLeasePeriod = TimeSpan.FromMinutes(10.0);
+		TimeSpan _natLeasePeriod = TimeSpan.FromMinutes(10.0);
 		/// <summary>
 		/// When using DetectExternalEndpoint, UPNP will open ports on the gateway for a fixed amount of time before renewing
 		/// </summary>
-		public TimeSpan NATLeasePeriod
+		public TimeSpan NatLeasePeriod
 		{
 			get
 			{
-				return _NATLeasePeriod;
+				return _natLeasePeriod;
 			}
 			set
 			{
-				_NATLeasePeriod = value;
+				_natLeasePeriod = value;
 			}
 		}
 
 
-		string _NATRuleName = "ChainUtils Node Server";
-		public string NATRuleName
+		string _natRuleName = "ChainUtils Node Server";
+		public string NatRuleName
 		{
 			get
 			{
-				return _NATRuleName;
+				return _natRuleName;
 			}
 			set
 			{
-				_NATRuleName = value;
+				_natRuleName = value;
 			}
 		}
 #if !NOUPNP
-		UPnPLease _UPnPLease;
-		public UPnPLease DetectExternalEndpoint(CancellationToken cancellation = default(CancellationToken))
+		UpnPLease _upnPLease;
+		public UpnPLease DetectExternalEndpoint(CancellationToken cancellation = default(CancellationToken))
 		{
-			if(_UPnPLease != null)
+			if(_upnPLease != null)
 			{
-				_UPnPLease.Dispose();
-				_UPnPLease = null;
+				_upnPLease.Dispose();
+				_upnPLease = null;
 			}
-			var lease = new UPnPLease(BitcoinPorts, LocalEndpoint.Port, NATRuleName);
-			lease.LeasePeriod = NATLeasePeriod;
+			var lease = new UpnPLease(BitcoinPorts, LocalEndpoint.Port, NatRuleName);
+			lease.LeasePeriod = NatLeasePeriod;
 			if(lease.DetectExternalEndpoint(cancellation))
 			{
-				_UPnPLease = lease;
-				ExternalEndpoint = _UPnPLease.ExternalEndpoint;
+				_upnPLease = lease;
+				ExternalEndpoint = _upnPLease.ExternalEndpoint;
 				return lease;
 			}
 			else
@@ -149,7 +148,7 @@ namespace ChainUtils.Protocol
 					NodeServerTrace.Information("No UPNP device found, try to use external web services to deduce external address");
 					try
 					{
-						var ip = GetMyExternalIP(cancellation);
+						var ip = GetMyExternalIp(cancellation);
 						if(ip != null)
 							ExternalEndpoint = new IPEndPoint(ip, ExternalEndpoint.Port);
 					}
@@ -171,11 +170,11 @@ namespace ChainUtils.Protocol
 
 		private void PopulateTableWithHardNodes()
 		{
-			_InternalMessageProducer.PushMessages(Network.SeedNodes.Select(n => new Peer(PeerOrigin.HardSeed, n)).ToArray());
+			InternalMessageProducer.PushMessages(Network.SeedNodes.Select(n => new Peer(PeerOrigin.HardSeed, n)).ToArray());
 		}
-		private void PopulateTableWithDNSNodes()
+		private void PopulateTableWithDnsNodes()
 		{
-			var peers = Network.DNSSeeds
+			var peers = Network.DnsSeeds
 							.SelectMany(s =>
 							{
 								try
@@ -184,63 +183,63 @@ namespace ChainUtils.Protocol
 								}
 								catch(Exception ex)
 								{
-									NodeServerTrace.ErrorWhileRetrievingDNSSeedIp(s.Name, ex);
+									NodeServerTrace.ErrorWhileRetrievingDnsSeedIp(s.Name, ex);
 									return new IPAddress[0];
 								}
 							})
-							.Select(s => new Peer(PeerOrigin.DNSSeed, new NetworkAddress()
+							.Select(s => new Peer(PeerOrigin.DnsSeed, new NetworkAddress()
 							{
 								Endpoint = new IPEndPoint(s, Network.DefaultPort),
 								Time = Utils.UnixTimeToDateTime(0)
 							})).ToArray();
 
-			_InternalMessageProducer.PushMessages(peers);
+			InternalMessageProducer.PushMessages(peers);
 		}
 
-		readonly PeerTable _PeerTable = new PeerTable();
+		readonly PeerTable _peerTable = new PeerTable();
 		public PeerTable PeerTable
 		{
 			get
 			{
-				return _PeerTable;
+				return _peerTable;
 			}
 		}
 
-		private IPEndPoint _LocalEndpoint;
+		private IPEndPoint _localEndpoint;
 		public IPEndPoint LocalEndpoint
 		{
 			get
 			{
-				return _LocalEndpoint;
+				return _localEndpoint;
 			}
 		}
 
-		Socket socket;
-		TraceCorrelation _Trace;
+		Socket _socket;
+		TraceCorrelation _trace;
 
 		public bool IsListening
 		{
 			get
 			{
-				return socket != null;
+				return _socket != null;
 			}
 		}
 
 		public void Listen()
 		{
-			if(socket != null)
+			if(_socket != null)
 				throw new InvalidOperationException("Already listening");
-			using(_Trace.Open())
+			using(_trace.Open())
 			{
 				try
 				{
-					socket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
+					_socket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
 #if !NOIPDUALMODE
-					socket.DualMode = true;
+					_socket.DualMode = true;
 #endif
 
-					socket.Bind(LocalEndpoint);
-					socket.Listen(8);
+					_socket.Bind(LocalEndpoint);
+					_socket.Listen(8);
 					NodeServerTrace.Information("Listening...");
 					BeginAccept();
 				}
@@ -254,26 +253,26 @@ namespace ChainUtils.Protocol
 
 		private void BeginAccept()
 		{
-			if(isDisposed)
+			if(_isDisposed)
 				return;
 			NodeServerTrace.Information("Accepting connection...");
-			socket.BeginAccept(EndAccept, null);
+			_socket.BeginAccept(EndAccept, null);
 		}
 		private void EndAccept(IAsyncResult ar)
 		{
-			using(_Trace.Open())
+			using(_trace.Open())
 			{
 				Socket client = null;
 				try
 				{
-					client = socket.EndAccept(ar);
-					if(isDisposed)
+					client = _socket.EndAccept(ar);
+					if(_isDisposed)
 						return;
 					NodeServerTrace.Information("Client connection accepted : " + client.RemoteEndPoint);
 					var cancel = new CancellationTokenSource();
 					cancel.CancelAfter(TimeSpan.FromSeconds(10));
 					var message = Message.ReadNext(client, Network, Version, cancel.Token);
-					_MessageProducer.PushMessage(new IncomingMessage()
+					MessageProducer.PushMessage(new IncomingMessage()
 					{
 						Socket = client,
 						Message = message,
@@ -286,7 +285,7 @@ namespace ChainUtils.Protocol
 				}
 				catch(Exception ex)
 				{
-					if(isDisposed)
+					if(_isDisposed)
 						return;
 					if(client == null)
 					{
@@ -302,7 +301,7 @@ namespace ChainUtils.Protocol
 			}
 		}
 
-		public IPAddress GetMyExternalIP(CancellationToken cancellation = default(CancellationToken))
+		public IPAddress GetMyExternalIp(CancellationToken cancellation = default(CancellationToken))
 		{
 
 			var tasks = new[]{
@@ -321,7 +320,7 @@ namespace ChainUtils.Protocol
 						 {
 							 NodeServerTrace.Warning("can't resolve ip of " + site.DNS + " using hardcoded one " + site.IP, ex);
 						 }
-						 WebClient client = new WebClient();
+						 var client = new WebClient();
 						 var page = client.DownloadString("http://" + ip);
 						 var match = Regex.Match(page, "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}");
 						 return match.Value;
@@ -343,28 +342,28 @@ namespace ChainUtils.Protocol
 			}
 		}
 
-		internal readonly MessageProducer<IncomingMessage> _MessageProducer = new MessageProducer<IncomingMessage>();
-		internal readonly MessageProducer<object> _InternalMessageProducer = new MessageProducer<object>();
+		internal readonly MessageProducer<IncomingMessage> MessageProducer = new MessageProducer<IncomingMessage>();
+		internal readonly MessageProducer<object> InternalMessageProducer = new MessageProducer<object>();
 
-		MessageProducer<IncomingMessage> _AllMessages = new MessageProducer<IncomingMessage>();
+		MessageProducer<IncomingMessage> _allMessages = new MessageProducer<IncomingMessage>();
 		public MessageProducer<IncomingMessage> AllMessages
 		{
 			get
 			{
-				return _AllMessages;
+				return _allMessages;
 			}
 		}
 
-		volatile IPEndPoint _ExternalEndpoint;
+		volatile IPEndPoint _externalEndpoint;
 		public IPEndPoint ExternalEndpoint
 		{
 			get
 			{
-				return _ExternalEndpoint;
+				return _externalEndpoint;
 			}
 			set
 			{
-				_ExternalEndpoint = Utils.EnsureIPv6(value);
+				_externalEndpoint = Utils.EnsureIPv6(value);
 			}
 		}
 
@@ -388,15 +387,15 @@ namespace ChainUtils.Protocol
 		}
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		readonly NodeSet _Nodes;
+		readonly NodeSet _nodes;
 
 		public Node GetNodeByEndpoint(IPEndPoint endpoint, CancellationToken cancellation = default(CancellationToken))
 		{
-			lock(_Nodes)
+			lock(_nodes)
 			{
 				endpoint = Utils.EnsureIPv6(endpoint);
 
-				var node = _Nodes.GetNodeByEndpoint(endpoint);
+				var node = _nodes.GetNodeByEndpoint(endpoint);
 				if(node != null)
 					return node;
 				var peer = PeerTable.GetPeer(endpoint);
@@ -414,13 +413,13 @@ namespace ChainUtils.Protocol
 
 		public Node GetNodeByEndpoint(string endpoint)
 		{
-			IPEndPoint ip = Utils.ParseIpEndpoint(endpoint, Network.DefaultPort);
+			var ip = Utils.ParseIpEndpoint(endpoint, Network.DefaultPort);
 			return GetNodeByEndpoint(ip);
 		}
 
 		public Node GetNodeByPeer(Peer peer, CancellationToken cancellation = default(CancellationToken))
 		{
-			var node = _Nodes.GetNodeByPeer(peer);
+			var node = _nodes.GetNodeByPeer(peer);
 			if(node != null)
 				return node;
 			return AddNode(peer, cancellation);
@@ -444,12 +443,12 @@ namespace ChainUtils.Protocol
 		{
 			if(node.State < NodeState.Connected)
 				return null;
-			return _Nodes.AddNode(node);
+			return _nodes.AddNode(node);
 		}
 
 		internal void RemoveNode(Node node)
 		{
-			_Nodes.RemoveNode(node);
+			_nodes.RemoveNode(node);
 		}
 		void ProcessMessage(IncomingMessage message)
 		{
@@ -506,7 +505,7 @@ namespace ChainUtils.Protocol
 						return;
 					}
 
-					CancellationTokenSource cancel = new CancellationTokenSource();
+					var cancel = new CancellationTokenSource();
 					cancel.CancelAfter(TimeSpan.FromSeconds(10.0));
 					try
 					{
@@ -535,17 +534,17 @@ namespace ChainUtils.Protocol
 
 		public bool IsConnectedTo(IPEndPoint endpoint)
 		{
-			return _Nodes.Contains(endpoint);
+			return _nodes.Contains(endpoint);
 		}
 
-		ConcurrentDictionary<Node, Node> _ConnectedNodes = new ConcurrentDictionary<Node, Node>();
+		ConcurrentDictionary<Node, Node> _connectedNodes = new ConcurrentDictionary<Node, Node>();
 
 		public bool AdvertiseMyself()
 		{
 			if(IsListening && ExternalEndpoint.Address.IsRoutable(AllowLocalPeers))
 			{
 				NodeServerTrace.Information("Advertizing myself");
-				foreach(var node in _ConnectedNodes)
+				foreach(var node in _connectedNodes)
 				{
 					node.Value.SendMessage(new AddrPayload(new NetworkAddress()
 					{
@@ -560,58 +559,58 @@ namespace ChainUtils.Protocol
 
 		}
 
-		List<IDisposable> _Resources = new List<IDisposable>();
+		List<IDisposable> _resources = new List<IDisposable>();
 		IDisposable OwnResource(IDisposable resource)
 		{
-			if(isDisposed)
+			if(_isDisposed)
 			{
 				resource.Dispose();
 				return Scope.Nothing;
 			}
 			return new Scope(() =>
 			{
-				lock(_Resources)
+				lock(_resources)
 				{
-					_Resources.Add(resource);
+					_resources.Add(resource);
 				}
 			}, () =>
 			{
-				lock(_Resources)
+				lock(_resources)
 				{
-					_Resources.Remove(resource);
+					_resources.Remove(resource);
 				}
 			});
 		}
 		#region IDisposable Members
 
-		bool isDisposed;
+		bool _isDisposed;
 		public void Dispose()
 		{
-			if(!isDisposed)
+			if(!_isDisposed)
 			{
-				isDisposed = true;
+				_isDisposed = true;
 
-				lock(_Resources)
+				lock(_resources)
 				{
-					foreach(var resource in _Resources)
+					foreach(var resource in _resources)
 						resource.Dispose();
 				}
 				try
 				{
-					_Nodes.DisconnectAll();
+					_nodes.DisconnectAll();
 				}
 				finally
 				{
 #if !NOUPNP
-					if(_UPnPLease != null)
+					if(_upnPLease != null)
 					{
-						_UPnPLease.Dispose();
+						_upnPLease.Dispose();
 					}
 #endif
-					if(socket != null)
+					if(_socket != null)
 					{
-						Utils.SafeCloseSocket(socket);
-						socket = null;
+						Utils.SafeCloseSocket(_socket);
+						_socket = null;
 					}
 				}
 			}
@@ -641,33 +640,33 @@ namespace ChainUtils.Protocol
 			set;
 		}
 
-		string _UserAgent;
+		string _userAgent;
 		public string UserAgent
 		{
 			get
 			{
-				if(_UserAgent == null)
+				if(_userAgent == null)
 				{
-					_UserAgent = VersionPayload.GetChainUtilsUserAgent();
+					_userAgent = VersionPayload.GetChainUtilsUserAgent();
 				}
-				return _UserAgent;
+				return _userAgent;
 			}
 		}
 
-		ulong _Nonce;
+		ulong _nonce;
 		public ulong Nonce
 		{
 			get
 			{
-				if(_Nonce == 0)
+				if(_nonce == 0)
 				{
-					_Nonce = RandomUtils.GetUInt64();
+					_nonce = RandomUtils.GetUInt64();
 				}
-				return _Nonce;
+				return _nonce;
 			}
 			set
 			{
-				_Nonce = value;
+				_nonce = value;
 			}
 		}
 
@@ -680,8 +679,8 @@ namespace ChainUtils.Protocol
 		/// </summary>
 		public void DiscoverPeers(int peerToFind = 990)
 		{
-			TraceCorrelation traceCorrelation = new TraceCorrelation(NodeServerTrace.Trace, "Discovering nodes");
-			List<Task> tasks = new List<Task>();
+			var traceCorrelation = new TraceCorrelation(NodeServerTrace.Trace, "Discovering nodes");
+			var tasks = new List<Task>();
 			using(traceCorrelation.Open())
 			{
 				while(CountPeerRequired(peerToFind) != 0)
@@ -690,14 +689,14 @@ namespace ChainUtils.Protocol
 					var peers = PeerTable.GetActivePeers(1000);
 					if(peers.Length == 0)
 					{
-						PopulateTableWithDNSNodes();
+						PopulateTableWithDnsNodes();
 						PopulateTableWithHardNodes();
 						peers = PeerTable.GetActivePeers(1000);
 					}
 
 
-					CancellationTokenSource peerTableFull = new CancellationTokenSource();
-					NodeSet connected = new NodeSet();
+					var peerTableFull = new CancellationTokenSource();
+					var connected = new NodeSet();
 					try
 					{
 						Parallel.ForEach(peers, new ParallelOptions()
@@ -706,7 +705,7 @@ namespace ChainUtils.Protocol
 							CancellationToken = peerTableFull.Token,
 						}, p =>
 						{
-							CancellationTokenSource cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(40));
+							var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(40));
 							Node n = null;
 							try
 							{
@@ -751,8 +750,8 @@ namespace ChainUtils.Protocol
 		{
 			if(size > 1000)
 				throw new ArgumentOutOfRangeException("size", "size should be less than 1000");
-			TraceCorrelation trace = new TraceCorrelation(NodeServerTrace.Trace, "Creating node set of size " + size);
-			NodeSet set = new NodeSet();
+			var trace = new TraceCorrelation(NodeServerTrace.Trace, "Creating node set of size " + size);
+			var set = new NodeSet();
 			using(trace.Open())
 			{
 				while(set.Count() < size)
@@ -767,8 +766,8 @@ namespace ChainUtils.Protocol
 					}
 					NodeServerTrace.Information("Need " + peerToGet + " more nodes");
 
-					BlockingCollection<Node> handshakedNodes = new BlockingCollection<Node>(peerToGet);
-					CancellationTokenSource handshakedFull = new CancellationTokenSource();
+					var handshakedNodes = new BlockingCollection<Node>(peerToGet);
+					var handshakedFull = new CancellationTokenSource();
 
 					try
 					{
@@ -842,11 +841,11 @@ namespace ChainUtils.Protocol
 				}
 			});
 
-			if(peerTableRepository != _PeerTable)
+			if(peerTableRepository != _peerTable)
 			{
-				_InternalMessageProducer.PushMessages(peerTableRepository.GetPeers());
+				InternalMessageProducer.PushMessages(peerTableRepository.GetPeers());
 			}
-			return new CompositeDisposable(AllMessages.AddMessageListener(poll), _InternalMessageProducer.AddMessageListener(poll), OwnResource(poll));
+			return new CompositeDisposable(AllMessages.AddMessageListener(poll), InternalMessageProducer.AddMessageListener(poll), OwnResource(poll));
 		}
 
 #if !NOFILEIO

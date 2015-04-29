@@ -25,8 +25,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 
 		public virtual CertStatus[] ToCertStatusArray()
 		{
-			CertStatus[] result = new CertStatus[content.Count];
-			for (int i = 0; i != result.Length; i++)
+			var result = new CertStatus[content.Count];
+			for (var i = 0; i != result.Length; i++)
 			{
 				result[i] = CertStatus.GetInstance(content[i]);
 			}

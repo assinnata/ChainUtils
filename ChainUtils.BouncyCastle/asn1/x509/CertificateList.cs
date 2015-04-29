@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.X509
 {
     /**

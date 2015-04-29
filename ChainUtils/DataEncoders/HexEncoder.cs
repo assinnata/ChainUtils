@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.DataEncoders
 {
@@ -20,10 +16,10 @@ namespace ChainUtils.DataEncoders
 			if(length < 0)
 				length = data.Length;
 
-			char[] result = new char[length * 2 + (Space ? Math.Max((length - 1), 0) : 0)];
+			var result = new char[length * 2 + (Space ? Math.Max((length - 1), 0) : 0)];
 
-			int pos = 0;
-			for(int i = 0 ; i < length ; i++)
+			var pos = 0;
+			for(var i = 0 ; i < length ; i++)
 			{
 				var val = data[i];
 				if(Space && i != 0)
@@ -31,9 +27,9 @@ namespace ChainUtils.DataEncoders
 					result[pos] = ' ';
 					pos++;
 				}
-				result[pos] = (hexDigits[val >> 4]);
+				result[pos] = (HexDigits[val >> 4]);
 				pos++;
-				result[pos] = (hexDigits[val & 15]);
+				result[pos] = (HexDigits[val & 15]);
 				pos++;
 			}
 
@@ -59,14 +55,14 @@ namespace ChainUtils.DataEncoders
 		}
 
 
-		static readonly char[] hexDigits = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F' };
-		static readonly byte[] hexValues = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 10, 11, 12, 13, 14, 15 };
+		static readonly char[] HexDigits = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F' };
+		static readonly byte[] HexValues = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 10, 11, 12, 13, 14, 15 };
 		public static int IsDigit(char c)
 		{
-			var i = Array.IndexOf(hexDigits, c);
+			var i = Array.IndexOf(HexDigits, c);
 			if(i == -1)
 				return -1;
-			return hexValues[i];
+			return HexValues[i];
 		}
 
 		public static bool IsWellFormed(string str)

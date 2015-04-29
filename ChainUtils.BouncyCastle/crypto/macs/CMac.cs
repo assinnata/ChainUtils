@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Modes;
 using ChainUtils.BouncyCastle.Crypto.Paddings;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
@@ -89,7 +88,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             }
 
             this.cipher = new CbcBlockCipher(cipher);
-            this.macSize = macSizeInBits / 8;
+            macSize = macSizeInBits / 8;
 
             mac = new byte[cipher.GetBlockSize()];
 
@@ -107,7 +106,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
         private static int ShiftLeft(byte[] block, byte[] output)
         {
-            int i = block.Length;
+            var i = block.Length;
             uint bit = 0;
             while (--i >= 0)
             {
@@ -120,8 +119,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
         private static byte[] DoubleLu(byte[] input)
         {
-            byte[] ret = new byte[input.Length];
-            int carry = ShiftLeft(input, ret);
+            var ret = new byte[input.Length];
+            var carry = ShiftLeft(input, ret);
             int xor = input.Length == 16 ? CONSTANT_128 : CONSTANT_64;
 
             /*
@@ -179,8 +178,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             if (len < 0)
                 throw new ArgumentException("Can't have a negative input length!");
 
-            int blockSize = cipher.GetBlockSize();
-            int gapLen = blockSize - bufOff;
+            var blockSize = cipher.GetBlockSize();
+            var gapLen = blockSize - bufOff;
 
             if (len > gapLen)
             {
@@ -210,7 +209,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
             byte[]	outBytes,
             int		outOff)
         {
-            int blockSize = cipher.GetBlockSize();
+            var blockSize = cipher.GetBlockSize();
 
             byte[] lu;
             if (bufOff == blockSize)
@@ -223,7 +222,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
                 lu = Lu2;
             }
 
-            for (int i = 0; i < mac.Length; i++)
+            for (var i = 0; i < mac.Length; i++)
             {
                 buf[i] ^= lu[i];
             }

@@ -45,7 +45,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 		private Accuracy(
 			Asn1Sequence seq)
 		{
-			for (int i = 0; i < seq.Count; ++i)
+			for (var i = 0; i < seq.Count; ++i)
 			{
 				// seconds
 				if (seq[i] is DerInteger)
@@ -54,7 +54,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 				}
 				else if (seq[i] is DerTaggedObject)
 				{
-					DerTaggedObject extra = (DerTaggedObject) seq[i];
+					var extra = (DerTaggedObject) seq[i];
 
 					switch (extra.TagNo)
 					{
@@ -126,7 +126,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 
 			if (seconds != null)
 			{

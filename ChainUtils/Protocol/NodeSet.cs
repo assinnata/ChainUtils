@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,44 +12,44 @@ namespace ChainUtils.Protocol
 	public delegate void NodeSetEventHandler(NodeSet sender, Node node);
 	public class NodeSet : IDisposable
 	{
-		class NodeListener : MessageListener<IncomingMessage>
+		class NodeListener : IMessageListener<IncomingMessage>
 		{
-			NodeSet _Parent;
+			NodeSet _parent;
 			public NodeListener(NodeSet parent)
 			{
-				_Parent = parent;
+				_parent = parent;
 			}
 			#region MessageListener<IncomingMessage> Members
 
 			public void PushMessage(IncomingMessage message)
 			{
-				_Parent.MessageProducer.PushMessage(message);
+				_parent.MessageProducer.PushMessage(message);
 			}
 
 			#endregion
 		}
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		Dictionary<IPEndPoint, List<Node>> _Nodes = new Dictionary<IPEndPoint, List<Node>>();
-		readonly NodeListener _MessageListener;
+		Dictionary<IPEndPoint, List<Node>> _nodes = new Dictionary<IPEndPoint, List<Node>>();
+		readonly NodeListener _messageListener;
 		public NodeSet()
 		{
-			_MessageListener = new NodeListener(this);
+			_messageListener = new NodeListener(this);
 		}
 
 
-		private readonly MessageProducer<IncomingMessage> _MessageProducer = new MessageProducer<IncomingMessage>();
+		private readonly MessageProducer<IncomingMessage> _messageProducer = new MessageProducer<IncomingMessage>();
 		public MessageProducer<IncomingMessage> MessageProducer
 		{
 			get
 			{
-				return _MessageProducer;
+				return _messageProducer;
 			}
 		}
 
 		public Node GetNodeByEndpoint(IPEndPoint endpoint)
 		{
-			lock(_Nodes)
+			lock(_nodes)
 			{
 				endpoint = Utils.EnsureIPv6(endpoint);
 				return GetNodesList(endpoint).FirstOrDefault();
@@ -59,7 +58,7 @@ namespace ChainUtils.Protocol
 
 		public Node GetNodeByPeer(Peer peer)
 		{
-			lock(_Nodes)
+			lock(_nodes)
 			{
 				return GetNodesList(peer.NetworkAddress.Endpoint).FirstOrDefault();
 			}
@@ -68,7 +67,7 @@ namespace ChainUtils.Protocol
 		List<Node> GetNodesList(IPEndPoint endpoint)
 		{
 			List<Node> result = null;
-			if(!_Nodes.TryGetValue(endpoint, out result))
+			if(!_nodes.TryGetValue(endpoint, out result))
 				result = new List<Node>();
 			return result;
 		}
@@ -76,17 +75,17 @@ namespace ChainUtils.Protocol
 		public Node AddNode(Node node)
 		{
 			var added = false;
-			lock(_Nodes)
+			lock(_nodes)
 			{
 				if(node.State < NodeState.Connected)
 					return null;
 				node.StateChanged += node_StateChanged;
-				node.MessageProducer.AddMessageListener(_MessageListener);
+				node.MessageProducer.AddMessageListener(_messageListener);
 				var list = GetNodesList(node.Peer.NetworkAddress.Endpoint);
 				list.Add(node);
 				added = true;
 				if(list.Count == 1)
-					_Nodes.Add(node.Peer.NetworkAddress.Endpoint, list);
+					_nodes.Add(node.Peer.NetworkAddress.Endpoint, list);
 			}
 			if(added)
 			{
@@ -109,18 +108,18 @@ namespace ChainUtils.Protocol
 
 		public void RemoveNode(Node node)
 		{
-			bool removed = false;
-			lock(_Nodes)
+			var removed = false;
+			lock(_nodes)
 			{
 				var endpoint = node.Peer.NetworkAddress.Endpoint;
 				var nodes = GetNodesList(endpoint);
 				if(nodes.Remove(node))
 				{
 					removed = true;
-					node.MessageProducer.RemoveMessageListener(_MessageListener);
+					node.MessageProducer.RemoveMessageListener(_messageListener);
 					node.StateChanged -= node_StateChanged;
 					if(nodes.Count == 0)
-						_Nodes.Remove(endpoint);
+						_nodes.Remove(endpoint);
 				}
 			}
 			if(removed)
@@ -133,9 +132,9 @@ namespace ChainUtils.Protocol
 
 		public Node[] GetNodes()
 		{
-			lock(_Nodes)
+			lock(_nodes)
 			{
-				return _Nodes.Values.SelectMany(s => s).ToArray();
+				return _nodes.Values.SelectMany(s => s).ToArray();
 			}
 		}
 
@@ -154,15 +153,15 @@ namespace ChainUtils.Protocol
 
 		public bool Contains(IPEndPoint endpoint)
 		{
-			lock(_Nodes)
+			lock(_nodes)
 			{
-				return _Nodes.ContainsKey(endpoint);
+				return _nodes.ContainsKey(endpoint);
 			}
 		}
 
 		public void AddNodes(Node[] nodes)
 		{
-			lock(_Nodes)
+			lock(_nodes)
 			{
 				foreach(var node in nodes)
 				{
@@ -173,9 +172,9 @@ namespace ChainUtils.Protocol
 
 		public int Count()
 		{
-			lock(_Nodes)
+			lock(_nodes)
 			{
-				return _Nodes.Count;
+				return _nodes.Count;
 			}
 		}
 
@@ -183,7 +182,7 @@ namespace ChainUtils.Protocol
 
 		public void RemoveNodes(Node[] nodes)
 		{
-			lock(_Nodes)
+			lock(_nodes)
 			{
 				foreach(var node in nodes)
 				{

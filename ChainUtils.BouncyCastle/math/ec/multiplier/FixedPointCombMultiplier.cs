@@ -7,8 +7,8 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
     {
         protected override ECPoint MultiplyPositive(ECPoint p, BigInteger k)
         {
-            ECCurve c = p.Curve;
-            int size = FixedPointUtilities.GetCombSize(c);
+            var c = p.Curve;
+            var size = FixedPointUtilities.GetCombSize(c);
 
             if (k.BitLength > size)
             {
@@ -21,22 +21,22 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
                 throw new InvalidOperationException("fixed-point comb doesn't support scalars larger than the curve order");
             }
 
-            int minWidth = GetWidthForCombSize(size);
+            var minWidth = GetWidthForCombSize(size);
 
-            FixedPointPreCompInfo info = FixedPointUtilities.Precompute(p, minWidth);
-            ECPoint[] lookupTable = info.PreComp;
-            int width = info.Width;
+            var info = FixedPointUtilities.Precompute(p, minWidth);
+            var lookupTable = info.PreComp;
+            var width = info.Width;
 
-            int d = (size + width - 1) / width;
+            var d = (size + width - 1) / width;
 
-            ECPoint R = c.Infinity;
+            var R = c.Infinity;
 
-            int top = d * width - 1;
-            for (int i = 0; i < d; ++i)
+            var top = d * width - 1;
+            for (var i = 0; i < d; ++i)
             {
-                int index = 0;
+                var index = 0;
 
-                for (int j = top - i; j >= 0; j -= d)
+                for (var j = top - i; j >= 0; j -= d)
                 {
                     index <<= 1;
                     if (k.TestBit(j))

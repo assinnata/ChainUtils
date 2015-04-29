@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.Kisa;
 using ChainUtils.BouncyCastle.Asn1.Nist;
@@ -57,8 +56,8 @@ namespace ChainUtils.BouncyCastle.Security
         public static IWrapper GetWrapper(
             string algorithm)
         {
-            string upper = Platform.ToUpperInvariant(algorithm);
-            string mechanism = (string)algorithms[upper];
+            var upper = Platform.ToUpperInvariant(algorithm);
+            var mechanism = (string)algorithms[upper];
 
             if (mechanism == null)
             {
@@ -67,7 +66,7 @@ namespace ChainUtils.BouncyCastle.Security
 
             try
             {
-                WrapAlgorithm wrapAlgorithm = (WrapAlgorithm)Enums.GetEnumValue(
+                var wrapAlgorithm = (WrapAlgorithm)Enums.GetEnumValue(
                     typeof(WrapAlgorithm), mechanism);
 
                 switch (wrapAlgorithm)
@@ -87,7 +86,7 @@ namespace ChainUtils.BouncyCastle.Security
             }
 
             // Create an IBufferedCipher and use it as IWrapper (via BufferedCipherWrapper)
-            IBufferedCipher blockCipher = CipherUtilities.GetCipher(algorithm);
+            var blockCipher = CipherUtilities.GetCipher(algorithm);
 
             if (blockCipher != null)
                 return new BufferedCipherWrapper(blockCipher);

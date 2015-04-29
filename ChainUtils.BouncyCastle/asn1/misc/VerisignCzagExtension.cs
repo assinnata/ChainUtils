@@ -1,5 +1,3 @@
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Misc
 {
     public class VerisignCzagExtension
@@ -12,7 +10,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Misc
 
         public override string ToString()
         {
-            return "VerisignCzagExtension: " + this.GetString();
+            return "VerisignCzagExtension: " + GetString();
         }
     }
 }

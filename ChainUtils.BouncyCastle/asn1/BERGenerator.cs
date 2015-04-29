@@ -1,5 +1,4 @@
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -56,7 +55,7 @@ namespace ChainUtils.BouncyCastle.Asn1
         {
             if (_tagged)
             {
-                int tagNum = _tagNo | Asn1Tags.Tagged;
+                var tagNum = _tagNo | Asn1Tags.Tagged;
 
                 if (_isExplicit)
                 {

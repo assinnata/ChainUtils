@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 {
 	public class PemHeader
@@ -25,7 +23,7 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 
 		public override int GetHashCode()
 		{
-			return GetHashCode(this.name) + 31 * GetHashCode(this.val);
+			return GetHashCode(name) + 31 * GetHashCode(val);
 		}
 
 		public override bool Equals(object obj)
@@ -36,10 +34,10 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 			if (!(obj is PemHeader))
 				return false;
 
-			PemHeader other = (PemHeader)obj;
+			var other = (PemHeader)obj;
 
-			return Platform.Equals(this.name, other.name)
-				&& Platform.Equals(this.val, other.val);
+			return Equals(name, other.name)
+				&& Equals(val, other.val);
 		}
 
 		private int GetHashCode(string s)

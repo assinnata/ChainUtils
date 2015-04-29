@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -92,7 +90,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public override void Reset(IMemoable other)
 		{
-			Sha384Digest d = (Sha384Digest)other;
+			var d = (Sha384Digest)other;
 
 			CopyIn(d);
 		}

@@ -1,10 +1,7 @@
-using System;
-
 using ChainUtils.BouncyCastle.Asn1.CryptoPro;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC.Multiplier;
-using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
 {
@@ -23,11 +20,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             if (parameters is Gost3410KeyGenerationParameters)
             {
-                this.param = (Gost3410KeyGenerationParameters) parameters;
+                param = (Gost3410KeyGenerationParameters) parameters;
             }
             else
             {
-                Gost3410KeyGenerationParameters kgp = new Gost3410KeyGenerationParameters(
+                var kgp = new Gost3410KeyGenerationParameters(
                     parameters.Random,
                     CryptoProObjectIdentifiers.GostR3410x94CryptoProA);
 
@@ -36,18 +33,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                     // TODO Should we complain?
                 }
 
-                this.param = kgp;
+                param = kgp;
             }
         }
 
         public AsymmetricCipherKeyPair GenerateKeyPair()
         {
-            SecureRandom random = param.Random;
-            Gost3410Parameters gost3410Params = param.Parameters;
+            var random = param.Random;
+            var gost3410Params = param.Parameters;
 
             BigInteger q = gost3410Params.Q, x;
 
-            int minWeight = 64;
+            var minWeight = 64;
             for (;;)
             {
                 x = new BigInteger(256, random);
@@ -67,11 +64,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                 break;
             }
 
-            BigInteger p = gost3410Params.P;
-            BigInteger a = gost3410Params.A;
+            var p = gost3410Params.P;
+            var a = gost3410Params.A;
 
             // calculate the public key.
-            BigInteger y = a.ModPow(x, p);
+            var y = a.ModPow(x, p);
 
             if (param.PublicKeyParamSet != null)
             {

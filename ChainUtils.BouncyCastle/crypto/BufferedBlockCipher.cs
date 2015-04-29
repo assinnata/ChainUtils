@@ -1,6 +1,4 @@
 using System;
-using System.Diagnostics;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto
@@ -67,7 +65,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 		{
 			this.forEncryption = forEncryption;
 
-            ParametersWithRandom pwr = parameters as ParametersWithRandom;
+            var pwr = parameters as ParametersWithRandom;
             if (pwr != null)
                 parameters = pwr.Parameters;
 
@@ -97,8 +95,8 @@ namespace ChainUtils.BouncyCastle.Crypto
 		public override int GetUpdateOutputSize(
 			int length)
 		{
-			int total = length + bufOff;
-			int leftOver = total % buf.Length;
+			var total = length + bufOff;
+			var leftOver = total % buf.Length;
 			return total - leftOver;
 		}
 
@@ -149,15 +147,15 @@ namespace ChainUtils.BouncyCastle.Crypto
 		public override byte[] ProcessByte(
 			byte input)
 		{
-			int outLength = GetUpdateOutputSize(1);
+			var outLength = GetUpdateOutputSize(1);
 
-			byte[] outBytes = outLength > 0 ? new byte[outLength] : null;
+			var outBytes = outLength > 0 ? new byte[outLength] : null;
 
-			int pos = ProcessByte(input, outBytes, 0);
+			var pos = ProcessByte(input, outBytes, 0);
 
 			if (outLength > 0 && pos < outLength)
 			{
-				byte[] tmp = new byte[pos];
+				var tmp = new byte[pos];
 				Array.Copy(outBytes, 0, tmp, 0, pos);
 				outBytes = tmp;
 			}
@@ -175,15 +173,15 @@ namespace ChainUtils.BouncyCastle.Crypto
 			if (length < 1)
 				return null;
 
-			int outLength = GetUpdateOutputSize(length);
+			var outLength = GetUpdateOutputSize(length);
 
-			byte[] outBytes = outLength > 0 ? new byte[outLength] : null;
+			var outBytes = outLength > 0 ? new byte[outLength] : null;
 
-			int pos = ProcessBytes(input, inOff, length, outBytes, 0);
+			var pos = ProcessBytes(input, inOff, length, outBytes, 0);
 
 			if (outLength > 0 && pos < outLength)
 			{
-				byte[] tmp = new byte[pos];
+				var tmp = new byte[pos];
 				Array.Copy(outBytes, 0, tmp, 0, pos);
 				outBytes = tmp;
 			}
@@ -218,8 +216,8 @@ namespace ChainUtils.BouncyCastle.Crypto
 				return 0;
 			}
 
-			int blockSize = GetBlockSize();
-			int outLength = GetUpdateOutputSize(length);
+			var blockSize = GetBlockSize();
+			var outLength = GetUpdateOutputSize(length);
 
 			if (outLength > 0)
 			{
@@ -229,8 +227,8 @@ namespace ChainUtils.BouncyCastle.Crypto
 				}
 			}
 
-			int resultLen = 0;
-			int gapLen = buf.Length - bufOff;
+			var resultLen = 0;
+			var gapLen = buf.Length - bufOff;
 			if (length > gapLen)
 			{
 				Array.Copy(input, inOff, buf, bufOff, gapLen);
@@ -257,17 +255,17 @@ namespace ChainUtils.BouncyCastle.Crypto
 
 		public override byte[] DoFinal()
 		{
-			byte[] outBytes = EmptyBuffer;
+			var outBytes = EmptyBuffer;
 
-			int length = GetOutputSize(0);
+			var length = GetOutputSize(0);
 			if (length > 0)
 			{
 				outBytes = new byte[length];
 
-				int pos = DoFinal(outBytes, 0);
+				var pos = DoFinal(outBytes, 0);
 				if (pos < outBytes.Length)
 				{
-					byte[] tmp = new byte[pos];
+					var tmp = new byte[pos];
 					Array.Copy(outBytes, 0, tmp, 0, pos);
 					outBytes = tmp;
 				}
@@ -288,15 +286,15 @@ namespace ChainUtils.BouncyCastle.Crypto
 			if (input == null)
 				throw new ArgumentNullException("input");
 
-			int length = GetOutputSize(inLen);
+			var length = GetOutputSize(inLen);
 
-			byte[] outBytes = EmptyBuffer;
+			var outBytes = EmptyBuffer;
 
 			if (length > 0)
 			{
 				outBytes = new byte[length];
 
-				int pos = (inLen > 0)
+				var pos = (inLen > 0)
 					?	ProcessBytes(input, inOff, inLen, outBytes, 0)
 					:	0;
 
@@ -304,7 +302,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 
 				if (pos < outBytes.Length)
 				{
-					byte[] tmp = new byte[pos];
+					var tmp = new byte[pos];
 					Array.Copy(outBytes, 0, tmp, 0, pos);
 					outBytes = tmp;
 				}

@@ -1,23 +1,19 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ChainUtils.RPC
 {
 	//{"code":-32601,"message":"Method not found"}
-	public class RPCError
+	public class RpcError
 	{
-		public RPCError(JObject error)
+		public RpcError(JObject error)
 		{
-			Code = (RPCErrorCode)((int)error.GetValue("code"));
+			Code = (RpcErrorCode)((int)error.GetValue("code"));
 			Message = (string)error.GetValue("message");
 		}
-		public RPCErrorCode Code
+		public RpcErrorCode Code
 		{
 			get;
 			set;
@@ -30,18 +26,18 @@ namespace ChainUtils.RPC
 		}
 	}
 	//{"result":null,"error":{"code":-32601,"message":"Method not found"},"id":1}
-	public class RPCResponse
+	public class RpcResponse
 	{
-		public RPCResponse(JObject json)
+		public RpcResponse(JObject json)
 		{
 			var error = json.GetValue("error") as JObject;
 			if(error != null)
 			{
-				Error = new RPCError(error);
+				Error = new RpcError(error);
 			}
 			Result = json.GetValue("result") as JToken;
 		}
-		public RPCError Error
+		public RpcError Error
 		{
 			get;
 			set;
@@ -53,17 +49,17 @@ namespace ChainUtils.RPC
 			set;
 		}
 
-		public static RPCResponse Load(Stream stream)
+		public static RpcResponse Load(Stream stream)
 		{
-			JsonTextReader reader = new JsonTextReader(new StreamReader(stream, Encoding.UTF8));
-			return new RPCResponse(JObject.Load(reader));
+			var reader = new JsonTextReader(new StreamReader(stream, Encoding.UTF8));
+			return new RpcResponse(JObject.Load(reader));
 		}
 
 		public void ThrowIfError()
 		{
 			if(Error != null)
 			{
-				throw new RPCException(Error.Code, Error.Message, this);
+				throw new RpcException(Error.Code, Error.Message, this);
 			}
 		}
 	}

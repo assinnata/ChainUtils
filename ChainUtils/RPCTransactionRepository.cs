@@ -1,29 +1,26 @@
-﻿using ChainUtils.RPC;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
+using ChainUtils.RPC;
 
 namespace ChainUtils
 {
-	public class RPCTransactionRepository : ITransactionRepository
+	public class RpcTransactionRepository : ITransactionRepository
 	{
-		RPCClient _Client;
-		public RPCTransactionRepository(RPCClient client)
+		RpcClient _client;
+		public RpcTransactionRepository(RpcClient client)
 		{
 			if(client == null)
 				throw new ArgumentNullException("client");
-			_Client = client;
+			_client = client;
 		}
 		#region ITransactionRepository Members
 
-		public Task<Transaction> GetAsync(uint256 txId)
+		public Task<Transaction> GetAsync(Uint256 txId)
 		{
-			return _Client.GetRawTransactionAsync(txId, false);
+			return _client.GetRawTransactionAsync(txId, false);
 		}
 
-		public Task PutAsync(uint256 txId, Transaction tx)
+		public Task PutAsync(Uint256 txId, Transaction tx)
 		{
 			return Task.FromResult(false);
 		}

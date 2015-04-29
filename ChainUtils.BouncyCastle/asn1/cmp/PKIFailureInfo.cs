@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cmp
 {
 	/**
@@ -67,7 +65,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 
 		public override string ToString()
 		{
-			return "PkiFailureInfo: 0x" + this.IntValue.ToString("X");
+			return "PkiFailureInfo: 0x" + IntValue.ToString("X");
 		}
 	}
 }

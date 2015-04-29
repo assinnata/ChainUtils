@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -75,7 +74,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			_forEncryption = forEncryption;
 			_initialised = true;
 
-			KeyParameter p = (KeyParameter) parameters;
+			var p = (KeyParameter) parameters;
 
 			setKey(p.GetKey());
 		}
@@ -188,7 +187,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			a[1] ^= ~a[3] & ~a[2];
 			a[0] ^= a[2] & a[1];
 
-			uint tmp = a[3];
+			var tmp = a[3];
 			a[3]  = a[0];
 			a[0]  = tmp;
 			a[2] ^= a[0]^a[1]^a[3];
@@ -205,7 +204,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			a[1] ^= tmp; 
 			a[3] ^= tmp; 
 
-			for (int i = 0; i < 4; i++)
+			for (var i = 0; i < 4; i++)
 			{
 				a[i] ^= k[i];
 			}

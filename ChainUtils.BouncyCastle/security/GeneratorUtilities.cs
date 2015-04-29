@@ -1,5 +1,4 @@
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.CryptoPro;
 using ChainUtils.BouncyCastle.Asn1.Iana;
@@ -12,7 +11,6 @@ using ChainUtils.BouncyCastle.Asn1.X9;
 using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Generators;
 using ChainUtils.BouncyCastle.Utilities;
-using ChainUtils.BouncyCastle.Utilities.Collections;
 
 namespace ChainUtils.BouncyCastle.Security
 {
@@ -190,7 +188,7 @@ namespace ChainUtils.BouncyCastle.Security
 
         private static void AddDefaultKeySizeEntries(int size, params string[] algorithms)
         {
-            foreach (string algorithm in algorithms)
+            foreach (var algorithm in algorithms)
             {
                 defaultKeySizes.Add(algorithm, size);
             }
@@ -202,7 +200,7 @@ namespace ChainUtils.BouncyCastle.Security
         {
             kgAlgorithms[canonicalName] = canonicalName;
 
-            foreach (object alias in aliases)
+            foreach (var alias in aliases)
             {
                 kgAlgorithms[alias.ToString()] = canonicalName;
             }
@@ -214,7 +212,7 @@ namespace ChainUtils.BouncyCastle.Security
         {
             kpgAlgorithms[canonicalName] = canonicalName;
 
-            foreach (object alias in aliases)
+            foreach (var alias in aliases)
             {
                 kpgAlgorithms[alias.ToString()] = canonicalName;
             }
@@ -224,13 +222,13 @@ namespace ChainUtils.BouncyCastle.Security
             string			algorithm,
             params object[]	aliases)
         {
-            string mainName = "HMAC" + algorithm;
+            var mainName = "HMAC" + algorithm;
 
             kgAlgorithms[mainName] = mainName;
             kgAlgorithms["HMAC-" + algorithm] = mainName;
             kgAlgorithms["HMAC/" + algorithm] = mainName;
 
-            foreach (object alias in aliases)
+            foreach (var alias in aliases)
             {
                 kgAlgorithms[alias.ToString()] = mainName;
             }
@@ -259,12 +257,12 @@ namespace ChainUtils.BouncyCastle.Security
         public static CipherKeyGenerator GetKeyGenerator(
             string algorithm)
         {
-            string canonicalName = GetCanonicalKeyGeneratorAlgorithm(algorithm);
+            var canonicalName = GetCanonicalKeyGeneratorAlgorithm(algorithm);
 
             if (canonicalName == null)
                 throw new SecurityUtilityException("KeyGenerator " + algorithm + " not recognised.");
 
-            int defaultKeySize = FindDefaultKeySize(canonicalName);
+            var defaultKeySize = FindDefaultKeySize(canonicalName);
             if (defaultKeySize == -1)
                 throw new SecurityUtilityException("KeyGenerator " + algorithm
                     + " (" + canonicalName + ") not supported.");
@@ -287,7 +285,7 @@ namespace ChainUtils.BouncyCastle.Security
         public static IAsymmetricCipherKeyPairGenerator GetKeyPairGenerator(
             string algorithm)
         {
-            string canonicalName = GetCanonicalKeyPairGeneratorAlgorithm(algorithm);
+            var canonicalName = GetCanonicalKeyPairGeneratorAlgorithm(algorithm);
 
             if (canonicalName == null)
                 throw new SecurityUtilityException("KeyPairGenerator " + algorithm + " not recognised.");
@@ -324,12 +322,12 @@ namespace ChainUtils.BouncyCastle.Security
         internal static int GetDefaultKeySize(
             string algorithm)
         {
-            string canonicalName = GetCanonicalKeyGeneratorAlgorithm(algorithm);
+            var canonicalName = GetCanonicalKeyGeneratorAlgorithm(algorithm);
 
             if (canonicalName == null)
                 throw new SecurityUtilityException("KeyGenerator " + algorithm + " not recognised.");
 
-            int defaultKeySize = FindDefaultKeySize(canonicalName);
+            var defaultKeySize = FindDefaultKeySize(canonicalName);
             if (defaultKeySize == -1)
                 throw new SecurityUtilityException("KeyGenerator " + algorithm
                     + " (" + canonicalName + ") not supported.");

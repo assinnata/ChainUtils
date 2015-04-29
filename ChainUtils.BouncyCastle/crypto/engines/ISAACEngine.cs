@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -49,7 +48,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             * symmetrical, so the 'forEncryption' is 
             * irrelevant.
             */
-            KeyParameter p = (KeyParameter) parameters;
+            var p = (KeyParameter) parameters;
             setKey(p.GetKey());
         }
 
@@ -62,7 +61,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                 keyStream = Pack.UInt32_To_BE(results);
             }
 
-            byte output = (byte)(keyStream[index]^input);
+            var output = (byte)(keyStream[index]^input);
             index = (index + 1) & 1023;
 
             return output;
@@ -82,7 +81,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             if ((outOff + len) > output.Length)
                 throw new DataLengthException("output buffer too short");
 
-            for (int i = 0; i < len; i++)
+            for (var i = 0; i < len; i++)
             {
                 if (index == 0) 
                 {
@@ -133,7 +132,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             index = 0;
 
             // Convert the key bytes to ints and put them into results[] for initialization
-            byte[] t = new byte[keyBytes.Length + (keyBytes.Length & 3)];
+            var t = new byte[keyBytes.Length + (keyBytes.Length & 3)];
             Array.Copy(keyBytes, 0, t, 0, keyBytes.Length);
             for (i = 0; i < t.Length; i+=4)
             {
@@ -141,7 +140,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             }
 
             // It has begun?
-            uint[] abcdefgh = new uint[sizeL];
+            var abcdefgh = new uint[sizeL];
 
             for (i = 0; i < sizeL; i++)
             {
@@ -181,7 +180,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             uint x, y;
 
             b += ++c;
-            for (int i = 0; i < stateArraySize; i++)
+            for (var i = 0; i < stateArraySize; i++)
             {
                 x = engineState[i];
                 switch (i & 3)

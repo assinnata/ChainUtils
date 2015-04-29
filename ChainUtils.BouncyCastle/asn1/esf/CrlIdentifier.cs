@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Math;
 
@@ -46,12 +45,12 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count < 2 || seq.Count > 3)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.crlIssuer = X509Name.GetInstance(seq[0]);
-			this.crlIssuedTime = DerUtcTime.GetInstance(seq[1]);
+			crlIssuer = X509Name.GetInstance(seq[0]);
+			crlIssuedTime = DerUtcTime.GetInstance(seq[1]);
 
 			if (seq.Count > 2)
 			{
-				this.crlNumber = DerInteger.GetInstance(seq[2]);
+				crlNumber = DerInteger.GetInstance(seq[2]);
 			}
 		}
 
@@ -96,7 +95,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(
+			var v = new Asn1EncodableVector(
 				crlIssuer.ToAsn1Object(), crlIssuedTime);
 
 			if (crlNumber != null)

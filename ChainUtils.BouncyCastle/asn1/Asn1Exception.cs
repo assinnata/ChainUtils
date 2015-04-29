@@ -10,7 +10,6 @@ namespace ChainUtils.BouncyCastle.Asn1
 		: IOException
 	{
 		public Asn1Exception()
-			: base()
 		{
 		}
 

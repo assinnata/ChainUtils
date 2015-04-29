@@ -20,7 +20,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
             ECCurve			c,
             Asn1OctetString	s)
         {
-            this.p = c.DecodePoint(s.GetOctets());
+            p = c.DecodePoint(s.GetOctets());
         }
 
         public ECPoint Point

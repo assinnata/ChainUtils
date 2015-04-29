@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Crypto.Modes.Gcm
 {
 	public interface IGcmMultiplier

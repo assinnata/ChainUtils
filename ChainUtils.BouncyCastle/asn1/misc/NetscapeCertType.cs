@@ -1,5 +1,3 @@
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Misc
 {
     /**
@@ -47,7 +45,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Misc
 
 		public override string ToString()
         {
-			byte[] data = GetBytes();
+			var data = GetBytes();
 			return "NetscapeCertType: 0x" + (data[0] & 0xff).ToString("X");
         }
     }

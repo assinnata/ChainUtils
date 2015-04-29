@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 
 namespace ChainUtils.BouncyCastle.Asn1.Icao
 {
@@ -56,8 +53,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Icao
 			if (seq.Count != 2)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-			this.dataGroupNumber = DerInteger.GetInstance(seq[0]);
-            this.dataGroupHashValue = Asn1OctetString.GetInstance(seq[1]);
+			dataGroupNumber = DerInteger.GetInstance(seq[0]);
+            dataGroupHashValue = Asn1OctetString.GetInstance(seq[1]);
         }
 
 		public DataGroupHash(

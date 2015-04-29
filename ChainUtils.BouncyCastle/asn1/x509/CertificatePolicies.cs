@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
 {
@@ -28,7 +27,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
          */
         public CertificatePolicies(PolicyInformation name)
         {
-            this.policyInformation = new PolicyInformation[] { name };
+            policyInformation = new PolicyInformation[] { name };
         }
 
         public CertificatePolicies(PolicyInformation[] policyInformation)
@@ -38,9 +37,9 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
         private CertificatePolicies(Asn1Sequence seq)
         {
-            this.policyInformation = new PolicyInformation[seq.Count];
+            policyInformation = new PolicyInformation[seq.Count];
 
-            for (int i = 0; i < seq.Count; ++i)
+            for (var i = 0; i < seq.Count; ++i)
             {
                 policyInformation[i] = PolicyInformation.GetInstance(seq[i]);
             }
@@ -64,12 +63,12 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder("CertificatePolicies:");
+            var sb = new StringBuilder("CertificatePolicies:");
             if (policyInformation != null && policyInformation.Length > 0)
             {
                 sb.Append(' ');
                 sb.Append(policyInformation[0]);
-                for (int i = 1; i < policyInformation.Length; ++i)
+                for (var i = 1; i < policyInformation.Length; ++i)
                 {
                     sb.Append(", ");
                     sb.Append(policyInformation[i]);

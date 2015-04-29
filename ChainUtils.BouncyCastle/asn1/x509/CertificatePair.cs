@@ -78,9 +78,9 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 			}
 
-			foreach (object obj in seq)
+			foreach (var obj in seq)
 			{
-				Asn1TaggedObject o = Asn1TaggedObject.GetInstance(obj);
+				var o = Asn1TaggedObject.GetInstance(obj);
 				if (o.TagNo == 0)
 				{
 					forward = X509CertificateStructure.GetInstance(o, true);
@@ -126,7 +126,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		*/
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector vec = new Asn1EncodableVector();
+			var vec = new Asn1EncodableVector();
 
 			if (forward != null)
 			{

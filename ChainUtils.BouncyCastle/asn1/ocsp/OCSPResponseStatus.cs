@@ -1,7 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 {
     public class OcspResponseStatus

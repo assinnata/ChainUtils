@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.Oiw;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
@@ -65,9 +64,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 			saltLength = DefaultSaltLength;
 			trailerField = DefaultTrailerField;
 
-			for (int i = 0; i != seq.Count; i++)
+			for (var i = 0; i != seq.Count; i++)
 			{
-				Asn1TaggedObject o = (Asn1TaggedObject)seq[i];
+				var o = (Asn1TaggedObject)seq[i];
 
 				switch (o.TagNo)
 				{
@@ -137,7 +136,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 
 			if (!hashAlgorithm.Equals(DefaultHashAlgorithm))
 			{

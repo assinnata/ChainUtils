@@ -82,7 +82,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public void SetSubjectPublicKeyInfo(
             SubjectPublicKeyInfo pubKeyInfo)
         {
-            this.subjectPublicKeyInfo = pubKeyInfo;
+            subjectPublicKeyInfo = pubKeyInfo;
         }
 
 		public TbsCertificateStructure GenerateTbsCertificate()

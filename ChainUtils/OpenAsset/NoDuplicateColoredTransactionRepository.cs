@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils.OpenAsset
@@ -12,9 +10,9 @@ namespace ChainUtils.OpenAsset
 		{
 			if(inner == null)
 				throw new ArgumentNullException("inner");
-			_Inner = inner;
+			_inner = inner;
 		}
-		IColoredTransactionRepository _Inner;
+		IColoredTransactionRepository _inner;
 		#region IColoredTransactionRepository Members
 
 		public ITransactionRepository Transactions
@@ -25,57 +23,57 @@ namespace ChainUtils.OpenAsset
 			}
 		}
 
-		public Task<ColoredTransaction> GetAsync(uint256 txId)
+		public Task<ColoredTransaction> GetAsync(Uint256 txId)
 		{
-			return Request("c" + txId.ToString(), () => _Inner.GetAsync(txId));
+			return Request("c" + txId.ToString(), () => _inner.GetAsync(txId));
 		}
 
-		public Task PutAsync(uint256 txId, ColoredTransaction tx)
+		public Task PutAsync(Uint256 txId, ColoredTransaction tx)
 		{
-			return _Inner.PutAsync(txId, tx);
+			return _inner.PutAsync(txId, tx);
 		}
 
 		#endregion
 
 		#region ITransactionRepository Members
 
-		Task<Transaction> ITransactionRepository.GetAsync(uint256 txId)
+		Task<Transaction> ITransactionRepository.GetAsync(Uint256 txId)
 		{
-			return Request("t" + txId.ToString(), () => _Inner.Transactions.GetAsync(txId));
+			return Request("t" + txId.ToString(), () => _inner.Transactions.GetAsync(txId));
 		}
 
-		public Task PutAsync(uint256 txId, Transaction tx)
+		public Task PutAsync(Uint256 txId, Transaction tx)
 		{
-			return _Inner.Transactions.PutAsync(txId, tx);
+			return _inner.Transactions.PutAsync(txId, tx);
 		}
 
 		#endregion
 
-		Dictionary<string, Task> _Tasks = new Dictionary<string, Task>();
-		ReaderWriterLock @lock = new ReaderWriterLock();
+		Dictionary<string, Task> _tasks = new Dictionary<string, Task>();
+		ReaderWriterLock _lock = new ReaderWriterLock();
 
 		Task<T> Request<T>(string key, Func<Task<T>> wrapped)
 		{
 			Task<T> task = null;
-			using(@lock.LockRead())
+			using(_lock.LockRead())
 			{
-				task = _Tasks.TryGet(key) as Task<T>;
+				task = _tasks.TryGet(key) as Task<T>;
 			}
 			if(task != null)
 				return task;
-			using(@lock.LockWrite())
+			using(_lock.LockWrite())
 			{
-				task = _Tasks.TryGet(key) as Task<T>;
+				task = _tasks.TryGet(key) as Task<T>;
 				if(task != null)
 					return task;
 				task = wrapped();
-				_Tasks.Add(key, task);
+				_tasks.Add(key, task);
 			}
 			task.ContinueWith((_) =>
 			{
-				using(@lock.LockWrite())
+				using(_lock.LockWrite())
 				{
-					_Tasks.Remove(key);
+					_tasks.Remove(key);
 				}
 			});
 			return task;

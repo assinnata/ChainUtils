@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -25,12 +24,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement.Kdf
 
         public virtual void Init(IDerivationParameters param)
         {
-            DHKdfParameters parameters = (DHKdfParameters)param;
+            var parameters = (DHKdfParameters)param;
 
-            this.algorithm = parameters.Algorithm;
-            this.keySize = parameters.KeySize;
-            this.z = parameters.GetZ(); // TODO Clone?
-            this.partyAInfo = parameters.GetExtraInfo(); // TODO Clone?
+            algorithm = parameters.Algorithm;
+            keySize = parameters.KeySize;
+            z = parameters.GetZ(); // TODO Clone?
+            partyAInfo = parameters.GetExtraInfo(); // TODO Clone?
         }
 
         public virtual IDigest Digest
@@ -46,7 +45,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement.Kdf
             }
 
             long oBytes = len;
-            int outLen = digest.GetDigestSize();
+            var outLen = digest.GetDigestSize();
 
             //
             // this is at odds with the standard implementation, the
@@ -59,23 +58,23 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement.Kdf
                 throw new ArgumentException("Output length too large");
             }
 
-            int cThreshold = (int)((oBytes + outLen - 1) / outLen);
+            var cThreshold = (int)((oBytes + outLen - 1) / outLen);
 
-            byte[] dig = new byte[digest.GetDigestSize()];
+            var dig = new byte[digest.GetDigestSize()];
 
             uint counter = 1;
 
-            for (int i = 0; i < cThreshold; i++)
+            for (var i = 0; i < cThreshold; i++)
             {
                 digest.BlockUpdate(z, 0, z.Length);
 
                 // KeySpecificInfo
-                DerSequence keyInfo = new DerSequence(
+                var keyInfo = new DerSequence(
                     algorithm,
                     new DerOctetString(Pack.UInt32_To_BE(counter)));
 
                 // OtherInfo
-                Asn1EncodableVector v1 = new Asn1EncodableVector(keyInfo);
+                var v1 = new Asn1EncodableVector(keyInfo);
 
                 if (partyAInfo != null)
                 {
@@ -84,7 +83,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Agreement.Kdf
 
                 v1.Add(new DerTaggedObject(true, 2, new DerOctetString(Pack.UInt32_To_BE((uint)keySize))));
 
-                byte[] other = new DerSequence(v1).GetDerEncoded();
+                var other = new DerSequence(v1).GetDerEncoded();
 
                 digest.BlockUpdate(other, 0, other.Length);
 

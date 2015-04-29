@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Esf
 {
     public class CommitmentTypeIndication
@@ -33,11 +31,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count < 1 || seq.Count > 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.commitmentTypeId = (DerObjectIdentifier) seq[0].ToAsn1Object();
+			commitmentTypeId = (DerObjectIdentifier) seq[0].ToAsn1Object();
 
 			if (seq.Count > 1)
             {
-                this.commitmentTypeQualifier = (Asn1Sequence) seq[1].ToAsn1Object();
+                commitmentTypeQualifier = (Asn1Sequence) seq[1].ToAsn1Object();
             }
         }
 
@@ -82,7 +80,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
         */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(commitmentTypeId);
+            var v = new Asn1EncodableVector(commitmentTypeId);
 
 			if (commitmentTypeQualifier != null)
             {

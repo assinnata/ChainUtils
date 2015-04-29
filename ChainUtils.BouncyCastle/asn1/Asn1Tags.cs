@@ -19,7 +19,7 @@ namespace ChainUtils.BouncyCastle.Asn1
         public const int PrintableString = 0x13;
         public const int T61String = 0x14;
         public const int VideotexString = 0x15;
-        public const int IA5String = 0x16;
+        public const int Ia5String = 0x16;
         public const int UtcTime = 0x17;
         public const int GeneralizedTime = 0x18;
         public const int GraphicString = 0x19;

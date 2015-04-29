@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Modes;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Security;
@@ -32,9 +31,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			if (param is ParametersWithRandom)
 			{
-				ParametersWithRandom p = (ParametersWithRandom) param;
+				var p = (ParametersWithRandom) param;
 
-				this.rand = p.Random;
+				rand = p.Random;
 				this.param = (ParametersWithIV) p.Parameters;
 			}
 			else
@@ -65,7 +64,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			engine.Init(true, param);
 
-			int blockSize = engine.GetBlockSize();
+			var blockSize = engine.GetBlockSize();
 			byte[] cekBlock;
 
 			if (inLen + 4 < blockSize * 2)
@@ -86,12 +85,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			rand.NextBytes(cekBlock, inLen + 4, cekBlock.Length - inLen - 4);
 
-			for (int i = 0; i < cekBlock.Length; i += blockSize)
+			for (var i = 0; i < cekBlock.Length; i += blockSize)
 			{
 				engine.ProcessBlock(cekBlock, i, cekBlock, i);
 			}
 
-			for (int i = 0; i < cekBlock.Length; i += blockSize)
+			for (var i = 0; i < cekBlock.Length; i += blockSize)
 			{
 				engine.ProcessBlock(cekBlock, i, cekBlock, i);
 			}
@@ -109,22 +108,22 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				throw new InvalidOperationException("not set for unwrapping");
 			}
 
-			int blockSize = engine.GetBlockSize();
+			var blockSize = engine.GetBlockSize();
 
 			if (inLen < 2 * blockSize)
 			{
 				throw new InvalidCipherTextException("input too short");
 			}
 
-			byte[] cekBlock = new byte[inLen];
-			byte[] iv = new byte[blockSize];
+			var cekBlock = new byte[inLen];
+			var iv = new byte[blockSize];
 
 			Array.Copy(inBytes, inOff, cekBlock, 0, inLen);
 			Array.Copy(inBytes, inOff, iv, 0, iv.Length);
 
 			engine.Init(false, new ParametersWithIV(param.Parameters, iv));
 
-			for (int i = blockSize; i < cekBlock.Length; i += blockSize)
+			for (var i = blockSize; i < cekBlock.Length; i += blockSize)
 			{
 				engine.ProcessBlock(cekBlock, i, cekBlock, i);    
 			}
@@ -137,7 +136,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			engine.Init(false, param);
 
-			for (int i = 0; i < cekBlock.Length; i += blockSize)
+			for (var i = 0; i < cekBlock.Length; i += blockSize)
 			{
 				engine.ProcessBlock(cekBlock, i, cekBlock, i);
 			}
@@ -147,15 +146,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 				throw new InvalidCipherTextException("wrapped key corrupted");
 			}
 
-			byte[] key = new byte[cekBlock[0] & 0xff];
+			var key = new byte[cekBlock[0] & 0xff];
 
 			Array.Copy(cekBlock, 4, key, 0, cekBlock[0]);
 
 			// Note: Using constant time comparison
-			int nonEqual = 0;
-			for (int i = 0; i != 3; i++)
+			var nonEqual = 0;
+			for (var i = 0; i != 3; i++)
 			{
-				byte check = (byte)~cekBlock[1 + i];
+				var check = (byte)~cekBlock[1 + i];
 				nonEqual |= (check ^ key[i]);
 			}
 

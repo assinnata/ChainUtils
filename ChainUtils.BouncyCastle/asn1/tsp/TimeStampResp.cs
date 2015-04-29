@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1.Cmp;
 using ChainUtils.BouncyCastle.Asn1.Cms;
 
@@ -32,11 +30,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 		private TimeStampResp(
 			Asn1Sequence seq)
 		{
-			this.pkiStatusInfo = PkiStatusInfo.GetInstance(seq[0]);
+			pkiStatusInfo = PkiStatusInfo.GetInstance(seq[0]);
 
 			if (seq.Count > 1)
 			{
-				this.timeStampToken = ContentInfo.GetInstance(seq[1]);
+				timeStampToken = ContentInfo.GetInstance(seq[1]);
 			}
 		}
 
@@ -67,7 +65,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Tsp
 		 */
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(pkiStatusInfo);
+			var v = new Asn1EncodableVector(pkiStatusInfo);
 
 			if (timeStampToken != null)
 			{

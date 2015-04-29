@@ -1,21 +1,19 @@
 ﻿#if !NOHTTPCLIENT
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public class QBitNinjaTransactionRepository : ITransactionRepository
 	{
-		private readonly Uri _BaseUri;
+		private readonly Uri _baseUri;
 		public Uri BaseUri
 		{
 			get
 			{
-				return _BaseUri;
+				return _baseUri;
 			}
 		}
 
@@ -27,7 +25,7 @@ namespace ChainUtils
 		{
 			if(network == null)
 				throw new ArgumentNullException("network");
-			_BaseUri = new Uri("http://" + (network == Network.Main ? "" : "t") + "api.qbit.ninja/");
+			_baseUri = new Uri("http://" + (network == Network.Main ? "" : "t") + "api.qbit.ninja/");
 		}
 
 		public QBitNinjaTransactionRepository(Uri baseUri)
@@ -40,19 +38,19 @@ namespace ChainUtils
 		{
 			if(!baseUri.EndsWith("/"))
 				baseUri += "/";
-			_BaseUri = new Uri(baseUri, UriKind.Absolute);
+			_baseUri = new Uri(baseUri, UriKind.Absolute);
 		}
 
 
 
 		#region ITransactionRepository Members
 		
-		public async Task<Transaction> GetAsync(uint256 txId)
+		public async Task<Transaction> GetAsync(Uint256 txId)
 		{
-			using(HttpClient client = new HttpClient())
+			using(var client = new HttpClient())
 			{
 				var tx = await client.GetAsync(BaseUri.AbsoluteUri + "transactions/" + txId + "?format=raw").ConfigureAwait(false);
-				if(tx.StatusCode == System.Net.HttpStatusCode.NotFound)
+				if(tx.StatusCode == HttpStatusCode.NotFound)
 					return null;
 				tx.EnsureSuccessStatusCode();
 				var bytes = await tx.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
@@ -60,7 +58,7 @@ namespace ChainUtils
 			}
 		}
 
-		public Task PutAsync(uint256 txId, Transaction tx)
+		public Task PutAsync(Uint256 txId, Transaction tx)
 		{
 			return Task.FromResult(false);
 		}

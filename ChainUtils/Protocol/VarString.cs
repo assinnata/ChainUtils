@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Protocol
 {
@@ -12,19 +9,19 @@ namespace ChainUtils.Protocol
 		{
 
 		}
-		byte[] _Bytes = new byte[0];
+		byte[] _bytes = new byte[0];
 		public int Length
 		{
 			get
 			{
-				return _Bytes.Length;
+				return _bytes.Length;
 			}
 		}
 		public VarString(byte[] bytes)
 		{
 			if(bytes == null)
 				throw new ArgumentNullException("bytes");
-			_Bytes = bytes;
+			_bytes = bytes;
 		}
 		public byte[] GetString()
 		{
@@ -33,18 +30,18 @@ namespace ChainUtils.Protocol
 		public byte[] GetString(bool @unsafe)
 		{
 			if(@unsafe)
-				return _Bytes;
-			return _Bytes.ToArray();
+				return _bytes;
+			return _bytes.ToArray();
 		}
 		#region IBitcoinSerializable Members
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			 var len = new VarInt((ulong)_Bytes.Length);
+			 var len = new VarInt((ulong)_bytes.Length);
 			 stream.ReadWrite(ref len);
 			if(!stream.Serializing)
-				_Bytes = new byte[len.ToLong()];
-			stream.ReadWrite(ref _Bytes);
+				_bytes = new byte[len.ToLong()];
+			stream.ReadWrite(ref _bytes);
 		}
 
 		#endregion

@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.CryptoPro;
 using ChainUtils.BouncyCastle.Asn1.Kisa;
@@ -124,7 +123,7 @@ namespace ChainUtils.BouncyCastle.Security
         {
             algorithms[canonicalName] = canonicalName;
 
-            foreach (object alias in aliases)
+            foreach (var alias in aliases)
             {
                 algorithms[alias.ToString()] = canonicalName;
             }
@@ -132,7 +131,7 @@ namespace ChainUtils.BouncyCastle.Security
 
         private static void AddBasicIVSizeEntries(int size, params string[] algorithms)
         {
-            foreach (string algorithm in algorithms)
+            foreach (var algorithm in algorithms)
             {
                 basicIVSizes.Add(algorithm, size);
             }
@@ -176,7 +175,7 @@ namespace ChainUtils.BouncyCastle.Security
             if (algorithm == null)
                 throw new ArgumentNullException("algorithm");
 
-            string canonical = GetCanonicalAlgorithmName(algorithm);
+            var canonical = GetCanonicalAlgorithmName(algorithm);
 
             if (canonical == null)
                 throw new SecurityUtilityException("Algorithm " + algorithm + " not recognised.");
@@ -209,7 +208,7 @@ namespace ChainUtils.BouncyCastle.Security
             if (algorithm == null)
                 throw new ArgumentNullException("algorithm");
 
-            string canonical = GetCanonicalAlgorithmName(algorithm);
+            var canonical = GetCanonicalAlgorithmName(algorithm);
 
             if (canonical == null)
                 throw new SecurityUtilityException("Algorithm " + algorithm + " not recognised.");
@@ -222,7 +221,7 @@ namespace ChainUtils.BouncyCastle.Security
                 // but JCE doesn't seem to provide an AlgorithmParametersGenerator for them
                 // "RIJNDAEL", "SKIPJACK", "TWOFISH"
 
-                int basicIVKeySize = FindBasicIVSize(canonical);
+                var basicIVKeySize = FindBasicIVSize(canonical);
                 if (basicIVKeySize != -1
                     || canonical == "RIJNDAEL" || canonical == "SKIPJACK" || canonical == "TWOFISH")
                 {
@@ -268,7 +267,7 @@ namespace ChainUtils.BouncyCastle.Security
             if (algorithm == null)
                 throw new ArgumentNullException("algorithm");
 
-            string canonical = GetCanonicalAlgorithmName(algorithm);
+            var canonical = GetCanonicalAlgorithmName(algorithm);
 
             if (canonical == null)
                 throw new SecurityUtilityException("Algorithm " + algorithm + " not recognised.");
@@ -277,7 +276,7 @@ namespace ChainUtils.BouncyCastle.Security
             // but JCE doesn't seem to provide an AlgorithmParametersGenerator for them
             // "RIJNDAEL", "SKIPJACK", "TWOFISH"
 
-            int basicIVKeySize = FindBasicIVSize(canonical);
+            var basicIVKeySize = FindBasicIVSize(canonical);
             if (basicIVKeySize != -1)
                 return CreateIVOctetString(random, basicIVKeySize);
 
@@ -304,7 +303,7 @@ namespace ChainUtils.BouncyCastle.Security
             SecureRandom	random,
             int				ivLength)
         {
-            byte[] iv = new byte[ivLength];
+            var iv = new byte[ivLength];
             random.NextBytes(iv);
             return iv;
         }

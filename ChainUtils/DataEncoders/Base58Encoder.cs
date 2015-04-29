@@ -1,10 +1,7 @@
-﻿using ChainUtils.Crypto;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.Crypto;
 
 namespace ChainUtils.DataEncoders
 {
@@ -29,29 +26,29 @@ namespace ChainUtils.DataEncoders
 
 			// Convert big endian data to little endian
 			// Extra zero at the end make sure bignum will interpret as a positive number
-			byte[] vchTmp = data.Take(length).Reverse().Concat(new byte[] { 0x00 }).ToArray();
+			var vchTmp = data.Take(length).Reverse().Concat(new byte[] { 0x00 }).ToArray();
 
 			// Convert little endian data to bignum
-			BigInteger bn = new BigInteger(vchTmp);
+			var bn = new BigInteger(vchTmp);
 
 			// Convert bignum to std::string
-			String str = "";
+			var str = "";
 			// Expected size increase from base58 conversion is approximately 137%
 			// use 138% to be safe
 
-			BigInteger dv = BigInteger.Zero;
-			BigInteger rem = BigInteger.Zero;
+			var dv = BigInteger.Zero;
+			var rem = BigInteger.Zero;
 			while(bn > bn0)
 			{
 				dv = BigInteger.DivRem(bn, bn58, out rem);
 				bn = dv;
 				var c = (int)rem;
-				str += pszBase58[c];
+				str += PszBase58[c];
 			}
 
 			// Leading zeroes encoded as base58 zeros
-			for(int i = 0 ; i < length && data[i] == 0 ; i++)
-				str += pszBase58[0];
+			for(var i = 0 ; i < length && data[i] == 0 ; i++)
+				str += PszBase58[0];
 
 			// Convert little endian std::string to big endian
 			str = new String(str.ToCharArray().Reverse().ToArray());
@@ -59,7 +56,7 @@ namespace ChainUtils.DataEncoders
 		}
 
 
-		const string pszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+		const string PszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 
 		public override byte[] DecodeData(string encoded)
@@ -95,20 +92,20 @@ namespace ChainUtils.DataEncoders
 			BigInteger bn58 = 58;
 			BigInteger bn = 0;
 			BigInteger bnChar;
-			int i = 0;
-			while(DataEncoder.IsSpace(encoded[i]))
+			var i = 0;
+			while(IsSpace(encoded[i]))
 			{
 				i++;
 				if(i >= encoded.Length)
 					return result;
 			}
 
-			for(int y = i ; y < encoded.Length ; y++)
+			for(var y = i ; y < encoded.Length ; y++)
 			{
-				var p1 = pszBase58.IndexOf(encoded[y]);
+				var p1 = PszBase58.IndexOf(encoded[y]);
 				if(p1 == -1)
 				{
-					while(DataEncoder.IsSpace(encoded[y]))
+					while(IsSpace(encoded[y]))
 					{
 						y++;
 						if(y >= encoded.Length)
@@ -133,8 +130,8 @@ namespace ChainUtils.DataEncoders
 				vchTmp = vchTmp.Take(vchTmp.Length - 1).ToArray();
 
 			// Restore leading zeros
-			int nLeadingZeros = 0;
-			for(int y = i ; y < encoded.Length && encoded[y] == pszBase58[0] ; y++)
+			var nLeadingZeros = 0;
+			for(var y = i ; y < encoded.Length && encoded[y] == PszBase58[0] ; y++)
 				nLeadingZeros++;
 
 

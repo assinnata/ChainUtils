@@ -21,11 +21,11 @@ namespace ChainUtils.Tests
 			// test/data/Mar12Fork.dat from
 			// http://sourceforge.net/projects/bitcoin/files/Bitcoin/blockchain/Mar12Fork.dat/download
 			var tMay15 = Utils.UnixTimeToDateTime(1368576000);
-			ValidationState state = Network.Main.CreateValidationState();
+			var state = Network.Main.CreateValidationState();
 			state.CheckProofOfWork = false;
 			state.Now = tMay15; // Test as if it was right at May 15
 
-			Block forkingBlock = read_block("Mar12Fork.dat");
+			var forkingBlock = read_block("Mar12Fork.dat");
 
 			// After May 15'th, big blocks are OK:
 			forkingBlock.Header.BlockTime = tMay15; // Invalidates PoW
@@ -37,7 +37,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanCalculateMerkleRoot()
 		{
-			Block block = new Block();
+			var block = new Block();
 			block.ReadWrite(Encoders.Hex.DecodeData(File.ReadAllText(@"data\block169482.txt")));
 			Assert.Equal(block.Header.HashMerkleRoot, block.GetMerkleRoot().Hash);
 		}
@@ -47,7 +47,7 @@ namespace ChainUtils.Tests
 			var file = "Data/" + blockName;
 			if(File.Exists(file))
 			{
-				Block b = new Block();
+				var b = new Block();
 				b.ReadWrite(File.ReadAllBytes(file), 8); // skip msgheader/size
 				return b;
 			}

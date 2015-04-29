@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities.Collections;
 
 namespace ChainUtils.BouncyCastle.Asn1.Esf
@@ -41,9 +40,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count != 1)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.ocspResponses = (Asn1Sequence) seq[0].ToAsn1Object();
+			ocspResponses = (Asn1Sequence) seq[0].ToAsn1Object();
 
-			foreach (Asn1Encodable ae in this.ocspResponses)
+			foreach (Asn1Encodable ae in ocspResponses)
 			{
 				OcspResponsesID.GetInstance(ae.ToAsn1Object());
 			}
@@ -72,8 +71,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public OcspResponsesID[] GetOcspResponses()
 		{
-			OcspResponsesID[] result = new OcspResponsesID[ocspResponses.Count];
-			for (int i = 0; i < ocspResponses.Count; ++i)
+			var result = new OcspResponsesID[ocspResponses.Count];
+			for (var i = 0; i < ocspResponses.Count; ++i)
 			{
 				result[i] = OcspResponsesID.GetInstance(ocspResponses[i].ToAsn1Object());
 			}

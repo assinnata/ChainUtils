@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Crypto.Parameters;
-
 namespace ChainUtils.BouncyCastle.Crypto.Engines
 {
 	/**
@@ -54,7 +52,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			if ((outOff + BlockSize) > output.Length)
 				throw new DataLengthException("output buffer too short");
 
-			for (int i = 0; i < BlockSize; ++i)
+			for (var i = 0; i < BlockSize; ++i)
 			{
 				output[outOff + i] = input[inOff + i];
 			}

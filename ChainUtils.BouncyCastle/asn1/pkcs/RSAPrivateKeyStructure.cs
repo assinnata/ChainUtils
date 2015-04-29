@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
@@ -55,7 +52,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
         public RsaPrivateKeyStructure(
             Asn1Sequence seq)
         {
-            BigInteger version = ((DerInteger) seq[0]).Value;
+            var version = ((DerInteger) seq[0]).Value;
             if (version.IntValue != 0)
                 throw new ArgumentException("wrong version for RSA private key");
 

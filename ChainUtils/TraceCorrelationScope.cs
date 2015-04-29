@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
@@ -14,34 +10,34 @@ namespace ChainUtils
 #endif
 	 class TraceCorrelationScope : IDisposable
 	{
-		private Guid activity;
-		private Guid old;
+		private Guid _activity;
+		private Guid _old;
 
 		public Guid OldActivity
 		{
 			get
 			{
-				return old;
+				return _old;
 			}
 			private set
 			{
-				old = value;
+				_old = value;
 			}
 		}
 
-		bool _Transfered;
+		bool _transfered;
 
-		TraceSource _Source;
+		TraceSource _source;
 		public TraceCorrelationScope(Guid activity, TraceSource source, bool traceTransfer)
 		{
-			this.old = Trace.CorrelationManager.ActivityId;
-			this.activity = activity;
+			_old = Trace.CorrelationManager.ActivityId;
+			this._activity = activity;
 
-			_Transfered = old != activity && traceTransfer;
-			if(_Transfered)
+			_transfered = _old != activity && traceTransfer;
+			if(_transfered)
 			{
-				_Source = source;
-				_Source.TraceTransfer(0, "transfer", activity);
+				_source = source;
+				_source.TraceTransfer(0, "transfer", activity);
 			}
 			Trace.CorrelationManager.ActivityId = activity;
 		}
@@ -51,11 +47,11 @@ namespace ChainUtils
 
 		public void Dispose()
 		{
-			if(_Transfered)
+			if(_transfered)
 			{
-				_Source.TraceTransfer(0, "transfer", old);
+				_source.TraceTransfer(0, "transfer", _old);
 			}
-			Trace.CorrelationManager.ActivityId = old;
+			Trace.CorrelationManager.ActivityId = _old;
 		}
 
 		#endregion
@@ -68,8 +64,8 @@ namespace ChainUtils
 	class TraceCorrelation
 	{
 
-		TraceSource _Source;
-		string _ActivityName;
+		TraceSource _source;
+		string _activityName;
 		public TraceCorrelation(TraceSource source, string activityName)
 			: this(Guid.NewGuid(), source, activityName)
 		{
@@ -77,32 +73,32 @@ namespace ChainUtils
 		}
 		public TraceCorrelation(Guid activity, TraceSource source, string activityName)
 		{
-			_Source = source;
-			_ActivityName = activityName;
-			this.activity = activity;
+			_source = source;
+			_activityName = activityName;
+			this._activity = activity;
 		}
 
-		Guid activity;
+		Guid _activity;
 		public Guid Activity
 		{
 			get
 			{
-				return activity;
+				return _activity;
 			}
 			private set
 			{
-				activity = value;
+				_activity = value;
 			}
 		}
 
-		volatile bool _First = true;
+		volatile bool _first = true;
 		public TraceCorrelationScope Open(bool traceTransfer = true)
 		{
-			var scope = new TraceCorrelationScope(activity, _Source, traceTransfer);
-			if(_First)
+			var scope = new TraceCorrelationScope(_activity, _source, traceTransfer);
+			if(_first)
 			{
-				_First = false;
-				_Source.TraceEvent(TraceEventType.Start, 0, _ActivityName);
+				_first = false;
+				_source.TraceEvent(TraceEventType.Start, 0, _activityName);
 			}
 			return scope;
 		}
@@ -124,7 +120,7 @@ namespace ChainUtils
 
 		public override string ToString()
 		{
-			return _ActivityName;
+			return _activityName;
 		}
 	}
 }

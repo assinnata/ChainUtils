@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Security;
 
@@ -62,7 +60,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Paddings
 			SecureRandom initRandom = null;
 			if (parameters is ParametersWithRandom)
 			{
-				ParametersWithRandom p = (ParametersWithRandom)parameters;
+				var p = (ParametersWithRandom)parameters;
 				initRandom = p.Random;
 				parameters = p.Parameters;
 			}
@@ -83,8 +81,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Paddings
 		public override int GetOutputSize(
 			int length)
 		{
-			int total = length + bufOff;
-			int leftOver = total % buf.Length;
+			var total = length + bufOff;
+			var leftOver = total % buf.Length;
 
 			if (leftOver == 0)
 			{
@@ -110,8 +108,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Paddings
 		public override int GetUpdateOutputSize(
 			int length)
 		{
-			int total       = length + bufOff;
-			int leftOver    = total % buf.Length;
+			var total       = length + bufOff;
+			var leftOver    = total % buf.Length;
 
 			if (leftOver == 0)
 			{
@@ -136,7 +134,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Paddings
 			byte[]	output,
 			int		outOff)
 		{
-			int resultLen = 0;
+			var resultLen = 0;
 
 			if (bufOff == buf.Length)
 			{
@@ -173,8 +171,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Paddings
 				throw new ArgumentException("Can't have a negative input length!");
 			}
 
-			int blockSize = GetBlockSize();
-			int outLength = GetUpdateOutputSize(length);
+			var blockSize = GetBlockSize();
+			var outLength = GetUpdateOutputSize(length);
 
 			if (outLength > 0)
 			{
@@ -184,8 +182,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Paddings
 				}
 			}
 
-			int resultLen = 0;
-			int gapLen = buf.Length - bufOff;
+			var resultLen = 0;
+			var gapLen = buf.Length - bufOff;
 
 			if (length > gapLen)
 			{
@@ -231,8 +229,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Paddings
 			byte[]  output,
 			int     outOff)
 		{
-			int blockSize = cipher.GetBlockSize();
-			int resultLen = 0;
+			var blockSize = cipher.GetBlockSize();
+			var resultLen = 0;
 
 			if (forEncryption)
 			{

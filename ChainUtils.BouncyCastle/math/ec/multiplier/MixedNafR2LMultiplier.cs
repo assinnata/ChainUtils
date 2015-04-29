@@ -28,26 +28,26 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
 
         protected override ECPoint MultiplyPositive(ECPoint p, BigInteger k)
         {
-            ECCurve curveOrig = p.Curve;
+            var curveOrig = p.Curve;
 
-            ECCurve curveAdd = ConfigureCurve(curveOrig, additionCoord);
-            ECCurve curveDouble = ConfigureCurve(curveOrig, doublingCoord);
+            var curveAdd = ConfigureCurve(curveOrig, additionCoord);
+            var curveDouble = ConfigureCurve(curveOrig, doublingCoord);
 
-            int[] naf = WNafUtilities.GenerateCompactNaf(k);
+            var naf = WNafUtilities.GenerateCompactNaf(k);
 
-            ECPoint Ra = curveAdd.Infinity;
-            ECPoint Td = curveDouble.ImportPoint(p);
+            var Ra = curveAdd.Infinity;
+            var Td = curveDouble.ImportPoint(p);
 
-            int zeroes = 0;
-            for (int i = 0; i < naf.Length; ++i)
+            var zeroes = 0;
+            for (var i = 0; i < naf.Length; ++i)
             {
-                int ni = naf[i];
-                int digit = ni >> 16;
+                var ni = naf[i];
+                var digit = ni >> 16;
                 zeroes += ni & 0xFFFF;
 
                 Td = Td.TimesPow2(zeroes);
 
-                ECPoint Tj = curveAdd.ImportPoint(Td);
+                var Tj = curveAdd.ImportPoint(Td);
                 if (digit < 0)
                 {
                     Tj = Tj.Negate();

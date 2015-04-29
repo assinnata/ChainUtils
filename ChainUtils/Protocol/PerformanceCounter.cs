@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
@@ -12,28 +8,28 @@ namespace ChainUtils
 		
 		public PerformanceSnapshot(long readen, long written)
 		{
-			_TotalWrittenBytes = written;
-			_TotalReadenBytes = readen;	
+			_totalWrittenBytes = written;
+			_totalReadenBytes = readen;	
 		}
-		private readonly long _TotalWrittenBytes;
+		private readonly long _totalWrittenBytes;
 		public long TotalWrittenBytes
 		{
 			get
 			{
-				return _TotalWrittenBytes;
+				return _totalWrittenBytes;
 			}
 		}
 
-		long _TotalReadenBytes;
+		long _totalReadenBytes;
 		public long TotalReadenBytes
 		{
 			get
 			{
-				return _TotalReadenBytes;
+				return _totalReadenBytes;
 			}
 			set
 			{
-				_TotalReadenBytes = value;
+				_totalReadenBytes = value;
 			}
 		}
 		public TimeSpan Elapsed
@@ -78,12 +74,12 @@ namespace ChainUtils
 
 		public override string ToString()
 		{
-			return "Read : " + ToKBSec(ReadenBytesPerSecond) + ", Write : " + ToKBSec(WrittenBytesPerSecond);
+			return "Read : " + ToKbSec(ReadenBytesPerSecond) + ", Write : " + ToKbSec(WrittenBytesPerSecond);
 		}
 
-		private string ToKBSec(ulong bytesPerSec)
+		private string ToKbSec(ulong bytesPerSec)
 		{
-			double speed = ((double)bytesPerSec / 1024.0);
+			var speed = ((double)bytesPerSec / 1024.0);
 			return speed.ToString("0.00") + " KB/S)";
 		}
 
@@ -103,34 +99,34 @@ namespace ChainUtils
 	{
 		public PerformanceCounter()
 		{
-			_Start = DateTime.UtcNow;
+			_start = DateTime.UtcNow;
 		}
 
-		long _WrittenBytes;
+		long _writtenBytes;
 		public long WrittenBytes
 		{
 			get
 			{
-				return _WrittenBytes;
+				return _writtenBytes;
 			}
 		}
 
 
 		public void AddWritten(long count)
 		{
-			Interlocked.Add(ref _WrittenBytes, count);
+			Interlocked.Add(ref _writtenBytes, count);
 		}
 		public void AddReaden(long count)
 		{
-			Interlocked.Add(ref _ReadenBytes, count);
+			Interlocked.Add(ref _readenBytes, count);
 		}
 
-		long _ReadenBytes;
+		long _readenBytes;
 		public long ReadenBytes
 		{
 			get
 			{
-				return _ReadenBytes;
+				return _readenBytes;
 			}
 		}
 
@@ -147,12 +143,12 @@ namespace ChainUtils
 			return snap;
 		}
 
-		DateTime _Start;
+		DateTime _start;
 		public DateTime Start
 		{
 			get
 			{
-				return _Start;
+				return _start;
 			}
 		}
 		public TimeSpan Elapsed

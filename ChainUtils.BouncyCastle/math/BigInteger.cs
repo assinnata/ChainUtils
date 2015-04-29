@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math
@@ -222,11 +220,11 @@ namespace ChainUtils.BouncyCastle.Math
 
             primeProducts = new int[primeLists.Length];
 
-            for (int i = 0; i < primeLists.Length; ++i)
+            for (var i = 0; i < primeLists.Length; ++i)
             {
-                int[] primeList = primeLists[i];
-                int product = primeList[0];
-                for (int j = 1; j < primeList.Length; ++j)
+                var primeList = primeLists[i];
+                var product = primeList[0];
+                for (var j = 1; j < primeList.Length; ++j)
                 {
                     product *= primeList[j];
                 }
@@ -253,7 +251,7 @@ namespace ChainUtils.BouncyCastle.Math
         {
             if (checkMag)
             {
-                int i = 0;
+                var i = 0;
                 while (i < mag.Length && mag[i] == 0)
                 {
                     ++i;
@@ -261,29 +259,29 @@ namespace ChainUtils.BouncyCastle.Math
 
                 if (i == mag.Length)
                 {
-                    this.sign = 0;
-                    this.magnitude = ZeroMagnitude;
+                    sign = 0;
+                    magnitude = ZeroMagnitude;
                 }
                 else
                 {
-                    this.sign = signum;
+                    sign = signum;
 
                     if (i == 0)
                     {
-                        this.magnitude = mag;
+                        magnitude = mag;
                     }
                     else
                     {
                         // strip leading 0 words
-                        this.magnitude = new int[mag.Length - i];
-                        Array.Copy(mag, i, this.magnitude, 0, this.magnitude.Length);
+                        magnitude = new int[mag.Length - i];
+                        Array.Copy(mag, i, magnitude, 0, magnitude.Length);
                     }
                 }
             }
             else
             {
-                this.sign = signum;
-                this.magnitude = mag;
+                sign = signum;
+                magnitude = mag;
             }
         }
 
@@ -340,7 +338,7 @@ namespace ChainUtils.BouncyCastle.Math
             }
 
 
-            int index = 0;
+            var index = 0;
             sign = 1;
 
             if (str[0] == '-')
@@ -372,18 +370,18 @@ namespace ChainUtils.BouncyCastle.Math
             // storage in one hit?, then Generate the magnitude in one hit too?
             //////
 
-            BigInteger b = Zero;
+            var b = Zero;
 
 
-            int next = index + chunk;
+            var next = index + chunk;
 
             if (next <= str.Length)
             {
                 do
                 {
-                    string s = str.Substring(index, chunk);
-                    ulong i = ulong.Parse(s, style);
-                    BigInteger bi = CreateUValueOf(i);
+                    var s = str.Substring(index, chunk);
+                    var i = ulong.Parse(s, style);
+                    var bi = CreateUValueOf(i);
 
                     switch (radix)
                     {
@@ -421,9 +419,9 @@ namespace ChainUtils.BouncyCastle.Math
 
             if (index < str.Length)
             {
-                string s = str.Substring(index);
-                ulong i = ulong.Parse(s, style);
-                BigInteger bi = CreateUValueOf(i);
+                var s = str.Substring(index);
+                var i = ulong.Parse(s, style);
+                var bi = CreateUValueOf(i);
 
                 if (b.sign > 0)
                 {
@@ -491,9 +489,9 @@ namespace ChainUtils.BouncyCastle.Math
             // TODO Move this processing into MakeMagnitude (provide sign argument)
             if ((sbyte)bytes[offset] < 0)
             {
-                this.sign = -1;
+                sign = -1;
 
-                int end = offset + length;
+                var end = offset + length;
 
                 int iBval;
                 // strip leading sign bytes
@@ -503,14 +501,14 @@ namespace ChainUtils.BouncyCastle.Math
 
                 if (iBval >= end)
                 {
-                    this.magnitude = One.magnitude;
+                    magnitude = One.magnitude;
                 }
                 else
                 {
-                    int numBytes = end - iBval;
-                    byte[] inverse = new byte[numBytes];
+                    var numBytes = end - iBval;
+                    var inverse = new byte[numBytes];
 
-                    int index = 0;
+                    var index = 0;
                     while (index < numBytes)
                     {
                         inverse[index++] = (byte)~bytes[iBval++];
@@ -525,14 +523,14 @@ namespace ChainUtils.BouncyCastle.Math
 
                     inverse[index]++;
 
-                    this.magnitude = MakeMagnitude(inverse, 0, inverse.Length);
+                    magnitude = MakeMagnitude(inverse, 0, inverse.Length);
                 }
             }
             else
             {
                 // strip leading zero bytes and return magnitude bytes
-                this.magnitude = MakeMagnitude(bytes, offset, length);
-                this.sign = this.magnitude.Length > 0 ? 1 : 0;
+                magnitude = MakeMagnitude(bytes, offset, length);
+                sign = magnitude.Length > 0 ? 1 : 0;
             }
         }
 
@@ -541,7 +539,7 @@ namespace ChainUtils.BouncyCastle.Math
             int		offset,
             int		length)
         {
-            int end = offset + length;
+            var end = offset + length;
 
             // strip leading zeros
             int firstSignificant;
@@ -555,8 +553,8 @@ namespace ChainUtils.BouncyCastle.Math
                 return ZeroMagnitude;
             }
 
-            int nInts = (end - firstSignificant + 3) / BytesPerInt;
-            int bCount = (end - firstSignificant) % BytesPerInt;
+            var nInts = (end - firstSignificant + 3) / BytesPerInt;
+            var bCount = (end - firstSignificant) % BytesPerInt;
             if (bCount == 0)
             {
                 bCount = BytesPerInt;
@@ -567,11 +565,11 @@ namespace ChainUtils.BouncyCastle.Math
                 return ZeroMagnitude;
             }
 
-            int[] mag = new int[nInts];
+            var mag = new int[nInts];
 
-            int v = 0;
-            int magnitudeIndex = 0;
-            for (int i = firstSignificant; i < end; ++i)
+            var v = 0;
+            var magnitudeIndex = 0;
+            for (var i = firstSignificant; i < end; ++i)
             {
                 v <<= 8;
                 v |= bytes[i] & 0xff;
@@ -612,13 +610,13 @@ namespace ChainUtils.BouncyCastle.Math
             if (sign == 0)
             {
                 this.sign = 0;
-                this.magnitude = ZeroMagnitude;
+                magnitude = ZeroMagnitude;
             }
             else
             {
                 // copy bytes
-                this.magnitude = MakeMagnitude(bytes, offset, length);
-                this.sign = this.magnitude.Length < 1 ? 0 : sign;
+                magnitude = MakeMagnitude(bytes, offset, length);
+                this.sign = magnitude.Length < 1 ? 0 : sign;
             }
         }
 
@@ -629,26 +627,26 @@ namespace ChainUtils.BouncyCastle.Math
             if (sizeInBits < 0)
                 throw new ArgumentException("sizeInBits must be non-negative");
 
-            this.nBits = -1;
-            this.nBitLength = -1;
+            nBits = -1;
+            nBitLength = -1;
 
             if (sizeInBits == 0)
             {
-                this.sign = 0;
-                this.magnitude = ZeroMagnitude;
+                sign = 0;
+                magnitude = ZeroMagnitude;
                 return;
             }
 
-            int nBytes = GetByteLength(sizeInBits);
-            byte[] b = new byte[nBytes];
+            var nBytes = GetByteLength(sizeInBits);
+            var b = new byte[nBytes];
             random.NextBytes(b);
 
             // strip off any excess bits in the MSB
-            int xBits = BitsPerByte * nBytes - sizeInBits;
+            var xBits = BitsPerByte * nBytes - sizeInBits;
             b[0] &= (byte)(255U >> xBits);
 
-            this.magnitude = MakeMagnitude(b, 0, b.Length);
-            this.sign = this.magnitude.Length < 1 ? 0 : 1;
+            magnitude = MakeMagnitude(b, 0, b.Length);
+            sign = magnitude.Length < 1 ? 0 : 1;
         }
 
         public BigInteger(
@@ -659,22 +657,22 @@ namespace ChainUtils.BouncyCastle.Math
             if (bitLength < 2)
                 throw new ArithmeticException("bitLength < 2");
 
-            this.sign = 1;
-            this.nBitLength = bitLength;
+            sign = 1;
+            nBitLength = bitLength;
 
             if (bitLength == 2)
             {
-                this.magnitude = random.Next(2) == 0
+                magnitude = random.Next(2) == 0
                     ?	Two.magnitude
                     :	Three.magnitude;
                 return;
             }
              
-            int nBytes = GetByteLength(bitLength);
-            byte[] b = new byte[nBytes];
+            var nBytes = GetByteLength(bitLength);
+            var b = new byte[nBytes];
 
-            int xBits = BitsPerByte * nBytes - bitLength;
-            byte mask = (byte)(255U >> xBits);
+            var xBits = BitsPerByte * nBytes - bitLength;
+            var mask = (byte)(255U >> xBits);
 
             for (;;)
             {
@@ -689,9 +687,9 @@ namespace ChainUtils.BouncyCastle.Math
                 // ensure the trailing bit is 1 (i.e. must be odd)
                 b[nBytes - 1] |= 1;
 
-                this.magnitude = MakeMagnitude(b, 0, b.Length);
-                this.nBits = -1;
-                this.mQuote = 0;
+                magnitude = MakeMagnitude(b, 0, b.Length);
+                nBits = -1;
+                mQuote = 0;
 
                 if (certainty < 1)
                     break;
@@ -701,12 +699,12 @@ namespace ChainUtils.BouncyCastle.Math
 
                 if (bitLength > 32)
                 {
-                    for (int rep = 0; rep < 10000; ++rep)
+                    for (var rep = 0; rep < 10000; ++rep)
                     {
-                        int n = 33 + random.Next(bitLength - 2);
-                        this.magnitude[this.magnitude.Length - (n >> 5)] ^= (1 << (n & 31));
-                        this.magnitude[this.magnitude.Length - 1] ^= ((random.Next() + 1) << 1);
-                        this.mQuote = 0;
+                        var n = 33 + random.Next(bitLength - 2);
+                        magnitude[magnitude.Length - (n >> 5)] ^= (1 << (n & 31));
+                        magnitude[magnitude.Length - 1] ^= ((random.Next() + 1) << 1);
+                        mQuote = 0;
 
                         if (CheckProbablePrime(certainty, random))
                             return;
@@ -727,8 +725,8 @@ namespace ChainUtils.BouncyCastle.Math
             int[] a,
             int[] b)
         {
-            int tI = a.Length - 1;
-            int vI = b.Length - 1;
+            var tI = a.Length - 1;
+            var vI = b.Length - 1;
             long m = 0;
 
             while (vI >= 0)
@@ -751,10 +749,10 @@ namespace ChainUtils.BouncyCastle.Math
         public BigInteger Add(
             BigInteger value)
         {
-            if (this.sign == 0)
+            if (sign == 0)
                 return value;
 
-            if (this.sign != value.sign)
+            if (sign != value.sign)
             {
                 if (value.sign == 0)
                     return this;
@@ -772,23 +770,23 @@ namespace ChainUtils.BouncyCastle.Math
             int[] magToAdd)
         {
             int[] big, small;
-            if (this.magnitude.Length < magToAdd.Length)
+            if (magnitude.Length < magToAdd.Length)
             {
                 big = magToAdd;
-                small = this.magnitude;
+                small = magnitude;
             }
             else
             {
-                big = this.magnitude;
+                big = magnitude;
                 small = magToAdd;
             }
 
             // Conservatively avoid over-allocation when no overflow possible
-            uint limit = uint.MaxValue;
+            var limit = uint.MaxValue;
             if (big.Length == small.Length)
                 limit -= (uint) small[0];
 
-            bool possibleOverflow = (uint) big[0] >= limit;
+            var possibleOverflow = (uint) big[0] >= limit;
 
             int[] bigCopy;
             if (possibleOverflow)
@@ -803,38 +801,38 @@ namespace ChainUtils.BouncyCastle.Math
 
             bigCopy = AddMagnitudes(bigCopy, small);
 
-            return new BigInteger(this.sign, bigCopy, possibleOverflow);
+            return new BigInteger(sign, bigCopy, possibleOverflow);
         }
 
         public BigInteger And(
             BigInteger value)
         {
-            if (this.sign == 0 || value.sign == 0)
+            if (sign == 0 || value.sign == 0)
             {
                 return Zero;
             }
 
-            int[] aMag = this.sign > 0
-                ? this.magnitude
+            var aMag = sign > 0
+                ? magnitude
                 : Add(One).magnitude;
 
-            int[] bMag = value.sign > 0
+            var bMag = value.sign > 0
                 ? value.magnitude
                 : value.Add(One).magnitude;
 
-            bool resultNeg = sign < 0 && value.sign < 0;
-            int resultLength = System.Math.Max(aMag.Length, bMag.Length);
-            int[] resultMag = new int[resultLength];
+            var resultNeg = sign < 0 && value.sign < 0;
+            var resultLength = System.Math.Max(aMag.Length, bMag.Length);
+            var resultMag = new int[resultLength];
 
-            int aStart = resultMag.Length - aMag.Length;
-            int bStart = resultMag.Length - bMag.Length;
+            var aStart = resultMag.Length - aMag.Length;
+            var bStart = resultMag.Length - bMag.Length;
 
-            for (int i = 0; i < resultMag.Length; ++i)
+            for (var i = 0; i < resultMag.Length; ++i)
             {
-                int aWord = i >= aStart ? aMag[i - aStart] : 0;
-                int bWord = i >= bStart ? bMag[i - bStart] : 0;
+                var aWord = i >= aStart ? aMag[i - aStart] : 0;
+                var bWord = i >= bStart ? bMag[i - bStart] : 0;
 
-                if (this.sign < 0)
+                if (sign < 0)
                 {
                     aWord = ~aWord;
                 }
@@ -852,7 +850,7 @@ namespace ChainUtils.BouncyCastle.Math
                 }
             }
 
-            BigInteger result = new BigInteger(1, resultMag, true);
+            var result = new BigInteger(1, resultMag, true);
 
             // TODO Optimise this case
             if (resultNeg)
@@ -882,8 +880,8 @@ namespace ChainUtils.BouncyCastle.Math
                     }
                     else
                     {
-                        int sum = 0;
-                        for (int i = 0; i < magnitude.Length; ++i)
+                        var sum = 0;
+                        for (var i = 0; i < magnitude.Length; ++i)
                         {
                             sum += BitCnt(magnitude[i]);
                         }
@@ -897,7 +895,7 @@ namespace ChainUtils.BouncyCastle.Math
 
         public static int BitCnt(int i)
         {
-            uint u = (uint)i;
+            var u = (uint)i;
             u = u - ((u >> 1) & 0x55555555);
             u = (u & 0x33333333) + ((u >> 2) & 0x33333333);
             u = (u + (u >> 4)) & 0x0f0f0f0f;
@@ -921,10 +919,10 @@ namespace ChainUtils.BouncyCastle.Math
             }
 
             // bit length for everything after the first int
-            int bitLength = 32 * ((mag.Length - indx) - 1);
+            var bitLength = 32 * ((mag.Length - indx) - 1);
 
             // and determine bitlength of first int
-            int firstMag = mag[indx];
+            var firstMag = mag[indx];
             bitLength += BitLen(firstMag);
 
             // Check for negative powers of two
@@ -964,8 +962,8 @@ namespace ChainUtils.BouncyCastle.Math
         //
         private static int BitLen(int w)
         {
-            uint v = (uint)w;
-            uint t = v >> 24;
+            var v = (uint)w;
+            var t = v >> 24;
             if (t != 0)
                 return 24 + BitLengthTable[t];
             t = v >> 16;
@@ -1017,7 +1015,7 @@ namespace ChainUtils.BouncyCastle.Math
             int		yIndx,
             int[]	y)
         {
-            int diff = (x.Length - y.Length) - (xIndx - yIndx);
+            var diff = (x.Length - y.Length) - (xIndx - yIndx);
 
             if (diff != 0)
             {
@@ -1028,8 +1026,8 @@ namespace ChainUtils.BouncyCastle.Math
 
             while (xIndx < x.Length)
             {
-                uint v1 = (uint)x[xIndx++];
-                uint v2 = (uint)y[yIndx++];
+                var v1 = (uint)x[xIndx++];
+                var v2 = (uint)y[yIndx++];
 
                 if (v1 != v2)
                     return v1 < v2 ? -1 : 1;
@@ -1055,13 +1053,13 @@ namespace ChainUtils.BouncyCastle.Math
             int[]	x,
             int[]	y)
         {
-            int xStart = 0;
+            var xStart = 0;
             while (xStart < x.Length && x[xStart] == 0)
             {
                 ++xStart;
             }
 
-            int yStart = 0;
+            var yStart = 0;
             while (yStart < y.Length && y[yStart] == 0)
             {
                 ++yStart;
@@ -1069,21 +1067,21 @@ namespace ChainUtils.BouncyCastle.Math
 
             Debug.Assert(yStart < y.Length);
 
-            int xyCmp = CompareNoLeadingZeroes(xStart, x, yStart, y);
+            var xyCmp = CompareNoLeadingZeroes(xStart, x, yStart, y);
             int[] count;
 
             if (xyCmp > 0)
             {
-                int yBitLength = CalcBitLength(1, yStart, y);
-                int xBitLength = CalcBitLength(1, xStart, x);
-                int shift = xBitLength - yBitLength;
+                var yBitLength = CalcBitLength(1, yStart, y);
+                var xBitLength = CalcBitLength(1, xStart, x);
+                var shift = xBitLength - yBitLength;
 
                 int[] iCount;
-                int iCountStart = 0;
+                var iCountStart = 0;
 
                 int[] c;
-                int cStart = 0;
-                int cBitLength = yBitLength;
+                var cStart = 0;
+                var cBitLength = yBitLength;
                 if (shift > 0)
                 {
 //					iCount = ShiftLeft(One.magnitude, shift);
@@ -1097,7 +1095,7 @@ namespace ChainUtils.BouncyCastle.Math
                 {
                     iCount = new int[] { 1 };
 
-                    int len = y.Length - yStart;
+                    var len = y.Length - yStart;
                     c = new int[len];
                     Array.Copy(y, yStart, c, 0, len);
                 }
@@ -1138,8 +1136,8 @@ namespace ChainUtils.BouncyCastle.Math
                     // NB: The case where c[cStart] is 1-bit is harmless
                     if (shift == 1)
                     {
-                        uint firstC = (uint) c[cStart] >> 1;
-                        uint firstX = (uint) x[xStart];
+                        var firstC = (uint) c[cStart] >> 1;
+                        var firstX = (uint) x[xStart];
                         if (firstC > firstX)
                             ++shift;
                     }
@@ -1194,13 +1192,13 @@ namespace ChainUtils.BouncyCastle.Math
 
             if (val.QuickPow2Check()) // val is power of two
             {
-                BigInteger result = this.Abs().ShiftRight(val.Abs().BitLength - 1);
-                return val.sign == this.sign ? result : result.Negate();
+                var result = Abs().ShiftRight(val.Abs().BitLength - 1);
+                return val.sign == sign ? result : result.Negate();
             }
 
-            int[] mag = (int[]) this.magnitude.Clone();
+            var mag = (int[]) magnitude.Clone();
 
-            return new BigInteger(this.sign * val.sign, Divide(mag, val.magnitude), true);
+            return new BigInteger(sign * val.sign, Divide(mag, val.magnitude), true);
         }
 
         public BigInteger[] DivideAndRemainder(
@@ -1209,7 +1207,7 @@ namespace ChainUtils.BouncyCastle.Math
             if (val.sign == 0)
                 throw new ArithmeticException("Division by zero error");
 
-            BigInteger[] biggies = new BigInteger[2];
+            var biggies = new BigInteger[2];
 
             if (sign == 0)
             {
@@ -1218,20 +1216,20 @@ namespace ChainUtils.BouncyCastle.Math
             }
             else if (val.QuickPow2Check()) // val is power of two
             {
-                int e = val.Abs().BitLength - 1;
-                BigInteger quotient = this.Abs().ShiftRight(e);
-                int[] remainder = this.LastNBits(e);
+                var e = val.Abs().BitLength - 1;
+                var quotient = Abs().ShiftRight(e);
+                var remainder = LastNBits(e);
 
-                biggies[0] = val.sign == this.sign ? quotient : quotient.Negate();
-                biggies[1] = new BigInteger(this.sign, remainder, true);
+                biggies[0] = val.sign == sign ? quotient : quotient.Negate();
+                biggies[1] = new BigInteger(sign, remainder, true);
             }
             else
             {
-                int[] remainder = (int[]) this.magnitude.Clone();
-                int[] quotient = Divide(remainder, val.magnitude);
+                var remainder = (int[]) magnitude.Clone();
+                var quotient = Divide(remainder, val.magnitude);
 
-                biggies[0] = new BigInteger(this.sign * val.sign, quotient, true);
-                biggies[1] = new BigInteger(this.sign, remainder, true);
+                biggies[0] = new BigInteger(sign * val.sign, quotient, true);
+                biggies[1] = new BigInteger(sign, remainder, true);
             }
 
             return biggies;
@@ -1243,7 +1241,7 @@ namespace ChainUtils.BouncyCastle.Math
             if (obj == this)
                 return true;
 
-            BigInteger biggie = obj as BigInteger;
+            var biggie = obj as BigInteger;
             if (biggie == null)
                 return false;
 
@@ -1252,10 +1250,10 @@ namespace ChainUtils.BouncyCastle.Math
 
         private bool IsEqualMagnitude(BigInteger x)
         {
-            int[] xMag = x.magnitude;
+            var xMag = x.magnitude;
             if (magnitude.Length != x.magnitude.Length)
                 return false;
-            for (int i = 0; i < magnitude.Length; i++)
+            for (var i = 0; i < magnitude.Length; i++)
             {
                 if (magnitude[i] != x.magnitude[i])
                     return false;
@@ -1273,8 +1271,8 @@ namespace ChainUtils.BouncyCastle.Math
                 return value.Abs();
 
             BigInteger r;
-            BigInteger u = this;
-            BigInteger v = value;
+            var u = this;
+            var v = value;
 
             while (v.sign != 0)
             {
@@ -1288,7 +1286,7 @@ namespace ChainUtils.BouncyCastle.Math
 
         public override int GetHashCode()
         {
-            int hc = magnitude.Length;
+            var hc = magnitude.Length;
             if (magnitude.Length > 0)
             {
                 hc ^= magnitude[0];
@@ -1305,11 +1303,11 @@ namespace ChainUtils.BouncyCastle.Math
         // TODO Make public?
         private BigInteger Inc()
         {
-            if (this.sign == 0)
+            if (sign == 0)
                 return One;
 
-            if (this.sign < 0)
-                return new BigInteger(-1, doSubBigLil(this.magnitude, One.magnitude), true);
+            if (sign < 0)
+                return new BigInteger(-1, doSubBigLil(magnitude, One.magnitude), true);
 
             return AddToMagnitude(One.magnitude);
         }
@@ -1321,9 +1319,9 @@ namespace ChainUtils.BouncyCastle.Math
                 if (sign == 0)
                     return 0;
 
-                int n = magnitude.Length;
+                var n = magnitude.Length;
 
-                int v = magnitude[n - 1];
+                var v = magnitude[n - 1];
 
                 return sign < 0 ? -v : v;
             }
@@ -1340,7 +1338,7 @@ namespace ChainUtils.BouncyCastle.Math
             if (certainty <= 0)
                 return true;
 
-            BigInteger n = Abs();
+            var n = Abs();
 
             if (!n.TestBit(0))
                 return n.Equals(Two);
@@ -1361,17 +1359,17 @@ namespace ChainUtils.BouncyCastle.Math
 
 
             // Try to reduce the penalty for really small numbers
-            int numLists = System.Math.Min(BitLength - 1, primeLists.Length);
+            var numLists = System.Math.Min(BitLength - 1, primeLists.Length);
 
-            for (int i = 0; i < numLists; ++i)
+            for (var i = 0; i < numLists; ++i)
             {
-                int test = Remainder(primeProducts[i]);
+                var test = Remainder(primeProducts[i]);
 
-                int[] primeList = primeLists[i];
-                for (int j = 0; j < primeList.Length; ++j)
+                var primeList = primeLists[i];
+                for (var j = 0; j < primeList.Length; ++j)
                 {
-                    int prime = primeList[j];
-                    int qRem = test % prime;
+                    var prime = primeList[j];
+                    var qRem = test % prime;
                     if (qRem == 0)
                     {
                         // We may find small numbers in the list
@@ -1407,15 +1405,15 @@ namespace ChainUtils.BouncyCastle.Math
             Debug.Assert(TestBit(0));
 
             // let n = 1 + d . 2^s
-            BigInteger n = this;
-            int s = n.GetLowestSetBitMaskFirst(-1 << 1);
+            var n = this;
+            var s = n.GetLowestSetBitMaskFirst(-1 << 1);
             Debug.Assert(s >= 1);
-            BigInteger r = n.ShiftRight(s);
+            var r = n.ShiftRight(s);
 
             // NOTE: Avoid conversion to/from Montgomery form and check for R/-R as result instead
 
-            BigInteger montRadix = One.ShiftLeft(32 * n.magnitude.Length).Remainder(n);
-            BigInteger minusMontRadix = n.Subtract(montRadix);
+            var montRadix = One.ShiftLeft(32 * n.magnitude.Length).Remainder(n);
+            var minusMontRadix = n.Subtract(montRadix);
 
             do
             {
@@ -1427,11 +1425,11 @@ namespace ChainUtils.BouncyCastle.Math
                 while (a.sign == 0 || a.CompareTo(n) >= 0
                     || a.IsEqualMagnitude(montRadix) || a.IsEqualMagnitude(minusMontRadix));
 
-                BigInteger y = ModPowMonty(a, r, n, false);
+                var y = ModPowMonty(a, r, n, false);
 
                 if (!y.Equals(montRadix))
                 {
-                    int j = 0;
+                    var j = 0;
                     while (!y.Equals(minusMontRadix))
                     {
                         if (++j == s)
@@ -1547,9 +1545,9 @@ namespace ChainUtils.BouncyCastle.Math
                 if (sign == 0)
                     return 0;
 
-                int n = magnitude.Length;
+                var n = magnitude.Length;
 
-                long v = magnitude[n - 1] & IMASK;
+                var v = magnitude[n - 1] & IMASK;
                 if (n > 1)
                 {
                     v |= (magnitude[n - 2] & IMASK) << 32;
@@ -1577,7 +1575,7 @@ namespace ChainUtils.BouncyCastle.Math
             if (m.sign < 1)
                 throw new ArithmeticException("Modulus must be positive");
 
-            BigInteger biggie = Remainder(m);
+            var biggie = Remainder(m);
 
             return (biggie.sign >= 0 ? biggie : biggie.Add(m));
         }
@@ -1631,9 +1629,9 @@ namespace ChainUtils.BouncyCastle.Math
                 return ModInversePow2(m);
             }
 
-            BigInteger d = this.Remainder(m);
+            var d = Remainder(m);
             BigInteger x;
-            BigInteger gcd = ExtEuclid(d, m, out x);
+            var gcd = ExtEuclid(d, m, out x);
 
             if (!gcd.Equals(One))
                 throw new ArithmeticException("Numbers not relatively prime.");
@@ -1656,24 +1654,24 @@ namespace ChainUtils.BouncyCastle.Math
                 throw new ArithmeticException("Numbers not relatively prime.");
             }
 
-            int pow = m.BitLength - 1;
+            var pow = m.BitLength - 1;
 
-            long inv64 = ModInverse64(LongValue);
+            var inv64 = ModInverse64(LongValue);
             if (pow < 64)
             {
                 inv64 &= ((1L << pow) - 1);
             }
 
-            BigInteger x = BigInteger.ValueOf(inv64);
+            var x = ValueOf(inv64);
 
             if (pow > 64)
             {
-                BigInteger d = this.Remainder(m);
-                int bitsCorrect = 64;
+                var d = Remainder(m);
+                var bitsCorrect = 64;
 
                 do
                 {
-                    BigInteger t = x.Multiply(d).Remainder(m);
+                    var t = x.Multiply(d).Remainder(m);
                     x = x.Multiply(Two.Subtract(t)).Remainder(m);
                     bitsCorrect <<= 1;
                 }
@@ -1692,7 +1690,7 @@ namespace ChainUtils.BouncyCastle.Math
         {
             // Newton's method with initial estimate "correct to 4 bits"
             Debug.Assert((d & 1) != 0);
-            int x = d + (((d + 1) & 4) << 1);   // d.x == 1 mod 2**4
+            var x = d + (((d + 1) & 4) << 1);   // d.x == 1 mod 2**4
             Debug.Assert(((d * x) & 15) == 1);
             x *= 2 - d * x;                     // d.x == 1 mod 2**8
             x *= 2 - d * x;                     // d.x == 1 mod 2**16
@@ -1705,7 +1703,7 @@ namespace ChainUtils.BouncyCastle.Math
         {
             // Newton's method with initial estimate "correct to 4 bits"
             Debug.Assert((d & 1L) != 0);
-            long x = d + (((d + 1L) & 4L) << 1);    // d.x == 1 mod 2**4
+            var x = d + (((d + 1L) & 4L) << 1);    // d.x == 1 mod 2**4
             Debug.Assert(((d * x) & 15L) == 1L);
             x *= 2 - d * x;                         // d.x == 1 mod 2**8
             x *= 2 - d * x;                         // d.x == 1 mod 2**16
@@ -1740,11 +1738,11 @@ namespace ChainUtils.BouncyCastle.Math
             {
                 for (;;)
                 {
-                    BigInteger[] q = u3.DivideAndRemainder(v3);
+                    var q = u3.DivideAndRemainder(v3);
                     u3 = v3;
                     v3 = q[1];
 
-                    BigInteger oldU1 = u1;
+                    var oldU1 = u1;
                     u1 = v1;
 
                     if (v3.sign <= 0)
@@ -1779,11 +1777,11 @@ namespace ChainUtils.BouncyCastle.Math
             if (sign == 0)
                 return Zero;
 
-            bool negExp = e.sign < 0;
+            var negExp = e.sign < 0;
             if (negExp)
                 e = e.Negate();
 
-            BigInteger result = this.Mod(m);
+            var result = Mod(m);
             if (!e.Equals(One))
             {
                 if ((m.magnitude[m.magnitude.Length - 1] & 1) == 0)
@@ -1804,9 +1802,9 @@ namespace ChainUtils.BouncyCastle.Math
 
         private static BigInteger ModPowBarrett(BigInteger b, BigInteger e, BigInteger m)
         {
-            int k = m.magnitude.Length;
-            BigInteger mr = One.ShiftLeft((k + 1) << 5);
-            BigInteger yu = One.ShiftLeft(k << 6).Divide(m);
+            var k = m.magnitude.Length;
+            var mr = One.ShiftLeft((k + 1) << 5);
+            var yu = One.ShiftLeft(k << 6).Divide(m);
 
             // Sliding window from MSW to LSW
             int extraBits = 0, expLength = e.BitLength;
@@ -1815,21 +1813,21 @@ namespace ChainUtils.BouncyCastle.Math
                 ++extraBits;
             }
 
-            int numPowers = 1 << extraBits;
-            BigInteger[] oddPowers = new BigInteger[numPowers];
+            var numPowers = 1 << extraBits;
+            var oddPowers = new BigInteger[numPowers];
             oddPowers[0] = b;
 
-            BigInteger b2 = ReduceBarrett(b.Square(), m, mr, yu);
+            var b2 = ReduceBarrett(b.Square(), m, mr, yu);
 
-            for (int i = 1; i < numPowers; ++i)
+            for (var i = 1; i < numPowers; ++i)
             {
                 oddPowers[i] = ReduceBarrett(oddPowers[i - 1].Multiply(b2), m, mr, yu);
             }
 
-            int[] windowList = GetWindowList(e.magnitude, extraBits);
+            var windowList = GetWindowList(e.magnitude, extraBits);
             Debug.Assert(windowList.Length > 0);
 
-            int window = windowList[0];
+            var window = windowList[0];
             int mult = window & 0xFF, lastZeroes = window >> 8;
 
             BigInteger y;
@@ -1843,13 +1841,13 @@ namespace ChainUtils.BouncyCastle.Math
                 y = oddPowers[mult >> 1];
             }
 
-            int windowPos = 1;
+            var windowPos = 1;
             while ((window = windowList[windowPos++]) != -1)
             {
                 mult = window & 0xFF;
 
-                int bits = lastZeroes + BitLengthTable[mult];
-                for (int j = 0; j < bits; ++j)
+                var bits = lastZeroes + BitLengthTable[mult];
+                for (var j = 0; j < bits; ++j)
                 {
                     y = ReduceBarrett(y.Square(), m, mr, yu);
                 }
@@ -1859,7 +1857,7 @@ namespace ChainUtils.BouncyCastle.Math
                 lastZeroes = window >> 8;
             }
 
-            for (int i = 0; i < lastZeroes; ++i)
+            for (var i = 0; i < lastZeroes; ++i)
             {
                 y = ReduceBarrett(y.Square(), m, mr, yu);
             }
@@ -1875,15 +1873,15 @@ namespace ChainUtils.BouncyCastle.Math
 
             if (xLen - mLen > 1)
             {
-                int k = m.magnitude.Length;
+                var k = m.magnitude.Length;
 
-                BigInteger q1 = x.DivideWords(k - 1);
-                BigInteger q2 = q1.Multiply(yu); // TODO Only need partial multiplication here
-                BigInteger q3 = q2.DivideWords(k + 1);
+                var q1 = x.DivideWords(k - 1);
+                var q2 = q1.Multiply(yu); // TODO Only need partial multiplication here
+                var q3 = q2.DivideWords(k + 1);
 
-                BigInteger r1 = x.RemainderWords(k + 1);
-                BigInteger r2 = q3.Multiply(m); // TODO Only need partial multiplication here
-                BigInteger r3 = r2.RemainderWords(k + 1);
+                var r1 = x.RemainderWords(k + 1);
+                var r2 = q3.Multiply(m); // TODO Only need partial multiplication here
+                var r3 = r2.RemainderWords(k + 1);
 
                 x = r1.Subtract(r3);
                 if (x.sign < 0)
@@ -1902,10 +1900,10 @@ namespace ChainUtils.BouncyCastle.Math
 
         private static BigInteger ModPowMonty(BigInteger b, BigInteger e, BigInteger m, bool convert)
         {
-            int n = m.magnitude.Length;
-            int powR = 32 * n;
-            bool smallMontyModulus = m.BitLength + 2 <= powR;
-            uint mDash = (uint)m.GetMQuote();
+            var n = m.magnitude.Length;
+            var powR = 32 * n;
+            var smallMontyModulus = m.BitLength + 2 <= powR;
+            var mDash = (uint)m.GetMQuote();
 
             // tmp = this * R mod m
             if (convert)
@@ -1913,48 +1911,48 @@ namespace ChainUtils.BouncyCastle.Math
                 b = b.ShiftLeft(powR).Remainder(m);
             }
 
-            int[] yAccum = new int[n + 1];
+            var yAccum = new int[n + 1];
 
-            int[] zVal = b.magnitude;
+            var zVal = b.magnitude;
             Debug.Assert(zVal.Length <= n);
             if (zVal.Length < n)
             {
-                int[] tmp = new int[n];
+                var tmp = new int[n];
                 zVal.CopyTo(tmp, n - zVal.Length);
                 zVal = tmp;
             }
 
             // Sliding window from MSW to LSW
 
-            int extraBits = 0;
+            var extraBits = 0;
 
             // Filter the common case of small RSA exponents with few bits set
             if (e.magnitude.Length > 1 || e.BitCount > 2)
             {
-                int expLength = e.BitLength;
+                var expLength = e.BitLength;
                 while (expLength > ExpWindowThresholds[extraBits])
                 {
                     ++extraBits;
                 }
             }
 
-            int numPowers = 1 << extraBits;
-            int[][] oddPowers = new int[numPowers][];
+            var numPowers = 1 << extraBits;
+            var oddPowers = new int[numPowers][];
             oddPowers[0] = zVal;
 
-            int[] zSquared = Arrays.Clone(zVal);
+            var zSquared = Arrays.Clone(zVal);
             SquareMonty(yAccum, zSquared, m.magnitude, mDash, smallMontyModulus);
 
-            for (int i = 1; i < numPowers; ++i)
+            for (var i = 1; i < numPowers; ++i)
             {
                 oddPowers[i] = Arrays.Clone(oddPowers[i - 1]);
                 MultiplyMonty(yAccum, oddPowers[i], zSquared, m.magnitude, mDash, smallMontyModulus);
             }
 
-            int[] windowList = GetWindowList(e.magnitude, extraBits);
+            var windowList = GetWindowList(e.magnitude, extraBits);
             Debug.Assert(windowList.Length > 1);
 
-            int window = windowList[0];
+            var window = windowList[0];
             int mult = window & 0xFF, lastZeroes = window >> 8;
 
             int[] yVal;
@@ -1968,13 +1966,13 @@ namespace ChainUtils.BouncyCastle.Math
                 yVal = Arrays.Clone(oddPowers[mult >> 1]);
             }
 
-            int windowPos = 1;
+            var windowPos = 1;
             while ((window = windowList[windowPos++]) != -1)
             {
                 mult = window & 0xFF;
 
-                int bits = lastZeroes + BitLengthTable[mult];
-                for (int j = 0; j < bits; ++j)
+                var bits = lastZeroes + BitLengthTable[mult];
+                for (var j = 0; j < bits; ++j)
                 {
                     SquareMonty(yAccum, yVal, m.magnitude, mDash, smallMontyModulus);
                 }
@@ -1984,7 +1982,7 @@ namespace ChainUtils.BouncyCastle.Math
                 lastZeroes = window >> 8;
             }
 
-            for (int i = 0; i < lastZeroes; ++i)
+            for (var i = 0; i < lastZeroes; ++i)
             {
                 SquareMonty(yAccum, yVal, m.magnitude, mDash, smallMontyModulus);
             }
@@ -2004,22 +2002,22 @@ namespace ChainUtils.BouncyCastle.Math
 
         private static int[] GetWindowList(int[] mag, int extraBits)
         {
-            int v = mag[0];
+            var v = mag[0];
             Debug.Assert(v != 0);
 
-            int leadingBits = BitLen(v);
+            var leadingBits = BitLen(v);
 
-            int resultSize = (((mag.Length - 1) << 5) + leadingBits) / (1 + extraBits) + 2;
-            int[] result = new int[resultSize];
-            int resultPos = 0;
+            var resultSize = (((mag.Length - 1) << 5) + leadingBits) / (1 + extraBits) + 2;
+            var result = new int[resultSize];
+            var resultPos = 0;
 
-            int bitPos = 33 - leadingBits;
+            var bitPos = 33 - leadingBits;
             v <<= bitPos;
 
             int mult = 1, multLimit = 1 << extraBits;
-            int zeroes = 0;
+            var zeroes = 0;
 
-            int i = 0;
+            var i = 0;
             for (; ; )
             {
                 for (; bitPos < 32; ++bitPos)
@@ -2080,9 +2078,9 @@ namespace ChainUtils.BouncyCastle.Math
 
             ulong c;
 
-            int wBase = w.Length - 1;
+            var wBase = w.Length - 1;
 
-            for (int i = x.Length - 1; i > 0; --i)
+            for (var i = x.Length - 1; i > 0; --i)
             {
                 ulong v = (uint)x[i];
 
@@ -2090,9 +2088,9 @@ namespace ChainUtils.BouncyCastle.Math
                 w[wBase] = (int)c;
                 c >>= 32;
 
-                for (int j = i - 1; j >= 0; --j)
+                for (var j = i - 1; j >= 0; --j)
                 {
-                    ulong prod = v * (uint)x[j];
+                    var prod = v * (uint)x[j];
 
                     c += ((uint)w[--wBase] & UIMASK) + ((uint)prod << 1);
                     w[wBase] = (int)c;
@@ -2136,21 +2134,21 @@ namespace ChainUtils.BouncyCastle.Math
          */
         private static int[] Multiply(int[]	x, int[] y, int[] z)
         {
-            int i = z.Length;
+            var i = z.Length;
 
             if (i < 1)
                 return x;
 
-            int xBase = x.Length - y.Length;
+            var xBase = x.Length - y.Length;
 
             do
             {
-                long a = z[--i] & IMASK;
+                var a = z[--i] & IMASK;
                 long val = 0;
 
                 if (a != 0)
                 {
-                    for (int j = y.Length - 1; j >= 0; j--)
+                    for (var j = y.Length - 1; j >= 0; j--)
                     {
                         val += a * (y[j] & IMASK) + (x[xBase + j] & IMASK);
     
@@ -2186,9 +2184,9 @@ namespace ChainUtils.BouncyCastle.Math
                 return mQuote; // already calculated
             }
 
-            Debug.Assert(this.sign > 0);
+            Debug.Assert(sign > 0);
 
-            int d = -magnitude[magnitude.Length - 1];
+            var d = -magnitude[magnitude.Length - 1];
 
             Debug.Assert((d & 1) != 0);
 
@@ -2200,18 +2198,18 @@ namespace ChainUtils.BouncyCastle.Math
             // NOTE: Not a general purpose reduction (which would allow x up to twice the bitlength of m)
             Debug.Assert(x.Length == m.Length);
 
-            int n = m.Length;
+            var n = m.Length;
 
-            for (int i = n - 1; i >= 0; --i)
+            for (var i = n - 1; i >= 0; --i)
             {
-                uint x0 = (uint)x[n - 1];
+                var x0 = (uint)x[n - 1];
                 ulong t = x0 * mDash;
 
-                ulong carry = t * (uint)m[n - 1] + x0;
+                var carry = t * (uint)m[n - 1] + x0;
                 Debug.Assert((uint)carry == 0);
                 carry >>= 32;
 
-                for (int j = n - 2; j >= 0; --j)
+                for (var j = n - 2; j >= 0; --j)
                 {
                     carry += t * (uint)m[j] + (uint)x[j];
                     x[j + 1] = (int)carry;
@@ -2244,7 +2242,7 @@ namespace ChainUtils.BouncyCastle.Math
         private static void MultiplyMonty(int[]	a, int[] x, int[] y, int[] m, uint mDash, bool smallMontyModulus)
             // mDash = -m^(-1) mod b
         {
-            int n = m.Length;
+            var n = m.Length;
 
             if (n == 1)
             {
@@ -2252,23 +2250,23 @@ namespace ChainUtils.BouncyCastle.Math
                 return;
             }
 
-            uint y0 = (uint)y[n - 1];
+            var y0 = (uint)y[n - 1];
             int aMax;
 
             {
                 ulong xi = (uint)x[n - 1];
 
-                ulong carry = xi * y0;
+                var carry = xi * y0;
                 ulong t = (uint)carry * mDash;
 
-                ulong prod2 = t * (uint)m[n - 1];
+                var prod2 = t * (uint)m[n - 1];
                 carry += (uint)prod2;
                 Debug.Assert((uint)carry == 0);
                 carry = (carry >> 32) + (prod2 >> 32);
 
-                for (int j = n - 2; j >= 0; --j)
+                for (var j = n - 2; j >= 0; --j)
                 {
-                    ulong prod1 = xi * (uint)y[j];
+                    var prod1 = xi * (uint)y[j];
                     prod2 = t * (uint)m[j];
 
                     carry += (prod1 & UIMASK) + (uint)prod2;
@@ -2280,21 +2278,21 @@ namespace ChainUtils.BouncyCastle.Math
                 aMax = (int)(carry >> 32);
             }
 
-            for (int i = n - 2; i >= 0; --i)
+            for (var i = n - 2; i >= 0; --i)
             {
-                uint a0 = (uint)a[n];
+                var a0 = (uint)a[n];
                 ulong xi = (uint)x[i];
 
-                ulong prod1 = xi * y0;
-                ulong carry = (prod1 & UIMASK) + a0;
+                var prod1 = xi * y0;
+                var carry = (prod1 & UIMASK) + a0;
                 ulong t = (uint)carry * mDash;
 
-                ulong prod2 = t * (uint)m[n - 1];
+                var prod2 = t * (uint)m[n - 1];
                 carry += (uint)prod2;
                 Debug.Assert((uint)carry == 0);
                 carry = (carry >> 32) + (prod1 >> 32) + (prod2 >> 32);
 
-                for (int j = n - 2; j >= 0; --j)
+                for (var j = n - 2; j >= 0; --j)
                 {
                     prod1 = xi * (uint)y[j];
                     prod2 = t * (uint)m[j];
@@ -2322,11 +2320,11 @@ namespace ChainUtils.BouncyCastle.Math
         private static void SquareMonty(int[] a, int[] x, int[] m, uint mDash, bool smallMontyModulus)
             // mDash = -m^(-1) mod b
         {
-            int n = m.Length;
+            var n = m.Length;
 
             if (n == 1)
             {
-                uint xVal = (uint)x[0];
+                var xVal = (uint)x[0];
                 x[0] = (int)MultiplyMontyNIsOne(xVal, xVal, (uint)m[0], mDash);
                 return;
             }
@@ -2335,17 +2333,17 @@ namespace ChainUtils.BouncyCastle.Math
             int aMax;
 
             {
-                ulong carry = x0 * x0;
+                var carry = x0 * x0;
                 ulong t = (uint)carry * mDash;
 
-                ulong prod2 = t * (uint)m[n - 1];
+                var prod2 = t * (uint)m[n - 1];
                 carry += (uint)prod2;
                 Debug.Assert((uint)carry == 0);
                 carry = (carry >> 32) + (prod2 >> 32);
 
-                for (int j = n - 2; j >= 0; --j)
+                for (var j = n - 2; j >= 0; --j)
                 {
-                    ulong prod1 = x0 * (uint)x[j];
+                    var prod1 = x0 * (uint)x[j];
                     prod2 = t * (uint)m[j];
 
                     carry += (prod2 & UIMASK) + ((uint)prod1 << 1);
@@ -2357,16 +2355,16 @@ namespace ChainUtils.BouncyCastle.Math
                 aMax = (int)(carry >> 32);
             }
 
-            for (int i = n - 2; i >= 0; --i)
+            for (var i = n - 2; i >= 0; --i)
             {
-                uint a0 = (uint)a[n];
+                var a0 = (uint)a[n];
                 ulong t = a0 * mDash;
 
-                ulong carry = t * (uint)m[n - 1] + a0;
+                var carry = t * (uint)m[n - 1] + a0;
                 Debug.Assert((uint)carry == 0);
                 carry >>= 32;
 
-                for (int j = n - 2; j > i; --j)
+                for (var j = n - 2; j > i; --j)
                 {
                     carry += t * (uint)m[j] + (uint)a[j + 1];
                     a[j + 2] = (int)carry;
@@ -2376,18 +2374,18 @@ namespace ChainUtils.BouncyCastle.Math
                 ulong xi = (uint)x[i];
 
                 {
-                    ulong prod1 = xi * xi;
-                    ulong prod2 = t * (uint)m[i];
+                    var prod1 = xi * xi;
+                    var prod2 = t * (uint)m[i];
 
                     carry += (prod1 & UIMASK) + (uint)prod2 + (uint)a[i + 1];
                     a[i + 2] = (int)carry;
                     carry = (carry >> 32) + (prod1 >> 32) + (prod2 >> 32);
                 }
 
-                for (int j = i - 1; j >= 0; --j)
+                for (var j = i - 1; j >= 0; --j)
                 {
-                    ulong prod1 = xi * (uint)x[j];
-                    ulong prod2 = t * (uint)m[j];
+                    var prod1 = xi * (uint)x[j];
+                    var prod2 = t * (uint)m[j];
 
                     carry += (prod2 & UIMASK) + ((uint)prod1 << 1) + (uint)a[j + 1];
                     a[j + 2] = (int)carry;
@@ -2411,10 +2409,10 @@ namespace ChainUtils.BouncyCastle.Math
 
         private static uint MultiplyMontyNIsOne(uint x, uint y, uint m, uint mDash)
         {
-            ulong carry = (ulong)x * y;
-            uint t = (uint)carry * mDash;
+            var carry = (ulong)x * y;
+            var t = (uint)carry * mDash;
             ulong um = m;
-            ulong prod2 = um * t;
+            var prod2 = um * t;
             carry += (uint)prod2;
             Debug.Assert((uint)carry == 0);
             carry = (carry >> 32) + (prod2 >> 32);
@@ -2437,22 +2435,22 @@ namespace ChainUtils.BouncyCastle.Math
 
             if (val.QuickPow2Check()) // val is power of two
             {
-                BigInteger result = this.ShiftLeft(val.Abs().BitLength - 1);
+                var result = ShiftLeft(val.Abs().BitLength - 1);
                 return val.sign > 0 ? result : result.Negate();
             }
 
-            if (this.QuickPow2Check()) // this is power of two
+            if (QuickPow2Check()) // this is power of two
             {
-                BigInteger result = val.ShiftLeft(this.Abs().BitLength - 1);
-                return this.sign > 0 ? result : result.Negate();
+                var result = val.ShiftLeft(Abs().BitLength - 1);
+                return sign > 0 ? result : result.Negate();
             }
 
-            int resLength = magnitude.Length + val.magnitude.Length;
-            int[] res = new int[resLength];
+            var resLength = magnitude.Length + val.magnitude.Length;
+            var res = new int[resLength];
 
-            Multiply(res, this.magnitude, val.magnitude);
+            Multiply(res, magnitude, val.magnitude);
 
-            int resSign = sign ^ val.sign ^ 1;
+            var resSign = sign ^ val.sign ^ 1;
             return new BigInteger(resSign, res, true);
         }
 
@@ -2460,12 +2458,12 @@ namespace ChainUtils.BouncyCastle.Math
         {
             if (sign == 0)
                 return Zero;
-            if (this.QuickPow2Check())
+            if (QuickPow2Check())
                 return ShiftLeft(Abs().BitLength - 1);
-            int resLength = magnitude.Length << 1;
+            var resLength = magnitude.Length << 1;
             if ((uint)magnitude[0] >> 16 == 0)
                 --resLength;
-            int[] res = new int[resLength];
+            var res = new int[resLength];
             Square(res, magnitude);
             return new BigInteger(1, res, false);
         }
@@ -2486,7 +2484,7 @@ namespace ChainUtils.BouncyCastle.Math
             if (CompareTo(Two) < 0)
                 return Two;
 
-            BigInteger n = Inc().SetBit(0);
+            var n = Inc().SetBit(0);
 
             while (!n.CheckProbablePrime(100, RandomSource))
             {
@@ -2518,7 +2516,7 @@ namespace ChainUtils.BouncyCastle.Math
 
             if (QuickPow2Check())
             {
-                long powOf2 = (long)exp * (BitLength - 1);
+                var powOf2 = (long)exp * (BitLength - 1);
                 if (powOf2 > Int32.MaxValue)
                 {
                     throw new ArithmeticException("Result too large");
@@ -2526,8 +2524,8 @@ namespace ChainUtils.BouncyCastle.Math
                 return One.ShiftLeft((int)powOf2); 
             }
 
-            BigInteger y = One;
-            BigInteger z = this;
+            var y = One;
+            var z = this;
 
             for (;;)
             {
@@ -2556,7 +2554,7 @@ namespace ChainUtils.BouncyCastle.Math
             Debug.Assert(m > 0);
 
             long acc = 0;
-            for (int pos = 0; pos < magnitude.Length; ++pos)
+            for (var pos = 0; pos < magnitude.Length; ++pos)
             {
                 long posVal = (uint) magnitude[pos];
                 acc = (acc << 32 | posVal) % m;
@@ -2572,13 +2570,13 @@ namespace ChainUtils.BouncyCastle.Math
             int[] x,
             int[] y)
         {
-            int xStart = 0;
+            var xStart = 0;
             while (xStart < x.Length && x[xStart] == 0)
             {
                 ++xStart;
             }
 
-            int yStart = 0;
+            var yStart = 0;
             while (yStart < y.Length && y[yStart] == 0)
             {
                 ++yStart;
@@ -2586,17 +2584,17 @@ namespace ChainUtils.BouncyCastle.Math
 
             Debug.Assert(yStart < y.Length);
 
-            int xyCmp = CompareNoLeadingZeroes(xStart, x, yStart, y);
+            var xyCmp = CompareNoLeadingZeroes(xStart, x, yStart, y);
 
             if (xyCmp > 0)
             {
-                int yBitLength = CalcBitLength(1, yStart, y);
-                int xBitLength = CalcBitLength(1, xStart, x);
-                int shift = xBitLength - yBitLength;
+                var yBitLength = CalcBitLength(1, yStart, y);
+                var xBitLength = CalcBitLength(1, xStart, x);
+                var shift = xBitLength - yBitLength;
 
                 int[] c;
-                int cStart = 0;
-                int cBitLength = yBitLength;
+                var cStart = 0;
+                var cBitLength = yBitLength;
                 if (shift > 0)
                 {
                     c = ShiftLeft(y, shift);
@@ -2605,7 +2603,7 @@ namespace ChainUtils.BouncyCastle.Math
                 }
                 else
                 {
-                    int len = y.Length - yStart;
+                    var len = y.Length - yStart;
                     c = new int[len];
                     Array.Copy(y, yStart, c, 0, len);
                 }
@@ -2643,8 +2641,8 @@ namespace ChainUtils.BouncyCastle.Math
                     // NB: The case where c[cStart] is 1-bit is harmless
                     if (shift == 1)
                     {
-                        uint firstC = (uint) c[cStart] >> 1;
-                        uint firstX = (uint) x[xStart];
+                        var firstC = (uint) c[cStart] >> 1;
+                        var firstX = (uint) x[xStart];
                         if (firstC > firstX)
                             ++shift;
                     }
@@ -2682,13 +2680,13 @@ namespace ChainUtils.BouncyCastle.Math
             if (n.sign == 0)
                 throw new ArithmeticException("Division by zero error");
 
-            if (this.sign == 0)
+            if (sign == 0)
                 return Zero;
 
             // For small values, use fast remainder method
             if (n.magnitude.Length == 1)
             {
-                int val = n.magnitude[0];
+                var val = n.magnitude[0];
 
                 if (val > 0)
                 {
@@ -2696,7 +2694,7 @@ namespace ChainUtils.BouncyCastle.Math
                         return Zero;
 
                     // TODO Make this func work on uint, and handle val == 1?
-                    int rem = Remainder(val);
+                    var rem = Remainder(val);
 
                     return rem == 0
                         ?	Zero
@@ -2715,7 +2713,7 @@ namespace ChainUtils.BouncyCastle.Math
             }
             else
             {
-                result = (int[]) this.magnitude.Clone();
+                result = (int[]) magnitude.Clone();
                 result = Remainder(result, n.magnitude);
             }
 
@@ -2728,13 +2726,13 @@ namespace ChainUtils.BouncyCastle.Math
             if (n < 1)
                 return ZeroMagnitude;
 
-            int numWords = (n + BitsPerInt - 1) / BitsPerInt;
-            numWords = System.Math.Min(numWords, this.magnitude.Length);
-            int[] result = new int[numWords];
+            var numWords = (n + BitsPerInt - 1) / BitsPerInt;
+            numWords = System.Math.Min(numWords, magnitude.Length);
+            var result = new int[numWords];
 
-            Array.Copy(this.magnitude, this.magnitude.Length - numWords, result, 0, numWords);
+            Array.Copy(magnitude, magnitude.Length - numWords, result, 0, numWords);
 
-            int excessBits = (numWords << 5) - n;
+            var excessBits = (numWords << 5) - n;
             if (excessBits > 0)
             {
                 result[0] &= (int)(UInt32.MaxValue >> excessBits);
@@ -2746,10 +2744,10 @@ namespace ChainUtils.BouncyCastle.Math
         private BigInteger DivideWords(int w)
         {
             Debug.Assert(w >= 0);
-            int n = magnitude.Length;
+            var n = magnitude.Length;
             if (w >= n)
                 return Zero;
-            int[] mag = new int[n - w];
+            var mag = new int[n - w];
             Array.Copy(magnitude, 0, mag, 0, n - w);
             return new BigInteger(sign, mag, false);
         }
@@ -2757,10 +2755,10 @@ namespace ChainUtils.BouncyCastle.Math
         private BigInteger RemainderWords(int w)
         {
             Debug.Assert(w >= 0);
-            int n = magnitude.Length;
+            var n = magnitude.Length;
             if (w >= n)
                 return this;
-            int[] mag = new int[w];
+            var mag = new int[w];
             Array.Copy(magnitude, n - w, mag, 0, w);
             return new BigInteger(sign, mag, false);
         }
@@ -2772,9 +2770,9 @@ namespace ChainUtils.BouncyCastle.Math
             int[]	mag,
             int		n)
         {
-            int nInts = (int)((uint)n >> 5);
-            int nBits = n & 0x1f;
-            int magLen = mag.Length;
+            var nInts = (int)((uint)n >> 5);
+            var nBits = n & 0x1f;
+            var magLen = mag.Length;
             int[] newMag;
 
             if (nBits == 0)
@@ -2784,9 +2782,9 @@ namespace ChainUtils.BouncyCastle.Math
             }
             else
             {
-                int i = 0;
-                int nBits2 = 32 - nBits;
-                int highBits = (int)((uint)mag[0] >> nBits2);
+                var i = 0;
+                var nBits2 = 32 - nBits;
+                var highBits = (int)((uint)mag[0] >> nBits2);
 
                 if (highBits != 0)
                 {
@@ -2798,10 +2796,10 @@ namespace ChainUtils.BouncyCastle.Math
                     newMag = new int[magLen + nInts];
                 }
 
-                int m = mag[0];
-                for (int j = 0; j < magLen - 1; j++)
+                var m = mag[0];
+                for (var j = 0; j < magLen - 1; j++)
                 {
-                    int next = mag[j + 1];
+                    var next = mag[j + 1];
 
                     newMag[i++] = (m << nBits) | (int)((uint)next >> nBits2);
                     m = next;
@@ -2816,10 +2814,10 @@ namespace ChainUtils.BouncyCastle.Math
         private static int ShiftLeftOneInPlace(int[] x, int carry)
         {
             Debug.Assert(carry == 0 || carry == 1);
-            int pos = x.Length;
+            var pos = x.Length;
             while (--pos >= 0)
             {
-                uint val = (uint)x[pos];
+                var val = (uint)x[pos];
                 x[pos] = (int)(val << 1) | carry;
                 carry = (int)(val >> 31);
             }
@@ -2838,18 +2836,18 @@ namespace ChainUtils.BouncyCastle.Math
             if (n < 0)
                 return ShiftRight(-n);
 
-            BigInteger result = new BigInteger(sign, ShiftLeft(magnitude, n), true);
+            var result = new BigInteger(sign, ShiftLeft(magnitude, n), true);
 
-            if (this.nBits != -1)
+            if (nBits != -1)
             {
                 result.nBits = sign > 0
-                    ?	this.nBits
-                    :	this.nBits + n;
+                    ?	nBits
+                    :	nBits + n;
             }
 
-            if (this.nBitLength != -1)
+            if (nBitLength != -1)
             {
-                result.nBitLength = this.nBitLength + n;
+                result.nBitLength = nBitLength + n;
             }
 
             return result;
@@ -2863,19 +2861,19 @@ namespace ChainUtils.BouncyCastle.Math
             int[]	mag,
             int		n)
         {
-            int nInts = (int)((uint)n >> 5) + start;
-            int nBits = n & 0x1f;
-            int magEnd = mag.Length - 1;
+            var nInts = (int)((uint)n >> 5) + start;
+            var nBits = n & 0x1f;
+            var magEnd = mag.Length - 1;
 
             if (nInts != start)
             {
-                int delta = (nInts - start);
+                var delta = (nInts - start);
 
-                for (int i = magEnd; i >= nInts; i--)
+                for (var i = magEnd; i >= nInts; i--)
                 {
                     mag[i] = mag[i - delta];
                 }
-                for (int i = nInts - 1; i >= start; i--)
+                for (var i = nInts - 1; i >= start; i--)
                 {
                     mag[i] = 0;
                 }
@@ -2883,12 +2881,12 @@ namespace ChainUtils.BouncyCastle.Math
 
             if (nBits != 0)
             {
-                int nBits2 = 32 - nBits;
-                int m = mag[magEnd];
+                var nBits2 = 32 - nBits;
+                var m = mag[magEnd];
 
-                for (int i = magEnd; i > nInts; --i)
+                for (var i = magEnd; i > nInts; --i)
                 {
-                    int next = mag[i - 1];
+                    var next = mag[i - 1];
 
                     mag[i] = (int)((uint)m >> nBits) | (next << nBits2);
                     m = next;
@@ -2905,12 +2903,12 @@ namespace ChainUtils.BouncyCastle.Math
             int		start,
             int[]	mag)
         {
-            int i = mag.Length;
-            int m = mag[i - 1];
+            var i = mag.Length;
+            var m = mag[i - 1];
 
             while (--i > start)
             {
-                int next = mag[i - 1];
+                var next = mag[i - 1];
                 mag[i] = ((int)((uint)m >> 1)) | (next << 31);
                 m = next;
             }
@@ -2928,7 +2926,7 @@ namespace ChainUtils.BouncyCastle.Math
                 return ShiftLeft(-n);
 
             if (n >= BitLength)
-                return (this.sign < 0 ? One.Negate() : Zero);
+                return (sign < 0 ? One.Negate() : Zero);
 
 //			int[] res = (int[]) this.magnitude.Clone();
 //
@@ -2936,35 +2934,35 @@ namespace ChainUtils.BouncyCastle.Math
 //
 //			return new BigInteger(this.sign, res, true);
 
-            int resultLength = (BitLength - n + 31) >> 5;
-            int[] res = new int[resultLength];
+            var resultLength = (BitLength - n + 31) >> 5;
+            var res = new int[resultLength];
 
-            int numInts = n >> 5;
-            int numBits = n & 31;
+            var numInts = n >> 5;
+            var numBits = n & 31;
 
             if (numBits == 0)
             {
-                Array.Copy(this.magnitude, 0, res, 0, res.Length);
+                Array.Copy(magnitude, 0, res, 0, res.Length);
             }
             else
             {
-                int numBits2 = 32 - numBits;
+                var numBits2 = 32 - numBits;
 
-                int magPos = this.magnitude.Length - 1 - numInts;
-                for (int i = resultLength - 1; i >= 0; --i)
+                var magPos = magnitude.Length - 1 - numInts;
+                for (var i = resultLength - 1; i >= 0; --i)
                 {
-                    res[i] = (int)((uint) this.magnitude[magPos--] >> numBits);
+                    res[i] = (int)((uint) magnitude[magPos--] >> numBits);
 
                     if (magPos >= 0)
                     {
-                        res[i] |= this.magnitude[magPos] << numBits2;
+                        res[i] |= magnitude[magPos] << numBits2;
                     }
                 }
             }
 
             Debug.Assert(res[0] != 0);
 
-            return new BigInteger(this.sign, res, false);
+            return new BigInteger(sign, res, false);
         }
 
         public int SignValue
@@ -2984,10 +2982,10 @@ namespace ChainUtils.BouncyCastle.Math
             Debug.Assert(yStart < y.Length);
             Debug.Assert(x.Length - xStart >= y.Length - yStart);
 
-            int iT = x.Length;
-            int iV = y.Length;
+            var iT = x.Length;
+            var iV = y.Length;
             long m;
-            int borrow = 0;
+            var borrow = 0;
 
             do
             {
@@ -3015,13 +3013,13 @@ namespace ChainUtils.BouncyCastle.Math
             if (n.sign == 0)
                 return this;
 
-            if (this.sign == 0)
+            if (sign == 0)
                 return n.Negate();
 
-            if (this.sign != n.sign)
+            if (sign != n.sign)
                 return Add(n.Negate());
 
-            int compare = CompareNoLeadingZeroes(0, magnitude, 0, n.magnitude);
+            var compare = CompareNoLeadingZeroes(0, magnitude, 0, n.magnitude);
             if (compare == 0)
                 return Zero;
 
@@ -3037,14 +3035,14 @@ namespace ChainUtils.BouncyCastle.Math
                 lilun = n;
             }
 
-            return new BigInteger(this.sign * compare, doSubBigLil(bigun.magnitude, lilun.magnitude), true);
+            return new BigInteger(sign * compare, doSubBigLil(bigun.magnitude, lilun.magnitude), true);
         }
 
         private static int[] doSubBigLil(
             int[]	bigMag,
             int[]	lilMag)
         {
-            int[] res = (int[]) bigMag.Clone();
+            var res = (int[]) bigMag.Clone();
 
             return Subtract(0, res, 0, lilMag);
         }
@@ -3065,28 +3063,28 @@ namespace ChainUtils.BouncyCastle.Math
             if (sign == 0)
                 return unsigned ? ZeroEncoding : new byte[1];
 
-            int nBits = (unsigned && sign > 0)
+            var nBits = (unsigned && sign > 0)
                 ?	BitLength
                 :	BitLength + 1;
 
-            int nBytes = GetByteLength(nBits);
-            byte[] bytes = new byte[nBytes];
+            var nBytes = GetByteLength(nBits);
+            var bytes = new byte[nBytes];
 
-            int magIndex = magnitude.Length;
-            int bytesIndex = bytes.Length;
+            var magIndex = magnitude.Length;
+            var bytesIndex = bytes.Length;
 
             if (sign > 0)
             {
                 while (magIndex > 1)
                 {
-                    uint mag = (uint) magnitude[--magIndex];
+                    var mag = (uint) magnitude[--magIndex];
                     bytes[--bytesIndex] = (byte) mag;
                     bytes[--bytesIndex] = (byte)(mag >> 8);
                     bytes[--bytesIndex] = (byte)(mag >> 16);
                     bytes[--bytesIndex] = (byte)(mag >> 24);
                 }
 
-                uint lastMag = (uint) magnitude[0];
+                var lastMag = (uint) magnitude[0];
                 while (lastMag > byte.MaxValue)
                 {
                     bytes[--bytesIndex] = (byte) lastMag;
@@ -3097,11 +3095,11 @@ namespace ChainUtils.BouncyCastle.Math
             }
             else // sign < 0
             {
-                bool carry = true;
+                var carry = true;
 
                 while (magIndex > 1)
                 {
-                    uint mag = ~((uint) magnitude[--magIndex]);
+                    var mag = ~((uint) magnitude[--magIndex]);
 
                     if (carry)
                     {
@@ -3114,7 +3112,7 @@ namespace ChainUtils.BouncyCastle.Math
                     bytes[--bytesIndex] = (byte)(mag >> 24);
                 }
 
-                uint lastMag = (uint) magnitude[0];
+                var lastMag = (uint) magnitude[0];
 
                 if (carry)
                 {
@@ -3168,7 +3166,7 @@ namespace ChainUtils.BouncyCastle.Math
 
 
             // NOTE: This *should* be unnecessary, since the magnitude *should* never have leading zero digits
-            int firstNonZero = 0;
+            var firstNonZero = 0;
             while (firstNonZero < magnitude.Length)
             {
                 if (magnitude[firstNonZero] != 0)
@@ -3184,7 +3182,7 @@ namespace ChainUtils.BouncyCastle.Math
             }
 
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             if (sign == -1)
             {
                 sb.Append('-');
@@ -3194,7 +3192,7 @@ namespace ChainUtils.BouncyCastle.Math
             {
             case 2:
             {
-                int pos = firstNonZero;
+                var pos = firstNonZero;
                 sb.Append(Convert.ToString(magnitude[pos], 2));
                 while (++pos < magnitude.Length)
                 {
@@ -3204,10 +3202,10 @@ namespace ChainUtils.BouncyCastle.Math
             }
             case 8:
             {
-                int mask = (1 << 30) - 1;
-                BigInteger u = this.Abs();
-                int bits = u.BitLength;
-                IList S = Platform.CreateArrayList();
+                var mask = (1 << 30) - 1;
+                var u = Abs();
+                var bits = u.BitLength;
+                var S = Platform.CreateArrayList();
                 while (bits > 30)
                 {
                     S.Add(Convert.ToString(u.IntValue & mask, 8));
@@ -3215,7 +3213,7 @@ namespace ChainUtils.BouncyCastle.Math
                     bits -= 30;
                 }
                 sb.Append(Convert.ToString(u.IntValue, 8));
-                for (int i = S.Count - 1; i >= 0; --i)
+                for (var i = S.Count - 1; i >= 0; --i)
                 {
                     AppendZeroExtendedString(sb, (string)S[i], 10);
                 }
@@ -3223,7 +3221,7 @@ namespace ChainUtils.BouncyCastle.Math
             }
             case 16:
             {
-                int pos = firstNonZero;
+                var pos = firstNonZero;
                 sb.Append(Convert.ToString(magnitude[pos], 16));
                 while (++pos < magnitude.Length)
                 {
@@ -3235,7 +3233,7 @@ namespace ChainUtils.BouncyCastle.Math
             //default:
             case 10:
             {
-                BigInteger q = this.Abs();
+                var q = Abs();
                 if (q.BitLength < 64)
                 {
                     sb.Append(Convert.ToString(q.LongValue, radix));
@@ -3246,27 +3244,27 @@ namespace ChainUtils.BouncyCastle.Math
 
                 // Work out the largest power of 'rdx' that is a positive 64-bit integer
                 // TODO possibly cache power/exponent against radix?
-                long limit = Int64.MaxValue / radix;
+                var limit = Int64.MaxValue / radix;
                 long power = radix;
-                int exponent = 1;
+                var exponent = 1;
                 while (power <= limit)
                 {
                     power *= radix;
                     ++exponent;
                 }
 
-                BigInteger bigPower = BigInteger.ValueOf(power);
+                var bigPower = ValueOf(power);
 
-                IList S = Platform.CreateArrayList();
+                var S = Platform.CreateArrayList();
                 while (q.CompareTo(bigPower) >= 0)
                 {
-                    BigInteger[] qr = q.DivideAndRemainder(bigPower);
+                    var qr = q.DivideAndRemainder(bigPower);
                     S.Add(Convert.ToString(qr[1].LongValue, radix));
                     q = qr[0];
                 }
 
                 sb.Append(Convert.ToString(q.LongValue, radix));
-                for (int i = S.Count - 1; i >= 0; --i)
+                for (var i = S.Count - 1; i >= 0; --i)
                 {
                     AppendZeroExtendedString(sb, (string)S[i], exponent);
                 }
@@ -3279,7 +3277,7 @@ namespace ChainUtils.BouncyCastle.Math
 
         private static void AppendZeroExtendedString(StringBuilder sb, string s, int minLength)
         {
-            for (int len = s.Length; len < minLength; ++len)
+            for (var len = s.Length; len < minLength; ++len)
             {
                 sb.Append('0');
             }
@@ -3289,15 +3287,15 @@ namespace ChainUtils.BouncyCastle.Math
         private static BigInteger CreateUValueOf(
             ulong value)
         {
-            int msw = (int)(value >> 32);
-            int lsw = (int)value;
+            var msw = (int)(value >> 32);
+            var lsw = (int)value;
 
             if (msw != 0)
                 return new BigInteger(1, new int[] { msw, lsw }, false);
 
             if (lsw != 0)
             {
-                BigInteger n = new BigInteger(1, new int[] { lsw }, false);
+                var n = new BigInteger(1, new int[] { lsw }, false);
                 // Check for a power of two
                 if ((lsw & -lsw) == lsw)
                 {
@@ -3336,7 +3334,7 @@ namespace ChainUtils.BouncyCastle.Math
 
         public int GetLowestSetBit()
         {
-            if (this.sign == 0)
+            if (sign == 0)
                 return -1;
 
             return GetLowestSetBitMaskFirst(-1);
@@ -3346,7 +3344,7 @@ namespace ChainUtils.BouncyCastle.Math
         {
             int w = magnitude.Length, offset = 0;
 
-            uint word = (uint)(magnitude[--w] & firstWordMask);
+            var word = (uint)(magnitude[--w] & firstWordMask);
             Debug.Assert(magnitude[0] != 0);
 
             while (word == 0)
@@ -3379,44 +3377,44 @@ namespace ChainUtils.BouncyCastle.Math
             if (sign < 0)
                 return !Not().TestBit(n);
 
-            int wordNum = n / 32;
+            var wordNum = n / 32;
             if (wordNum >= magnitude.Length)
                 return false;
 
-            int word = magnitude[magnitude.Length - 1 - wordNum];
+            var word = magnitude[magnitude.Length - 1 - wordNum];
             return ((word >> (n % 32)) & 1) > 0;
         }
 
         public BigInteger Or(
             BigInteger value)
         {
-            if (this.sign == 0)
+            if (sign == 0)
                 return value;
 
             if (value.sign == 0)
                 return this;
 
-            int[] aMag = this.sign > 0
-                ? this.magnitude
+            var aMag = sign > 0
+                ? magnitude
                 : Add(One).magnitude;
 
-            int[] bMag = value.sign > 0
+            var bMag = value.sign > 0
                 ? value.magnitude
                 : value.Add(One).magnitude;
 
-            bool resultNeg = sign < 0 || value.sign < 0;
-            int resultLength = System.Math.Max(aMag.Length, bMag.Length);
-            int[] resultMag = new int[resultLength];
+            var resultNeg = sign < 0 || value.sign < 0;
+            var resultLength = System.Math.Max(aMag.Length, bMag.Length);
+            var resultMag = new int[resultLength];
 
-            int aStart = resultMag.Length - aMag.Length;
-            int bStart = resultMag.Length - bMag.Length;
+            var aStart = resultMag.Length - aMag.Length;
+            var bStart = resultMag.Length - bMag.Length;
 
-            for (int i = 0; i < resultMag.Length; ++i)
+            for (var i = 0; i < resultMag.Length; ++i)
             {
-                int aWord = i >= aStart ? aMag[i - aStart] : 0;
-                int bWord = i >= bStart ? bMag[i - bStart] : 0;
+                var aWord = i >= aStart ? aMag[i - aStart] : 0;
+                var bWord = i >= bStart ? bMag[i - bStart] : 0;
 
-                if (this.sign < 0)
+                if (sign < 0)
                 {
                     aWord = ~aWord;
                 }
@@ -3434,7 +3432,7 @@ namespace ChainUtils.BouncyCastle.Math
                 }
             }
 
-            BigInteger result = new BigInteger(1, resultMag, true);
+            var result = new BigInteger(1, resultMag, true);
 
             // TODO Optimise this case
             if (resultNeg)
@@ -3448,34 +3446,34 @@ namespace ChainUtils.BouncyCastle.Math
         public BigInteger Xor(
             BigInteger value)
         {
-            if (this.sign == 0)
+            if (sign == 0)
                 return value;
 
             if (value.sign == 0)
                 return this;
 
-            int[] aMag = this.sign > 0
-                ? this.magnitude
+            var aMag = sign > 0
+                ? magnitude
                 : Add(One).magnitude;
 
-            int[] bMag = value.sign > 0
+            var bMag = value.sign > 0
                 ? value.magnitude
                 : value.Add(One).magnitude;
 
             // TODO Can just replace with sign != value.sign?
-            bool resultNeg = (sign < 0 && value.sign >= 0) || (sign >= 0 && value.sign < 0);
-            int resultLength = System.Math.Max(aMag.Length, bMag.Length);
-            int[] resultMag = new int[resultLength];
+            var resultNeg = (sign < 0 && value.sign >= 0) || (sign >= 0 && value.sign < 0);
+            var resultLength = System.Math.Max(aMag.Length, bMag.Length);
+            var resultMag = new int[resultLength];
 
-            int aStart = resultMag.Length - aMag.Length;
-            int bStart = resultMag.Length - bMag.Length;
+            var aStart = resultMag.Length - aMag.Length;
+            var bStart = resultMag.Length - bMag.Length;
 
-            for (int i = 0; i < resultMag.Length; ++i)
+            for (var i = 0; i < resultMag.Length; ++i)
             {
-                int aWord = i >= aStart ? aMag[i - aStart] : 0;
-                int bWord = i >= bStart ? bMag[i - bStart] : 0;
+                var aWord = i >= aStart ? aMag[i - aStart] : 0;
+                var bWord = i >= bStart ? bMag[i - bStart] : 0;
 
-                if (this.sign < 0)
+                if (sign < 0)
                 {
                     aWord = ~aWord;
                 }
@@ -3493,7 +3491,7 @@ namespace ChainUtils.BouncyCastle.Math
                 }
             }
 
-            BigInteger result = new BigInteger(1, resultMag, true);
+            var result = new BigInteger(1, resultMag, true);
 
             // TODO Optimise this case
             if (resultNeg)
@@ -3556,10 +3554,10 @@ namespace ChainUtils.BouncyCastle.Math
             Debug.Assert(n >= 0);
             Debug.Assert(n < BitLength - 1);
 
-            int[] mag = (int[]) this.magnitude.Clone();
+            var mag = (int[]) magnitude.Clone();
             mag[mag.Length - 1 - (n >> 5)] ^= (1 << (n & 31)); // Flip bit
             //mag[mag.Length - 1 - (n / 32)] ^= (1 << (n % 32));
-            return new BigInteger(this.sign, mag, false);
+            return new BigInteger(sign, mag, false);
         }
     }
 }

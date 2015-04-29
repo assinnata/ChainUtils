@@ -1,11 +1,7 @@
 ﻿#if !NOFILEIO
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
@@ -16,7 +12,7 @@ namespace ChainUtils
 	}
 	public class FileLock : IDisposable
 	{
-		FileStream _Fs = null;
+		FileStream _fs = null;
 		public FileLock(string filePath, FileLockType lockType)
 		{
 			if(filePath == null)
@@ -29,16 +25,16 @@ namespace ChainUtils
 				catch
 				{
 				}
-			CancellationTokenSource source = new CancellationTokenSource();
+			var source = new CancellationTokenSource();
 			source.CancelAfter(20000);
 			while(true)
 			{
 				try
 				{
 					if(lockType == FileLockType.Read)
-						_Fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+						_fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 					if(lockType == FileLockType.ReadWrite)
-						_Fs = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+						_fs = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
 					break;
 				}
 				catch(IOException)
@@ -52,7 +48,7 @@ namespace ChainUtils
 
 		public void Dispose()
 		{
-			_Fs.Dispose();
+			_fs.Dispose();
 		}
 
 

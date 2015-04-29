@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Crypto
 {
 	/// <remarks>Base interface for a public/private key block cipher.</remarks>

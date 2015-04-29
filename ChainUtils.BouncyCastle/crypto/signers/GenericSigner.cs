@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Security;
 using ChainUtils.BouncyCastle.Utilities;
@@ -84,7 +83,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             if (!forSigning)
                 throw new InvalidOperationException("GenericSigner not initialised for signature generation.");
 
-            byte[] hash = new byte[digest.GetDigestSize()];
+            var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
             return engine.ProcessBlock(hash, 0, hash.Length);
@@ -99,17 +98,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             if (forSigning)
                 throw new InvalidOperationException("GenericSigner not initialised for verification");
 
-            byte[] hash = new byte[digest.GetDigestSize()];
+            var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
             try
             {
-                byte[] sig = engine.ProcessBlock(signature, 0, signature.Length);
+                var sig = engine.ProcessBlock(signature, 0, signature.Length);
 
                 // Extend with leading zeroes to match the digest size, if necessary.
                 if (sig.Length < hash.Length)
                 {
-                    byte[] tmp = new byte[hash.Length];
+                    var tmp = new byte[hash.Length];
                     Array.Copy(sig, 0, tmp, tmp.Length - sig.Length, sig.Length);
                     sig = tmp;
                 }

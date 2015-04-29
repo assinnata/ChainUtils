@@ -32,7 +32,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanSaveChain()
 		{
-			ConcurrentChain chain = new ConcurrentChain(Network.Main);
+			var chain = new ConcurrentChain(Network.Main);
 			AppendBlock(chain);
 			AppendBlock(chain);
 			var fork = AppendBlock(chain);
@@ -54,7 +54,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanParseRandomScripts()
 		{
-			for(int i = 0 ; i < 600 ; i++)
+			for(var i = 0 ; i < 600 ; i++)
 			{
 				var bytes = RandomUtils.GetBytes(120);
 				new Script(bytes).ToString();
@@ -65,8 +65,8 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanLoadAndSaveConcurrentChain()
 		{
-			ConcurrentChain cchain = new ConcurrentChain();
-			ConcurrentChain chain = new ConcurrentChain(Network.Main);
+			var cchain = new ConcurrentChain();
+			var chain = new ConcurrentChain(Network.Main);
 			AddBlock(chain);
 			AddBlock(chain);
 			AddBlock(chain);
@@ -88,8 +88,8 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanBuildConcurrentChain()
 		{
-			ConcurrentChain cchain = new ConcurrentChain();
-			ConcurrentChain chain = new ConcurrentChain(Network.Main);
+			var cchain = new ConcurrentChain();
+			var chain = new ConcurrentChain(Network.Main);
 			Assert.Null(cchain.SetTip(chain.Tip));
 			var b0 = cchain.Tip;
 			Assert.Equal(cchain.Tip, chain.Tip);
@@ -129,7 +129,7 @@ namespace ChainUtils.Tests
 
 		private ChainedBlock AddBlock(ConcurrentChain chain)
 		{
-			BlockHeader header = new BlockHeader();
+			var header = new BlockHeader();
 			header.Nonce = RandomUtils.GetUInt32();
 			header.HashPrevBlock = chain.Tip.HashBlock;
 			chain.SetTip(header);
@@ -140,7 +140,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanBuildChain()
 		{
-			ConcurrentChain chain = new ConcurrentChain(Network.Main);
+			var chain = new ConcurrentChain(Network.Main);
 			AppendBlock(chain);
 			AppendBlock(chain);
 			AppendBlock(chain);
@@ -184,7 +184,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanEnumerateAfterChainedBlock()
 		{
-			ConcurrentChain chain = new ConcurrentChain(Network.Main);
+			var chain = new ConcurrentChain(Network.Main);
 			AppendBlock(chain);
 			var a = AppendBlock(chain);
 			var b = AppendBlock(chain);
@@ -209,7 +209,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanBuildChain2()
 		{
-			ConcurrentChain chain = CreateChain(10);
+			var chain = CreateChain(10);
 			AppendBlock(chain);
 			AppendBlock(chain);
 			AppendBlock(chain);
@@ -223,7 +223,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanForkBackward()
 		{
-			ConcurrentChain chain = new ConcurrentChain(Network.Main);
+			var chain = new ConcurrentChain(Network.Main);
 			AppendBlock(chain);
 			AppendBlock(chain);
 			var fork = AppendBlock(chain);
@@ -266,7 +266,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanForkBackwardPartialChain()
 		{
-			ConcurrentChain chain = CreateChain(10);
+			var chain = CreateChain(10);
 			AppendBlock(chain);
 			AppendBlock(chain);
 			var fork = AppendBlock(chain);
@@ -309,8 +309,8 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanForkSide()
 		{
-			ConcurrentChain side = new ConcurrentChain(Network.Main);
-			ConcurrentChain main = new ConcurrentChain(Network.Main);
+			var side = new ConcurrentChain(Network.Main);
+			var main = new ConcurrentChain(Network.Main);
 			AppendBlock(side, main);
 			AppendBlock(side, main);
 			var common = AppendBlock(side, main);
@@ -336,8 +336,8 @@ namespace ChainUtils.Tests
 		public void CanForkSidePartialChain()
 		{
 			var genesis = TestUtils.CreateFakeBlock();
-			ConcurrentChain side = new ConcurrentChain(genesis.Header);
-			ConcurrentChain main = new ConcurrentChain(genesis.Header);
+			var side = new ConcurrentChain(genesis.Header);
+			var main = new ConcurrentChain(genesis.Header);
 			AppendBlock(side, main);
 			AppendBlock(side, main);
 			var common = AppendBlock(side, main);
@@ -367,7 +367,7 @@ namespace ChainUtils.Tests
 		private ConcurrentChain CreateChain(BlockHeader genesis, int height)
 		{
 			var chain = new ConcurrentChain(genesis);
-			for(int i = 0 ; i < height ; i++)
+			for(var i = 0 ; i < height ; i++)
 			{
 				var b = TestUtils.CreateFakeBlock();
 				b.Header.HashPrevBlock = chain.Tip.HashBlock;

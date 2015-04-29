@@ -1,10 +1,6 @@
 ﻿#if !NOFILEIO
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
@@ -30,9 +26,9 @@ namespace ChainUtils.BitcoinCore
 			return stored;
 		}
 
-		protected override StoredItem<BlockUndo> ReadStoredItem(System.IO.Stream stream, DiskBlockPos pos)
+		protected override StoredItem<BlockUndo> ReadStoredItem(Stream stream, DiskBlockPos pos)
 		{
-			StoredItem<BlockUndo> item = new StoredItem<BlockUndo>(Network, pos);
+			var item = new StoredItem<BlockUndo>(Network, pos);
 			item.HasChecksum = true;
 			item.ReadWrite(stream, false);
 			item.Item.CalculatedChecksum = item.Checksum;

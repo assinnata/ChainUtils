@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -44,8 +43,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             if (!(parameters is KeyParameter))
 				throw new ArgumentException("invalid parameter passed to Serpent init - " + parameters.GetType().ToString());
 
-			this.encrypting = forEncryption;
-            this.wKey = MakeWorkingKey(((KeyParameter)parameters).GetKey());
+			encrypting = forEncryption;
+            wKey = MakeWorkingKey(((KeyParameter)parameters).GetKey());
         }
 
 		public string AlgorithmName
@@ -117,9 +116,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             //
             // pad key to 256 bits
             //
-            int[]   kPad = new int[16];
-            int     off = 0;
-            int     length = 0;
+            var   kPad = new int[16];
+            var     off = 0;
+            var     length = 0;
 
             for (off = key.Length - 4; off > 0; off -= 4)
             {
@@ -142,13 +141,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             //
             // expand the padded key up to 33 x 128 bits of key material
             //
-            int amount = (ROUNDS + 1) * 4;
-            int[] w = new int[amount];
+            var amount = (ROUNDS + 1) * 4;
+            var w = new int[amount];
 
             //
             // compute w0 to w7 from w-8 to w-1
             //
-            for (int i = 8; i < 16; i++)
+            for (var i = 8; i < 16; i++)
             {
                 kPad[i] = RotateLeft(kPad[i - 8] ^ kPad[i - 5] ^ kPad[i - 3] ^ kPad[i - 1] ^ PHI ^ (i - 8), 11);
             }
@@ -158,7 +157,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             //
             // compute w8 to w136
             //
-            for (int i = 8; i < amount; i++)
+            for (var i = 8; i < amount; i++)
             {
                 w[i] = RotateLeft(w[i - 8] ^ w[i - 5] ^ w[i - 3] ^ w[i - 1] ^ PHI ^ i, 11);
             }
@@ -445,13 +444,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Sb0(int a, int b, int c, int d)
         {
-            int    t1 = a ^ d;
-            int    t3 = c ^ t1;
-            int    t4 = b ^ t3;
+            var    t1 = a ^ d;
+            var    t3 = c ^ t1;
+            var    t4 = b ^ t3;
             X3 = (a & d) ^ t4;
-            int    t7 = a ^ (b & t1);
+            var    t7 = a ^ (b & t1);
             X2 = t4 ^ (c | t7);
-            int    t12 = X3 & (t3 ^ t7);
+            var    t12 = X3 & (t3 ^ t7);
             X1 = (~t3) ^ t12;
             X0 = t12 ^ (~t7);
         }
@@ -461,12 +460,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Ib0(int a, int b, int c, int d)
         {
-            int    t1 = ~a;
-            int    t2 = a ^ b;
-            int    t4 = d ^ (t1 | t2);
-            int    t5 = c ^ t4;
+            var    t1 = ~a;
+            var    t2 = a ^ b;
+            var    t4 = d ^ (t1 | t2);
+            var    t5 = c ^ t4;
             X2 = t2 ^ t5;
-            int    t8 = t1 ^ (d & t2);
+            var    t8 = t1 ^ (d & t2);
             X1 = t4 ^ (X2 & t8);
             X3 = (a & t4) ^ (t5 | X1);
             X0 = X3 ^ (t5 ^ t8);
@@ -477,13 +476,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Sb1(int a, int b, int c, int d)
         {
-            int    t2 = b ^ (~a);
-            int    t5 = c ^ (a | t2);
+            var    t2 = b ^ (~a);
+            var    t5 = c ^ (a | t2);
             X2 = d ^ t5;
-            int    t7 = b ^ (d | t2);
-            int    t8 = t2 ^ X2;
+            var    t7 = b ^ (d | t2);
+            var    t8 = t2 ^ X2;
             X3 = t8 ^ (t5 & t7);
-            int    t11 = t5 ^ t7;
+            var    t11 = t5 ^ t7;
             X1 = X3 ^ t11;
             X0 = t5 ^ (t8 & t11);
         }
@@ -493,15 +492,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Ib1(int a, int b, int c, int d)
         {
-            int    t1 = b ^ d;
-            int    t3 = a ^ (b & t1);
-            int    t4 = t1 ^ t3;
+            var    t1 = b ^ d;
+            var    t3 = a ^ (b & t1);
+            var    t4 = t1 ^ t3;
             X3 = c ^ t4;
-            int    t7 = b ^ (t1 & t3);
-            int    t8 = X3 | t7;
+            var    t7 = b ^ (t1 & t3);
+            var    t8 = X3 | t7;
             X1 = t3 ^ t8;
-            int    t10 = ~X1;
-            int    t11 = X3 ^ t7;
+            var    t10 = ~X1;
+            var    t11 = X3 ^ t7;
             X0 = t10 ^ t11;
             X2 = t4 ^ (t10 | t11);
         }
@@ -511,13 +510,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Sb2(int a, int b, int c, int d)
         {
-            int    t1 = ~a;
-            int    t2 = b ^ d;
-            int    t3 = c & t1;
+            var    t1 = ~a;
+            var    t2 = b ^ d;
+            var    t3 = c & t1;
             X0 = t2 ^ t3;
-            int    t5 = c ^ t1;
-            int    t6 = c ^ X0;
-            int    t7 = b & t6;
+            var    t5 = c ^ t1;
+            var    t6 = c ^ X0;
+            var    t7 = b & t6;
             X3 = t5 ^ t7;
             X2 = a ^ ((d | t7) & (X0 | t5));
             X1 = (t2 ^ X3) ^ (X2 ^ (d | t1));
@@ -528,18 +527,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Ib2(int a, int b, int c, int d)
         {
-            int    t1 = b ^ d;
-            int    t2 = ~t1;
-            int    t3 = a ^ c;
-            int    t4 = c ^ t1;
-            int    t5 = b & t4;
+            var    t1 = b ^ d;
+            var    t2 = ~t1;
+            var    t3 = a ^ c;
+            var    t4 = c ^ t1;
+            var    t5 = b & t4;
             X0 = t3 ^ t5;
-            int    t7 = a | t2;
-            int    t8 = d ^ t7;
-            int    t9 = t3 | t8;
+            var    t7 = a | t2;
+            var    t8 = d ^ t7;
+            var    t9 = t3 | t8;
             X3 = t1 ^ t9;
-            int    t11 = ~t4;
-            int    t12 = X0 | X3;
+            var    t11 = ~t4;
+            var    t12 = X0 | X3;
             X1 = t11 ^ t12;
             X2 = (d & t11) ^ (t3 ^ t12);
         }
@@ -549,18 +548,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Sb3(int a, int b, int c, int d)
         {
-            int    t1 = a ^ b;
-            int    t2 = a & c;
-            int    t3 = a | d;
-            int    t4 = c ^ d;
-            int    t5 = t1 & t3;
-            int    t6 = t2 | t5;
+            var    t1 = a ^ b;
+            var    t2 = a & c;
+            var    t3 = a | d;
+            var    t4 = c ^ d;
+            var    t5 = t1 & t3;
+            var    t6 = t2 | t5;
             X2 = t4 ^ t6;
-            int    t8 = b ^ t3;
-            int    t9 = t6 ^ t8;
-            int    t10 = t4 & t9;
+            var    t8 = b ^ t3;
+            var    t9 = t6 ^ t8;
+            var    t10 = t4 & t9;
             X0 = t1 ^ t10;
-            int    t12 = X2 & X0;
+            var    t12 = X2 & X0;
             X1 = t9 ^ t12;
             X3 = (b | d) ^ (t4 ^ t12);
         }
@@ -570,18 +569,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Ib3(int a, int b, int c, int d)
         {
-            int    t1 = a | b;
-            int    t2 = b ^ c;
-            int    t3 = b & t2;
-            int    t4 = a ^ t3;
-            int    t5 = c ^ t4;
-            int    t6 = d | t4;
+            var    t1 = a | b;
+            var    t2 = b ^ c;
+            var    t3 = b & t2;
+            var    t4 = a ^ t3;
+            var    t5 = c ^ t4;
+            var    t6 = d | t4;
             X0 = t2 ^ t6;
-            int    t8 = t2 | t6;
-            int    t9 = d ^ t8;
+            var    t8 = t2 | t6;
+            var    t9 = d ^ t8;
             X2 = t5 ^ t9;
-            int    t11 = t1 ^ t9;
-            int    t12 = X0 & t11;
+            var    t11 = t1 ^ t9;
+            var    t12 = X0 & t11;
             X3 = t4 ^ t12;
             X1 = X3 ^ (X0 ^ t11);
         }
@@ -591,17 +590,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Sb4(int a, int b, int c, int d)
         {
-            int    t1 = a ^ d;
-            int    t2 = d & t1;
-            int    t3 = c ^ t2;
-            int    t4 = b | t3;
+            var    t1 = a ^ d;
+            var    t2 = d & t1;
+            var    t3 = c ^ t2;
+            var    t4 = b | t3;
             X3 = t1 ^ t4;
-            int    t6 = ~b;
-            int    t7 = t1 | t6;
+            var    t6 = ~b;
+            var    t7 = t1 | t6;
             X0 = t3 ^ t7;
-            int    t9 = a & X0;
-            int    t10 = t1 ^ t6;
-            int    t11 = t4 & t10;
+            var    t9 = a & X0;
+            var    t10 = t1 ^ t6;
+            var    t11 = t4 & t10;
             X2 = t9 ^ t11;
             X1 = (a ^ t3) ^ (t10 & X2);
         }
@@ -611,17 +610,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Ib4(int a, int b, int c, int d)
         {
-            int    t1 = c | d;
-            int    t2 = a & t1;
-            int    t3 = b ^ t2;
-            int    t4 = a & t3;
-            int    t5 = c ^ t4;
+            var    t1 = c | d;
+            var    t2 = a & t1;
+            var    t3 = b ^ t2;
+            var    t4 = a & t3;
+            var    t5 = c ^ t4;
             X1 = d ^ t5;
-            int    t7 = ~a;
-            int    t8 = t5 & X1;
+            var    t7 = ~a;
+            var    t8 = t5 & X1;
             X3 = t3 ^ t8;
-            int    t10 = X1 | t7;
-            int    t11 = d ^ t10;
+            var    t10 = X1 | t7;
+            var    t11 = d ^ t10;
             X0 = X3 ^ t11;
             X2 = (t3 & t11) ^ (X1 ^ t7);
         }
@@ -631,18 +630,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Sb5(int a, int b, int c, int d)
         {
-            int    t1 = ~a;
-            int    t2 = a ^ b;
-            int    t3 = a ^ d;
-            int    t4 = c ^ t1;
-            int    t5 = t2 | t3;
+            var    t1 = ~a;
+            var    t2 = a ^ b;
+            var    t3 = a ^ d;
+            var    t4 = c ^ t1;
+            var    t5 = t2 | t3;
             X0 = t4 ^ t5;
-            int    t7 = d & X0;
-            int    t8 = t2 ^ X0;
+            var    t7 = d & X0;
+            var    t8 = t2 ^ X0;
             X1 = t7 ^ t8;
-            int    t10 = t1 | X0;
-            int    t11 = t2 | t7;
-            int    t12 = t3 ^ t10;
+            var    t10 = t1 | X0;
+            var    t11 = t2 | t7;
+            var    t12 = t3 ^ t10;
             X2 = t11 ^ t12;
             X3 = (b ^ t7) ^ (X1 & t12);
         }
@@ -652,17 +651,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Ib5(int a, int b, int c, int d)
         {
-            int    t1 = ~c;
-            int    t2 = b & t1;
-            int    t3 = d ^ t2;
-            int    t4 = a & t3;
-            int    t5 = b ^ t1;
+            var    t1 = ~c;
+            var    t2 = b & t1;
+            var    t3 = d ^ t2;
+            var    t4 = a & t3;
+            var    t5 = b ^ t1;
             X3 = t4 ^ t5;
-            int    t7 = b | X3;
-            int    t8 = a & t7;
+            var    t7 = b | X3;
+            var    t8 = a & t7;
             X1 = t3 ^ t8;
-            int    t10 = a | d;
-            int    t11 = t1 ^ t7;
+            var    t10 = a | d;
+            var    t11 = t1 ^ t7;
             X0 = t10 ^ t11;
             X2 = (b & t10) ^ (t4 | (a ^ c));
         }
@@ -672,17 +671,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Sb6(int a, int b, int c, int d)
         {
-            int    t1 = ~a;
-            int    t2 = a ^ d;
-            int    t3 = b ^ t2;
-            int    t4 = t1 | t2;
-            int    t5 = c ^ t4;
+            var    t1 = ~a;
+            var    t2 = a ^ d;
+            var    t3 = b ^ t2;
+            var    t4 = t1 | t2;
+            var    t5 = c ^ t4;
             X1 = b ^ t5;
-            int    t7 = t2 | X1;
-            int    t8 = d ^ t7;
-            int    t9 = t5 & t8;
+            var    t7 = t2 | X1;
+            var    t8 = d ^ t7;
+            var    t9 = t5 & t8;
             X2 = t3 ^ t9;
-            int    t11 = t5 ^ t8;
+            var    t11 = t5 ^ t8;
             X0 = X2 ^ t11;
             X3 = (~t5) ^ (t3 & t11);
         }
@@ -692,17 +691,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Ib6(int a, int b, int c, int d)
         {
-            int    t1 = ~a;
-            int    t2 = a ^ b;
-            int    t3 = c ^ t2;
-            int    t4 = c | t1;
-            int    t5 = d ^ t4;
+            var    t1 = ~a;
+            var    t2 = a ^ b;
+            var    t3 = c ^ t2;
+            var    t4 = c | t1;
+            var    t5 = d ^ t4;
             X1 = t3 ^ t5;
-            int    t7 = t3 & t5;
-            int    t8 = t2 ^ t7;
-            int    t9 = b | t8;
+            var    t7 = t3 & t5;
+            var    t8 = t2 ^ t7;
+            var    t9 = b | t8;
             X3 = t5 ^ t9;
-            int    t11 = b | X3;
+            var    t11 = b | X3;
             X0 = t8 ^ t11;
             X2 = (d & t1) ^ (t3 ^ t11);
         }
@@ -712,18 +711,18 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Sb7(int a, int b, int c, int d)
         {
-            int    t1 = b ^ c;
-            int    t2 = c & t1;
-            int    t3 = d ^ t2;
-            int    t4 = a ^ t3;
-            int    t5 = d | t1;
-            int    t6 = t4 & t5;
+            var    t1 = b ^ c;
+            var    t2 = c & t1;
+            var    t3 = d ^ t2;
+            var    t4 = a ^ t3;
+            var    t5 = d | t1;
+            var    t6 = t4 & t5;
             X1 = b ^ t6;
-            int    t8 = t3 | X1;
-            int    t9 = a & t4;
+            var    t8 = t3 | X1;
+            var    t9 = a & t4;
             X3 = t1 ^ t9;
-            int    t11 = t4 ^ t8;
-            int    t12 = X3 & t11;
+            var    t11 = t4 ^ t8;
+            var    t12 = X3 & t11;
             X2 = t3 ^ t12;
             X0 = (~t11) ^ (X3 & X2);
         }
@@ -733,12 +732,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void Ib7(int a, int b, int c, int d)
         {
-            int t3 = c | (a & b);
-            int    t4 = d & (a | b);
+            var t3 = c | (a & b);
+            var    t4 = d & (a | b);
             X3 = t3 ^ t4;
-            int    t6 = ~d;
-            int    t7 = b ^ t4;
-            int    t9 = t7 | (X3 ^ t6);
+            var    t6 = ~d;
+            var    t7 = b ^ t4;
+            var    t9 = t7 | (X3 ^ t6);
             X1 = a ^ t9;
             X0 = (c ^ t7) ^ (d | X1);
             X2 = (t3 ^ X1) ^ (X0 ^ (a & X3));
@@ -749,10 +748,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void LT()
         {
-            int x0  = RotateLeft(X0, 13);
-            int x2  = RotateLeft(X2, 3);
-            int x1  = X1 ^ x0 ^ x2 ;
-            int x3  = X3 ^ x2 ^ x0 << 3;
+            var x0  = RotateLeft(X0, 13);
+            var x2  = RotateLeft(X2, 3);
+            var x1  = X1 ^ x0 ^ x2 ;
+            var x3  = X3 ^ x2 ^ x0 << 3;
 
             X1  = RotateLeft(x1, 1);
             X3  = RotateLeft(x3, 7);
@@ -765,10 +764,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         */
         private void InverseLT()
         {
-            int x2 = RotateRight(X2, 22) ^ X3 ^ (X1 << 7);
-            int x0 = RotateRight(X0, 5) ^ X1 ^ X3;
-            int x3 = RotateRight(X3, 7);
-            int x1 = RotateRight(X1, 1);
+            var x2 = RotateRight(X2, 22) ^ X3 ^ (X1 << 7);
+            var x0 = RotateRight(X0, 5) ^ X1 ^ X3;
+            var x3 = RotateRight(X3, 7);
+            var x1 = RotateRight(X1, 1);
             X3 = x3 ^ x2 ^ x0 << 3;
             X1 = x1 ^ x0 ^ x2;
             X2 = RotateRight(x2, 3);

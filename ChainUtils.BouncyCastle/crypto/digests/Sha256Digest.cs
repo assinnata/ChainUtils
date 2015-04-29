@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -145,7 +144,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             //
             // expand 16 word block into 64 word blocks.
             //
-            for (int ti = 16; ti <= 63; ti++)
+            for (var ti = 16; ti <= 63; ti++)
             {
                 X[ti] = Theta1(X[ti - 2]) + X[ti - 7] + Theta0(X[ti - 15]) + X[ti - 16];
             }
@@ -153,17 +152,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             //
             // set up working variables.
             //
-            uint a = H1;
-            uint b = H2;
-            uint c = H3;
-            uint d = H4;
-            uint e = H5;
-            uint f = H6;
-            uint g = H7;
-            uint h = H8;
+            var a = H1;
+            var b = H2;
+            var c = H3;
+            var d = H4;
+            var e = H5;
+            var f = H6;
+            var g = H7;
+            var h = H8;
 
-			int t = 0;
-			for(int i = 0; i < 8; ++i)
+			var t = 0;
+			for(var i = 0; i < 8; ++i)
 			{
 				// t = 8 * i
 				h += Sum1Ch(e, f, g) + K[t] + X[t];
@@ -321,7 +320,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public override void Reset(IMemoable other)
 		{
-			Sha256Digest d = (Sha256Digest)other;
+			var d = (Sha256Digest)other;
 
 			CopyIn(d);
 		}

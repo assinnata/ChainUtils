@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -59,7 +58,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (obj == this)
 				return true;
 
-			ElGamalParameters other = obj as ElGamalParameters;
+			var other = obj as ElGamalParameters;
 
 			if (other == null)
 				return false;

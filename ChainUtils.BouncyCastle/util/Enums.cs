@@ -1,18 +1,14 @@
 using System;
-using System.Text;
-
+using ChainUtils.BouncyCastle.Utilities.Date;
 #if NETCF_1_0 || NETCF_2_0 || SILVERLIGHT
-using System.Collections;
 using System.Reflection;
 #endif
-
-using ChainUtils.BouncyCastle.Utilities.Date;
 
 namespace ChainUtils.BouncyCastle.Utilities
 {
 	internal abstract class Enums
 	{
-		internal static Enum GetEnumValue(System.Type enumType, string s)
+		internal static Enum GetEnumValue(Type enumType, string s)
 		{
 			if(!enumType.GetTypeInfo().IsEnum)
 				throw new ArgumentException("Not an enumeration type", "enumType");
@@ -37,7 +33,7 @@ namespace ChainUtils.BouncyCastle.Utilities
 			throw new ArgumentException();
 		}
 
-		internal static Array GetEnumValues(System.Type enumType)
+		internal static Array GetEnumValues(Type enumType)
 		{
 			if(!enumType.GetTypeInfo().IsEnum)
 				throw new ArgumentException("Not an enumeration type", "enumType");
@@ -45,10 +41,10 @@ namespace ChainUtils.BouncyCastle.Utilities
 			return Enum.GetValues(enumType);
 		}
 
-		internal static Enum GetArbitraryValue(System.Type enumType)
+		internal static Enum GetArbitraryValue(Type enumType)
 		{
-			Array values = GetEnumValues(enumType);
-			int pos = (int)(DateTimeUtilities.CurrentUnixMs() & int.MaxValue) % values.Length;
+			var values = GetEnumValues(enumType);
+			var pos = (int)(DateTimeUtilities.CurrentUnixMs() & int.MaxValue) % values.Length;
 			return (Enum)values.GetValue(pos);
 		}
 	}

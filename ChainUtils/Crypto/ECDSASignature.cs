@@ -1,42 +1,38 @@
-﻿using ChainUtils.BouncyCastle.Asn1;
-using ChainUtils.BouncyCastle.Math;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.BouncyCastle.Asn1;
+using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.Crypto
 {
-	public class ECDSASignature
+	public class EcdsaSignature
 	{
-		private readonly BigInteger _R;
+		private readonly BigInteger _r;
 		public BigInteger R
 		{
 			get
 			{
-				return _R;
+				return _r;
 			}
 		}
-		private BigInteger _S;
+		private BigInteger _s;
 		public BigInteger S
 		{
 			get
 			{
-				return _S;
+				return _s;
 			}
 		}
-		public ECDSASignature(BigInteger r, BigInteger s)
+		public EcdsaSignature(BigInteger r, BigInteger s)
 		{
-			_R = r;
-			_S = s;
+			_r = r;
+			_s = s;
 		}
 
-		public ECDSASignature(BigInteger[] rs)
+		public EcdsaSignature(BigInteger[] rs)
 		{
-			_R = rs[0];
-			_S = rs[1];
+			_r = rs[0];
+			_s = rs[1];
 		}
 
 		/**
@@ -44,39 +40,39 @@ namespace ChainUtils.Crypto
 		* of the type used by Bitcoin we have to encode them using DER encoding, which is just a way to pack the two
 		* components into a structure.
 		*/
-		public byte[] ToDER()
+		public byte[] ToDer()
 		{
 			// Usually 70-72 bytes.
-			MemoryStream bos = new MemoryStream(72);
-			DerSequenceGenerator seq = new DerSequenceGenerator(bos);
+			var bos = new MemoryStream(72);
+			var seq = new DerSequenceGenerator(bos);
 			seq.AddObject(new DerInteger(R));
 			seq.AddObject(new DerInteger(S));
 			seq.Close();
 			return bos.ToArray();
 
 		}
-		const string InvalidDERSignature = "Invalid DER signature";
-		public static ECDSASignature FromDER(byte[] sig)
+		const string InvalidDerSignature = "Invalid DER signature";
+		public static EcdsaSignature FromDer(byte[] sig)
 		{
 			try
 			{
-				Asn1InputStream decoder = new Asn1InputStream(sig);
+				var decoder = new Asn1InputStream(sig);
 				var seq = decoder.ReadObject() as DerSequence;
 				if(seq == null || seq.Count != 2)
-					throw new FormatException(InvalidDERSignature);
-				return new ECDSASignature(((DerInteger)seq[0]).Value, ((DerInteger)seq[1]).Value);
+					throw new FormatException(InvalidDerSignature);
+				return new EcdsaSignature(((DerInteger)seq[0]).Value, ((DerInteger)seq[1]).Value);
 			}
 			catch(IOException ex)
 			{
-				throw new FormatException(InvalidDERSignature, ex);
+				throw new FormatException(InvalidDerSignature, ex);
 			}
 		}
 
-		public ECDSASignature MakeCanonical()
+		public EcdsaSignature MakeCanonical()
 		{
-			if(this.S.CompareTo(ECKey.HALF_CURVE_ORDER) > 0)
+			if(S.CompareTo(EcKey.HalfCurveOrder) > 0)
 			{
-				return new ECDSASignature(this.R, ECKey.CreateCurve().N.Subtract(this.S));
+				return new EcdsaSignature(R, EcKey.CreateCurve().N.Subtract(S));
 			}
 			else
 				return this;
@@ -84,11 +80,11 @@ namespace ChainUtils.Crypto
 
 
 
-		public static bool IsValidDER(byte[] bytes)
+		public static bool IsValidDer(byte[] bytes)
 		{
 			try
 			{
-				ECDSASignature.FromDER(bytes);
+				FromDer(bytes);
 				return true;
 			}
 			catch(FormatException)

@@ -25,8 +25,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 
 		public virtual DerInteger[][] GetCertReqIDs()
 		{
-			DerInteger[][] result = new DerInteger[content.Count][];
-			for (int i = 0; i != result.Length; ++i)
+			var result = new DerInteger[content.Count][];
+			for (var i = 0; i != result.Length; ++i)
 			{
 				result[i] = SequenceToDerIntegerArray((Asn1Sequence)content[i]);
 			}
@@ -35,8 +35,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 
 		private static DerInteger[] SequenceToDerIntegerArray(Asn1Sequence seq)
 		{
-			DerInteger[] result = new DerInteger[seq.Count];
-			for (int i = 0; i != result.Length; ++i)
+			var result = new DerInteger[seq.Count];
+			for (var i = 0; i != result.Length; ++i)
 			{
 				result[i] = DerInteger.GetInstance(seq[i]);
 			}

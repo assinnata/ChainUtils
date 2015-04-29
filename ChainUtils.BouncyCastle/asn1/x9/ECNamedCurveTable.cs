@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-
+﻿using System.Collections;
 using ChainUtils.BouncyCastle.Asn1.Nist;
 using ChainUtils.BouncyCastle.Asn1.Sec;
 using ChainUtils.BouncyCastle.Asn1.TeleTrust;
@@ -23,7 +21,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
          */
         public static X9ECParameters GetByName(string name)
         {
-            X9ECParameters ecP = X962NamedCurves.GetByName(name);
+            var ecP = X962NamedCurves.GetByName(name);
 
             if (ecP == null)
             {
@@ -51,7 +49,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
          */
         public static DerObjectIdentifier GetOid(string name)
         {
-            DerObjectIdentifier oid = X962NamedCurves.GetOid(name);
+            var oid = X962NamedCurves.GetOid(name);
 
             if (oid == null)
             {
@@ -80,7 +78,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
          */
         public static X9ECParameters GetByOid(DerObjectIdentifier oid)
         {
-            X9ECParameters ecP = X962NamedCurves.GetByOid(oid);
+            var ecP = X962NamedCurves.GetByOid(oid);
 
             if (ecP == null)
             {
@@ -106,7 +104,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
         {
             get
             {
-                IList v = Platform.CreateArrayList();
+                var v = Platform.CreateArrayList();
                 CollectionUtilities.AddRange(v, X962NamedCurves.Names);
                 CollectionUtilities.AddRange(v, SecNamedCurves.Names);
                 CollectionUtilities.AddRange(v, NistNamedCurves.Names);

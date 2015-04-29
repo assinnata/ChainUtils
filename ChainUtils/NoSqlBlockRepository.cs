@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public class NoSqlBlockRepository : IBlockRepository
 	{
-		NoSqlRepository _Repository;
+		NoSqlRepository _repository;
 		public NoSqlBlockRepository(NoSqlRepository repository)
 		{
 			if(repository == null)
 				throw new ArgumentNullException("repository");
-			_Repository = repository;
+			_repository = repository;
 		}
 		public NoSqlBlockRepository()
 			: this(new InMemoryNoSqlRepository())
@@ -23,9 +20,9 @@ namespace ChainUtils
 
 		#region IBlockRepository Members
 
-		public Task<Block> GetBlockAsync(uint256 blockId)
+		public Task<Block> GetBlockAsync(Uint256 blockId)
 		{
-			return _Repository.GetAsync<Block>(blockId.ToString());
+			return _repository.GetAsync<Block>(blockId.ToString());
 		}
 
 		#endregion
@@ -34,9 +31,9 @@ namespace ChainUtils
 		{
 			return PutAsync(block.GetHash(), block);
 		}
-		public Task PutAsync(uint256 blockId, Block block)
+		public Task PutAsync(Uint256 blockId, Block block)
 		{
-			return _Repository.PutAsync(blockId.ToString(), block);
+			return _repository.PutAsync(blockId.ToString(), block);
 		}
 	}
 }

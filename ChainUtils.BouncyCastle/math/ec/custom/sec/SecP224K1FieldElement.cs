@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
@@ -26,7 +24,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public SecP224K1FieldElement()
         {
-            this.x = Nat224.Create();
+            x = Nat224.Create();
         }
 
         protected internal SecP224K1FieldElement(uint[] x)
@@ -66,28 +64,28 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECFieldElement Add(ECFieldElement b)
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224K1Field.Add(x, ((SecP224K1FieldElement)b).x, z);
             return new SecP224K1FieldElement(z);
         }
 
         public override ECFieldElement AddOne()
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224K1Field.AddOne(x, z);
             return new SecP224K1FieldElement(z);
         }
 
         public override ECFieldElement Subtract(ECFieldElement b)
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224K1Field.Subtract(x, ((SecP224K1FieldElement)b).x, z);
             return new SecP224K1FieldElement(z);
         }
 
         public override ECFieldElement Multiply(ECFieldElement b)
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224K1Field.Multiply(x, ((SecP224K1FieldElement)b).x, z);
             return new SecP224K1FieldElement(z);
         }
@@ -95,7 +93,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public override ECFieldElement Divide(ECFieldElement b)
         {
             //return Multiply(b.Invert());
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             Mod.Invert(SecP224K1Field.P, ((SecP224K1FieldElement)b).x, z);
             SecP224K1Field.Multiply(z, x, z);
             return new SecP224K1FieldElement(z);
@@ -103,14 +101,14 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public override ECFieldElement Negate()
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224K1Field.Negate(x, z);
             return new SecP224K1FieldElement(z);
         }
 
         public override ECFieldElement Square()
         {
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             SecP224K1Field.Square(x, z);
             return new SecP224K1FieldElement(z);
         }
@@ -118,7 +116,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public override ECFieldElement Invert()
         {
             //return new SecP224K1FieldElement(ToBigInteger().ModInverse(Q));
-            uint[] z = Nat224.Create();
+            var z = Nat224.Create();
             Mod.Invert(SecP224K1Field.P, x, z);
             return new SecP224K1FieldElement(z);
         }
@@ -141,45 +139,45 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
              * We use: [1], 2, [3], 4, 8, 11, [19], 23, 42, 84, 107, [191]
              */
 
-            uint[] x1 = this.x;
+            var x1 = x;
             if (Nat224.IsZero(x1) || Nat224.IsOne(x1))
                 return this;
 
-            uint[] x2 = Nat224.Create();
+            var x2 = Nat224.Create();
             SecP224K1Field.Square(x1, x2);
             SecP224K1Field.Multiply(x2, x1, x2);
-            uint[] x3 = x2;
+            var x3 = x2;
             SecP224K1Field.Square(x2, x3);
             SecP224K1Field.Multiply(x3, x1, x3);
-            uint[] x4 = Nat224.Create();
+            var x4 = Nat224.Create();
             SecP224K1Field.Square(x3, x4);
             SecP224K1Field.Multiply(x4, x1, x4);
-            uint[] x8 = Nat224.Create();
+            var x8 = Nat224.Create();
             SecP224K1Field.SquareN(x4, 4, x8);
             SecP224K1Field.Multiply(x8, x4, x8);
-            uint[] x11 = Nat224.Create();
+            var x11 = Nat224.Create();
             SecP224K1Field.SquareN(x8, 3, x11);
             SecP224K1Field.Multiply(x11, x3, x11);
-            uint[] x19 = x11;
+            var x19 = x11;
             SecP224K1Field.SquareN(x11, 8, x19);
             SecP224K1Field.Multiply(x19, x8, x19);
-            uint[] x23 = x8;
+            var x23 = x8;
             SecP224K1Field.SquareN(x19, 4, x23);
             SecP224K1Field.Multiply(x23, x4, x23);
-            uint[] x42 = x4;
+            var x42 = x4;
             SecP224K1Field.SquareN(x23, 19, x42);
             SecP224K1Field.Multiply(x42, x19, x42);
-            uint[] x84 = Nat224.Create();
+            var x84 = Nat224.Create();
             SecP224K1Field.SquareN(x42, 42, x84);
             SecP224K1Field.Multiply(x84, x42, x84);
-            uint[] x107 = x42;
+            var x107 = x42;
             SecP224K1Field.SquareN(x84, 23, x107);
             SecP224K1Field.Multiply(x107, x23, x107);
-            uint[] x191 = x23;
+            var x191 = x23;
             SecP224K1Field.SquareN(x107, 84, x191);
             SecP224K1Field.Multiply(x191, x84, x191);
 
-            uint[] t1 = x191;
+            var t1 = x191;
             SecP224K1Field.SquareN(t1, 20, t1);
             SecP224K1Field.Multiply(t1, x19, t1);
             SecP224K1Field.SquareN(t1, 3, t1);
@@ -190,7 +188,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             SecP224K1Field.Multiply(t1, x3, t1);
             SecP224K1Field.Square(t1, t1);
 
-            uint[] t2 = x84;
+            var t2 = x84;
             SecP224K1Field.Square(t1, t2);
 
             if (Nat224.Eq(x1, t2))

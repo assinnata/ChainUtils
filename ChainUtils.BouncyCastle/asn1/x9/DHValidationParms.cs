@@ -40,18 +40,18 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
 			if (seq.Count != 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.seed = DerBitString.GetInstance(seq[0]);
-			this.pgenCounter = DerInteger.GetInstance(seq[1]);
+			seed = DerBitString.GetInstance(seq[0]);
+			pgenCounter = DerInteger.GetInstance(seq[1]);
 		}
 
 		public DerBitString Seed
 		{
-			get { return this.seed; }
+			get { return seed; }
 		}
 
 		public DerInteger PgenCounter
 		{
-			get { return this.pgenCounter; }
+			get { return pgenCounter; }
 		}
 
 		public override Asn1Object ToAsn1Object()

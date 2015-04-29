@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChainUtils.BouncyCastle.Utilities
+﻿namespace ChainUtils.BouncyCastle.Utilities
 {
     public abstract class Integers
     {

@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.DataEncoders
 {
-	public class ASCIIEncoder : DataEncoder
+	public class AsciiEncoder : DataEncoder
 	{
 		public override byte[] DecodeData(string encoded)
 		{

@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto
@@ -43,7 +42,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 			if (parameters == null)
 				throw new ArgumentNullException("parameters");
 
-			this.uninitialised = false;
+			uninitialised = false;
 
 			engineInit(parameters);
 		}
@@ -51,8 +50,8 @@ namespace ChainUtils.BouncyCastle.Crypto
 		protected virtual void engineInit(
 			KeyGenerationParameters parameters)
 		{
-			this.random = parameters.Random;
-			this.strength = (parameters.Strength + 7) / 8;
+			random = parameters.Random;
+			strength = (parameters.Strength + 7) / 8;
 		}
 
 		/**

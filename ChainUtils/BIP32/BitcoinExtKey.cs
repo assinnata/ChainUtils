@@ -1,6 +1,5 @@
 ﻿namespace ChainUtils
 {
-    //LOL
 	public abstract class BitcoinExtKeyBase : Base58Data, IDestination
 	{
 	    protected BitcoinExtKeyBase(IBitcoinSerializable key, Network network)
@@ -41,21 +40,21 @@
 		{
 			get
 			{
-				return vchData.Length == 74;
+				return VchData.Length == 74;
 			}
 		}
 
-		ExtKey _Key;
+		ExtKey _key;
 		public ExtKey ExtKey
 		{
 			get
 			{
-				if(_Key == null)
+				if(_key == null)
 				{
-					_Key = new ExtKey();
-					_Key.ReadWrite(vchData);
+					_key = new ExtKey();
+					_key.ReadWrite(VchData);
 				}
-				return _Key;
+				return _key;
 			}
 		}
 
@@ -64,7 +63,7 @@
 		{
 			get
 			{
-				return Base58Type.EXT_SECRET_KEY;
+				return Base58Type.ExtSecretKey;
 			}
 		}
 
@@ -101,17 +100,17 @@
 		{
 		}
 
-		ExtPubKey _PubKey;
+		ExtPubKey _pubKey;
 		public ExtPubKey ExtPubKey
 		{
 			get
 			{
-				if(_PubKey == null)
+				if(_pubKey == null)
 				{
-					_PubKey = new ExtPubKey();
-					_PubKey.ReadWrite(vchData);
+					_pubKey = new ExtPubKey();
+					_pubKey.ReadWrite(VchData);
 				}
-				return _PubKey;
+				return _pubKey;
 			}
 		}
 
@@ -119,7 +118,7 @@
 		{
 			get
 			{
-				return Base58Type.EXT_PUBLIC_KEY;
+				return Base58Type.ExtPublicKey;
 			}
 		}
 

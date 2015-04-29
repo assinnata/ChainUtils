@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChainUtils.MicroPayment
+﻿namespace ChainUtils.MicroPayment
 {
 	public class OpenChannelMessage
 	{
@@ -24,7 +18,7 @@ namespace ChainUtils.MicroPayment
 	}
 	public class OpenedChannelMessage : PayMessage
 	{
-		public uint256 FundId
+		public Uint256 FundId
 		{
 			get;
 			set;

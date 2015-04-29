@@ -39,11 +39,11 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count < 1 || seq.Count > 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.crlHash = OtherHash.GetInstance(seq[0].ToAsn1Object());
+			crlHash = OtherHash.GetInstance(seq[0].ToAsn1Object());
 
 			if (seq.Count > 1)
 			{
-				this.crlIdentifier = CrlIdentifier.GetInstance(seq[1].ToAsn1Object());
+				crlIdentifier = CrlIdentifier.GetInstance(seq[1].ToAsn1Object());
 			}
 		}
 
@@ -76,7 +76,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(crlHash.ToAsn1Object());
+			var v = new Asn1EncodableVector(crlHash.ToAsn1Object());
 
 			if (crlIdentifier != null)
 			{

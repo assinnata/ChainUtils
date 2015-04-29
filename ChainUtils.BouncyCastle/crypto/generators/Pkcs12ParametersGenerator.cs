@@ -1,8 +1,5 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
-using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
@@ -52,12 +49,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             int     aOff,
             byte[]  b)
         {
-            int  x = (b[b.Length - 1] & 0xff) + (a[aOff + b.Length - 1] & 0xff) + 1;
+            var  x = (b[b.Length - 1] & 0xff) + (a[aOff + b.Length - 1] & 0xff) + 1;
 
             a[aOff + b.Length - 1] = (byte)x;
             x = (int) ((uint) x >> 8);
 
-            for (int i = b.Length - 2; i >= 0; i--)
+            for (var i = b.Length - 2; i >= 0; i--)
             {
                 x += (b[i] & 0xff) + (a[aOff + i] & 0xff);
                 a[aOff + i] = (byte)x;
@@ -72,10 +69,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             int idByte,
             int n)
         {
-            byte[] D = new byte[v];
-            byte[] dKey = new byte[n];
+            var D = new byte[v];
+            var dKey = new byte[n];
 
-            for (int i = 0; i != D.Length; i++)
+            for (var i = 0; i != D.Length; i++)
             {
                 D[i] = (byte)idByte;
             }
@@ -86,7 +83,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             {
                 S = new byte[v * ((mSalt.Length + v - 1) / v)];
 
-                for (int i = 0; i != S.Length; i++)
+                for (var i = 0; i != S.Length; i++)
                 {
                     S[i] = mSalt[i % mSalt.Length];
                 }
@@ -102,7 +99,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             {
                 P = new byte[v * ((mPassword.Length + v - 1) / v)];
 
-                for (int i = 0; i != P.Length; i++)
+                for (var i = 0; i != P.Length; i++)
                 {
                     P[i] = mPassword[i % mPassword.Length];
                 }
@@ -112,33 +109,33 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                 P = new byte[0];
             }
 
-            byte[]  I = new byte[S.Length + P.Length];
+            var  I = new byte[S.Length + P.Length];
 
             Array.Copy(S, 0, I, 0, S.Length);
             Array.Copy(P, 0, I, S.Length, P.Length);
 
-            byte[]  B = new byte[v];
-            int     c = (n + u - 1) / u;
-            byte[]  A = new byte[u];
+            var  B = new byte[v];
+            var     c = (n + u - 1) / u;
+            var  A = new byte[u];
 
-            for (int i = 1; i <= c; i++)
+            for (var i = 1; i <= c; i++)
             {
                 digest.BlockUpdate(D, 0, D.Length);
                 digest.BlockUpdate(I, 0, I.Length);
                 digest.DoFinal(A, 0);
 
-                for (int j = 1; j != mIterationCount; j++)
+                for (var j = 1; j != mIterationCount; j++)
                 {
                     digest.BlockUpdate(A, 0, A.Length);
                     digest.DoFinal(A, 0);
                 }
 
-                for (int j = 0; j != B.Length; j++)
+                for (var j = 0; j != B.Length; j++)
                 {
                     B[j] = A[j % A.Length];
                 }
 
-                for (int j = 0; j != I.Length / v; j++)
+                for (var j = 0; j != I.Length / v; j++)
                 {
                     Adjust(I, j * v, B);
                 }
@@ -169,7 +166,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             keySize /= 8;
 
-            byte[] dKey = GenerateDerivedKey(KeyMaterial, keySize);
+            var dKey = GenerateDerivedKey(KeyMaterial, keySize);
 
             return new KeyParameter(dKey, 0, keySize);
         }
@@ -180,7 +177,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             keySize /= 8;
 
-            byte[] dKey = GenerateDerivedKey(KeyMaterial, keySize);
+            var dKey = GenerateDerivedKey(KeyMaterial, keySize);
 
             return ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
         }
@@ -202,9 +199,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             keySize /= 8;
             ivSize /= 8;
 
-            byte[] dKey = GenerateDerivedKey(KeyMaterial, keySize);
+            var dKey = GenerateDerivedKey(KeyMaterial, keySize);
 
-            byte[] iv = GenerateDerivedKey(IVMaterial, ivSize);
+            var iv = GenerateDerivedKey(IVMaterial, ivSize);
 
             return new ParametersWithIV(new KeyParameter(dKey, 0, keySize), iv, 0, ivSize);
         }
@@ -217,10 +214,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
             keySize /= 8;
             ivSize /= 8;
 
-            byte[] dKey = GenerateDerivedKey(KeyMaterial, keySize);
-            KeyParameter key = ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
+            var dKey = GenerateDerivedKey(KeyMaterial, keySize);
+            var key = ParameterUtilities.CreateKeyParameter(algorithm, dKey, 0, keySize);
 
-            byte[] iv = GenerateDerivedKey(IVMaterial, ivSize);
+            var iv = GenerateDerivedKey(IVMaterial, ivSize);
 
             return new ParametersWithIV(key, iv, 0, ivSize);
         }
@@ -237,7 +234,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             keySize /= 8;
 
-            byte[] dKey = GenerateDerivedKey(MacMaterial, keySize);
+            var dKey = GenerateDerivedKey(MacMaterial, keySize);
 
             return new KeyParameter(dKey, 0, keySize);
         }

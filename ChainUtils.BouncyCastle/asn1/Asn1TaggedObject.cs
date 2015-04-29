@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -48,7 +47,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             int             tagNo,
             Asn1Encodable   obj)
         {
-            this.explicitly = true;
+            explicitly = true;
             this.tagNo = tagNo;
             this.obj = obj;
         }
@@ -72,20 +71,20 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
         {
-			Asn1TaggedObject other = asn1Object as Asn1TaggedObject;
+			var other = asn1Object as Asn1TaggedObject;
 
 			if (other == null)
 				return false;
 
-			return this.tagNo == other.tagNo
+			return tagNo == other.tagNo
 //				&& this.empty == other.empty
-				&& this.explicitly == other.explicitly   // TODO Should this be part of equality?
-				&& Platform.Equals(GetObject(), other.GetObject());
+				&& explicitly == other.explicitly   // TODO Should this be part of equality?
+				&& Equals(GetObject(), other.GetObject());
 		}
 
 		protected override int Asn1GetHashCode()
 		{
-            int code = tagNo.GetHashCode();
+            var code = tagNo.GetHashCode();
 
 			// TODO: actually this is wrong - the problem is that a re-encoded
 			// object may end up with a different hashCode due to implicit

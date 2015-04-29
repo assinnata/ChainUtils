@@ -1,6 +1,4 @@
 using System;
-using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -42,7 +40,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				isExplicit)
         {
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is DerNumericString)
 			{
@@ -109,12 +107,12 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
 		{
-			DerNumericString other = asn1Object as DerNumericString;
+			var other = asn1Object as DerNumericString;
 
 			if (other == null)
 				return false;
 
-			return this.str.Equals(other.str);
+			return str.Equals(other.str);
         }
 
 		/**
@@ -126,7 +124,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		public static bool IsNumericString(
 			string str)
 		{
-			foreach (char ch in str)
+			foreach (var ch in str)
 			{
 				if (ch > 0x007f || (ch != ' ' && !char.IsDigit(ch)))
 					return false;

@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -18,7 +16,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             AlgorithmIdentifier keyEncryptionAlgorithm,
             Asn1OctetString     encryptedKey)
         {
-            this.version = new DerInteger(4);
+            version = new DerInteger(4);
             this.kekID = kekID;
             this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
             this.encryptedKey = encryptedKey;

@@ -1,8 +1,6 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
-
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -61,7 +59,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             if (!IsValidBranchID(branchID, 0))
                 throw new ArgumentException("string " + branchID + " not a valid OID branch", "branchID");
 
-            this.identifier = oid.Id + "." + branchID;
+            identifier = oid.Id + "." + branchID;
         }
 
         // TODO Change to ID?
@@ -88,16 +86,16 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         internal DerObjectIdentifier(byte[] bytes)
         {
-            this.identifier = MakeOidStringFromBytes(bytes);
-            this.body = Arrays.Clone(bytes);
+            identifier = MakeOidStringFromBytes(bytes);
+            body = Arrays.Clone(bytes);
         }
 
         private void WriteField(
             Stream	outputStream,
             long	fieldValue)
         {
-            byte[] result = new byte[9];
-            int pos = 8;
+            var result = new byte[9];
+            var pos = 8;
             result[pos] = (byte)(fieldValue & 0x7f);
             while (fieldValue >= (1L << 7))
             {
@@ -111,16 +109,16 @@ namespace ChainUtils.BouncyCastle.Asn1
             Stream		outputStream,
             BigInteger	fieldValue)
         {
-            int byteCount = (fieldValue.BitLength + 6) / 7;
+            var byteCount = (fieldValue.BitLength + 6) / 7;
             if (byteCount == 0)
             {
                 outputStream.WriteByte(0);
             }
             else
             {
-                BigInteger tmpValue = fieldValue;
-                byte[] tmp = new byte[byteCount];
-                for (int i = byteCount-1; i >= 0; i--)
+                var tmpValue = fieldValue;
+                var tmp = new byte[byteCount];
+                for (var i = byteCount-1; i >= 0; i--)
                 {
                     tmp[i] = (byte) ((tmpValue.IntValue & 0x7f) | 0x80);
                     tmpValue = tmpValue.ShiftRight(7);
@@ -132,10 +130,10 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         private void DoOutput(MemoryStream bOut)
         {
-            OidTokenizer tok = new OidTokenizer(identifier);
+            var tok = new OidTokenizer(identifier);
 
-            string token = tok.NextToken();
-            int first = int.Parse(token) * 40;
+            var token = tok.NextToken();
+            var first = int.Parse(token) * 40;
 
             token = tok.NextToken();
             if (token.Length <= 18)
@@ -167,7 +165,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             {
                 if (body == null)
                 {
-                    MemoryStream bOut = new MemoryStream();
+                    var bOut = new MemoryStream();
                     DoOutput(bOut);
                     body = bOut.ToArray();
                 }
@@ -190,12 +188,12 @@ namespace ChainUtils.BouncyCastle.Asn1
         protected override bool Asn1Equals(
             Asn1Object asn1Object)
         {
-            DerObjectIdentifier other = asn1Object as DerObjectIdentifier;
+            var other = asn1Object as DerObjectIdentifier;
 
             if (other == null)
                 return false;
 
-            return this.identifier.Equals(other.identifier);
+            return identifier.Equals(other.identifier);
         }
 
         public override string ToString()
@@ -206,12 +204,12 @@ namespace ChainUtils.BouncyCastle.Asn1
         private static bool IsValidBranchID(
             String branchID, int start)
         {
-            bool periodAllowed = false;
+            var periodAllowed = false;
 
-            int pos = branchID.Length;
+            var pos = branchID.Length;
             while (--pos >= start)
             {
-                char ch = branchID[pos];
+                var ch = branchID[pos];
 
                 // TODO Leading zeroes?
                 if ('0' <= ch && ch <= '9')
@@ -240,7 +238,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             if (identifier.Length < 3 || identifier[1] != '.')
                 return false;
 
-            char first = identifier[0];
+            var first = identifier[0];
             if (first < '0' || first > '2')
                 return false;
 
@@ -252,12 +250,12 @@ namespace ChainUtils.BouncyCastle.Asn1
         private static string MakeOidStringFromBytes(
             byte[] bytes)
         {
-            StringBuilder	objId = new StringBuilder();
+            var	objId = new StringBuilder();
             long			value = 0;
             BigInteger		bigValue = null;
-            bool			first = true;
+            var			first = true;
 
-            for (int i = 0; i != bytes.Length; i++)
+            for (var i = 0; i != bytes.Length; i++)
             {
                 int b = bytes[i];
 
@@ -329,12 +327,12 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         internal static DerObjectIdentifier FromOctetString(byte[] enc)
         {
-            int hashCode = Arrays.GetHashCode(enc);
-            int first = hashCode & 1023;
+            var hashCode = Arrays.GetHashCode(enc);
+            var first = hashCode & 1023;
 
             lock (cache)
             {
-                DerObjectIdentifier entry = cache[first];
+                var entry = cache[first];
                 if (entry != null && Arrays.AreEqual(enc, entry.GetBody()))
                 {
                     return entry;

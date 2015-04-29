@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.BC;
 using ChainUtils.BouncyCastle.Asn1.Nist;
@@ -10,11 +9,7 @@ using ChainUtils.BouncyCastle.Asn1.TeleTrust;
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Digests;
-using ChainUtils.BouncyCastle.Crypto.Engines;
 using ChainUtils.BouncyCastle.Crypto.Generators;
-using ChainUtils.BouncyCastle.Crypto.Macs;
-using ChainUtils.BouncyCastle.Crypto.Modes;
-using ChainUtils.BouncyCastle.Crypto.Paddings;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -260,7 +255,7 @@ namespace ChainUtils.BouncyCastle.Security
         public static bool IsPkcs12(
             string algorithm)
         {
-            string mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
+            var mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
 
             return mechanism != null && Pkcs12.Equals(algorithmType[mechanism]);
         }
@@ -268,7 +263,7 @@ namespace ChainUtils.BouncyCastle.Security
         public static bool IsPkcs5Scheme1(
             string algorithm)
         {
-            string mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
+            var mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
 
             return mechanism != null && Pkcs5S1.Equals(algorithmType[mechanism]);
         }
@@ -276,7 +271,7 @@ namespace ChainUtils.BouncyCastle.Security
         public static bool IsPkcs5Scheme2(
             string algorithm)
         {
-            string mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
+            var mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
 
             return mechanism != null && Pkcs5S2.Equals(algorithmType[mechanism]);
         }
@@ -284,7 +279,7 @@ namespace ChainUtils.BouncyCastle.Security
         public static bool IsOpenSsl(
             string algorithm)
         {
-            string mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
+            var mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
 
             return mechanism != null && OpenSsl.Equals(algorithmType[mechanism]);
         }
@@ -292,7 +287,7 @@ namespace ChainUtils.BouncyCastle.Security
         public static bool IsPbeAlgorithm(
             string algorithm)
         {
-            string mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
+            var mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
 
             return mechanism != null && algorithmType[mechanism] != null;
         }
@@ -370,15 +365,15 @@ namespace ChainUtils.BouncyCastle.Security
             bool			wrongPkcs12Zero,
             Asn1Encodable   pbeParameters)
         {
-            string mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
+            var mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
 
             byte[] keyBytes = null;
             byte[] salt = null;
-            int iterationCount = 0;
+            var iterationCount = 0;
 
             if (IsPkcs12(mechanism))
             {
-                Pkcs12PbeParams pbeParams = Pkcs12PbeParams.GetInstance(pbeParameters);
+                var pbeParams = Pkcs12PbeParams.GetInstance(pbeParameters);
                 salt = pbeParams.GetIV();
                 iterationCount = pbeParams.Iterations.IntValue;
                 keyBytes = PbeParametersGenerator.Pkcs12PasswordToBytes(password, wrongPkcs12Zero);
@@ -389,7 +384,7 @@ namespace ChainUtils.BouncyCastle.Security
             }
             else
             {
-                PbeParameter pbeParams = PbeParameter.GetInstance(pbeParameters);
+                var pbeParams = PbeParameter.GetInstance(pbeParameters);
                 salt = pbeParams.GetSalt();
                 iterationCount = pbeParams.IterationCount.IntValue;
                 keyBytes = PbeParametersGenerator.Pkcs5PasswordToBytes(password);
@@ -399,18 +394,18 @@ namespace ChainUtils.BouncyCastle.Security
 
             if (IsPkcs5Scheme2(mechanism))
             {
-                PbeS2Parameters s2p = PbeS2Parameters.GetInstance(pbeParameters.ToAsn1Object());
+                var s2p = PbeS2Parameters.GetInstance(pbeParameters.ToAsn1Object());
                 AlgorithmIdentifier encScheme = s2p.EncryptionScheme;
-                DerObjectIdentifier encOid = encScheme.ObjectID;
-                Asn1Object encParams = encScheme.Parameters.ToAsn1Object();
+                var encOid = encScheme.ObjectID;
+                var encParams = encScheme.Parameters.ToAsn1Object();
 
                 // TODO What about s2p.KeyDerivationFunc.ObjectID?
-                Pbkdf2Params pbeParams = Pbkdf2Params.GetInstance(s2p.KeyDerivationFunc.Parameters.ToAsn1Object());
+                var pbeParams = Pbkdf2Params.GetInstance(s2p.KeyDerivationFunc.Parameters.ToAsn1Object());
 
                 byte[] iv;
                 if (encOid.Equals(PkcsObjectIdentifiers.RC2Cbc)) // PKCS5.B.2.3
                 {
-                    RC2CbcParameter rc2Params = RC2CbcParameter.GetInstance(encParams);
+                    var rc2Params = RC2CbcParameter.GetInstance(encParams);
                     iv = rc2Params.GetIV();
                 }
                 else
@@ -422,11 +417,11 @@ namespace ChainUtils.BouncyCastle.Security
                 iterationCount = pbeParams.IterationCount.IntValue;
                 keyBytes = PbeParametersGenerator.Pkcs5PasswordToBytes(password);
 
-                int keyLength = pbeParams.KeyLength != null
+                var keyLength = pbeParams.KeyLength != null
                     ?	pbeParams.KeyLength.IntValue * 8
                     :	GeneratorUtilities.GetDefaultKeySize(encOid);
 
-                PbeParametersGenerator gen = MakePbeGenerator(
+                var gen = MakePbeGenerator(
                     (string)algorithmType[mechanism], null, keyBytes, salt, iterationCount);
 
                 parameters = gen.GenerateDerivedParameters(encOid.Id, keyLength);
@@ -446,7 +441,7 @@ namespace ChainUtils.BouncyCastle.Security
             }
             else if (mechanism.StartsWith("PBEwithSHA-1"))
             {
-                PbeParametersGenerator generator = MakePbeGenerator(
+                var generator = MakePbeGenerator(
                     (string) algorithmType[mechanism], new Sha1Digest(), keyBytes, salt, iterationCount);
 
                 if (mechanism.Equals("PBEwithSHA-1and128bitAES-CBC-BC"))
@@ -496,7 +491,7 @@ namespace ChainUtils.BouncyCastle.Security
             }
             else if (mechanism.StartsWith("PBEwithSHA-256"))
             {
-                PbeParametersGenerator generator = MakePbeGenerator(
+                var generator = MakePbeGenerator(
                     (string) algorithmType[mechanism], new Sha256Digest(), keyBytes, salt, iterationCount);
 
                 if (mechanism.Equals("PBEwithSHA-256and128bitAES-CBC-BC"))
@@ -514,7 +509,7 @@ namespace ChainUtils.BouncyCastle.Security
             }
             else if (mechanism.StartsWith("PBEwithMD5"))
             {
-                PbeParametersGenerator generator = MakePbeGenerator(
+                var generator = MakePbeGenerator(
                     (string)algorithmType[mechanism], new MD5Digest(), keyBytes, salt, iterationCount);
 
                 if (mechanism.Equals("PBEwithMD5andDES-CBC"))
@@ -540,7 +535,7 @@ namespace ChainUtils.BouncyCastle.Security
             }
             else if (mechanism.StartsWith("PBEwithMD2"))
             {
-                PbeParametersGenerator generator = MakePbeGenerator(
+                var generator = MakePbeGenerator(
                     (string)algorithmType[mechanism], new MD2Digest(), keyBytes, salt, iterationCount);
                 if (mechanism.Equals("PBEwithMD2andDES-CBC"))
                 {
@@ -553,13 +548,13 @@ namespace ChainUtils.BouncyCastle.Security
             }
             else if (mechanism.StartsWith("PBEwithHmac"))
             {
-                string digestName = mechanism.Substring("PBEwithHmac".Length);
-                IDigest digest = DigestUtilities.GetDigest(digestName);
+                var digestName = mechanism.Substring("PBEwithHmac".Length);
+                var digest = DigestUtilities.GetDigest(digestName);
 
-                PbeParametersGenerator generator = MakePbeGenerator(
+                var generator = MakePbeGenerator(
                     (string) algorithmType[mechanism], digest, keyBytes, salt, iterationCount);
 
-                int bitLen = digest.GetDigestSize() * 8;
+                var bitLen = digest.GetDigestSize() * 8;
                 parameters = generator.GenerateDerivedMacParameters(bitLen);
             }
 
@@ -577,11 +572,11 @@ namespace ChainUtils.BouncyCastle.Security
         public static object CreateEngine(
             AlgorithmIdentifier algID)
         {
-            string algorithm = algID.ObjectID.Id;
+            var algorithm = algID.ObjectID.Id;
 
             if (IsPkcs5Scheme2(algorithm))
             {
-                PbeS2Parameters s2p = PbeS2Parameters.GetInstance(algID.Parameters.ToAsn1Object());
+                var s2p = PbeS2Parameters.GetInstance(algID.Parameters.ToAsn1Object());
                 AlgorithmIdentifier encScheme = s2p.EncryptionScheme;
                 return CipherUtilities.GetCipher(encScheme.ObjectID);
             }
@@ -592,11 +587,11 @@ namespace ChainUtils.BouncyCastle.Security
         public static object CreateEngine(
             string algorithm)
         {
-            string mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
+            var mechanism = (string)algorithms[Platform.ToUpperInvariant(algorithm)];
 
             if (mechanism.StartsWith("PBEwithHmac"))
             {
-                string digestName = mechanism.Substring("PBEwithHmac".Length);
+                var digestName = mechanism.Substring("PBEwithHmac".Length);
 
                 return MacUtilities.GetMac("HMAC/" + digestName);
             }
@@ -650,12 +645,12 @@ namespace ChainUtils.BouncyCastle.Security
 
             if (parameters is ParametersWithIV)
             {
-                ParametersWithIV ivParams = (ParametersWithIV)parameters;
+                var ivParams = (ParametersWithIV)parameters;
                 return new ParametersWithIV(FixDesParity(mechanism, ivParams.Parameters), ivParams.GetIV());
             }
 
-            KeyParameter kParam = (KeyParameter)parameters;
-            byte[] keyBytes = kParam.GetKey();
+            var kParam = (KeyParameter)parameters;
+            var keyBytes = kParam.GetKey();
             DesParameters.SetOddParity(keyBytes);
             return new KeyParameter(keyBytes);
         }

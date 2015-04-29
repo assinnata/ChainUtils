@@ -1,13 +1,11 @@
 ﻿#if !NOHTTPCLIENT
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
+using Newtonsoft.Json.Linq;
 
 namespace ChainUtils
 {
@@ -54,11 +52,11 @@ namespace ChainUtils
 
 		#region ITransactionRepository Members
 
-		public async Task<Transaction> GetAsync(uint256 txId)
+		public async Task<Transaction> GetAsync(Uint256 txId)
 		{
 			while(true)
 			{
-				using(HttpClient client = new HttpClient())
+				using(var client = new HttpClient())
 				{
 					var response = await client.GetAsync(BlockrAddress + "tx/raw/" + txId).ConfigureAwait(false);
 					if(response.StatusCode == HttpStatusCode.NotFound)
@@ -77,34 +75,34 @@ namespace ChainUtils
 			}
 		}
 
-		public async Task<List<Coin>> GetUnspentAsync(string Address)
+		public async Task<List<Coin>> GetUnspentAsync(string address)
 		{
 			while(true)
 			{
-				using(HttpClient client = new HttpClient())
+				using(var client = new HttpClient())
 				{
-					var response = await client.GetAsync(BlockrAddress + "address/unspent/" + Address).ConfigureAwait(false);
+					var response = await client.GetAsync(BlockrAddress + "address/unspent/" + address).ConfigureAwait(false);
 					if(response.StatusCode == HttpStatusCode.NotFound)
 						return null;
 					var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 					var json = JObject.Parse(result);
 					var status = json["status"];
 					var code = json["code"];
-					if((status != null && status.ToString() == "error") || (json["data"]["address"].ToString() != Address))
+					if((status != null && status.ToString() == "error") || (json["data"]["address"].ToString() != address))
 					{
 						throw new BlockrException(json);
 					}
-					List<Coin> list = new List<Coin>();
+					var list = new List<Coin>();
 					foreach(var element in json["data"]["unspent"])
 					{
-						list.Add(new Coin(new uint256(element["tx"].ToString()), (uint)element["n"], new Money((decimal)element["amount"], MoneyUnit.BTC), new Script(DataEncoders.Encoders.Hex.DecodeData(element["script"].ToString()))));
+						list.Add(new Coin(new Uint256(element["tx"].ToString()), (uint)element["n"], new Money((decimal)element["amount"], MoneyUnit.Btc), new Script(Encoders.Hex.DecodeData(element["script"].ToString()))));
 					}
 					return list;
 				}
 			}
 		}
 
-		public Task PutAsync(uint256 txId, Transaction tx)
+		public Task PutAsync(Uint256 txId, Transaction tx)
 		{
 			return Task.FromResult(false);
 		}

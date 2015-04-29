@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
@@ -13,7 +11,7 @@ namespace ChainUtils.BitcoinCore
 		{
 			if(index == null)
 				throw new ArgumentNullException("index");
-			_Index = index;
+			_index = index;
 		}
 
 		public CoinsView()
@@ -21,16 +19,16 @@ namespace ChainUtils.BitcoinCore
 		{
 
 		}
-		private readonly NoSqlRepository _Index;
+		private readonly NoSqlRepository _index;
 		public NoSqlRepository Index
 		{
 			get
 			{
-				return _Index;
+				return _index;
 			}
 		}
 
-		public Coins GetCoins(uint256 txId)
+		public Coins GetCoins(Uint256 txId)
 		{
 			try
 			{
@@ -43,23 +41,23 @@ namespace ChainUtils.BitcoinCore
 			}
 		}
 
-		public Task<Coins> GetCoinsAsync(uint256 txId)
+		public Task<Coins> GetCoinsAsync(Uint256 txId)
 		{
 			return Index.GetAsync<Coins>(txId.ToString());
 		}
 
 
-		public void SetCoins(uint256 txId, Coins coins)
+		public void SetCoins(Uint256 txId, Coins coins)
 		{
 			Index.PutAsync(txId.ToString(), coins);
 		}
 
-		public bool HaveCoins(uint256 txId)
+		public bool HaveCoins(Uint256 txId)
 		{
 			return GetCoins(txId) != null;
 		}
 
-		public uint256 GetBestBlock()
+		public Uint256 GetBestBlock()
 		{
 			try
 			{
@@ -71,13 +69,13 @@ namespace ChainUtils.BitcoinCore
 				return null; //Can't happen
 			}
 		}
-		public async Task<uint256> GetBestBlockAsync()
+		public async Task<Uint256> GetBestBlockAsync()
 		{
-			var block = await Index.GetAsync<uint256>("B").ConfigureAwait(false);
-			return block ?? new uint256(0);
+			var block = await Index.GetAsync<Uint256>("B").ConfigureAwait(false);
+			return block ?? new Uint256(0);
 		}
 
-		public void SetBestBlock(uint256 blockId)
+		public void SetBestBlock(Uint256 blockId)
 		{
 			Index.PutAsync("B", blockId);
 		}
@@ -87,18 +85,18 @@ namespace ChainUtils.BitcoinCore
 			if(!tx.IsCoinBase)
 			{
 				// first check whether information about the prevout hash is available
-				for(int i = 0 ; i < tx.Inputs.Count ; i++)
+				for(var i = 0 ; i < tx.Inputs.Count ; i++)
 				{
-					OutPoint prevout = tx.Inputs[i].PrevOut;
+					var prevout = tx.Inputs[i].PrevOut;
 					if(!HaveCoins(prevout.Hash))
 						return false;
 				}
 
 				// then check whether the actual outputs are available
-				for(int i = 0 ; i < tx.Inputs.Count ; i++)
+				for(var i = 0 ; i < tx.Inputs.Count ; i++)
 				{
-					OutPoint prevout = tx.Inputs[i].PrevOut;
-					Coins coins = GetCoins(prevout.Hash);
+					var prevout = tx.Inputs[i].PrevOut;
+					var coins = GetCoins(prevout.Hash);
 					if(!coins.IsAvailable(prevout.N))
 						return false;
 				}
@@ -108,7 +106,7 @@ namespace ChainUtils.BitcoinCore
 
 		public TxOut GetOutputFor(TxIn input)
 		{
-			Coins coins = GetCoins(input.PrevOut.Hash);
+			var coins = GetCoins(input.PrevOut.Hash);
 			if(!coins.IsAvailable(input.PrevOut.N))
 			{
 				return null;

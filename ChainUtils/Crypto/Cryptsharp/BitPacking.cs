@@ -21,7 +21,7 @@ namespace ChainUtils.Crypto.Internal
 {
     static class BitPacking
     {
-        public static uint UInt32FromBEBytes(byte[] bytes, int offset)
+        public static uint UInt32FromBeBytes(byte[] bytes, int offset)
         {
             return
                 (uint)bytes[offset + 0] << 24 |
@@ -30,7 +30,7 @@ namespace ChainUtils.Crypto.Internal
                 (uint)bytes[offset + 3];
         }
 
-        public static ulong UInt64FromBEBytes(byte[] bytes, int offset)
+        public static ulong UInt64FromBeBytes(byte[] bytes, int offset)
         {
             return
                 (ulong)bytes[offset + 0] << 56 |
@@ -43,7 +43,7 @@ namespace ChainUtils.Crypto.Internal
                 (ulong)bytes[offset + 7];
         }
 
-        public static uint UInt24FromLEBytes(byte[] bytes, int offset)
+        public static uint UInt24FromLeBytes(byte[] bytes, int offset)
         {
             return
                 (uint)bytes[offset + 2] << 16 |
@@ -51,14 +51,14 @@ namespace ChainUtils.Crypto.Internal
                 (uint)bytes[offset + 0];
         }
 
-        public static uint UInt32FromLEBytes(byte[] bytes, int offset)
+        public static uint UInt32FromLeBytes(byte[] bytes, int offset)
         {
             return
                 (uint)bytes[offset + 3] << 24 |
-                UInt24FromLEBytes(bytes, offset);
+                UInt24FromLeBytes(bytes, offset);
         }
 
-        public static void BEBytesFromUInt32(uint value, byte[] bytes, int offset)
+        public static void BeBytesFromUInt32(uint value, byte[] bytes, int offset)
         {
             bytes[offset + 0] = (byte)(value >> 24);
             bytes[offset + 1] = (byte)(value >> 16);
@@ -66,7 +66,7 @@ namespace ChainUtils.Crypto.Internal
             bytes[offset + 3] = (byte)(value);
         }
 
-        public static void BEBytesFromUInt64(ulong value, byte[] bytes, int offset)
+        public static void BeBytesFromUInt64(ulong value, byte[] bytes, int offset)
         {
             bytes[offset + 0] = (byte)(value >> 56);
             bytes[offset + 1] = (byte)(value >> 48);
@@ -78,17 +78,17 @@ namespace ChainUtils.Crypto.Internal
             bytes[offset + 7] = (byte)(value);
         }
 
-        public static void LEBytesFromUInt24(uint value, byte[] bytes, int offset)
+        public static void LeBytesFromUInt24(uint value, byte[] bytes, int offset)
         {
             bytes[offset + 2] = (byte)(value >> 16);
             bytes[offset + 1] = (byte)(value >> 8);
             bytes[offset + 0] = (byte)(value);
         }
 
-        public static void LEBytesFromUInt32(uint value, byte[] bytes, int offset)
+        public static void LeBytesFromUInt32(uint value, byte[] bytes, int offset)
         {
             bytes[offset + 3] = (byte)(value >> 24);
-            LEBytesFromUInt24(value, bytes, offset);
+            LeBytesFromUInt24(value, bytes, offset);
         }
     }
 }

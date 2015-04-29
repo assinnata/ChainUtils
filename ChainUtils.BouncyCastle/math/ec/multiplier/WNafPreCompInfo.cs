@@ -28,19 +28,19 @@ namespace ChainUtils.BouncyCastle.Math.EC.Multiplier
         public virtual ECPoint[] PreComp
         {
             get { return m_preComp; }
-            set { this.m_preComp = value; }
+            set { m_preComp = value; }
         }
 
         public virtual ECPoint[] PreCompNeg
         {
             get { return m_preCompNeg; }
-            set { this.m_preCompNeg = value; }
+            set { m_preCompNeg = value; }
         }
 
         public virtual ECPoint Twice
         {
             get { return m_twice; }
-            set { this.m_twice = value; }
+            set { m_twice = value; }
         }
     }
 }

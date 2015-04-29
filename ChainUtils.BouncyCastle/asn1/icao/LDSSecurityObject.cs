@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Math;
 
@@ -50,7 +47,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Icao
 			if (seq == null || seq.Count == 0)
 				throw new ArgumentException("null or empty sequence passed.");
 
-			IEnumerator e = seq.GetEnumerator();
+			var e = seq.GetEnumerator();
 
 			// version
 			e.MoveNext();
@@ -60,7 +57,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Icao
 			digestAlgorithmIdentifier = AlgorithmIdentifier.GetInstance(e.Current);
 
 			e.MoveNext();
-			Asn1Sequence datagroupHashSeq = Asn1Sequence.GetInstance(e.Current);
+			var datagroupHashSeq = Asn1Sequence.GetInstance(e.Current);
 
 			if (version.Value.Equals(BigInteger.One))
 			{
@@ -71,7 +68,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Icao
 			CheckDatagroupHashSeqSize(datagroupHashSeq.Count);
 
 			datagroupHash = new DataGroupHash[datagroupHashSeq.Count];
-			for (int i= 0; i< datagroupHashSeq.Count; i++)
+			for (var i= 0; i< datagroupHashSeq.Count; i++)
 			{
 				datagroupHash[i] = DataGroupHash.GetInstance(datagroupHashSeq[i]);
 			}
@@ -81,7 +78,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Icao
 			AlgorithmIdentifier	digestAlgorithmIdentifier,
 			DataGroupHash[]		datagroupHash)
 		{
-			this.version = new DerInteger(0);
+			version = new DerInteger(0);
 			this.digestAlgorithmIdentifier = digestAlgorithmIdentifier;
 			this.datagroupHash = datagroupHash;
 
@@ -94,7 +91,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Icao
 			DataGroupHash[]		datagroupHash,
 			LdsVersionInfo		versionInfo)
 		{
-			this.version = new DerInteger(1);
+			version = new DerInteger(1);
 			this.digestAlgorithmIdentifier = digestAlgorithmIdentifier;
 			this.datagroupHash = datagroupHash;
 			this.versionInfo = versionInfo;
@@ -130,9 +127,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Icao
 
 		public override Asn1Object ToAsn1Object()
 		{
-			DerSequence hashSeq = new DerSequence(datagroupHash);
+			var hashSeq = new DerSequence(datagroupHash);
 
-			Asn1EncodableVector v = new Asn1EncodableVector(version, digestAlgorithmIdentifier, hashSeq);
+			var v = new Asn1EncodableVector(version, digestAlgorithmIdentifier, hashSeq);
 
 			if (versionInfo != null)
 			{

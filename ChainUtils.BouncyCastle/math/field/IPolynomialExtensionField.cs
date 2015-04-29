@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ChainUtils.BouncyCastle.Math.Field
+﻿namespace ChainUtils.BouncyCastle.Math.Field
 {
     public interface IPolynomialExtensionField
         : IExtensionField

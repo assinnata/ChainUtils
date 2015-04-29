@@ -40,7 +40,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				isExplicit)
         {
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is DerBmpString)
 			{
@@ -59,9 +59,9 @@ namespace ChainUtils.BouncyCastle.Asn1
 			if (str == null)
 				throw new ArgumentNullException("str");
 
-            char[] cs = new char[str.Length / 2];
+            var cs = new char[str.Length / 2];
 
-			for (int i = 0; i != cs.Length; i++)
+			for (var i = 0; i != cs.Length; i++)
             {
                 cs[i] = (char)((str[2 * i] << 8) | (str[2 * i + 1] & 0xff));
             }
@@ -89,21 +89,21 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
         {
-			DerBmpString other = asn1Object as DerBmpString;
+			var other = asn1Object as DerBmpString;
 
 			if (other == null)
 				return false;
 
-			return this.str.Equals(other.str);
+			return str.Equals(other.str);
         }
 
 		internal override void Encode(
             DerOutputStream derOut)
         {
-            char[] c = str.ToCharArray();
-            byte[] b = new byte[c.Length * 2];
+            var c = str.ToCharArray();
+            var b = new byte[c.Length * 2];
 
-			for (int i = 0; i != c.Length; i++)
+			for (var i = 0; i != c.Length; i++)
             {
                 b[2 * i] = (byte)(c[i] >> 8);
                 b[2 * i + 1] = (byte)c[i];

@@ -1,8 +1,5 @@
 using System;
-using System.Globalization;
-using System.IO;
-using System.Text;
-
+using System.Collections;
 #if SILVERLIGHT
 using System.Collections.Generic;
 #else
@@ -84,44 +81,44 @@ namespace ChainUtils.BouncyCastle.Utilities
 #endif
 
 #if SILVERLIGHT
-        internal static System.Collections.IList CreateArrayList()
+        internal static IList CreateArrayList()
         {
             return new List<object>();
         }
-        internal static System.Collections.IList CreateArrayList(int capacity)
+        internal static IList CreateArrayList(int capacity)
         {
             return new List<object>(capacity);
         }
-        internal static System.Collections.IList CreateArrayList(System.Collections.ICollection collection)
+        internal static IList CreateArrayList(ICollection collection)
         {
-            System.Collections.IList result = new List<object>(collection.Count);
-            foreach (object o in collection)
+            IList result = new List<object>(collection.Count);
+            foreach (var o in collection)
             {
                 result.Add(o);
             }
             return result;
         }
-        internal static System.Collections.IList CreateArrayList(System.Collections.IEnumerable collection)
+        internal static IList CreateArrayList(IEnumerable collection)
         {
-            System.Collections.IList result = new List<object>();
-            foreach (object o in collection)
+            IList result = new List<object>();
+            foreach (var o in collection)
             {
                 result.Add(o);
             }
             return result;
         }
-        internal static System.Collections.IDictionary CreateHashtable()
+        internal static IDictionary CreateHashtable()
         {
             return new Dictionary<object, object>();
         }
-        internal static System.Collections.IDictionary CreateHashtable(int capacity)
+        internal static IDictionary CreateHashtable(int capacity)
         {
             return new Dictionary<object, object>(capacity);
         }
-        internal static System.Collections.IDictionary CreateHashtable(System.Collections.IDictionary dictionary)
+        internal static IDictionary CreateHashtable(IDictionary dictionary)
         {
-            System.Collections.IDictionary result = new Dictionary<object, object>(dictionary.Count);
-            foreach (System.Collections.DictionaryEntry entry in dictionary)
+            IDictionary result = new Dictionary<object, object>(dictionary.Count);
+            foreach (DictionaryEntry entry in dictionary)
             {
                 result.Add(entry.Key, entry.Value);
             }

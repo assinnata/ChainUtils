@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities.Collections;
 
 namespace ChainUtils.BouncyCastle.Asn1.Esf
@@ -42,7 +41,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 				CrlOcspRef.GetInstance(ae.ToAsn1Object());
 			}
 
-			this.crlOcspRefs = seq;
+			crlOcspRefs = seq;
 		}
 
 		public CompleteRevocationRefs(
@@ -68,8 +67,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public CrlOcspRef[] GetCrlOcspRefs()
 		{
-			CrlOcspRef[] result = new CrlOcspRef[crlOcspRefs.Count];
-			for (int i = 0; i < crlOcspRefs.Count; ++i)
+			var result = new CrlOcspRef[crlOcspRefs.Count];
+			for (var i = 0; i < crlOcspRefs.Count; ++i)
 			{
 				result[i] = CrlOcspRef.GetInstance(crlOcspRefs[i].ToAsn1Object());
 			}

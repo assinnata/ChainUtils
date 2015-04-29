@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Modes
@@ -24,11 +23,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             IBlockCipher cipher)
         {
             this.cipher = cipher;
-            this.blockSize = cipher.GetBlockSize();
+            blockSize = cipher.GetBlockSize();
 
-            this.IV = new byte[blockSize];
-            this.cbcV = new byte[blockSize];
-            this.cbcNextV = new byte[blockSize];
+            IV = new byte[blockSize];
+            cbcV = new byte[blockSize];
+            cbcNextV = new byte[blockSize];
         }
 
         /**
@@ -55,14 +54,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             bool forEncryption,
             ICipherParameters parameters)
         {
-            bool oldEncrypting = this.encrypting;
+            var oldEncrypting = encrypting;
 
-            this.encrypting = forEncryption;
+            encrypting = forEncryption;
 
             if (parameters is ParametersWithIV)
             {
-                ParametersWithIV ivParam = (ParametersWithIV)parameters;
-                byte[]      iv = ivParam.GetIV();
+                var ivParam = (ParametersWithIV)parameters;
+                var      iv = ivParam.GetIV();
 
                 if (iv.Length != blockSize)
                 {
@@ -175,12 +174,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
             * XOR the cbcV and the input,
             * then encrypt the cbcV
             */
-            for (int i = 0; i < blockSize; i++)
+            for (var i = 0; i < blockSize; i++)
             {
                 cbcV[i] ^= input[inOff + i];
             }
 
-            int length = cipher.ProcessBlock(cbcV, 0, outBytes, outOff);
+            var length = cipher.ProcessBlock(cbcV, 0, outBytes, outOff);
 
             /*
             * copy ciphertext to cbcV
@@ -215,12 +214,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Modes
 
             Array.Copy(input, inOff, cbcNextV, 0, blockSize);
 
-            int length = cipher.ProcessBlock(input, inOff, outBytes, outOff);
+            var length = cipher.ProcessBlock(input, inOff, outBytes, outOff);
 
             /*
             * XOR the cbcV and the output
             */
-            for (int i = 0; i < blockSize; i++)
+            for (var i = 0; i < blockSize; i++)
             {
                 outBytes[outOff + i] ^= cbcV[i];
             }

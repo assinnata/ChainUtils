@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities.Collections;
 
 namespace ChainUtils.BouncyCastle.Asn1.Esf
@@ -42,9 +41,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count != 1)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.crls = (Asn1Sequence) seq[0].ToAsn1Object();
+			crls = (Asn1Sequence) seq[0].ToAsn1Object();
 
-			foreach (Asn1Encodable ae in this.crls)
+			foreach (Asn1Encodable ae in crls)
 			{
 				CrlValidatedID.GetInstance(ae.ToAsn1Object());
 			}
@@ -73,8 +72,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public CrlValidatedID[] GetCrls()
 		{
-			CrlValidatedID[] result = new CrlValidatedID[crls.Count];
-			for (int i = 0; i < crls.Count; ++i)
+			var result = new CrlValidatedID[crls.Count];
+			for (var i = 0; i < crls.Count; ++i)
 			{
 				result[i] = CrlValidatedID.GetInstance(crls[i].ToAsn1Object());
 			}

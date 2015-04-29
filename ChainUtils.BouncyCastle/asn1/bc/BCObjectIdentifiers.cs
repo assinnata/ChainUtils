@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.BC
 {
 	public abstract class BCObjectIdentifiers

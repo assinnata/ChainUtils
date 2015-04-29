@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
@@ -25,7 +23,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 
 			if (obj is Asn1TaggedObject)
 			{
-				Asn1TaggedObject o = (Asn1TaggedObject)obj;
+				var o = (Asn1TaggedObject)obj;
 
 				if (o.TagNo == 1)
 				{

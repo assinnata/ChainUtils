@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Security;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters

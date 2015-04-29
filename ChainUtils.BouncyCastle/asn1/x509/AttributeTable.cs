@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
@@ -13,7 +10,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
         public AttributeTable(
             IDictionary attrs)
         {
-            this.attributes = Platform.CreateHashtable(attrs);
+            attributes = Platform.CreateHashtable(attrs);
         }
 
 #if !SILVERLIGHT
@@ -28,11 +25,11 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public AttributeTable(
             Asn1EncodableVector v)
         {
-            this.attributes = Platform.CreateHashtable(v.Count);
+            attributes = Platform.CreateHashtable(v.Count);
 
-			for (int i = 0; i != v.Count; i++)
+			for (var i = 0; i != v.Count; i++)
             {
-                AttributeX509 a = AttributeX509.GetInstance(v[i]);
+                var a = AttributeX509.GetInstance(v[i]);
 
 				attributes.Add(a.AttrType, a);
             }
@@ -41,11 +38,11 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public AttributeTable(
             Asn1Set s)
         {
-            this.attributes = Platform.CreateHashtable(s.Count);
+            attributes = Platform.CreateHashtable(s.Count);
 
-			for (int i = 0; i != s.Count; i++)
+			for (var i = 0; i != s.Count; i++)
             {
-                AttributeX509 a = AttributeX509.GetInstance(s[i]);
+                var a = AttributeX509.GetInstance(s[i]);
 
 				attributes.Add(a.AttrType, a);
             }

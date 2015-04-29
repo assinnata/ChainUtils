@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Math.EC.Custom.Sec;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
@@ -60,27 +59,27 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public override ECPoint Add(ECPoint b)
         {
-            if (this.IsInfinity)
+            if (IsInfinity)
                 return b;
             if (b.IsInfinity)
                 return this;
             if (this == b)
                 return Twice();
 
-            ECCurve curve = this.Curve;
+            var curve = Curve;
 
-            Curve25519FieldElement X1 = (Curve25519FieldElement)this.RawXCoord, Y1 = (Curve25519FieldElement)this.RawYCoord,
-                Z1 = (Curve25519FieldElement)this.RawZCoords[0];
+            Curve25519FieldElement X1 = (Curve25519FieldElement)RawXCoord, Y1 = (Curve25519FieldElement)RawYCoord,
+                Z1 = (Curve25519FieldElement)RawZCoords[0];
             Curve25519FieldElement X2 = (Curve25519FieldElement)b.RawXCoord, Y2 = (Curve25519FieldElement)b.RawYCoord,
                 Z2 = (Curve25519FieldElement)b.RawZCoords[0];
 
             uint c;
-            uint[] tt1 = Nat256.CreateExt();
-            uint[] t2 = Nat256.Create();
-            uint[] t3 = Nat256.Create();
-            uint[] t4 = Nat256.Create();
+            var tt1 = Nat256.CreateExt();
+            var t2 = Nat256.Create();
+            var t3 = Nat256.Create();
+            var t4 = Nat256.Create();
 
-            bool Z1IsOne = Z1.IsOne;
+            var Z1IsOne = Z1.IsOne;
             uint[] U2, S2;
             if (Z1IsOne)
             {
@@ -99,7 +98,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
                 Curve25519Field.Multiply(S2, Y2.x, S2);
             }
 
-            bool Z2IsOne = Z2.IsOne;
+            var Z2IsOne = Z2.IsOne;
             uint[] U1, S1;
             if (Z2IsOne)
             {
@@ -118,10 +117,10 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
                 Curve25519Field.Multiply(S1, Y1.x, S1);
             }
 
-            uint[] H = Nat256.Create();
+            var H = Nat256.Create();
             Curve25519Field.Subtract(U1, U2, H);
 
-            uint[] R = t2;
+            var R = t2;
             Curve25519Field.Subtract(S1, S2, R);
 
             // Check if b == this or b == -this
@@ -130,20 +129,20 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
                 if (Nat256.IsZero(R))
                 {
                     // this == b, i.e. this must be doubled
-                    return this.Twice();
+                    return Twice();
                 }
 
                 // this == -b, i.e. the result is the point at infinity
                 return curve.Infinity;
             }
 
-            uint[] HSquared = Nat256.Create();
+            var HSquared = Nat256.Create();
             Curve25519Field.Square(H, HSquared);
 
-            uint[] G = Nat256.Create();
+            var G = Nat256.Create();
             Curve25519Field.Multiply(HSquared, H, G);
 
-            uint[] V = t3;
+            var V = t3;
             Curve25519Field.Multiply(HSquared, U1, V);
 
             Curve25519Field.Negate(G, G);
@@ -152,16 +151,16 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
             c = Nat256.AddBothTo(V, V, G);
             Curve25519Field.Reduce27(c, G);
 
-            Curve25519FieldElement X3 = new Curve25519FieldElement(t4);
+            var X3 = new Curve25519FieldElement(t4);
             Curve25519Field.Square(R, X3.x);
             Curve25519Field.Subtract(X3.x, G, X3.x);
 
-            Curve25519FieldElement Y3 = new Curve25519FieldElement(G);
+            var Y3 = new Curve25519FieldElement(G);
             Curve25519Field.Subtract(V, X3.x, Y3.x);
             Curve25519Field.MultiplyAddToExt(Y3.x, R, tt1);
             Curve25519Field.Reduce(tt1, Y3.x);
 
-            Curve25519FieldElement Z3 = new Curve25519FieldElement(H);
+            var Z3 = new Curve25519FieldElement(H);
             if (!Z1IsOne)
             {
                 Curve25519Field.Multiply(Z3.x, Z1.x, Z3.x);
@@ -171,24 +170,24 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
                 Curve25519Field.Multiply(Z3.x, Z2.x, Z3.x);
             }
 
-            uint[] Z3Squared = (Z1IsOne && Z2IsOne) ? HSquared : null;
+            var Z3Squared = (Z1IsOne && Z2IsOne) ? HSquared : null;
 
             // TODO If the result will only be used in a subsequent addition, we don't need W3
-            Curve25519FieldElement W3 = CalculateJacobianModifiedW((Curve25519FieldElement)Z3, Z3Squared);
+            var W3 = CalculateJacobianModifiedW((Curve25519FieldElement)Z3, Z3Squared);
 
-            ECFieldElement[] zs = new ECFieldElement[] { Z3, W3 };
+            var zs = new ECFieldElement[] { Z3, W3 };
 
             return new Curve25519Point(curve, X3, Y3, zs, IsCompressed);
         }
 
         public override ECPoint Twice()
         {
-            if (this.IsInfinity)
+            if (IsInfinity)
                 return this;
 
-            ECCurve curve = this.Curve;
+            var curve = Curve;
 
-            ECFieldElement Y1 = this.RawYCoord;
+            var Y1 = RawYCoord;
             if (Y1.IsZero)
                 return curve.Infinity;
 
@@ -199,12 +198,12 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
         {
             if (this == b)
                 return ThreeTimes();
-            if (this.IsInfinity)
+            if (IsInfinity)
                 return b;
             if (b.IsInfinity)
                 return Twice();
 
-            ECFieldElement Y1 = this.RawYCoord;
+            var Y1 = RawYCoord;
             if (Y1.IsZero)
                 return b;
 
@@ -213,7 +212,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public override ECPoint ThreeTimes()
         {
-            if (this.IsInfinity || this.RawYCoord.IsZero)
+            if (IsInfinity || RawYCoord.IsZero)
                 return this;
 
             return TwiceJacobianModified(false).Add(this);
@@ -229,11 +228,11 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         protected virtual Curve25519FieldElement CalculateJacobianModifiedW(Curve25519FieldElement Z, uint[] ZSquared)
         {
-            Curve25519FieldElement a4 = (Curve25519FieldElement)this.Curve.A;
+            var a4 = (Curve25519FieldElement)Curve.A;
             if (Z.IsOne)
                 return a4;
 
-            Curve25519FieldElement W = new Curve25519FieldElement();
+            var W = new Curve25519FieldElement();
             if (ZSquared == null)
             {
                 ZSquared = W.x;
@@ -246,8 +245,8 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         protected virtual Curve25519FieldElement GetJacobianModifiedW()
         {
-            ECFieldElement[] ZZ = this.RawZCoords;
-            Curve25519FieldElement W = (Curve25519FieldElement)ZZ[1];
+            var ZZ = RawZCoords;
+            var W = (Curve25519FieldElement)ZZ[1];
             if (W == null)
             {
                 // NOTE: Rarely, TwicePlus will result in the need for a lazy W1 calculation here
@@ -258,42 +257,42 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         protected virtual Curve25519Point TwiceJacobianModified(bool calculateW)
         {
-            Curve25519FieldElement X1 = (Curve25519FieldElement)this.RawXCoord, Y1 = (Curve25519FieldElement)this.RawYCoord,
-                Z1 = (Curve25519FieldElement)this.RawZCoords[0], W1 = GetJacobianModifiedW();
+            Curve25519FieldElement X1 = (Curve25519FieldElement)RawXCoord, Y1 = (Curve25519FieldElement)RawYCoord,
+                Z1 = (Curve25519FieldElement)RawZCoords[0], W1 = GetJacobianModifiedW();
 
             uint c;
 
-            uint[] M = Nat256.Create();
+            var M = Nat256.Create();
             Curve25519Field.Square(X1.x, M);
             c = Nat256.AddBothTo(M, M, M);
             c += Nat256.AddTo(W1.x, M);
             Curve25519Field.Reduce27(c, M);
 
-            uint[] _2Y1 = Nat256.Create();
+            var _2Y1 = Nat256.Create();
             Curve25519Field.Twice(Y1.x, _2Y1);
 
-            uint[] _2Y1Squared = Nat256.Create();
+            var _2Y1Squared = Nat256.Create();
             Curve25519Field.Multiply(_2Y1, Y1.x, _2Y1Squared);
 
-            uint[] S = Nat256.Create();
+            var S = Nat256.Create();
             Curve25519Field.Multiply(_2Y1Squared, X1.x, S);
             Curve25519Field.Twice(S, S);
 
-            uint[] _8T = Nat256.Create();
+            var _8T = Nat256.Create();
             Curve25519Field.Square(_2Y1Squared, _8T);
             Curve25519Field.Twice(_8T, _8T);
 
-            Curve25519FieldElement X3 = new Curve25519FieldElement(_2Y1Squared);
+            var X3 = new Curve25519FieldElement(_2Y1Squared);
             Curve25519Field.Square(M, X3.x);
             Curve25519Field.Subtract(X3.x, S, X3.x);
             Curve25519Field.Subtract(X3.x, S, X3.x);
 
-            Curve25519FieldElement Y3 = new Curve25519FieldElement(S);
+            var Y3 = new Curve25519FieldElement(S);
             Curve25519Field.Subtract(S, X3.x, Y3.x);
             Curve25519Field.Multiply(Y3.x, M, Y3.x);
             Curve25519Field.Subtract(Y3.x, _8T, Y3.x);
 
-            Curve25519FieldElement Z3 = new Curve25519FieldElement(_2Y1);
+            var Z3 = new Curve25519FieldElement(_2Y1);
             if (!Nat256.IsOne(Z1.x))
             {
                 Curve25519Field.Multiply(Z3.x, Z1.x, Z3.x);
@@ -307,7 +306,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
                 Curve25519Field.Twice(W3.x, W3.x);
             }
 
-            return new Curve25519Point(this.Curve, X3, Y3, new ECFieldElement[] { Z3, W3 }, IsCompressed);
+            return new Curve25519Point(Curve, X3, Y3, new ECFieldElement[] { Z3, W3 }, IsCompressed);
         }
     }
 }

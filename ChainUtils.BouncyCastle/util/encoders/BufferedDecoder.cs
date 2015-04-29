@@ -45,7 +45,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             byte[]      output,
             int         outOff)
         {
-            int         resultLen = 0;
+            var         resultLen = 0;
 
             buffer[bufOff++] = input;
 
@@ -80,8 +80,8 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             throw new ArgumentException("Can't have a negative input length!");
             }
 
-            int resultLen = 0;
-            int gapLen = buffer.Length - bufOff;
+            var resultLen = 0;
+            var gapLen = buffer.Length - bufOff;
 
             if (len > gapLen)
             {
@@ -95,7 +95,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
                 inOff += gapLen;
                 outOff += resultLen;
 
-                int chunkSize = len - (len % buffer.Length);
+                var chunkSize = len - (len % buffer.Length);
 
                 resultLen += translator.Decode(input, inOff, chunkSize, outBytes, outOff);
 

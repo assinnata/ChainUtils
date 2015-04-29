@@ -1,8 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-using ChainUtils.BouncyCastle.Math;
-
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 {
     /**
@@ -17,7 +14,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 		public Pfx(
             Asn1Sequence seq)
         {
-            BigInteger version = ((DerInteger) seq[0]).Value;
+            var version = ((DerInteger) seq[0]).Value;
             if (version.IntValue != 3)
             {
                 throw new ArgumentException("wrong version for PFX PDU");
@@ -51,7 +48,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 
 		public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
 				new DerInteger(3), contentInfo);
 
 			if (macData != null)

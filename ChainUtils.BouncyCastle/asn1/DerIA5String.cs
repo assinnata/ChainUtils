@@ -1,6 +1,4 @@
 using System;
-using System.Text;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -42,7 +40,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				isExplicit)
         {
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is DerIA5String)
 			{
@@ -103,23 +101,23 @@ namespace ChainUtils.BouncyCastle.Asn1
 		internal override void Encode(
             DerOutputStream derOut)
         {
-            derOut.WriteEncoded(Asn1Tags.IA5String, GetOctets());
+            derOut.WriteEncoded(Asn1Tags.Ia5String, GetOctets());
         }
 
 		protected override int Asn1GetHashCode()
 		{
-            return this.str.GetHashCode();
+            return str.GetHashCode();
         }
 
 		protected override bool Asn1Equals(
             Asn1Object asn1Object)
         {
-			DerIA5String other = asn1Object as DerIA5String;
+			var other = asn1Object as DerIA5String;
 
 			if (other == null)
 				return false;
 
-			return this.str.Equals(other.str);
+			return str.Equals(other.str);
         }
 
 		/**
@@ -131,7 +129,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 		public static bool IsIA5String(
 			string str)
 		{
-			foreach (char ch in str)
+			foreach (var ch in str)
 			{
 				if (ch > 0x007f)
 				{

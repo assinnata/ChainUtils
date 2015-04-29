@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
 {
 	public class Gost3410ValidationParameters
@@ -33,13 +31,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 		public override bool Equals(
 			object obj)
 		{
-			Gost3410ValidationParameters other = obj as Gost3410ValidationParameters;
+			var other = obj as Gost3410ValidationParameters;
 
 			return other != null
-				&& other.c == this.c
-				&& other.x0 == this.x0
-				&& other.cL == this.cL
-				&& other.x0L == this.x0L;
+				&& other.c == c
+				&& other.x0 == x0
+				&& other.cL == cL
+				&& other.x0L == x0L;
 		}
 
 		public override int GetHashCode()

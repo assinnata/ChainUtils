@@ -1,20 +1,15 @@
 using System;
-using System.Collections;
 using System.IO;
-using System.Text;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.CryptoPro;
 using ChainUtils.BouncyCastle.Asn1.Oiw;
 using ChainUtils.BouncyCastle.Asn1.Pkcs;
-using ChainUtils.BouncyCastle.Asn1.Sec;
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Asn1.X9;
 using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Generators;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
-using ChainUtils.BouncyCastle.Math.EC;
 
 namespace ChainUtils.BouncyCastle.Security
 {
@@ -43,8 +38,8 @@ namespace ChainUtils.BouncyCastle.Security
         public static AsymmetricKeyParameter CreateKey(
             SubjectPublicKeyInfo keyInfo)
         {
-            AlgorithmIdentifier algID = keyInfo.AlgorithmID;
-            DerObjectIdentifier algOid = algID.ObjectID;
+            var algID = keyInfo.AlgorithmID;
+            var algOid = algID.ObjectID;
 
             // TODO See RSAUtil.isRsaOid in Java build
             if (algOid.Equals(PkcsObjectIdentifiers.RsaEncryption)
@@ -52,27 +47,27 @@ namespace ChainUtils.BouncyCastle.Security
                 || algOid.Equals(PkcsObjectIdentifiers.IdRsassaPss)
                 || algOid.Equals(PkcsObjectIdentifiers.IdRsaesOaep))
             {
-                RsaPublicKeyStructure pubKey = RsaPublicKeyStructure.GetInstance(
+                var pubKey = RsaPublicKeyStructure.GetInstance(
                     keyInfo.GetPublicKey());
 
                 return new RsaKeyParameters(false, pubKey.Modulus, pubKey.PublicExponent);
             }
             else if (algOid.Equals(X9ObjectIdentifiers.DHPublicNumber))
             {
-                Asn1Sequence seq = Asn1Sequence.GetInstance(algID.Parameters.ToAsn1Object());
+                var seq = Asn1Sequence.GetInstance(algID.Parameters.ToAsn1Object());
 
-                DHPublicKey dhPublicKey = DHPublicKey.GetInstance(keyInfo.GetPublicKey());
+                var dhPublicKey = DHPublicKey.GetInstance(keyInfo.GetPublicKey());
 
-                BigInteger y = dhPublicKey.Y.Value;
+                var y = dhPublicKey.Y.Value;
 
                 if (IsPkcsDHParam(seq))
                     return ReadPkcsDHParam(algOid, y, seq);
 
-                DHDomainParameters dhParams = DHDomainParameters.GetInstance(seq);
+                var dhParams = DHDomainParameters.GetInstance(seq);
 
-                BigInteger p = dhParams.P.Value;
-                BigInteger g = dhParams.G.Value;
-                BigInteger q = dhParams.Q.Value;
+                var p = dhParams.P.Value;
+                var g = dhParams.G.Value;
+                var q = dhParams.Q.Value;
 
                 BigInteger j = null;
                 if (dhParams.J != null)
@@ -81,11 +76,11 @@ namespace ChainUtils.BouncyCastle.Security
                 }
 
                 DHValidationParameters validation = null;
-                DHValidationParms dhValidationParms = dhParams.ValidationParms;
+                var dhValidationParms = dhParams.ValidationParms;
                 if (dhValidationParms != null)
                 {
-                    byte[] seed = dhValidationParms.Seed.GetBytes();
-                    BigInteger pgenCounter = dhValidationParms.PgenCounter.Value;
+                    var seed = dhValidationParms.Seed.GetBytes();
+                    var pgenCounter = dhValidationParms.PgenCounter.Value;
 
                     // TODO Check pgenCounter size?
 
@@ -96,17 +91,17 @@ namespace ChainUtils.BouncyCastle.Security
             }
             else if (algOid.Equals(PkcsObjectIdentifiers.DhKeyAgreement))
             {
-                Asn1Sequence seq = Asn1Sequence.GetInstance(algID.Parameters.ToAsn1Object());
+                var seq = Asn1Sequence.GetInstance(algID.Parameters.ToAsn1Object());
 
-                DerInteger derY = (DerInteger) keyInfo.GetPublicKey();
+                var derY = (DerInteger) keyInfo.GetPublicKey();
 
                 return ReadPkcsDHParam(algOid, derY.Value, seq);
             }
             else if (algOid.Equals(OiwObjectIdentifiers.ElGamalAlgorithm))
             {
-                ElGamalParameter para = new ElGamalParameter(
+                var para = new ElGamalParameter(
                     Asn1Sequence.GetInstance(algID.Parameters.ToAsn1Object()));
-                DerInteger derY = (DerInteger) keyInfo.GetPublicKey();
+                var derY = (DerInteger) keyInfo.GetPublicKey();
 
                 return new ElGamalPublicKeyParameters(
                     derY.Value,
@@ -115,13 +110,13 @@ namespace ChainUtils.BouncyCastle.Security
             else if (algOid.Equals(X9ObjectIdentifiers.IdDsa)
                 || algOid.Equals(OiwObjectIdentifiers.DsaWithSha1))
             {
-                DerInteger derY = (DerInteger) keyInfo.GetPublicKey();
-                Asn1Encodable ae = algID.Parameters;
+                var derY = (DerInteger) keyInfo.GetPublicKey();
+                var ae = algID.Parameters;
 
                 DsaParameters parameters = null;
                 if (ae != null)
                 {
-                    DsaParameter para = DsaParameter.GetInstance(ae.ToAsn1Object());
+                    var para = DsaParameter.GetInstance(ae.ToAsn1Object());
                     parameters = new DsaParameters(para.P, para.Q, para.G);
                 }
 
@@ -129,7 +124,7 @@ namespace ChainUtils.BouncyCastle.Security
             }
             else if (algOid.Equals(X9ObjectIdentifiers.IdECPublicKey))
             {
-                X962Parameters para = new X962Parameters(algID.Parameters.ToAsn1Object());
+                var para = new X962Parameters(algID.Parameters.ToAsn1Object());
 
                 X9ECParameters x9;
                 if (para.IsNamedCurve)
@@ -142,20 +137,20 @@ namespace ChainUtils.BouncyCastle.Security
                 }
 
                 Asn1OctetString key = new DerOctetString(keyInfo.PublicKeyData.GetBytes());
-                X9ECPoint derQ = new X9ECPoint(x9.Curve, key);
-                ECPoint q = derQ.Point;
+                var derQ = new X9ECPoint(x9.Curve, key);
+                var q = derQ.Point;
 
                 if (para.IsNamedCurve)
                 {
                     return new ECPublicKeyParameters("EC", q, (DerObjectIdentifier)para.Parameters);
                 }
 
-                ECDomainParameters dParams = new ECDomainParameters(x9.Curve, x9.G, x9.N, x9.H, x9.GetSeed());
+                var dParams = new ECDomainParameters(x9.Curve, x9.G, x9.N, x9.H, x9.GetSeed());
                 return new ECPublicKeyParameters(q, dParams);
             }
             else if (algOid.Equals(CryptoProObjectIdentifiers.GostR3410x2001))
             {
-                Gost3410PublicKeyAlgParameters gostParams = new Gost3410PublicKeyAlgParameters(
+                var gostParams = new Gost3410PublicKeyAlgParameters(
                     (Asn1Sequence) algID.Parameters);
 
                 Asn1OctetString key;
@@ -168,32 +163,32 @@ namespace ChainUtils.BouncyCastle.Security
                     throw new ArgumentException("invalid info structure in GOST3410 public key");
                 }
 
-                byte[] keyEnc = key.GetOctets();
-                byte[] x = new byte[32];
-                byte[] y = new byte[32];
+                var keyEnc = key.GetOctets();
+                var x = new byte[32];
+                var y = new byte[32];
 
-                for (int i = 0; i != y.Length; i++)
+                for (var i = 0; i != y.Length; i++)
                 {
                     x[i] = keyEnc[32 - 1 - i];
                 }
 
-                for (int i = 0; i != x.Length; i++)
+                for (var i = 0; i != x.Length; i++)
                 {
                     y[i] = keyEnc[64 - 1 - i];
                 }
 
-                ECDomainParameters ecP = ECGost3410NamedCurves.GetByOid(gostParams.PublicKeyParamSet);
+                var ecP = ECGost3410NamedCurves.GetByOid(gostParams.PublicKeyParamSet);
 
                 if (ecP == null)
                     return null;
 
-                ECPoint q = ecP.Curve.CreatePoint(new BigInteger(1, x), new BigInteger(1, y));
+                var q = ecP.Curve.CreatePoint(new BigInteger(1, x), new BigInteger(1, y));
 
                 return new ECPublicKeyParameters("ECGOST3410", q, gostParams.PublicKeyParamSet);
             }
             else if (algOid.Equals(CryptoProObjectIdentifiers.GostR3410x94))
             {
-                Gost3410PublicKeyAlgParameters algParams = new Gost3410PublicKeyAlgParameters(
+                var algParams = new Gost3410PublicKeyAlgParameters(
                     (Asn1Sequence) algID.Parameters);
 
                 DerOctetString derY;
@@ -206,15 +201,15 @@ namespace ChainUtils.BouncyCastle.Security
                     throw new ArgumentException("invalid info structure in GOST3410 public key");
                 }
 
-                byte[] keyEnc = derY.GetOctets();
-                byte[] keyBytes = new byte[keyEnc.Length];
+                var keyEnc = derY.GetOctets();
+                var keyBytes = new byte[keyEnc.Length];
 
-                for (int i = 0; i != keyEnc.Length; i++)
+                for (var i = 0; i != keyEnc.Length; i++)
                 {
                     keyBytes[i] = keyEnc[keyEnc.Length - 1 - i]; // was little endian
                 }
 
-                BigInteger y = new BigInteger(1, keyBytes);
+                var y = new BigInteger(1, keyBytes);
 
                 return new Gost3410PublicKeyParameters(y, algParams.PublicKeyParamSet);
             }
@@ -232,8 +227,8 @@ namespace ChainUtils.BouncyCastle.Security
             if (seq.Count > 3)
                 return false;
 
-            DerInteger l = DerInteger.GetInstance(seq[2]);
-            DerInteger p = DerInteger.GetInstance(seq[0]);
+            var l = DerInteger.GetInstance(seq[2]);
+            var p = DerInteger.GetInstance(seq[0]);
 
             return l.Value.CompareTo(BigInteger.ValueOf(p.Value.BitLength)) <= 0;
         }
@@ -241,11 +236,11 @@ namespace ChainUtils.BouncyCastle.Security
         private static DHPublicKeyParameters ReadPkcsDHParam(DerObjectIdentifier algOid,
             BigInteger y, Asn1Sequence seq)
         {
-            DHParameter para = new DHParameter(seq);
+            var para = new DHParameter(seq);
 
-            BigInteger lVal = para.L;
-            int l = lVal == null ? 0 : lVal.IntValue;
-            DHParameters dhParams = new DHParameters(para.P, para.G, null, l);
+            var lVal = para.L;
+            var l = lVal == null ? 0 : lVal.IntValue;
+            var dhParams = new DHParameters(para.P, para.G, null, l);
 
             return new DHPublicKeyParameters(y, dhParams, algOid);
         }

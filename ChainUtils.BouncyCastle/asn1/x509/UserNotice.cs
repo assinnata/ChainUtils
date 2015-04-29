@@ -104,7 +104,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector av = new Asn1EncodableVector();
+            var av = new Asn1EncodableVector();
 
             if (noticeRef != null)
             {

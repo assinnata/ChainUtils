@@ -1,18 +1,12 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1;
-using ChainUtils.BouncyCastle.Asn1.Nist;
 using ChainUtils.BouncyCastle.Asn1.Sec;
-using ChainUtils.BouncyCastle.Asn1.TeleTrust;
 using ChainUtils.BouncyCastle.Asn1.X9;
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.EC;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
-using ChainUtils.BouncyCastle.Math.EC;
 using ChainUtils.BouncyCastle.Math.EC.Multiplier;
 using ChainUtils.BouncyCastle.Security;
-using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Generators
 {
@@ -44,9 +38,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             if (parameters is ECKeyGenerationParameters)
             {
-                ECKeyGenerationParameters ecP = (ECKeyGenerationParameters) parameters;
+                var ecP = (ECKeyGenerationParameters) parameters;
 
-                this.publicKeyParamSet = ecP.PublicKeyParamSet;
+                publicKeyParamSet = ecP.PublicKeyParamSet;
                 this.parameters = ecP.DomainParameters;
             }
             else
@@ -76,17 +70,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                         throw new InvalidParameterException("unknown key size.");
                 }
 
-                X9ECParameters ecps = FindECCurveByOid(oid);
+                var ecps = FindECCurveByOid(oid);
 
                 this.parameters = new ECDomainParameters(
                     ecps.Curve, ecps.G, ecps.N, ecps.H, ecps.GetSeed());
             }
 
-            this.random = parameters.Random;
+            random = parameters.Random;
 
-            if (this.random == null)
+            if (random == null)
             {
-                this.random = new SecureRandom();
+                random = new SecureRandom();
             }
         }
 
@@ -96,9 +90,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
          */
         public AsymmetricCipherKeyPair GenerateKeyPair()
         {
-            BigInteger n = parameters.N;
+            var n = parameters.N;
             BigInteger d;
-            int minWeight = n.BitLength >> 2;
+            var minWeight = n.BitLength >> 2;
 
             for (;;)
             {
@@ -119,7 +113,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
                 break;
             }
 
-            ECPoint q = CreateBasePointMultiplier().Multiply(parameters.G, d);
+            var q = CreateBasePointMultiplier().Multiply(parameters.G, d);
 
             if (publicKeyParamSet != null)
             {
@@ -142,7 +136,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         {
             // TODO ECGost3410NamedCurves support (returns ECDomainParameters though)
 
-            X9ECParameters ecP = CustomNamedCurves.GetByOid(oid);
+            var ecP = CustomNamedCurves.GetByOid(oid);
             if (ecP == null)
             {
                 ecP = ECNamedCurveTable.GetByOid(oid);
@@ -153,8 +147,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
         internal static ECPublicKeyParameters GetCorrespondingPublicKey(
             ECPrivateKeyParameters privKey)
         {
-            ECDomainParameters ec = privKey.Parameters;
-            ECPoint q = new FixedPointCombMultiplier().Multiply(ec.G, privKey.D);
+            var ec = privKey.Parameters;
+            var q = new FixedPointCombMultiplier().Multiply(ec.G, privKey.D);
 
             if (privKey.PublicKeyParamSet != null)
             {

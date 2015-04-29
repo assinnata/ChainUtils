@@ -90,19 +90,19 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public void SetIssuerUniqueID(
 			DerBitString uniqueID)
 		{
-			this.issuerUniqueID = uniqueID;
+			issuerUniqueID = uniqueID;
 		}
 
 		public void SetSubjectUniqueID(
 			DerBitString uniqueID)
 		{
-			this.subjectUniqueID = uniqueID;
+			subjectUniqueID = uniqueID;
 		}
 
 		public void SetSubjectPublicKeyInfo(
             SubjectPublicKeyInfo pubKeyInfo)
         {
-            this.subjectPublicKeyInfo = pubKeyInfo;
+            subjectPublicKeyInfo = pubKeyInfo;
         }
 
 		public void SetExtensions(
@@ -112,7 +112,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 			if (extensions != null)
 			{
-				X509Extension altName = extensions.GetExtension(X509Extensions.SubjectAlternativeName);
+				var altName = extensions.GetExtension(X509Extensions.SubjectAlternativeName);
 
 				if (altName != null && altName.IsCritical)
 				{
@@ -131,9 +131,9 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
                 throw new InvalidOperationException("not all mandatory fields set in V3 TBScertificate generator");
             }
 
-			DerSequence validity = new DerSequence(startDate, endDate); // before and after dates
+			var validity = new DerSequence(startDate, endDate); // before and after dates
 
-			Asn1EncodableVector v = new Asn1EncodableVector(
+			var v = new Asn1EncodableVector(
 				version, serialNumber, signature, issuer, validity);
 
 			if (subject != null)

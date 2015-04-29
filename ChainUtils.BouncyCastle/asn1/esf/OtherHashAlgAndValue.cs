@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Esf
@@ -46,8 +45,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count != 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0].ToAsn1Object());
-			this.hashValue = (Asn1OctetString) seq[1].ToAsn1Object();
+			hashAlgorithm = AlgorithmIdentifier.GetInstance(seq[0].ToAsn1Object());
+			hashValue = (Asn1OctetString) seq[1].ToAsn1Object();
 		}
 
 		public OtherHashAlgAndValue(

@@ -1,5 +1,3 @@
-using System;
-
 using ChainUtils.BouncyCastle.Asn1;
 
 namespace ChainUtils.BouncyCastle.Crypto.Agreement.Kdf

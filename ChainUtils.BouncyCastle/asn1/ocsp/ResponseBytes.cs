@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 {
     public class ResponseBytes
@@ -52,8 +50,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Ocsp
 			if (seq.Count != 2)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-			this.responseType = DerObjectIdentifier.GetInstance(seq[0]);
-            this.response = Asn1OctetString.GetInstance(seq[1]);
+			responseType = DerObjectIdentifier.GetInstance(seq[0]);
+            response = Asn1OctetString.GetInstance(seq[1]);
         }
 
 		public DerObjectIdentifier ResponseType

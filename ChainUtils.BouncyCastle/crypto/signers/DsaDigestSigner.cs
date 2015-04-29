@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
 using System.IO;
-using System.Text;
-
 using ChainUtils.BouncyCastle.Asn1;
-using ChainUtils.BouncyCastle.Crypto.Signers;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
@@ -23,7 +19,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 			IDigest	digest)
 		{
 			this.digest = digest;
-			this.dsaSigner = signer;
+			dsaSigner = signer;
 		}
 
 		public string AlgorithmName
@@ -88,10 +84,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 			if (!forSigning)
 				throw new InvalidOperationException("DSADigestSigner not initialised for signature generation.");
 
-			byte[] hash = new byte[digest.GetDigestSize()];
+			var hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
 
-			BigInteger[] sig = dsaSigner.GenerateSignature(hash);
+			var sig = dsaSigner.GenerateSignature(hash);
 
 			return DerEncode(sig[0], sig[1]);
 		}
@@ -103,12 +99,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 			if (forSigning)
 				throw new InvalidOperationException("DSADigestSigner not initialised for verification");
 
-			byte[] hash = new byte[digest.GetDigestSize()];
+			var hash = new byte[digest.GetDigestSize()];
 			digest.DoFinal(hash, 0);
 
 			try
 			{
-				BigInteger[] sig = DerDecode(signature);
+				var sig = DerDecode(signature);
 				return dsaSigner.VerifySignature(hash, sig[0], sig[1]);
 			}
 			catch (IOException)
@@ -133,7 +129,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 		private BigInteger[] DerDecode(
 			byte[] encoding)
 		{
-			Asn1Sequence s = (Asn1Sequence) Asn1Object.FromByteArray(encoding);
+			var s = (Asn1Sequence) Asn1Object.FromByteArray(encoding);
 
 			return new BigInteger[]
 			{

@@ -68,18 +68,18 @@ namespace ChainUtils.Tests
 			Network network;
 			foreach(var test in tests)
 			{
-				string strTest = test.ToString();
+				var strTest = test.ToString();
 				if(test.Count < 3) // Allow for extra stuff (useful for comments)
 				{
 					Assert.True(false, "Bad test " + strTest);
 					continue;
 				}
 
-				string exp_base58string = (string)test[0];
-				byte[] exp_payload = TestUtils.ParseHex((string)test[1]);
+				var exp_base58string = (string)test[0];
+				var exp_payload = TestUtils.ParseHex((string)test[1]);
 				//const Object &metadata = test[2].get_obj();
-				bool isPrivkey = (bool)test.GetDynamic(2).isPrivkey;
-				bool isTestnet = (bool)test.GetDynamic(2).isTestnet;
+				var isPrivkey = (bool)test.GetDynamic(2).isPrivkey;
+				var isTestnet = (bool)test.GetDynamic(2).isTestnet;
 				if(isTestnet)
 					network = Network.TestNet;
 				else
@@ -87,14 +87,14 @@ namespace ChainUtils.Tests
 
 				if(isPrivkey)
 				{
-					bool isCompressed = (bool)test.GetDynamic(2).isCompressed;
+					var isCompressed = (bool)test.GetDynamic(2).isCompressed;
 
 					// Must be valid private key
 					// Note: CBitcoinSecret::SetString tests isValid, whereas CBitcoinAddress does not!
 					var secret = network.CreateBitcoinSecret(exp_base58string);
 					//If not valid exception would throw
 
-					Key privkey = secret.PrivateKey;
+					var privkey = secret.PrivateKey;
 					Assert.True(privkey.IsCompressed == isCompressed, "compressed mismatch:" + strTest);
 					Assert.True(Utils.ArrayEqual(privkey.ToBytes(), exp_payload), "key mismatch:" + strTest);
 
@@ -103,7 +103,7 @@ namespace ChainUtils.Tests
 				}
 				else
 				{
-					string exp_addrType = (string)test.GetDynamic(2).addrType; // "script" or "pubkey"
+					var exp_addrType = (string)test.GetDynamic(2).addrType; // "script" or "pubkey"
 					// Must be valid public key
 					var addr = network.CreateBitcoinAddress(exp_base58string);
 					Assert.True((addr is BitcoinScriptAddress) == (exp_addrType == "script"), "isScript mismatch" + strTest);
@@ -129,17 +129,17 @@ namespace ChainUtils.Tests
 
 			foreach(var test in tests)
 			{
-				string strTest = test.ToString();
+				var strTest = test.ToString();
 				if(test.Count < 3) // Allow for extra stuff (useful for comments)
 				{
 					Assert.False(true, "Bad test: " + strTest);
 					continue;
 				}
-				string exp_base58string = (string)test[0];
-				byte[] exp_payload = TestUtils.ParseHex((string)test[1]);
+				var exp_base58string = (string)test[0];
+				var exp_payload = TestUtils.ParseHex((string)test[1]);
 				dynamic metadata = test.GetDynamic(2);
-				bool isPrivkey = (bool)metadata.isPrivkey;
-				bool isTestnet = (bool)metadata.isTestnet;
+				var isPrivkey = (bool)metadata.isPrivkey;
+				var isTestnet = (bool)metadata.isTestnet;
 
 				if(isTestnet)
 					network = Network.TestNet;
@@ -148,13 +148,13 @@ namespace ChainUtils.Tests
 				if(isPrivkey)
 				{
 					bool isCompressed = metadata.isCompressed;
-					Key key = new Key(exp_payload, fCompressedIn: isCompressed);
-					BitcoinSecret secret = network.CreateBitcoinSecret(key);
+					var key = new Key(exp_payload, fCompressedIn: isCompressed);
+					var secret = network.CreateBitcoinSecret(key);
 					Assert.True(secret.ToString() == exp_base58string, "result mismatch: " + strTest);
 				}
 				else
 				{
-					string exp_addrType = (string)metadata.addrType;
+					var exp_addrType = (string)metadata.addrType;
 					TxDestination dest;
 					if(exp_addrType == "pubkey")
 					{
@@ -175,7 +175,7 @@ namespace ChainUtils.Tests
 					}
 					try
 					{
-						BitcoinAddress addrOut = network.CreateBitcoinAddress(dest);
+						var addrOut = network.CreateBitcoinAddress(dest);
 						Assert.True(addrOut.ToString() == exp_base58string, "mismatch: " + strTest);
 					}
 					catch(ArgumentException)
@@ -186,7 +186,7 @@ namespace ChainUtils.Tests
 			}
 
 			// Visiting a CNoDestination must fail
-			TxDestination nodest = new TxDestination();
+			var nodest = new TxDestination();
 			Assert.Throws<ArgumentException>(() => network.CreateBitcoinAddress(nodest));
 		}
 
@@ -200,13 +200,13 @@ namespace ChainUtils.Tests
 
 			foreach(var test in tests)
 			{
-				string strTest = tests.ToString();
+				var strTest = tests.ToString();
 				if(test.Count < 1) // Allow for extra stuff (useful for comments)
 				{
 					Assert.False(true, "Bad test: " + strTest);
 					continue;
 				}
-				string exp_base58string = (string)test[0];
+				var exp_base58string = (string)test[0];
 
 				// must be invalid as public and as private key
 				Assert.Throws<FormatException>(() => Network.Main.CreateBitcoinAddress(exp_base58string));

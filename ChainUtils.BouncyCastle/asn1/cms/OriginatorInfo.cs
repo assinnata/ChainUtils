@@ -1,7 +1,5 @@
 using System;
 
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
     public class OriginatorInfo
@@ -26,7 +24,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             case 0:     // empty
                 break;
             case 1:
-                Asn1TaggedObject o = (Asn1TaggedObject) seq[0];
+                var o = (Asn1TaggedObject) seq[0];
                 switch (o.TagNo)
                 {
                 case 0 :
@@ -103,7 +101,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
 			if (certs != null)
             {

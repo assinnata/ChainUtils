@@ -116,7 +116,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
 		public SimpleBigDecimal Divide(SimpleBigDecimal b)
 		{
 			CheckScale(b);
-			BigInteger dividend = bigInt.ShiftLeft(scale);
+			var dividend = bigInt.ShiftLeft(scale);
 			return new SimpleBigDecimal(dividend.Divide(b.bigInt), scale);
 		}
 
@@ -148,7 +148,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
 
 		public BigInteger Round()
 		{
-			SimpleBigDecimal oneHalf = new SimpleBigDecimal(BigInteger.One, 1);
+			var oneHalf = new SimpleBigDecimal(BigInteger.One, 1);
 			return Add(oneHalf.AdjustScale(scale)).Floor();
 		}
 
@@ -182,9 +182,9 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
 			if (scale == 0)
 				return bigInt.ToString();
 
-			BigInteger floorBigInt = Floor();
+			var floorBigInt = Floor();
 	        
-			BigInteger fract = bigInt.Subtract(floorBigInt.ShiftLeft(scale));
+			var fract = bigInt.Subtract(floorBigInt.ShiftLeft(scale));
 			if (bigInt.SignValue < 0)
 			{
 				fract = BigInteger.One.ShiftLeft(scale).Subtract(fract);
@@ -194,23 +194,23 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
 			{
 				floorBigInt = floorBigInt.Add(BigInteger.One);
 			}
-			string leftOfPoint = floorBigInt.ToString();
+			var leftOfPoint = floorBigInt.ToString();
 
-			char[] fractCharArr = new char[scale];
-				string fractStr = fract.ToString(2);
-			int fractLen = fractStr.Length;
-			int zeroes = scale - fractLen;
-			for (int i = 0; i < zeroes; i++)
+			var fractCharArr = new char[scale];
+				var fractStr = fract.ToString(2);
+			var fractLen = fractStr.Length;
+			var zeroes = scale - fractLen;
+			for (var i = 0; i < zeroes; i++)
 			{
 				fractCharArr[i] = '0';
 			}
-			for (int j = 0; j < fractLen; j++)
+			for (var j = 0; j < fractLen; j++)
 			{
 				fractCharArr[zeroes + j] = fractStr[j];
 			}
-			string rightOfPoint = new string(fractCharArr);
+			var rightOfPoint = new string(fractCharArr);
 
-			StringBuilder sb = new StringBuilder(leftOfPoint);
+			var sb = new StringBuilder(leftOfPoint);
 			sb.Append(".");
 			sb.Append(rightOfPoint);
 
@@ -223,7 +223,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Abc
 			if (this == obj)
 				return true;
 
-			SimpleBigDecimal other = obj as SimpleBigDecimal;
+			var other = obj as SimpleBigDecimal;
 
 			if (other == null)
 				return false;

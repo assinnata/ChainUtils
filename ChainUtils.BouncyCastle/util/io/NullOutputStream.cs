@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Utilities.IO
 {
 	internal class NullOutputStream

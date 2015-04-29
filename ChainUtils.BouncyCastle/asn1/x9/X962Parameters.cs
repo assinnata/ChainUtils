@@ -1,5 +1,3 @@
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.X9
 {
     public class X962Parameters
@@ -10,19 +8,19 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
 		public X962Parameters(
             X9ECParameters ecParameters)
         {
-            this._params = ecParameters.ToAsn1Object();
+            _params = ecParameters.ToAsn1Object();
         }
 
 		public X962Parameters(
             DerObjectIdentifier namedCurve)
         {
-            this._params = namedCurve;
+            _params = namedCurve;
         }
 
 		public X962Parameters(
             Asn1Object obj)
         {
-            this._params = obj;
+            _params = obj;
         }
 
 		public bool IsNamedCurve

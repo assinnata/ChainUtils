@@ -30,8 +30,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Cmp
 
 		public virtual InfoTypeAndValue[] ToInfoTypeAndValueArray()
 		{
-			InfoTypeAndValue[] result = new InfoTypeAndValue[content.Count];
-			for (int i = 0; i != result.Length; ++i)
+			var result = new InfoTypeAndValue[content.Count];
+			for (var i = 0; i != result.Length; ++i)
 			{
 				result[i] = InfoTypeAndValue.GetInstance(content[i]);
 			}

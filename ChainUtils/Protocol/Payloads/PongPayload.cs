@@ -1,30 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChainUtils.Protocol
+﻿namespace ChainUtils.Protocol
 {
 	[Payload("pong")]
 	public class PongPayload : Payload
 	{
-		private ulong _Nonce;
+		private ulong _nonce;
 		public ulong Nonce
 		{
 			get
 			{
-				return _Nonce;
+				return _nonce;
 			}
 			set
 			{
-				_Nonce = value;
+				_nonce = value;
 			}
 		}
 
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref _Nonce);
+			stream.ReadWrite(ref _nonce);
 		}
 	}
 }

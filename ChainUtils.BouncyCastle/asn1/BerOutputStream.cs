@@ -19,17 +19,25 @@ namespace ChainUtils.BouncyCastle.Asn1
             {
                 WriteNull();
             }
-            else if (obj is Asn1Object)
-            {
-                ((Asn1Object)obj).Encode(this);
-            }
-            else if (obj is Asn1Encodable)
-            {
-                ((Asn1Encodable)obj).ToAsn1Object().Encode(this);
-            }
             else
             {
-                throw new IOException("object not BerEncodable");
+                var o = obj as Asn1Object;
+                if (o != null)
+                {
+                    o.Encode(this);
+                }
+                else
+                {
+                    var encodable = obj as Asn1Encodable;
+                    if (encodable != null)
+                    {
+                        encodable.ToAsn1Object().Encode(this);
+                    }
+                    else
+                    {
+                        throw new IOException("object not BerEncodable");
+                    }
+                }
             }
         }
     }

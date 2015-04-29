@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 
 namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
 {
@@ -40,8 +37,8 @@ namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
 			if (seq.Count != 2)
 				throw new ArgumentException("Wrong number of elements in sequence", "seq");
 
-			this.iv = Asn1OctetString.GetInstance(seq[0]);
-			this.paramSet = DerObjectIdentifier.GetInstance(seq[1]);
+			iv = Asn1OctetString.GetInstance(seq[0]);
+			paramSet = DerObjectIdentifier.GetInstance(seq[1]);
         }
 
 		/**

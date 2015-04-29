@@ -46,8 +46,8 @@ namespace Mono.Nat.Upnp
 
 		public override WebRequest Encode(out byte[] body)
 		{
-			StringBuilder sb = new StringBuilder(64);
-			XmlWriter writer = CreateWriter(sb);
+			var sb = new StringBuilder(64);
+			var writer = CreateWriter(sb);
 
 			WriteFullElement(writer, "NewRemoteHost", string.Empty);
 			WriteFullElement(writer, "NewExternalPort", externalPort.ToString());

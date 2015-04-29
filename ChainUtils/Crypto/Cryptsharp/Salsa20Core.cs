@@ -17,8 +17,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 #endregion
 
-using ChainUtils.Crypto.Internal;
 using System;
+using ChainUtils.Crypto.Internal;
 
 namespace ChainUtils.Crypto
 {
@@ -51,24 +51,24 @@ namespace ChainUtils.Crypto
             {     
                 // .NET's bounds checking hurts performance in tight loops like this one.
                 // So, I unroll the array to eliminate it - a 50% speed increase.
-                uint x0 = input[inputOffset + 0];
-                uint x1 = input[inputOffset + 1];
-                uint x2 = input[inputOffset + 2];
-                uint x3 = input[inputOffset + 3];
-                uint x4 = input[inputOffset + 4];
-                uint x5 = input[inputOffset + 5];
-                uint x6 = input[inputOffset + 6];
-                uint x7 = input[inputOffset + 7];
-                uint x8 = input[inputOffset + 8];
-                uint x9 = input[inputOffset + 9];
-                uint x10 = input[inputOffset + 10];
-                uint x11 = input[inputOffset + 11];
-                uint x12 = input[inputOffset + 12];
-                uint x13 = input[inputOffset + 13];
-                uint x14 = input[inputOffset + 14];
-                uint x15 = input[inputOffset + 15];
+                var x0 = input[inputOffset + 0];
+                var x1 = input[inputOffset + 1];
+                var x2 = input[inputOffset + 2];
+                var x3 = input[inputOffset + 3];
+                var x4 = input[inputOffset + 4];
+                var x5 = input[inputOffset + 5];
+                var x6 = input[inputOffset + 6];
+                var x7 = input[inputOffset + 7];
+                var x8 = input[inputOffset + 8];
+                var x9 = input[inputOffset + 9];
+                var x10 = input[inputOffset + 10];
+                var x11 = input[inputOffset + 11];
+                var x12 = input[inputOffset + 12];
+                var x13 = input[inputOffset + 13];
+                var x14 = input[inputOffset + 14];
+                var x15 = input[inputOffset + 15];
 
-                for (int i = rounds; i > 0; i -= 2)
+                for (var i = rounds; i > 0; i -= 2)
                 {
                     x4 ^= R(x0 + x12, 7); x8 ^= R(x4 + x0, 9);
                     x12 ^= R(x8 + x4, 13); x0 ^= R(x12 + x8, 18);

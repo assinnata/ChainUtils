@@ -35,7 +35,7 @@ namespace ChainUtils.Crypto.Internal
 
         public static byte ReverseBits(byte value)
         {
-            byte reversed = (byte)((((ulong)value * 0x80200802) & 0x884422110) * 0x101010101 >> 32);
+            var reversed = (byte)((((ulong)value * 0x80200802) & 0x884422110) * 0x101010101 >> 32);
             return reversed;
         }
 

@@ -3,30 +3,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
 	public class IndexedBlockStore : IndexedStore<StoredBlock, Block>, IBlockProvider
 	{
-		private readonly BlockStore _Store;
+		private readonly BlockStore _store;
 
 		public new BlockStore Store
 		{
 			get
 			{
-				return _Store;
+				return _store;
 			}
 		}
 		public IndexedBlockStore(NoSqlRepository index, BlockStore store)
 			: base(index, store)
 		{
-			_Store = store;
+			_store = store;
 			IndexedLimit = "Last Index Position";
 		}
 
-		public BlockHeader GetHeader(uint256 hash)
+		public BlockHeader GetHeader(Uint256 hash)
 		{
 			try
 			{
@@ -39,18 +38,18 @@ namespace ChainUtils.BitcoinCore
 			}
 		}
 
-		public async Task<BlockHeader> GetHeaderAsync(uint256 hash)
+		public async Task<BlockHeader> GetHeaderAsync(Uint256 hash)
 		{
 			var pos = await Index.GetAsync<DiskBlockPos>(hash.ToString()).ConfigureAwait(false);
 			if(pos == null)
 				return null;
-			var stored = _Store.Enumerate(false, new DiskBlockPosRange(pos)).FirstOrDefault();
+			var stored = _store.Enumerate(false, new DiskBlockPosRange(pos)).FirstOrDefault();
 			if(stored == null)
 				return null;
 			return stored.Item.Header;
 		}
 
-		public Block Get(uint256 id)
+		public Block Get(Uint256 id)
 		{
 			try
 			{
@@ -62,14 +61,14 @@ namespace ChainUtils.BitcoinCore
 				return null; //Can't happen
 			}
 		}
-		public Task<Block> GetAsync(uint256 id)
+		public Task<Block> GetAsync(Uint256 id)
 		{
 			return GetAsync(id.ToString());
 		}
 
 #region IBlockProvider Members
 
-		public Block GetBlock(uint256 id, List<byte[]> searchedData)
+		public Block GetBlock(Uint256 id, List<byte[]> searchedData)
 		{
 			var block = Get(id.ToString());
 			if(block == null)

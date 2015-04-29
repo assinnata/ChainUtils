@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Utilities.Collections;
 
@@ -43,7 +42,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 				X509CertificateStructure.GetInstance(ae.ToAsn1Object());
 			}
 
-			this.certificates = seq;
+			certificates = seq;
 		}
 
 		public CertificateValues(
@@ -69,8 +68,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 
 		public X509CertificateStructure[] GetCertificates()
 		{
-			X509CertificateStructure[] result = new X509CertificateStructure[certificates.Count];
-			for (int i = 0; i < certificates.Count; ++i)
+			var result = new X509CertificateStructure[certificates.Count];
+			for (var i = 0; i < certificates.Count; ++i)
 			{
 				result[i] = X509CertificateStructure.GetInstance(certificates[i]);
 			}

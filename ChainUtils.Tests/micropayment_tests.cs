@@ -29,7 +29,7 @@ namespace ChainUtils.Tests
 					new TxOut(Money.Coins(1.0m), bobKey),
 				}
 			};
-			NoSqlTransactionRepository repo = new NoSqlTransactionRepository();
+			var repo = new NoSqlTransactionRepository();
 			repo.Put(init);
 
 			var args = new MicroChannelArguments()

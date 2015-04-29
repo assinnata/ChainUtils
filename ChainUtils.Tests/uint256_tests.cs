@@ -82,8 +82,8 @@ namespace ChainUtils.Tests
 
 		private string ArrayToString(byte[] array)
 		{
-			StringBuilder builder = new StringBuilder();
-			for(int i = 0 ; i < array.Length ; i++)
+			var builder = new StringBuilder();
+			for(var i = 0 ; i < array.Length ; i++)
 			{
 				builder.AppendFormat("{0:x2}", array[array.Length - i - 1]);
 			}
@@ -99,9 +99,9 @@ namespace ChainUtils.Tests
 			Assert.True(!ZeroS);
 			Assert.True(!(!OneL));
 			Assert.True(!(!OneS));
-			for(int i = 0 ; i < 256 ; ++i)
+			for(var i = 0 ; i < 256 ; ++i)
 				Assert.True(!(!(OneL << i)));
-			for(int i = 0 ; i < 160 ; ++i)
+			for(var i = 0 ; i < 160 ; ++i)
 				Assert.True(!(!(OneS << i)));
 			Assert.True(!(!R1L));
 			Assert.True(!(!R1S));
@@ -113,8 +113,8 @@ namespace ChainUtils.Tests
 			Assert.True(~ZeroL == MaxL);
 			Assert.True(~ZeroS == MaxS);
 
-			byte[] TmpArray = new byte[32];
-			for(int i = 0 ; i < 32 ; ++i)
+			var TmpArray = new byte[32];
+			for(var i = 0 ; i < 32 ; ++i)
 			{
 				TmpArray[i] = (byte)(~R1Array[i]);
 			}
@@ -125,9 +125,9 @@ namespace ChainUtils.Tests
 			Assert.True(-ZeroS == ZeroS);
 			Assert.True(-R1L == (~R1L) + 1);
 			Assert.True(-R1S == (~R1S) + 1);
-			for(int i = 0 ; i < 256 ; ++i)
+			for(var i = 0 ; i < 256 ; ++i)
 				Assert.True(-(OneL << i) == (MaxL << i));
-			for(int i = 0 ; i < 160 ; ++i)
+			for(var i = 0 ; i < 160 ; ++i)
 				Assert.True(-(OneS << i) == (MaxS << i));
 		}
 		[Fact]
@@ -138,7 +138,7 @@ namespace ChainUtils.Tests
 			Assert.True(R2L.GetHex() == R2L.ToString());
 			Assert.True(OneL.GetHex() == OneL.ToString());
 			Assert.True(MaxL.GetHex() == MaxL.ToString());
-			uint256 TmpL = new uint256(R1L);
+			var TmpL = new uint256(R1L);
 			Assert.True(TmpL == R1L);
 			TmpL.SetHex(R2L.ToString());
 			Assert.True(TmpL == R2L);
@@ -170,7 +170,7 @@ namespace ChainUtils.Tests
 			Assert.True(R1L.GetSerializeSize(0, ProtocolVersion.PROTOCOL_VERSION) == 32);
 			Assert.True(ZeroL.GetSerializeSize(0, ProtocolVersion.PROTOCOL_VERSION) == 32);
 
-			MemoryStream ss = new MemoryStream();
+			var ss = new MemoryStream();
 			R1L.Serialize(ss, 0, ProtocolVersion.PROTOCOL_VERSION);
 			Assert.True(ArrayToString(ss.ToArray()) == ArrayToString(R1Array));
 			TmpL.Unserialize(ss, 0, ProtocolVersion.PROTOCOL_VERSION);
@@ -193,7 +193,7 @@ namespace ChainUtils.Tests
 			Assert.True(R2S.GetHex() == R2S.ToString());
 			Assert.True(OneS.GetHex() == OneS.ToString());
 			Assert.True(MaxS.GetHex() == MaxS.ToString());
-			uint160 TmpS = new uint160(R1S);
+			var TmpS = new uint160(R1S);
 			Assert.True(TmpS == R1S);
 			TmpS.SetHex(R2S.ToString());
 			Assert.True(TmpS == R2S);
@@ -281,7 +281,7 @@ namespace ChainUtils.Tests
 			Assert.True(TmpL == R1L + R2L);
 			Assert.True(OneL + MaxL == ZeroL);
 			Assert.True(MaxL + OneL == ZeroL);
-			for(int i = 1 ; i < 256 ; ++i)
+			for(var i = 1 ; i < 256 ; ++i)
 			{
 				Assert.True((MaxL >> i) + OneL == (HalfL >> (i - 1)));
 				Assert.True(OneL + (MaxL >> i) == (HalfL >> (i - 1)));
@@ -307,7 +307,7 @@ namespace ChainUtils.Tests
 			Assert.True(R1L - (-R2L) == R1L + R2L);
 			Assert.True(R1L - (-OneL) == R1L + OneL);
 			Assert.True(R1L - OneL == R1L + (-OneL));
-			for(int i = 1 ; i < 256 ; ++i)
+			for(var i = 1 ; i < 256 ; ++i)
 			{
 				Assert.True((MaxL >> i) - (-OneL) == (HalfL >> (i - 1)));
 				Assert.True((HalfL >> (i - 1)) - OneL == (MaxL >> i));
@@ -329,7 +329,7 @@ namespace ChainUtils.Tests
 			Assert.True(TmpS == R1S + R2S);
 			Assert.True(OneS + MaxS == ZeroS);
 			Assert.True(MaxS + OneS == ZeroS);
-			for(int i = 1 ; i < 160 ; ++i)
+			for(var i = 1 ; i < 160 ; ++i)
 			{
 				Assert.True((MaxS >> i) + OneS == (HalfS >> (i - 1)));
 				Assert.True(OneS + (MaxS >> i) == (HalfS >> (i - 1)));
@@ -355,7 +355,7 @@ namespace ChainUtils.Tests
 			Assert.True(R1S - (-R2S) == R1S + R2S);
 			Assert.True(R1S - (-OneS) == R1S + OneS);
 			Assert.True(R1S - OneS == R1S + (-OneS));
-			for(int i = 1 ; i < 160 ; ++i)
+			for(var i = 1 ; i < 160 ; ++i)
 			{
 				Assert.True((MaxS >> i) - (-OneS) == (HalfS >> (i - 1)));
 				Assert.True((HalfS >> (i - 1)) - OneS == (MaxS >> i));
@@ -416,7 +416,7 @@ namespace ChainUtils.Tests
 		public void comparison()
 		{
 			uint256 TmpL;
-			for(int i = 0 ; i < 256 ; ++i)
+			for(var i = 0 ; i < 256 ; ++i)
 			{
 				TmpL = OneL << i;
 				Assert.True(TmpL >= ZeroL && TmpL > ZeroL && ZeroL < TmpL && ZeroL <= TmpL);
@@ -432,7 +432,7 @@ namespace ChainUtils.Tests
 				Assert.True(!(R1L > TmpL));
 			}
 			uint160 TmpS;
-			for(int i = 0 ; i < 160 ; ++i)
+			for(var i = 0 ; i < 160 ; ++i)
 			{
 				TmpS = OneS << i;
 				Assert.True(TmpS >= ZeroS && TmpS > ZeroS && ZeroS < TmpS && ZeroS <= TmpS);
@@ -488,7 +488,7 @@ namespace ChainUtils.Tests
 
 			uint256 TmpL = 0UL;
 			uint160 TmpS = 0UL;
-			ulong Tmp64 = 0xe1db685c9a0b47a2UL;
+			var Tmp64 = 0xe1db685c9a0b47a2UL;
 			TmpL = R1L;
 			TmpL |= Tmp64;
 			Assert.True(TmpL == (R1L | new uint256(Tmp64)));
@@ -537,8 +537,8 @@ namespace ChainUtils.Tests
 			var mL = typeof(uint256).GetMethod("op_" + map[op].Name);
 
 
-			byte[] arr = new byte[32];
-			for(int i = 0 ; i < arr.Length ; i++)
+			var arr = new byte[32];
+			for(var i = 0 ; i < arr.Length ; i++)
 			{
 				arr[i] = map[op].ByteFunc(aArray[i], bArray[i]);
 			}
@@ -548,7 +548,7 @@ namespace ChainUtils.Tests
 			Assert.True(expected == actual);
 
 			arr = new byte[20];
-			for(int i = 0 ; i < arr.Length ; i++)
+			for(var i = 0 ; i < arr.Length ; i++)
 			{
 				arr[i] = map[op].ByteFunc(aArray[i], bArray[i]);
 			}
@@ -588,8 +588,8 @@ namespace ChainUtils.Tests
 			Assert.True(((R1L ^ R2L) ^ R1L) == R2L);
 			Assert.True(((R1S ^ R2S) ^ R1S) == R2S);
 
-			ulong Tmp64 = 0xc4dab720d9c7acaaUL;
-			for(int i = 0 ; i < 256 ; ++i)
+			var Tmp64 = 0xc4dab720d9c7acaaUL;
+			for(var i = 0 ; i < 256 ; ++i)
 			{
 				Assert.True(ZeroL != (OneL << i));
 				Assert.True((OneL << i) != ZeroL);
@@ -599,7 +599,7 @@ namespace ChainUtils.Tests
 
 			Assert.True(ZeroL == (OneL << 256));
 
-			for(int i = 0 ; i < 160 ; ++i)
+			for(var i = 0 ; i < 160 ; ++i)
 			{
 				Assert.True(ZeroS != (OneS << i));
 				Assert.True((OneS << i) != ZeroS);
@@ -649,7 +649,7 @@ namespace ChainUtils.Tests
 			Assert.True(new uint160("0xffffffffffffffff") == new uint160(0xffffffffffffffffUL));
 
 			// Assignment (from base_uint)
-			uint256 tmpL = ~ZeroL;
+			var tmpL = ~ZeroL;
 			Assert.True(tmpL == ~ZeroL);
 			tmpL = ~OneL;
 			Assert.True(tmpL == ~OneL);
@@ -659,7 +659,7 @@ namespace ChainUtils.Tests
 			Assert.True(tmpL == ~R2L);
 			tmpL = ~MaxL;
 			Assert.True(tmpL == ~MaxL);
-			uint160 tmpS = ~ZeroS;
+			var tmpS = ~ZeroS;
 			Assert.True(tmpS == ~ZeroS);
 			tmpS = ~OneS;
 			Assert.True(tmpS == ~OneS);

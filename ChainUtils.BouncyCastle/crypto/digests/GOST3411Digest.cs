@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Engines;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
@@ -28,8 +27,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private static byte[][] MakeC()
 		{
-			byte[][] c = new byte[4][];
-			for (int i = 0; i < 4; ++i)
+			var c = new byte[4][];
+			for (var i = 0; i < 4; ++i)
 			{
 				c[i] = new byte[32];
 			}
@@ -128,8 +127,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private byte[] P(byte[] input)
 		{
-			int fourK = 0;
-			for(int k = 0; k < 8; k++)
+			var fourK = 0;
+			for(var k = 0; k < 8; k++)
 			{
 				K[fourK++] = input[k];
 				K[fourK++] = input[8 + k];
@@ -144,7 +143,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 		byte[] a = new byte[8];
 		private byte[] A(byte[] input)
 		{
-			for(int j=0; j<8; j++)
+			for(var j=0; j<8; j++)
 			{
 				a[j]=(byte)(input[j] ^ input[j+8]);
 			}
@@ -187,7 +186,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 			// S = s3 || s2 || s1 || s0
 			H.CopyTo(U, 0);
 			M.CopyTo(V, 0);
-			for (int j=0; j<32; j++)
+			for (var j=0; j<32; j++)
 			{
 				W[j] = (byte)(U[j]^V[j]);
 			}
@@ -195,15 +194,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 			E(P(W), S, 0, H, 0); // s0 = EK0 [h0]
 
 			//keys step 2,3,4
-			for (int i=1; i<4; i++)
+			for (var i=1; i<4; i++)
 			{
-				byte[] tmpA = A(U);
-				for (int j=0; j<32; j++)
+				var tmpA = A(U);
+				for (var j=0; j<32; j++)
 				{
 					U[j] = (byte)(tmpA[j] ^ C[i][j]);
 				}
 				V = A(A(V));
-				for (int j=0; j<32; j++)
+				for (var j=0; j<32; j++)
 				{
 					W[j] = (byte)(U[j]^V[j]);
 				}
@@ -212,22 +211,22 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 			}
 
 			// x(M, H) = y61(H^y(M^y12(S)))
-			for(int n = 0; n < 12; n++)
+			for(var n = 0; n < 12; n++)
 			{
 				fw(S);
 			}
-			for(int n = 0; n < 32; n++)
+			for(var n = 0; n < 32; n++)
 			{
 				S[n] = (byte)(S[n] ^ M[n]);
 			}
 
 			fw(S);
 
-			for(int n = 0; n < 32; n++)
+			for(var n = 0; n < 32; n++)
 			{
 				S[n] = (byte)(H[n] ^ S[n]);
 			}
-			for(int n = 0; n < 61; n++)
+			for(var n = 0; n < 61; n++)
 			{
 				fw(S);
 			}
@@ -236,7 +235,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private void finish()
 		{
-			ulong bitCount = byteCount * 8;
+			var bitCount = byteCount * 8;
 			Pack.UInt64_To_LE(bitCount, L);
 
 			while (xBufOff != 0)
@@ -291,11 +290,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 		private void sumByteArray(
 			byte[] input)
 		{
-			int carry = 0;
+			var carry = 0;
 
-			for (int i = 0; i != Sum.Length; i++)
+			for (var i = 0; i != Sum.Length; i++)
 			{
-				int sum = (Sum[i] & 0xff) + (input[i] & 0xff) + carry;
+				var sum = (Sum[i] & 0xff) + (input[i] & 0xff) + carry;
 
 				Sum[i] = (byte)sum;
 
@@ -305,7 +304,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private static void cpyBytesToShort(byte[] S, short[] wS)
 		{
-			for(int i = 0; i < S.Length / 2; i++)
+			for(var i = 0; i < S.Length / 2; i++)
 			{
 				wS[i] = (short)(((S[i*2+1]<<8)&0xFF00)|(S[i*2]&0xFF));
 			}
@@ -313,7 +312,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		private static void cpyShortToBytes(short[] wS, byte[] S)
 		{
-			for(int i=0; i<S.Length/2; i++)
+			for(var i=0; i<S.Length/2; i++)
 			{
 				S[i*2 + 1] = (byte)(wS[i] >> 8);
 				S[i*2] = (byte)wS[i];
@@ -332,24 +331,24 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
 
 		public void Reset(IMemoable other)
 		{
-			Gost3411Digest t = (Gost3411Digest)other;
+			var t = (Gost3411Digest)other;
 
-			this.sBox = t.sBox;
+			sBox = t.sBox;
 			cipher.Init(true, new ParametersWithSBox(null, sBox));
 
 			Reset();
 
-			Array.Copy(t.H, 0, this.H, 0, t.H.Length);
-			Array.Copy(t.L, 0, this.L, 0, t.L.Length);
-			Array.Copy(t.M, 0, this.M, 0, t.M.Length);
-			Array.Copy(t.Sum, 0, this.Sum, 0, t.Sum.Length);
-			Array.Copy(t.C[1], 0, this.C[1], 0, t.C[1].Length);
-			Array.Copy(t.C[2], 0, this.C[2], 0, t.C[2].Length);
-			Array.Copy(t.C[3], 0, this.C[3], 0, t.C[3].Length);
-			Array.Copy(t.xBuf, 0, this.xBuf, 0, t.xBuf.Length);
+			Array.Copy(t.H, 0, H, 0, t.H.Length);
+			Array.Copy(t.L, 0, L, 0, t.L.Length);
+			Array.Copy(t.M, 0, M, 0, t.M.Length);
+			Array.Copy(t.Sum, 0, Sum, 0, t.Sum.Length);
+			Array.Copy(t.C[1], 0, C[1], 0, t.C[1].Length);
+			Array.Copy(t.C[2], 0, C[2], 0, t.C[2].Length);
+			Array.Copy(t.C[3], 0, C[3], 0, t.C[3].Length);
+			Array.Copy(t.xBuf, 0, xBuf, 0, t.xBuf.Length);
 
-			this.xBufOff = t.xBufOff;
-			this.byteCount = t.byteCount;
+			xBufOff = t.xBufOff;
+			byteCount = t.byteCount;
 		}
 	}
 

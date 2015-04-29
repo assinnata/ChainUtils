@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Math.EC;
 using ChainUtils.BouncyCastle.Math.Field;
@@ -42,23 +41,23 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
                         (Asn1Sequence) seq[2]);
             }
 
-            this.curve = x9c.Curve;
+            curve = x9c.Curve;
 
             if (seq[3] is X9ECPoint)
             {
-                this.g = ((X9ECPoint) seq[3]).Point;
+                g = ((X9ECPoint) seq[3]).Point;
             }
             else
             {
-                this.g = new X9ECPoint(curve, (Asn1OctetString) seq[3]).Point;
+                g = new X9ECPoint(curve, (Asn1OctetString) seq[3]).Point;
             }
 
-            this.n = ((DerInteger) seq[4]).Value;
-            this.seed = x9c.GetSeed();
+            n = ((DerInteger) seq[4]).Value;
+            seed = x9c.GetSeed();
 
             if (seq.Count == 6)
             {
-                this.h = ((DerInteger) seq[5]).Value;
+                h = ((DerInteger) seq[5]).Value;
             }
         }
 
@@ -94,19 +93,19 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
 
             if (ECAlgorithms.IsFpCurve(curve))
             {
-                this.fieldID = new X9FieldID(curve.Field.Characteristic);
+                fieldID = new X9FieldID(curve.Field.Characteristic);
             }
             else if (ECAlgorithms.IsF2mCurve(curve))
             {
-                IPolynomialExtensionField field = (IPolynomialExtensionField)curve.Field;
-                int[] exponents = field.MinimalPolynomial.GetExponentsPresent();
+                var field = (IPolynomialExtensionField)curve.Field;
+                var exponents = field.MinimalPolynomial.GetExponentsPresent();
                 if (exponents.Length == 3)
                 {
-                    this.fieldID = new X9FieldID(exponents[2], exponents[1]);
+                    fieldID = new X9FieldID(exponents[2], exponents[1]);
                 }
                 else if (exponents.Length == 5)
                 {
-                    this.fieldID = new X9FieldID(exponents[4], exponents[1], exponents[2], exponents[3]);
+                    fieldID = new X9FieldID(exponents[4], exponents[1], exponents[2], exponents[3]);
                 }
                 else
                 {
@@ -168,7 +167,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
                 new DerInteger(1),
                 fieldID,
                 new X9Curve(curve, seed),

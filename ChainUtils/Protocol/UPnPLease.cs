@@ -1,35 +1,32 @@
 ﻿#if !NOSOCKET && !NOUPNP
-using Mono.Nat;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using Mono.Nat;
 
 namespace ChainUtils.Protocol
 {
-	public class UPnPLease : IDisposable
+	public class UpnPLease : IDisposable
 	{
 		public string RuleName
 		{
 			get;
 			private set;
 		}
-		public UPnPLease(int[] bitcoinPorts, int internalPort, string ruleName)
+		public UpnPLease(int[] bitcoinPorts, int internalPort, string ruleName)
 		{
 			RuleName = ruleName;
-			_BitcoinPorts = bitcoinPorts;
-			_InternalPort = internalPort;
+			_bitcoinPorts = bitcoinPorts;
+			_internalPort = internalPort;
 			Trace = new TraceCorrelation(NodeServerTrace.Trace, "UPNP external address and port detection");
 		}
-		private readonly int _InternalPort;
+		private readonly int _internalPort;
 		public int InternalPort
 		{
 			get
 			{
-				return _InternalPort;
+				return _internalPort;
 			}
 		}
 		public IPEndPoint ExternalEndpoint
@@ -37,12 +34,12 @@ namespace ChainUtils.Protocol
 			get;
 			set;
 		}
-		private readonly int[] _BitcoinPorts;
+		private readonly int[] _bitcoinPorts;
 		public int[] BitcoinPorts
 		{
 			get
 			{
-				return _BitcoinPorts;
+				return _bitcoinPorts;
 			}
 		}
 		public TraceCorrelation Trace
@@ -78,7 +75,7 @@ namespace ChainUtils.Protocol
 		{
 			using(Trace.Open())
 			{
-				int externalPort = 0;
+				var externalPort = 0;
 
 				try
 				{
@@ -122,7 +119,7 @@ namespace ChainUtils.Protocol
 								LogNextLeaseRenew();
 								Timer = new Timer(o =>
 								{
-									if(isDisposed)
+									if(_isDisposed)
 										return;
 									using(Trace.Open(false))
 									{
@@ -167,7 +164,7 @@ namespace ChainUtils.Protocol
 
 		private static INatDevice GetDevice(CancellationToken cancellation)
 		{
-			UpnpSearcher searcher = new UpnpSearcher();
+			var searcher = new UpnpSearcher();
 			var device = searcher.SearchAndReceive(cancellation);
 			if(device == null)
 			{
@@ -189,12 +186,12 @@ namespace ChainUtils.Protocol
 		}
 
 
-		volatile bool isDisposed;
+		volatile bool _isDisposed;
 		public void Dispose()
 		{
-			if(!isDisposed)
+			if(!_isDisposed)
 			{
-				isDisposed = true;
+				_isDisposed = true;
 				using(Trace.Open())
 				{
 					StopRenew();

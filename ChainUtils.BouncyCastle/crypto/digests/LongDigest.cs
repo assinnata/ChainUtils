@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -127,8 +125,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
         {
             AdjustByteCounts();
 
-            long    lowBitLength = byteCount1 << 3;
-            long    hiBitLength = byteCount2;
+            var    lowBitLength = byteCount1 << 3;
+            var    hiBitLength = byteCount2;
 
             //
             // add the pad bytes.
@@ -151,7 +149,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             byteCount2 = 0;
 
             xBufOff = 0;
-            for ( int i = 0; i < xBuf.Length; i++ )
+            for ( var i = 0; i < xBuf.Length; i++ )
             {
                 xBuf[i] = 0;
             }
@@ -205,7 +203,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             //
             // expand 16 word block into 80 word blocks.
             //
-            for (int ti = 16; ti <= 79; ++ti)
+            for (var ti = 16; ti <= 79; ++ti)
             {
                 W[ti] = Sigma1(W[ti - 2]) + W[ti - 7] + Sigma0(W[ti - 15]) + W[ti - 16];
             }
@@ -213,17 +211,17 @@ namespace ChainUtils.BouncyCastle.Crypto.Digests
             //
             // set up working variables.
             //
-            ulong a = H1;
-            ulong b = H2;
-            ulong c = H3;
-            ulong d = H4;
-            ulong e = H5;
-            ulong f = H6;
-            ulong g = H7;
-            ulong h = H8;
+            var a = H1;
+            var b = H2;
+            var c = H3;
+            var d = H4;
+            var e = H5;
+            var f = H6;
+            var g = H7;
+            var h = H8;
 
-			int t = 0;
-			for(int i = 0; i < 10; i ++)
+			var t = 0;
+			for(var i = 0; i < 10; i ++)
 			{
 				// t = 8 * i
 				h += Sum1(e) + Ch(e, f, g) + K[t] + W[t++];

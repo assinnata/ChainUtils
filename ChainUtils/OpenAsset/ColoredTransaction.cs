@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.ExceptionServices;
-using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ChainUtils.OpenAsset
 {
@@ -22,36 +22,36 @@ namespace ChainUtils.OpenAsset
 			Index = index;
 			Asset = asset;
 		}
-		uint _Index;
+		uint _index;
 		public uint Index
 		{
 			get
 			{
-				return _Index;
+				return _index;
 			}
 			set
 			{
-				_Index = value;
+				_index = value;
 			}
 		}
-		Asset _Asset = new Asset();
+		Asset _asset = new Asset();
 		public Asset Asset
 		{
 			get
 			{
-				return _Asset;
+				return _asset;
 			}
 			set
 			{
-				_Asset = value;
+				_asset = value;
 			}
 		}
 		#region IBitcoinSerializable Members
 
 		public void ReadWrite(BitcoinStream stream)
 		{
-			stream.ReadWriteAsVarInt(ref _Index);
-			stream.ReadWrite(ref _Asset);
+			stream.ReadWriteAsVarInt(ref _index);
+			stream.ReadWrite(ref _asset);
 		}
 
 		#endregion
@@ -74,15 +74,15 @@ namespace ChainUtils.OpenAsset
 		{
 			return FetchColors(null, tx, repo);
 		}
-		public static Task<ColoredTransaction> FetchColorsAsync(uint256 txId, IColoredTransactionRepository repo)
+		public static Task<ColoredTransaction> FetchColorsAsync(Uint256 txId, IColoredTransactionRepository repo)
 		{
 			return FetchColorsAsync(txId, null, repo);
 		}
-		public static ColoredTransaction FetchColors(uint256 txId, IColoredTransactionRepository repo)
+		public static ColoredTransaction FetchColors(Uint256 txId, IColoredTransactionRepository repo)
 		{
 			return FetchColors(txId, null, repo);
 		}
-		public static ColoredTransaction FetchColors(uint256 txId, Transaction tx, IColoredTransactionRepository repo)
+		public static ColoredTransaction FetchColors(Uint256 txId, Transaction tx, IColoredTransactionRepository repo)
 		{
 			try
 			{
@@ -94,7 +94,7 @@ namespace ChainUtils.OpenAsset
 				return null;
 			}
 		}
-		public static async Task<ColoredTransaction> FetchColorsAsync(uint256 txId, Transaction tx, IColoredTransactionRepository repo)
+		public static async Task<ColoredTransaction> FetchColorsAsync(Uint256 txId, Transaction tx, IColoredTransactionRepository repo)
 		{
 			if(repo == null)
 				throw new ArgumentNullException("repo");
@@ -125,15 +125,15 @@ namespace ChainUtils.OpenAsset
 
 			ColoredTransaction lastColored = null;
 			//The following code is to prevent recursion of FetchColors that would fire a StackOverflow if the origin of traded asset were deep in the transaction dependency tree
-			HashSet<uint256> invalidColored = new HashSet<uint256>();
-			Stack<Tuple<uint256, Transaction>> ancestors = new Stack<Tuple<uint256, Transaction>>();
+			var invalidColored = new HashSet<Uint256>();
+			var ancestors = new Stack<Tuple<Uint256, Transaction>>();
 			ancestors.Push(Tuple.Create(txId, tx));
 			while(ancestors.Count != 0)
 			{
 				var peek = ancestors.Peek();
 				txId = peek.Item1;
 				tx = peek.Item2;
-				bool isComplete = true;
+				var isComplete = true;
 				if(!tx.HasValidColoredMarker() && ancestors.Count != 1)
 				{
 					invalidColored.Add(txId);
@@ -188,11 +188,11 @@ namespace ChainUtils.OpenAsset
 			return repo;
 		}
 
-		private static async Task<ColoredTransaction> FetchColorsWithAncestorsSolved(uint256 txId, Transaction tx, CachedColoredTransactionRepository repo)
+		private static async Task<ColoredTransaction> FetchColorsWithAncestorsSolved(Uint256 txId, Transaction tx, CachedColoredTransactionRepository repo)
 		{
-			ColoredTransaction colored = new ColoredTransaction();
+			var colored = new ColoredTransaction();
 
-			Queue<ColoredEntry> previousAssetQueue = new Queue<ColoredEntry>();
+			var previousAssetQueue = new Queue<ColoredEntry>();
 			for(uint i = 0 ; i < tx.Inputs.Count ; i++)
 			{
 				var txin = tx.Inputs[i];
@@ -248,7 +248,7 @@ namespace ChainUtils.OpenAsset
 			}
 
 			ulong used = 0;
-			for(uint i = markerPos + 1 ; i < tx.Outputs.Count ; i++)
+			for(var i = markerPos + 1 ; i < tx.Outputs.Count ; i++)
 			{
 				var entry = new ColoredEntry();
 				entry.Index = i;
@@ -301,42 +301,42 @@ namespace ChainUtils.OpenAsset
 			Inputs = new List<ColoredEntry>();
 		}
 
-		ColorMarker _Marker;
+		ColorMarker _marker;
 		public ColorMarker Marker
 		{
 			get
 			{
-				return _Marker;
+				return _marker;
 			}
 			set
 			{
-				_Marker = value;
+				_marker = value;
 			}
 		}
 
-		List<ColoredEntry> _Issuances;
+		List<ColoredEntry> _issuances;
 		public List<ColoredEntry> Issuances
 		{
 			get
 			{
-				return _Issuances;
+				return _issuances;
 			}
 			set
 			{
-				_Issuances = value;
+				_issuances = value;
 			}
 		}
 
-		List<ColoredEntry> _Transfers;
+		List<ColoredEntry> _transfers;
 		public List<ColoredEntry> Transfers
 		{
 			get
 			{
-				return _Transfers;
+				return _transfers;
 			}
 			set
 			{
-				_Transfers = value;
+				_transfers = value;
 			}
 		}
 
@@ -376,40 +376,40 @@ namespace ChainUtils.OpenAsset
 		{
 			if(stream.Serializing)
 			{
-				if(_Marker != null)
-					stream.ReadWrite(ref _Marker);
+				if(_marker != null)
+					stream.ReadWrite(ref _marker);
 				else
 					stream.ReadWrite(new Script());
 			}
 			else
 			{
-				Script script = new Script();
+				var script = new Script();
 				stream.ReadWrite(ref script);
 				if(script.Length != 0)
 				{
-					_Marker = new ColorMarker(script);
+					_marker = new ColorMarker(script);
 				}
 				else
 				{
 				}
 			}
-			stream.ReadWrite(ref _Inputs);
-			stream.ReadWrite(ref _Issuances);
-			stream.ReadWrite(ref _Transfers);
+			stream.ReadWrite(ref _inputs);
+			stream.ReadWrite(ref _issuances);
+			stream.ReadWrite(ref _transfers);
 		}
 
 		#endregion
 
-		List<ColoredEntry> _Inputs;
+		List<ColoredEntry> _inputs;
 		public List<ColoredEntry> Inputs
 		{
 			get
 			{
-				return _Inputs;
+				return _inputs;
 			}
 			set
 			{
-				_Inputs = value;
+				_inputs = value;
 			}
 		}
 
@@ -420,7 +420,7 @@ namespace ChainUtils.OpenAsset
 
 		public string ToString(Network network)
 		{
-			JObject obj = new JObject();
+			var obj = new JObject();
 			var inputs = new JArray();
 			obj.Add(new JProperty("inputs", inputs));
 			foreach(var input in Inputs)
@@ -446,19 +446,19 @@ namespace ChainUtils.OpenAsset
 			obj.Add(new JProperty("destructions", destructions));
 			foreach(var destuction in GetDestroyedAssets())
 			{
-				JProperty asset = new JProperty("asset", destuction.Id.GetWif(network).ToString());
-				JProperty quantity = new JProperty("quantity", destuction.Quantity);
+				var asset = new JProperty("asset", destuction.Id.GetWif(network).ToString());
+				var quantity = new JProperty("quantity", destuction.Quantity);
 				inputs.Add(new JObject(asset, quantity));
 			}
 
-			return obj.ToString(Newtonsoft.Json.Formatting.Indented);
+			return obj.ToString(Formatting.Indented);
 		}
 
 		private static void WriteEntry(Network network, JArray inputs, ColoredEntry entry)
 		{
-			JProperty index = new JProperty("index", entry.Index);
-			JProperty asset = new JProperty("asset", entry.Asset.Id.GetWif(network).ToString());
-			JProperty quantity = new JProperty("quantity", entry.Asset.Quantity);
+			var index = new JProperty("index", entry.Index);
+			var asset = new JProperty("asset", entry.Asset.Id.GetWif(network).ToString());
+			var quantity = new JProperty("quantity", entry.Asset.Quantity);
 			inputs.Add(new JObject(index, asset, quantity));
 		}
 

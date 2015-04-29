@@ -1,32 +1,30 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
 namespace ChainUtils
 {
 	class BitReader
 	{
-		BitArray array;
+		BitArray _array;
 		public BitReader(byte[] data, int bitCount)
 		{
-			BitWriter writer = new BitWriter();
+			var writer = new BitWriter();
 			writer.Write(data, bitCount);
-			array = writer.ToBitArray();
+			_array = writer.ToBitArray();
 		}
 
 		public BitReader(BitArray array)
 		{
-			this.array = new BitArray(array.Length);
-			for(int i = 0 ; i < array.Length ; i++)
-				this.array.Set(i, array.Get(i));
+			this._array = new BitArray(array.Length);
+			for(var i = 0 ; i < array.Length ; i++)
+				this._array.Set(i, array.Get(i));
 		}
 
 		public bool Read()
 		{
-			var v = array.Get(Position);
+			var v = _array.Get(Position);
 			Position++;
 			return v;
 		}
@@ -40,7 +38,7 @@ namespace ChainUtils
 		public uint ReadUInt(int bitCount)
 		{
 			uint value = 0;
-			for(int i = 0 ; i < bitCount ; i++)
+			for(var i = 0 ; i < bitCount ; i++)
 			{
 				var v = Read() ? 1U : 0U;
 				value += (v << i);
@@ -52,22 +50,22 @@ namespace ChainUtils
 		{
 			get
 			{
-				return array.Length;
+				return _array.Length;
 			}
 		}
 
 		public BitArray ToBitArray()
 		{
-			BitArray result = new BitArray(array.Length);
-			for(int i = 0 ; i < array.Length ; i++)
-				result.Set(i, array.Get(i));
+			var result = new BitArray(_array.Length);
+			for(var i = 0 ; i < _array.Length ; i++)
+				result.Set(i, _array.Get(i));
 			return result;
 		}
 
 		public BitWriter ToWriter()
 		{
 			var writer = new BitWriter();
-			writer.Write(array);
+			writer.Write(_array);
 			return writer;
 		}
 
@@ -90,30 +88,30 @@ namespace ChainUtils
 
 		public override string ToString()
 		{
-			StringBuilder builder = new StringBuilder(array.Length);
-			for(int i = 0 ; i < Count ; i++)
+			var builder = new StringBuilder(_array.Length);
+			for(var i = 0 ; i < Count ; i++)
 			{
 				if(i != 0 && i % 8 == 0)
 					builder.Append(' ');
-				builder.Append(array.Get(i) ? "1" : "0");
+				builder.Append(_array.Get(i) ? "1" : "0");
 			}
 			return builder.ToString();
 		}
 	}
 	class BitWriter
 	{
-		List<bool> values = new List<bool>();
+		List<bool> _values = new List<bool>();
 		public int Count
 		{
 			get
 			{
-				return values.Count;
+				return _values.Count;
 			}
 		}
 		public void Write(bool value)
 		{
-			values.Insert(Position, value);
-			_Position++;
+			_values.Insert(Position, value);
+			_position++;
 		}
 
 		internal void Write(byte[] bytes)
@@ -124,9 +122,9 @@ namespace ChainUtils
 		public void Write(byte[] bytes, int bitCount)
 		{
 			bytes = SwapEndianBytes(bytes);
-			BitArray array = new BitArray(bytes);
-			values.InsertRange(Position, array.OfType<bool>().Take(bitCount));
-			_Position += bitCount;
+			var array = new BitArray(bytes);
+			_values.InsertRange(Position, array.OfType<bool>().Take(bitCount));
+			_position += bitCount;
 		}
 
 		public byte[] ToBytes()
@@ -140,15 +138,15 @@ namespace ChainUtils
 		//BitArray.CopyTo do not exist in portable lib
 		static byte[] ToByteArray(BitArray bits)
 		{
-			int arrayLength = bits.Length / 8;
+			var arrayLength = bits.Length / 8;
 			if(bits.Length % 8 != 0)
 				arrayLength++;
-			byte[] array = new byte[arrayLength];
+			var array = new byte[arrayLength];
 
-			for(int i = 0 ; i < bits.Length ; i++)
+			for(var i = 0 ; i < bits.Length ; i++)
 			{
-				int b = i / 8;
-				int offset = i % 8;
+				var b = i / 8;
+				var offset = i % 8;
 				array[b] |= bits.Get(i) ? (byte)(1 << offset) : (byte)0;
 			}
 			return array;
@@ -157,23 +155,23 @@ namespace ChainUtils
 
 		public BitArray ToBitArray()
 		{
-			return new BitArray(values.ToArray());
+			return new BitArray(_values.ToArray());
 		}
 
 		public int[] ToIntegers()
 		{
-			var array = new BitArray(values.ToArray());
+			var array = new BitArray(_values.ToArray());
 			return Wordlist.ToIntegers(array);
 		}
 
 
 		static byte[] SwapEndianBytes(byte[] bytes)
 		{
-			byte[] output = new byte[bytes.Length];
-			for(int i = 0 ; i < output.Length ; i++)
+			var output = new byte[bytes.Length];
+			for(var i = 0 ; i < output.Length ; i++)
 			{
 				byte newByte = 0;
-				for(int ib = 0 ; ib < 8 ; ib++)
+				for(var ib = 0 ; ib < 8 ; ib++)
 				{
 					newByte += (byte)(((bytes[i] >> ib) & 1) << (7 - ib));
 				}
@@ -186,29 +184,29 @@ namespace ChainUtils
 
 		public void Write(uint value, int bitCount)
 		{
-			for(int i = 0 ; i < bitCount ; i++)
+			for(var i = 0 ; i < bitCount ; i++)
 			{
 				Write((value & 1) == 1);
 				value = value >> 1;
 			}
 		}
 
-		int _Position;
+		int _position;
 		public int Position
 		{
 			get
 			{
-				return _Position;
+				return _position;
 			}
 			set
 			{
-				_Position = value;
+				_position = value;
 			}
 		}
 
 		internal void Write(BitReader reader, int bitCount)
 		{
-			for(int i = 0 ; i < bitCount ; i++)
+			for(var i = 0 ; i < bitCount ; i++)
 			{
 				Write(reader.Read());
 			}
@@ -220,7 +218,7 @@ namespace ChainUtils
 		}
 		public void Write(BitArray bitArray, int bitCount)
 		{
-			for(int i = 0 ; i < bitCount ; i++)
+			for(var i = 0 ; i < bitCount ; i++)
 			{
 				Write(bitArray.Get(i));
 			}
@@ -238,12 +236,12 @@ namespace ChainUtils
 
 		public override string ToString()
 		{
-			StringBuilder builder = new StringBuilder(values.Count);
-			for(int i = 0 ; i < Count ; i++)
+			var builder = new StringBuilder(_values.Count);
+			for(var i = 0 ; i < Count ; i++)
 			{
 				if(i != 0 && i % 8 == 0)
 					builder.Append(' ');
-				builder.Append(values[i] ? "1" : "0");
+				builder.Append(_values[i] ? "1" : "0");
 			}
 			return builder.ToString();
 		}

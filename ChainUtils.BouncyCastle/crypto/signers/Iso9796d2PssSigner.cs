@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-
-using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Security;
 using ChainUtils.BouncyCastle.Utilities;
@@ -86,7 +84,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
         {
             this.cipher = cipher;
             this.digest = digest;
-            this.hLen = digest.GetDigestSize();
+            hLen = digest.GetDigestSize();
             this.saltLength = saltLength;
 
             if (isImplicit)
@@ -95,7 +93,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             }
             else
             {
-                string digestAlg = digest.AlgorithmName;
+                var digestAlg = digest.AlgorithmName;
                 if (!trailerMap.Contains(digestAlg))
                     throw new ArgumentException("no valid trailer for digest");
 
@@ -142,7 +140,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             RsaKeyParameters kParam;
             if (parameters is ParametersWithRandom)
             {
-                ParametersWithRandom p = (ParametersWithRandom) parameters;
+                var p = (ParametersWithRandom) parameters;
 
                 kParam = (RsaKeyParameters) p.Parameters;
 
@@ -156,7 +154,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 if (!forSigning)
                     throw new ArgumentException("ParametersWithSalt only valid for signing", "parameters");
 
-                ParametersWithSalt p = (ParametersWithSalt) parameters;
+                var p = (ParametersWithSalt) parameters;
 
                 kParam = (RsaKeyParameters) p.Parameters;
                 standardSalt = p.GetSalt();
@@ -200,9 +198,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
                 return false;
             }
 
-            bool isOkay = true;
+            var isOkay = true;
 
-            for (int i = 0; i != b.Length; i++)
+            for (var i = 0; i != b.Length; i++)
             {
                 if (a[i] != b[i])
                 {
@@ -223,14 +221,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
         public virtual void UpdateWithRecoveredMessage(
             byte[] signature)
         {
-            byte[] block = cipher.ProcessBlock(signature, 0, signature.Length);
+            var block = cipher.ProcessBlock(signature, 0, signature.Length);
 
             //
             // adjust block size for leading zeroes if necessary
             //
             if (block.Length < (keyBits + 7) / 8)
             {
-                byte[] tmp = new byte[(keyBits + 7) / 8];
+                var tmp = new byte[(keyBits + 7) / 8];
 
                 Array.Copy(block, 0, tmp, tmp.Length - block.Length, block.Length);
                 ClearBlock(block);
@@ -245,9 +243,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             }
             else
             {
-                int sigTrail = ((block[block.Length - 2] & 0xFF) << 8) | (block[block.Length - 1] & 0xFF);
+                var sigTrail = ((block[block.Length - 2] & 0xFF) << 8) | (block[block.Length - 1] & 0xFF);
 
-                string digestAlg = digest.AlgorithmName;
+                var digestAlg = digest.AlgorithmName;
                 if (!trailerMap.Contains(digestAlg))
                     throw new ArgumentException("unrecognised hash in signature");
 
@@ -260,14 +258,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             //
             // calculate H(m2)
             //
-            byte[] m2Hash = new byte[hLen];
+            var m2Hash = new byte[hLen];
             digest.DoFinal(m2Hash, 0);
 
             //
             // remove the mask
             //
-            byte[] dbMask = MaskGeneratorFunction1(block, block.Length - hLen - tLength, hLen, block.Length - hLen - tLength);
-            for (int i = 0; i != dbMask.Length; i++)
+            var dbMask = MaskGeneratorFunction1(block, block.Length - hLen - tLength, hLen, block.Length - hLen - tLength);
+            for (var i = 0; i != dbMask.Length; i++)
             {
                 block[i] ^= dbMask[i];
             }
@@ -277,7 +275,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             //
             // find out how much padding we've got
             //
-            int mStart = 0;
+            var mStart = 0;
 
             while (mStart < block.Length)
             {
@@ -327,7 +325,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             {
                 while (length > 0 && messageLength < mBuf.Length)
                 {
-                    this.Update(input[inOff]);
+                    Update(input[inOff]);
                     inOff++;
                     length--;
                 }
@@ -367,11 +365,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
         /// </summary>
         public byte[] GenerateSignature()
         {
-            int digSize = digest.GetDigestSize();
-            byte[] m2Hash = new byte[digSize];
+            var digSize = digest.GetDigestSize();
+            var m2Hash = new byte[digSize];
             digest.DoFinal(m2Hash, 0);
 
-            byte[] C = new byte[8];
+            var C = new byte[8];
             LtoOSP(messageLength * 8, C);
 
             digest.BlockUpdate(C, 0, C.Length);
@@ -391,24 +389,24 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 
             digest.BlockUpdate(salt, 0, salt.Length);
 
-            byte[] hash = new byte[digest.GetDigestSize()];
+            var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
-            int tLength = 2;
+            var tLength = 2;
             if (trailer == TrailerImplicit)
             {
                 tLength = 1;
             }
 
-            int off = block.Length - messageLength - salt.Length - hLen - tLength - 1;
+            var off = block.Length - messageLength - salt.Length - hLen - tLength - 1;
 
             block[off] = (byte) (0x01);
 
             Array.Copy(mBuf, 0, block, off + 1, messageLength);
             Array.Copy(salt, 0, block, off + 1 + messageLength, salt.Length);
 
-            byte[] dbMask = MaskGeneratorFunction1(hash, 0, hash.Length, block.Length - hLen - tLength);
-            for (int i = 0; i != dbMask.Length; i++)
+            var dbMask = MaskGeneratorFunction1(hash, 0, hash.Length, block.Length - hLen - tLength);
+            for (var i = 0; i != dbMask.Length; i++)
             {
                 block[i] ^= dbMask[i];
             }
@@ -427,7 +425,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
 
             block[0] &= (byte) (0x7f);
 
-            byte[] b = cipher.ProcessBlock(block, 0, block.Length);
+            var b = cipher.ProcessBlock(block, 0, block.Length);
 
             ClearBlock(mBuf);
             ClearBlock(block);
@@ -445,12 +443,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             //
             // calculate H(m2)
             //
-            byte[] m2Hash = new byte[hLen];
+            var m2Hash = new byte[hLen];
             digest.DoFinal(m2Hash, 0);
 
             byte[] block;
             int tLength;
-            int mStart = 0;
+            var mStart = 0;
 
             if (preSig == null)
             {
@@ -481,7 +479,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             //
             // check the hashes
             //
-            byte[] C = new byte[8];
+            var C = new byte[8];
             LtoOSP(recoveredMessage.Length * 8, C);
 
             digest.BlockUpdate(C, 0, C.Length);
@@ -496,14 +494,14 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             // Update for the salt
             digest.BlockUpdate(block, mStart + recoveredMessage.Length, saltLength);
 
-            byte[] hash = new byte[digest.GetDigestSize()];
+            var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
-            int off = block.Length - tLength - hash.Length;
+            var off = block.Length - tLength - hash.Length;
 
-            bool isOkay = true;
+            var isOkay = true;
 
-            for (int i = 0; i != hash.Length; i++)
+            for (var i = 0; i != hash.Length; i++)
             {
                 if (hash[i] != block[off + i])
                 {
@@ -581,10 +579,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Signers
             int		zLen,
             int		length)
         {
-            byte[] mask = new byte[length];
-            byte[] hashBuf = new byte[hLen];
-            byte[] C = new byte[4];
-            int counter = 0;
+            var mask = new byte[length];
+            var hashBuf = new byte[hLen];
+            var C = new byte[4];
+            var counter = 0;
 
             digest.Reset();
 

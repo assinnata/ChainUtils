@@ -1,27 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChainUtils.Protocol
+﻿namespace ChainUtils.Protocol
 {
 	public enum InventoryType : uint
 	{
 		Error = 0,
-		MSG_TX = 1,
-		MSG_BLOCK = 2,
+		MsgTx = 1,
+		MsgBlock = 2,
 	}
 	public class InventoryVector : Payload, IBitcoinSerializable
 	{
-		uint type;
-		uint256 hash = new uint256(0);
+		uint _type;
+		Uint256 _hash = new Uint256(0);
 
 		public InventoryVector()
 		{
 
 		}
-		public InventoryVector(InventoryType type, uint256 hash)
+		public InventoryVector(InventoryType type, Uint256 hash)
 		{
 			Type = type;
 			Hash = hash;
@@ -30,22 +24,22 @@ namespace ChainUtils.Protocol
 		{
 			get
 			{
-				return (InventoryType)type;
+				return (InventoryType)_type;
 			}
 			set
 			{
-				type = (uint)value;
+				_type = (uint)value;
 			}
 		}
-		public uint256 Hash
+		public Uint256 Hash
 		{
 			get
 			{
-				return hash;
+				return _hash;
 			}
 			set
 			{
-				hash = value;
+				_hash = value;
 			}
 		}
 
@@ -53,8 +47,8 @@ namespace ChainUtils.Protocol
 
 		public override void ReadWriteCore(BitcoinStream stream)
 		{
-			stream.ReadWrite(ref type);
-			stream.ReadWrite(ref hash);
+			stream.ReadWrite(ref _type);
+			stream.ReadWrite(ref _hash);
 		}
 
 		#endregion

@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using ChainUtils.BouncyCastle.Utilities.Collections;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
@@ -143,7 +142,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public static TbsCertificateList GetInstance(
             object obj)
         {
-            TbsCertificateList list = obj as TbsCertificateList;
+            var list = obj as TbsCertificateList;
 
 			if (obj == null || list != null)
             {
@@ -166,7 +165,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 				throw new ArgumentException("Bad sequence size: " + seq.Count);
 			}
 
-			int seqPos = 0;
+			var seqPos = 0;
 
 			this.seq = seq;
 
@@ -241,9 +240,9 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 				return new CrlEntry[0];
 			}
 
-			CrlEntry[] entries = new CrlEntry[revokedCertificates.Count];
+			var entries = new CrlEntry[revokedCertificates.Count];
 
-			for (int i = 0; i < entries.Length; i++)
+			for (var i = 0; i < entries.Length; i++)
 			{
 				entries[i] = new CrlEntry(Asn1Sequence.GetInstance(revokedCertificates[i]));
 			}

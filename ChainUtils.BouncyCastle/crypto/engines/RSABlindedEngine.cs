@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
@@ -36,7 +35,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			if (param is ParametersWithRandom)
 			{
-				ParametersWithRandom rParam = (ParametersWithRandom)param;
+				var rParam = (ParametersWithRandom)param;
 
 				key = (RsaKeyParameters)rParam.Parameters;
 				random = rParam.Random;
@@ -89,23 +88,23 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			if (key == null)
 				throw new InvalidOperationException("RSA engine not initialised");
 
-			BigInteger input = core.ConvertInput(inBuf, inOff, inLen);
+			var input = core.ConvertInput(inBuf, inOff, inLen);
 
 			BigInteger result;
 			if (key is RsaPrivateCrtKeyParameters)
 			{
-				RsaPrivateCrtKeyParameters k = (RsaPrivateCrtKeyParameters)key;
-				BigInteger e = k.PublicExponent;
+				var k = (RsaPrivateCrtKeyParameters)key;
+				var e = k.PublicExponent;
 				if (e != null)   // can't do blinding without a public exponent
 				{
-					BigInteger m = k.Modulus;
-					BigInteger r = BigIntegers.CreateRandomInRange(
+					var m = k.Modulus;
+					var r = BigIntegers.CreateRandomInRange(
 						BigInteger.One, m.Subtract(BigInteger.One), random);
 
-					BigInteger blindedInput = r.ModPow(e, m).Multiply(input).Mod(m);
-					BigInteger blindedResult = core.ProcessBlock(blindedInput);
+					var blindedInput = r.ModPow(e, m).Multiply(input).Mod(m);
+					var blindedResult = core.ProcessBlock(blindedInput);
 
-					BigInteger rInv = r.ModInverse(m);
+					var rInv = r.ModInverse(m);
 					result = blindedResult.Multiply(rInv).Mod(m);
 				}
 				else

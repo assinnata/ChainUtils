@@ -3,9 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
@@ -19,52 +17,52 @@ namespace ChainUtils.BitcoinCore
 			set;
 		}
 
-		string _FilePrefix;
+		string _filePrefix;
 		public string FilePrefix
 		{
 			get
 			{
-				return _FilePrefix;
+				return _filePrefix;
 			}
 			set
 			{
-				_FilePrefix = value;
-				_FileRegex = null;
+				_filePrefix = value;
+				_fileRegex = null;
 			}
 		}
 
-		Regex _FileRegex;
+		Regex _fileRegex;
 		public Regex FileRegex
 		{
 			get
 			{
-				if(_FileRegex == null)
+				if(_fileRegex == null)
 				{
-					_FileRegex = new Regex(FilePrefix + "([0-9]{5,5}).dat");
+					_fileRegex = new Regex(FilePrefix + "([0-9]{5,5}).dat");
 				}
-				return _FileRegex;
+				return _fileRegex;
 			}
 		}
 
-		private readonly DirectoryInfo _Folder;
+		private readonly DirectoryInfo _folder;
 		public DirectoryInfo Folder
 		{
 			get
 			{
-				return _Folder;
+				return _folder;
 			}
 		}
 
-		int _BufferSize = 1024 * 4;
+		int _bufferSize = 1024 * 4;
 		public int BufferSize
 		{
 			get
 			{
-				return _BufferSize;
+				return _bufferSize;
 			}
 			set
 			{
-				_BufferSize = value;
+				_bufferSize = value;
 			}
 		}
 
@@ -79,18 +77,18 @@ namespace ChainUtils.BitcoinCore
 				throw new ArgumentNullException("folder");
 			if(network == null)
 				throw new ArgumentNullException("network");
-			_Folder = folder;
-			_Network = network;
+			_folder = folder;
+			_network = network;
 
 			//Create folders if needed
-			Directory.CreateDirectory(_Folder.FullName);
+			Directory.CreateDirectory(_folder.FullName);
 		}
-		private readonly Network _Network;
+		private readonly Network _network;
 		public Network Network
 		{
 			get
 			{
-				return _Network;
+				return _network;
 			}
 		}
 
@@ -172,7 +170,7 @@ namespace ChainUtils.BitcoinCore
 		{
 			if(range == null)
 				range = DiskBlockPosRange.All;
-			foreach(var file in _Folder.GetFiles().OrderBy(f => f.Name))
+			foreach(var file in _folder.GetFiles().OrderBy(f => f.Name))
 			{
 				var fileIndex = GetFileIndex(file.Name);
 				if(fileIndex < 0)
@@ -204,7 +202,7 @@ namespace ChainUtils.BitcoinCore
 
 		public DiskBlockPos SeekEnd()
 		{
-			var highestFile = _Folder.GetFiles().OrderBy(f => f.Name).Where(f => GetFileIndex(f.Name) != -1).LastOrDefault();
+			var highestFile = _folder.GetFiles().OrderBy(f => f.Name).Where(f => GetFileIndex(f.Name) != -1).LastOrDefault();
 			if(highestFile == null)
 				return new DiskBlockPos(0, 0);
 			using(var fs = new FileStream(highestFile.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -233,7 +231,7 @@ namespace ChainUtils.BitcoinCore
 		{
 			using(var @lock = CreateLock(FileLockType.ReadWrite))
 			{
-				DiskBlockPos position = SeekEnd(@lock);
+				var position = SeekEnd(@lock);
 				if(position.Position > MaxFileSize)
 					position = new DiskBlockPos(position.File + 1, 0);
 				var stored = CreateStoredItem(item, position);

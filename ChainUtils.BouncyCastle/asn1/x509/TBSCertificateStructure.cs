@@ -1,7 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Asn1.Pkcs;
-
 namespace ChainUtils.BouncyCastle.Asn1.X509
 {
     /**
@@ -27,7 +23,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 	public class TbsCertificateStructure
 		: Asn1Encodable
 	{
-		internal Asn1Sequence            seq;
+		internal Asn1Sequence            Seq;
 		internal DerInteger              version;
 		internal DerInteger              serialNumber;
 		internal AlgorithmIdentifier     signature;
@@ -35,8 +31,8 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		internal Time                    startDate, endDate;
 		internal X509Name                subject;
 		internal SubjectPublicKeyInfo    subjectPublicKeyInfo;
-		internal DerBitString            issuerUniqueID;
-		internal DerBitString            subjectUniqueID;
+		internal DerBitString            IssuerUniqueId;
+		internal DerBitString            SubjectUniqueId;
 		internal X509Extensions          extensions;
 
 		public static TbsCertificateStructure GetInstance(
@@ -49,28 +45,27 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public static TbsCertificateStructure GetInstance(
 			object obj)
 		{
-			if (obj is TbsCertificateStructure)
-				return (TbsCertificateStructure) obj;
+		    var instance = obj as TbsCertificateStructure;
+		    if (instance != null)
+				return instance;
 
-			if (obj != null)
-				return new TbsCertificateStructure(Asn1Sequence.GetInstance(obj));
-
-			return null;
+			return obj != null ? new TbsCertificateStructure(Asn1Sequence.GetInstance(obj)) : null;
 		}
 
 		internal TbsCertificateStructure(
 			Asn1Sequence seq)
 		{
-			int seqStart = 0;
+			var seqStart = 0;
 
-			this.seq = seq;
+			Seq = seq;
 
 			//
 			// some certficates don't include a version number - we assume v1
 			//
-			if (seq[0] is DerTaggedObject)
+		    var o = seq[0] as DerTaggedObject;
+		    if (o != null)
 			{
-				version = DerInteger.GetInstance((Asn1TaggedObject)seq[0], true);
+				version = DerInteger.GetInstance(o, true);
 			}
 			else
 			{
@@ -86,7 +81,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 			//
 			// before and after dates
 			//
-			Asn1Sequence  dates = (Asn1Sequence)seq[seqStart + 4];
+			var  dates = (Asn1Sequence)seq[seqStart + 4];
 
 			startDate = Time.GetInstance(dates[0]);
 			endDate = Time.GetInstance(dates[1]);
@@ -98,17 +93,17 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 			//
 			subjectPublicKeyInfo = SubjectPublicKeyInfo.GetInstance(seq[seqStart + 6]);
 
-			for (int extras = seq.Count - (seqStart + 6) - 1; extras > 0; extras--)
+			for (var extras = seq.Count - (seqStart + 6) - 1; extras > 0; extras--)
 			{
-				DerTaggedObject extra = (DerTaggedObject) seq[seqStart + 6 + extras];
+				var extra = (DerTaggedObject) seq[seqStart + 6 + extras];
 
 				switch (extra.TagNo)
 				{
 					case 1:
-						issuerUniqueID = DerBitString.GetInstance(extra, false);
+						IssuerUniqueId = DerBitString.GetInstance(extra, false);
 						break;
 					case 2:
-						subjectUniqueID = DerBitString.GetInstance(extra, false);
+						SubjectUniqueId = DerBitString.GetInstance(extra, false);
 						break;
 					case 3:
 						extensions = X509Extensions.GetInstance(extra);
@@ -164,12 +159,12 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 		public DerBitString IssuerUniqueID
 		{
-			get { return issuerUniqueID; }
+			get { return IssuerUniqueId; }
         }
 
 		public DerBitString SubjectUniqueID
         {
-			get { return subjectUniqueID; }
+			get { return SubjectUniqueId; }
         }
 
 		public X509Extensions Extensions
@@ -179,7 +174,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 		public override Asn1Object ToAsn1Object()
         {
-            return seq;
+            return Seq;
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -28,12 +27,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		private uint Step()
 		{
-			uint j = cnt & 0x3FF;
+			var j = cnt & 0x3FF;
 			uint ret;
 			if (cnt < 1024)
 			{
-				uint x = p[(j - 3 & 0x3FF)];
-				uint y = p[(j - 1023 & 0x3FF)];
+				var x = p[(j - 3 & 0x3FF)];
+				var y = p[(j - 1023 & 0x3FF)];
 				p[j] += p[(j - 10 & 0x3FF)]
 					+ (RotateRight(x, 10) ^ RotateRight(y, 23))
 					+ q[((x ^ y) & 0x3FF)];
@@ -45,8 +44,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			}
 			else
 			{
-				uint x = q[(j - 3 & 0x3FF)];
-				uint y = q[(j - 1023 & 0x3FF)];
+				var x = q[(j - 3 & 0x3FF)];
+				var y = q[(j - 1023 & 0x3FF)];
 				q[j] += q[(j - 10 & 0x3FF)]
 					+ (RotateRight(x, 10) ^ RotateRight(y, 23))
 					+ p[((x ^ y) & 0x3FF)];
@@ -73,7 +72,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			if (key.Length != 32)
 	        {
-				byte[] k = new byte[32];
+				var k = new byte[32];
 
 				Array.Copy(key, 0, k, 0, key.Length);
 				Array.Copy(key, 0, k, 16, key.Length);
@@ -83,7 +82,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			if (iv.Length < 32)
 			{
-				byte[] newIV = new byte[32];
+				var newIV = new byte[32];
 
 				Array.Copy(iv, 0, newIV, 0, iv.Length);
 				Array.Copy(iv, 0, newIV, iv.Length, newIV.Length - iv.Length);
@@ -93,22 +92,22 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			cnt = 0;
 
-			uint[] w = new uint[2560];
+			var w = new uint[2560];
 
-			for (int i = 0; i < 32; i++)
+			for (var i = 0; i < 32; i++)
 			{
 				w[i >> 2] |= ((uint)key[i] << (8 * (i & 0x3)));
 			}
 
-			for (int i = 0; i < 32; i++)
+			for (var i = 0; i < 32; i++)
 			{
 				w[(i >> 2) + 8] |= ((uint)iv[i] << (8 * (i & 0x3)));
 			}
 
 			for (uint i = 16; i < 2560; i++)
 			{
-				uint x = w[i - 2];
-				uint y = w[i - 15];
+				var x = w[i - 2];
+				var y = w[i - 15];
 				w[i] = (RotateRight(x, 17) ^ RotateRight(x, 19) ^ (x >> 10))
 					+ w[i - 7]
 					+ (RotateRight(y, 7) ^ RotateRight(y, 18) ^ (y >> 3))
@@ -118,7 +117,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			Array.Copy(w, 512, p, 0, 1024);
 			Array.Copy(w, 1536, q, 0, 1024);
 
-			for (int i = 0; i < 4096; i++)
+			for (var i = 0; i < 4096; i++)
 			{
 				Step();
 			}
@@ -144,7 +143,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			bool				forEncryption,
 			ICipherParameters	parameters)
 		{
-			ICipherParameters keyParam = parameters;
+			var keyParam = parameters;
 
 			if (parameters is ParametersWithIV)
 			{
@@ -180,7 +179,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			{
 				Pack.UInt32_To_LE(Step(), buf);
 			}
-			byte ret = buf[idx];
+			var ret = buf[idx];
 			idx = idx + 1 & 0x3;
 			return ret;
 		}
@@ -199,7 +198,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			if ((outOff + len) > output.Length)
 				throw new DataLengthException("output buffer too short");
 
-			for (int i = 0; i < len; i++)
+			for (var i = 0; i < len; i++)
 			{
 				output[outOff + i] = (byte)(input[inOff + i] ^ GetByte());
 			}

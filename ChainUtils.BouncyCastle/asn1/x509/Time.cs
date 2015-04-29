@@ -36,9 +36,9 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
         public Time(
             DateTime date)
         {
-            string d = date.ToString("yyyyMMddHHmmss") + "Z";
+            var d = date.ToString("yyyyMMddHHmmss") + "Z";
 
-            int year = Int32.Parse(d.Substring(0, 4));
+            var year = Int32.Parse(d.Substring(0, 4));
 
             if (year < 1950 || year > 2049)
             {

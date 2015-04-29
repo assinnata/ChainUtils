@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils
 {
 	public class Target
 	{
-		static Target _Difficulty1 = new Target(new byte[] { 0x1d, 0x00, 0xff, 0xff });
+		static Target _difficulty1 = new Target(new byte[] { 0x1d, 0x00, 0xff, 0xff });
 		public static Target Difficulty1
 		{
 			get
 			{
-				return _Difficulty1;
+				return _difficulty1;
 			}
 		}
 
@@ -27,7 +24,7 @@ namespace ChainUtils
 
 		private static byte[] ToBytes(uint bits)
 		{
-			return new byte[]
+			return new[]
 			{
 				(byte)(bits >> 24),
 				(byte)(bits >> 16),
@@ -38,14 +35,14 @@ namespace ChainUtils
 
 
 
-		BigInteger _Target;
+		BigInteger _target;
 		public Target(byte[] compact)
 		{
 			if(compact.Length == 4)
 			{
 				var exp = compact[0];
 				var val = compact.Skip(1).Take(3).Reverse().ToArray();
-				_Target = new BigInteger(val) << 8 * (exp - 3);
+				_target = new BigInteger(val) << 8 * (exp - 3);
 			}
 			else
 				throw new FormatException("Invalid number of bytes");
@@ -57,13 +54,13 @@ namespace ChainUtils
 		internal Target(BigInteger target)
 #endif
 		{
-			_Target = target;
-			_Target = new Target(this.ToCompact())._Target;
+			_target = target;
+			_target = new Target(ToCompact())._target;
 		}
-		public Target(uint256 target)
+		public Target(Uint256 target)
 		{
-			_Target = new BigInteger(target.ToBytes());
-			_Target = new Target(this.ToCompact())._Target;
+			_target = new BigInteger(target.ToBytes());
+			_target = new Target(ToCompact())._target;
 		}
 
 		public static implicit operator Target(uint a)
@@ -72,7 +69,7 @@ namespace ChainUtils
 		}
 		public static implicit operator uint(Target a)
 		{
-			var bytes = a._Target.ToByteArray().Reverse().ToArray();
+			var bytes = a._target.ToByteArray().Reverse().ToArray();
 			var val = bytes.Take(3).Reverse().ToArray();
 			var exp = (byte)(bytes.Length);
 			var missing = 4 - val.Length;
@@ -83,32 +80,32 @@ namespace ChainUtils
 			return (uint)val[0] + (uint)(val[1] << 8) + (uint)(val[2] << 16) + (uint)(exp << 24);
 		}
 
-		double? _Difficulty;
+		double? _difficulty;
 		public double Difficulty
 		{
 			get
 			{
-				if(_Difficulty == null)
+				if(_difficulty == null)
 				{
 					BigInteger remainder;
-					var quotient = BigInteger.DivRem(Difficulty1._Target, _Target, out remainder);
+					var quotient = BigInteger.DivRem(Difficulty1._target, _target, out remainder);
 					var decimalPart = BigInteger.Zero;
-					for(int i = 0 ; i < 12 ; i++)
+					for(var i = 0 ; i < 12 ; i++)
 					{
-						var div = (remainder * 10) / _Target;
+						var div = (remainder * 10) / _target;
 
 						decimalPart *= 10;
 						decimalPart += div;
 
-						remainder = remainder * 10 - div * _Target;
+						remainder = remainder * 10 - div * _target;
 					}
-					_Difficulty = double.Parse(quotient.ToString() + "." + decimalPart.ToString(), new NumberFormatInfo()
+					_difficulty = double.Parse(quotient.ToString() + "." + decimalPart.ToString(), new NumberFormatInfo()
 					{
 						NegativeSign = "-",
 						NumberDecimalSeparator = "."
 					});
 				}
-				return _Difficulty.Value;
+				return _difficulty.Value;
 			}
 		}
 
@@ -116,18 +113,18 @@ namespace ChainUtils
 
 		public override bool Equals(object obj)
 		{
-			Target item = obj as Target;
+			var item = obj as Target;
 			if(item == null)
 				return false;
-			return _Target.Equals(item._Target);
+			return _target.Equals(item._target);
 		}
 		public static bool operator ==(Target a, Target b)
 		{
-			if(System.Object.ReferenceEquals(a, b))
+			if(ReferenceEquals(a, b))
 				return true;
 			if(((object)a == null) || ((object)b == null))
 				return false;
-			return a._Target == b._Target;
+			return a._target == b._target;
 		}
 
 		public static bool operator !=(Target a, Target b)
@@ -137,7 +134,7 @@ namespace ChainUtils
 
 		public override int GetHashCode()
 		{
-			return _Target.GetHashCode();
+			return _target.GetHashCode();
 		}
 
 #if !NOBIGINT
@@ -146,7 +143,7 @@ namespace ChainUtils
 		internal BigInteger ToBigInteger()
 #endif
 		{
-			return _Target;
+			return _target;
 		}
 
 		public uint ToCompact()
@@ -154,9 +151,9 @@ namespace ChainUtils
 			return (uint)this;
 		}
 
-		public uint256 ToUInt256()
+		public Uint256 ToUInt256()
 		{
-			var array = _Target.ToByteArray();
+			var array = _target.ToByteArray();
 			var missingZero = 32 - array.Length;
 			if(missingZero < 0)
 				throw new InvalidOperationException("Awful bug, this should never happen");
@@ -164,7 +161,7 @@ namespace ChainUtils
 			{
 				array = array.Concat(new byte[missingZero]).ToArray();
 			}
-			return new uint256(array);
+			return new Uint256(array);
 		}
 
 		public override string ToString()

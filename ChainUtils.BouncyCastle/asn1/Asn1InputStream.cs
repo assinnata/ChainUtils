@@ -1,9 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Asn1.Utilities;
-using ChainUtils.BouncyCastle.Utilities.IO;
 
 namespace ChainUtils.BouncyCastle.Asn1
 {
@@ -28,7 +25,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             }
             else if (input is MemoryStream)
             {
-                MemoryStream mem = (MemoryStream)input;
+                var mem = (MemoryStream)input;
                 return (int)(mem.Length - mem.Position);
             }
 
@@ -53,7 +50,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             : base(inputStream)
         {
             this.limit = limit;
-            this.tmpBuffers = new byte[16][];
+            tmpBuffers = new byte[16][];
         }
 
         /**
@@ -76,9 +73,9 @@ namespace ChainUtils.BouncyCastle.Asn1
             int	tagNo,
             int	length)
         {
-            bool isConstructed = (tag & Asn1Tags.Constructed) != 0;
+            var isConstructed = (tag & Asn1Tags.Constructed) != 0;
 
-            DefiniteLengthInputStream defIn = new DefiniteLengthInputStream(this.s, length);
+            var defIn = new DefiniteLengthInputStream(s, length);
 
             if ((tag & Asn1Tags.Application) != 0)
             {
@@ -116,7 +113,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         internal Asn1EncodableVector BuildEncodableVector()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector();
+            var v = new Asn1EncodableVector();
 
             Asn1Object o;
             while ((o = ReadObject()) != null)
@@ -147,7 +144,7 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         public Asn1Object ReadObject()
         {
-            int tag = ReadByte();
+            var tag = ReadByte();
             if (tag <= 0)
             {
                 if (tag == 0)
@@ -159,22 +156,22 @@ namespace ChainUtils.BouncyCastle.Asn1
             //
             // calculate tag number
             //
-            int tagNo = ReadTagNumber(this.s, tag);
+            var tagNo = ReadTagNumber(s, tag);
 
-            bool isConstructed = (tag & Asn1Tags.Constructed) != 0;
+            var isConstructed = (tag & Asn1Tags.Constructed) != 0;
 
             //
             // calculate length
             //
-            int length = ReadLength(this.s, limit);
+            var length = ReadLength(s, limit);
 
             if (length < 0) // indefinite length method
             {
                 if (!isConstructed)
                     throw new IOException("indefinite length primitive encoding encountered");
 
-                IndefiniteLengthInputStream indIn = new IndefiniteLengthInputStream(this.s, limit);
-                Asn1StreamParser sp = new Asn1StreamParser(indIn, limit);
+                var indIn = new IndefiniteLengthInputStream(s, limit);
+                var sp = new Asn1StreamParser(indIn, limit);
 
                 if ((tag & Asn1Tags.Application) != 0)
                 {
@@ -218,7 +215,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Stream	s,
             int		tag)
         {
-            int tagNo = tag & 0x1f;
+            var tagNo = tag & 0x1f;
 
             //
             // with tagged object tag number is bottom 5 bits, or stored at the start of the content
@@ -227,7 +224,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             {
                 tagNo = 0;
 
-                int b = s.ReadByte();
+                var b = s.ReadByte();
 
                 // X.690-0207 8.1.2.4.2
                 // "c) bits 7 to 1 of the first subsequent octet shall not all be zero."
@@ -256,7 +253,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Stream	s,
             int		limit)
         {
-            int length = s.ReadByte();
+            var length = s.ReadByte();
             if (length < 0)
                 throw new EndOfStreamException("EOF found when length expected");
 
@@ -265,16 +262,16 @@ namespace ChainUtils.BouncyCastle.Asn1
 
             if (length > 127)
             {
-                int size = length & 0x7f;
+                var size = length & 0x7f;
 
                 // Note: The invalid long form "0xff" (see X.690 8.1.3.5c) will be caught here
                 if (size > 4)
                     throw new IOException("DER length more than 4 bytes: " + size);
 
                 length = 0;
-                for (int i = 0; i < size; i++)
+                for (var i = 0; i < size; i++)
                 {
-                    int next = s.ReadByte();
+                    var next = s.ReadByte();
 
                     if (next < 0)
                         throw new EndOfStreamException("EOF found reading length");
@@ -294,13 +291,13 @@ namespace ChainUtils.BouncyCastle.Asn1
 
         internal static byte[] GetBuffer(DefiniteLengthInputStream defIn, byte[][] tmpBuffers)
         {
-            int len = defIn.GetRemaining();
+            var len = defIn.GetRemaining();
             if (len >= tmpBuffers.Length)
             {
                 return defIn.ToArray();
             }
 
-            byte[] buf = tmpBuffers[len];
+            var buf = tmpBuffers[len];
             if (buf == null)
             {
                 buf = tmpBuffers[len] = new byte[len];
@@ -326,7 +323,7 @@ namespace ChainUtils.BouncyCastle.Asn1
                     return DerObjectIdentifier.FromOctetString(GetBuffer(defIn, tmpBuffers));
             }
 
-            byte[] bytes = defIn.ToArray();
+            var bytes = defIn.ToArray();
 
             switch (tagNo)
             {
@@ -338,7 +335,7 @@ namespace ChainUtils.BouncyCastle.Asn1
                     return new DerGeneralizedTime(bytes);
                 case Asn1Tags.GeneralString:
                     return new DerGeneralString(bytes);
-                case Asn1Tags.IA5String:
+                case Asn1Tags.Ia5String:
                     return new DerIA5String(bytes);
                 case Asn1Tags.Integer:
                     return new DerInteger(bytes);

@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 
 namespace ChainUtils.BouncyCastle.Asn1.Esf
 {
@@ -33,14 +30,14 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 				switch (obj.TagNo)
 				{
 					case 0:
-						this.countryName = DerUtf8String.GetInstance(obj, true);
+						countryName = DerUtf8String.GetInstance(obj, true);
 						break;
 					case 1:
-						this.localityName = DerUtf8String.GetInstance(obj, true);
+						localityName = DerUtf8String.GetInstance(obj, true);
 						break;
 					case 2:
-						bool isExplicit = obj.IsExplicit();	// handle erroneous implicitly tagged sequences
-						this.postalAddress = Asn1Sequence.GetInstance(obj, isExplicit);
+						var isExplicit = obj.IsExplicit();	// handle erroneous implicitly tagged sequences
+						postalAddress = Asn1Sequence.GetInstance(obj, isExplicit);
 						if (postalAddress != null && postalAddress.Count > 6)
 							throw new ArgumentException("postal address must contain less than 6 strings");
 						break;
@@ -121,7 +118,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 		*/
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector();
+			var v = new Asn1EncodableVector();
 
 			if (countryName != null)
 			{

@@ -1,15 +1,11 @@
 ﻿#if !NOSOCKET
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ChainUtils.Protocol
 {
@@ -30,40 +26,40 @@ namespace ChainUtils.Protocol
 	{
 		public class NodeConnection
 		{
-			private readonly Node _Node;
+			private readonly Node _node;
 			public Node Node
 			{
 				get
 				{
-					return _Node;
+					return _node;
 				}
 			}
-			private readonly Socket _Socket;
+			private readonly Socket _socket;
 			public Socket Socket
 			{
 				get
 				{
-					if(_IsDisposed)
+					if(_isDisposed)
 					{
 						throw new InvalidOperationException("Connection disposed");
 					}
-					return _Socket;
+					return _socket;
 				}
 			}
-			private readonly ManualResetEvent _Disconnected;
+			private readonly ManualResetEvent _disconnected;
 			public ManualResetEvent Disconnected
 			{
 				get
 				{
-					return _Disconnected;
+					return _disconnected;
 				}
 			}
-			private readonly CancellationTokenSource _Cancel;
+			private readonly CancellationTokenSource _cancel;
 			public CancellationTokenSource Cancel
 			{
 				get
 				{
-					return _Cancel;
+					return _cancel;
 				}
 			}
 #if NOTRACESOURCE
@@ -81,27 +77,27 @@ namespace ChainUtils.Protocol
 
 			public NodeConnection(Node node, Socket socket)
 			{
-				_Node = node;
-				_Socket = socket;
-				_Disconnected = new ManualResetEvent(false);
-				_Cancel = new CancellationTokenSource();
+				_node = node;
+				_socket = socket;
+				_disconnected = new ManualResetEvent(false);
+				_cancel = new CancellationTokenSource();
 			}
 
-			EventLoopMessageListener<IncomingMessage> _PingListener;
+			EventLoopMessageListener<IncomingMessage> _pingListener;
 
-			bool _IsDisposed;
+			bool _isDisposed;
 			public void Dispose()
 			{
-				if(!_IsDisposed)
+				if(!_isDisposed)
 				{
 					Utils.SafeCloseSocket(Socket);
-					if(_PingListener != null)
+					if(_pingListener != null)
 					{
-						Node.MessageProducer.RemoveMessageListener(_PingListener);
-						_PingListener.Dispose();
-						_PingListener = null;
+						Node.MessageProducer.RemoveMessageListener(_pingListener);
+						_pingListener.Dispose();
+						_pingListener = null;
 					}
-					_IsDisposed = true;
+					_isDisposed = true;
 				}
 			}
 
@@ -119,7 +115,7 @@ namespace ChainUtils.Protocol
 					if((uint)message.Node.Version >= 70002)
 						message.Node.SendMessage(new RejectPayload()
 						{
-							Code = RejectCode.DUPLICATE
+							Code = RejectCode.Duplicate
 						});
 				}
 				Node.OnMessageReceived(message);
@@ -132,8 +128,8 @@ namespace ChainUtils.Protocol
 					using(TraceCorrelation.Open(false))
 					{
 						NodeServerTrace.Information("Listening");
-						_PingListener = new EventLoopMessageListener<IncomingMessage>(MessageReceived);
-						Node.MessageProducer.AddMessageListener(_PingListener);
+						_pingListener = new EventLoopMessageListener<IncomingMessage>(MessageReceived);
+						Node.MessageProducer.AddMessageListener(_pingListener);
 						try
 						{
 							while(!Cancel.Token.IsCancellationRequested)
@@ -167,8 +163,8 @@ namespace ChainUtils.Protocol
 							Node.State = NodeState.Offline;
 						Dispose();
 
-						_Cancel.Cancel();
-						_Disconnected.Set();
+						_cancel.Cancel();
+						_disconnected.Set();
 
 					}
 				}).Start();
@@ -177,19 +173,19 @@ namespace ChainUtils.Protocol
 		}
 
 
-		volatile NodeState _State = NodeState.Offline;
+		volatile NodeState _state = NodeState.Offline;
 		public NodeState State
 		{
 			get
 			{
-				return _State;
+				return _state;
 			}
 			private set
 			{
-				TraceCorrelation.LogInside(() => NodeServerTrace.Information("State changed from " + _State + " to " + value));
-				var previous = _State;
-				_State = value;
-				if(previous != _State)
+				TraceCorrelation.LogInside(() => NodeServerTrace.Information("State changed from " + _state + " to " + value));
+				var previous = _state;
+				_state = value;
+				if(previous != _state)
 				{
 					OnStateChanged(previous);
 				}
@@ -239,7 +235,7 @@ namespace ChainUtils.Protocol
 		}
 
 
-		internal readonly NodeConnection _Connection;
+		internal readonly NodeConnection Connection;
 
 
 		public static Node ConnectToLocal(Network network,
@@ -270,7 +266,7 @@ namespace ChainUtils.Protocol
 				Endpoint = endpoint
 			});
 
-			VersionPayload version = new VersionPayload()
+			var version = new VersionPayload()
 			{
 				Nonce = 12345,
 				UserAgent = VersionPayload.GetChainUtilsUserAgent(),
@@ -286,23 +282,23 @@ namespace ChainUtils.Protocol
 
 		internal Node(Peer peer, Network network, VersionPayload myVersion, CancellationToken cancellation)
 		{
-			_MyVersion = myVersion;
-			Version = _MyVersion.Version;
+			_myVersion = myVersion;
+			Version = _myVersion.Version;
 			Network = network;
-			_Peer = peer;
+			_peer = peer;
 			LastSeen = peer.NetworkAddress.Time;
 
 			var socket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
 #if !NOIPDUALMODE
 			socket.DualMode = true;
 #endif
-			_Connection = new NodeConnection(this, socket);
+			Connection = new NodeConnection(this, socket);
 			using(TraceCorrelation.Open())
 			{
 				try
 				{
 					var ar = socket.BeginConnect(Peer.NetworkAddress.Endpoint, null, null);
-					WaitHandle.WaitAny(new WaitHandle[] { ar.AsyncWaitHandle, cancellation.WaitHandle });
+					WaitHandle.WaitAny(new[] { ar.AsyncWaitHandle, cancellation.WaitHandle });
 					cancellation.ThrowIfCancellationRequested();
 					socket.EndConnect(ar);
 					State = NodeState.Connected;
@@ -322,7 +318,7 @@ namespace ChainUtils.Protocol
 					State = NodeState.Failed;
 					throw;
 				}
-				_Connection.BeginListen();
+				Connection.BeginListen();
 			}
 		}
 
@@ -337,27 +333,27 @@ namespace ChainUtils.Protocol
 
 		internal Node(Peer peer, Network network, VersionPayload myVersion, Socket socket, VersionPayload peerVersion)
 		{
-			_MyVersion = myVersion;
+			_myVersion = myVersion;
 			Network = network;
-			_Peer = peer;
-			_Connection = new NodeConnection(this, socket);
-			_PeerVersion = peerVersion;
+			_peer = peer;
+			Connection = new NodeConnection(this, socket);
+			_peerVersion = peerVersion;
 			Version = peerVersion.Version;
 			LastSeen = peer.NetworkAddress.Time;
 			TraceCorrelation.LogInside(() =>
 			{
-				NodeServerTrace.Information("Connected to advertised node " + _Peer.NetworkAddress.Endpoint);
+				NodeServerTrace.Information("Connected to advertised node " + _peer.NetworkAddress.Endpoint);
 				State = NodeState.Connected;
 			});
-			_Connection.BeginListen();
+			Connection.BeginListen();
 		}
 
-		private readonly Peer _Peer;
+		private readonly Peer _peer;
 		public Peer Peer
 		{
 			get
 			{
-				return _Peer;
+				return _peer;
 			}
 		}
 
@@ -367,7 +363,7 @@ namespace ChainUtils.Protocol
 			private set;
 		}
 
-		TraceCorrelation _TraceCorrelation = null;
+		TraceCorrelation _traceCorrelation = null;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 #if NOTRACESOURCE
 		internal
@@ -378,11 +374,11 @@ namespace ChainUtils.Protocol
 		{
 			get
 			{
-				if(_TraceCorrelation == null)
+				if(_traceCorrelation == null)
 				{
-					_TraceCorrelation = new TraceCorrelation(NodeServerTrace.Trace, "Communication with " + Peer.NetworkAddress.Endpoint.ToString());
+					_traceCorrelation = new TraceCorrelation(NodeServerTrace.Trace, "Communication with " + Peer.NetworkAddress.Endpoint.ToString());
 				}
-				return _TraceCorrelation;
+				return _traceCorrelation;
 			}
 		}
 		public void SendMessage(Payload payload)
@@ -394,17 +390,17 @@ namespace ChainUtils.Protocol
 
 			var bytes = message.ToBytes();
 			Counter.AddWritten(bytes.LongLength);
-			var result = _Connection.Socket.Send(bytes);
+			var result = Connection.Socket.Send(bytes);
 		}
 
-		private PerformanceCounter _Counter;
+		private PerformanceCounter _counter;
 		public PerformanceCounter Counter
 		{
 			get
 			{
-				if(_Counter == null)
-					_Counter = new PerformanceCounter();
-				return _Counter;
+				if(_counter == null)
+					_counter = new PerformanceCounter();
+				return _counter;
 			}
 		}
 
@@ -414,12 +410,12 @@ namespace ChainUtils.Protocol
 			private set;
 		}
 
-		private readonly MessageProducer<IncomingMessage> _MessageProducer = new MessageProducer<IncomingMessage>();
+		private readonly MessageProducer<IncomingMessage> _messageProducer = new MessageProducer<IncomingMessage>();
 		public MessageProducer<IncomingMessage> MessageProducer
 		{
 			get
 			{
-				return _MessageProducer;
+				return _messageProducer;
 			}
 		}
 
@@ -440,21 +436,21 @@ namespace ChainUtils.Protocol
 			}
 		}
 
-		private readonly VersionPayload _MyVersion;
+		private readonly VersionPayload _myVersion;
 		public VersionPayload MyVersion
 		{
 			get
 			{
-				return _MyVersion;
+				return _myVersion;
 			}
 		}
 
-		VersionPayload _PeerVersion;
+		VersionPayload _peerVersion;
 		public VersionPayload PeerVersion
 		{
 			get
 			{
-				return _PeerVersion;
+				return _peerVersion;
 			}
 		}
 
@@ -475,13 +471,13 @@ namespace ChainUtils.Protocol
 						throw new InvalidOperationException("Handshake rejected : " + ((RejectPayload)payload).Reason);
 					}
 					var version = (VersionPayload)payload;
-					_PeerVersion = version;
+					_peerVersion = version;
 					Version = version.Version;
 					if(!version.AddressReceiver.Address.Equals(MyVersion.AddressFrom.Address))
 					{
 						NodeServerTrace.Warning("Different external address detected by the node " + version.AddressReceiver.Address + " instead of " + MyVersion.AddressFrom.Address);
 					}
-					if(version.Version < ProtocolVersion.MIN_PEER_PROTO_VERSION)
+					if(version.Version < ProtocolVersion.MinPeerProtoVersion)
 					{
 						NodeServerTrace.Warning("Outdated version " + version.Version + " disconnecting");
 						Disconnect();
@@ -508,7 +504,7 @@ namespace ChainUtils.Protocol
 					SendMessage(MyVersion);
 					listener.ReceiveMessage().AssertPayload<VerAckPayload>();
 					SendMessage(new VerAckPayload());
-					_State = NodeState.HandShaked;
+					_state = NodeState.HandShaked;
 				}
 			}
 		}
@@ -520,15 +516,15 @@ namespace ChainUtils.Protocol
 				return;
 			if(State < NodeState.Connected)
 			{
-				_Connection.Disconnected.WaitOne();
+				Connection.Disconnected.WaitOne();
 				return;
 			}
 			using(TraceCorrelation.Open())
 			{
 				NodeServerTrace.Information("Disconnection request");
 				State = NodeState.Disconnecting;
-				_Connection.Cancel.Cancel();
-				_Connection.Disconnected.WaitOne();
+				Connection.Cancel.Cancel();
+				Connection.Disconnected.WaitOne();
 			}
 		}
 
@@ -544,25 +540,25 @@ namespace ChainUtils.Protocol
 		{
 			get
 			{
-				return _Connection.Socket;
+				return Connection.Socket;
 			}
 		}
 
-		public ConcurrentChain GetChain(uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
+		public ConcurrentChain GetChain(Uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
 		{
-			ConcurrentChain chain = new ConcurrentChain(Network);
+			var chain = new ConcurrentChain(Network);
 			SynchronizeChain(chain, hashStop, cancellationToken);
 			return chain;
 		}
 		public IEnumerable<ChainedBlock> GetHeadersFromFork(ChainedBlock currentTip,
-														uint256 hashStop = null,
+														Uint256 hashStop = null,
 														CancellationToken cancellationToken = default(CancellationToken))
 		{
 			AssertState(NodeState.HandShaked, cancellationToken);
 			using(TraceCorrelation.Open())
 			{
 				NodeServerTrace.Information("Building chain");
-				using(var listener = this.CreateListener().OfType<HeadersPayload>())
+				using(var listener = CreateListener().OfType<HeadersPayload>())
 				{
 					while(true)
 					{
@@ -592,9 +588,9 @@ namespace ChainUtils.Protocol
 			}
 		}
 
-		public IEnumerable<ChainedBlock> SynchronizeChain(ChainBase chain, uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
+		public IEnumerable<ChainedBlock> SynchronizeChain(ChainBase chain, Uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
 		{
-			List<ChainedBlock> headers = new List<ChainedBlock>();
+			var headers = new List<ChainedBlock>();
 			foreach(var header in GetHeadersFromFork(chain.Tip, hashStop, cancellationToken))
 			{
 				chain.SetTip(header);
@@ -603,14 +599,14 @@ namespace ChainUtils.Protocol
 			return headers;
 		}
 
-		public IEnumerable<Block> GetBlocks(uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
+		public IEnumerable<Block> GetBlocks(Uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var genesis = new ChainedBlock(Network.GetGenesis().Header, 0);
 			return GetBlocksFromFork(genesis, hashStop, cancellationToken);
 		}
 
 
-		public IEnumerable<Block> GetBlocksFromFork(ChainedBlock currentTip, uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
+		public IEnumerable<Block> GetBlocksFromFork(ChainedBlock currentTip, Uint256 hashStop = null, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			using(var listener = CreateListener())
 			{
@@ -628,13 +624,13 @@ namespace ChainUtils.Protocol
 			}
 			//GetBlocks(neededBlocks.ToEnumerable(false).Select(e => e.HashBlock), cancellationToken);
 		}
-		public IEnumerable<Block> GetBlocks(IEnumerable<uint256> neededBlocks, CancellationToken cancellationToken = default(CancellationToken))
+		public IEnumerable<Block> GetBlocks(IEnumerable<Uint256> neededBlocks, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			AssertState(NodeState.HandShaked, cancellationToken);
 			using(TraceCorrelation.Open())
 			{
 				NodeServerTrace.Information("Downloading blocks");
-				int simultaneous = 70;
+				var simultaneous = 70;
 				PerformanceSnapshot lastSpeed = null;
 				using(var listener = CreateListener()
 									.OfType<BlockPayload>())
@@ -642,7 +638,7 @@ namespace ChainUtils.Protocol
 					foreach(var invs in neededBlocks
 										.Select(b => new InventoryVector()
 											{
-												Type = InventoryType.MSG_BLOCK,
+												Type = InventoryType.MsgBlock,
 												Hash = b
 											})
 										.Partition(simultaneous))
@@ -652,9 +648,9 @@ namespace ChainUtils.Protocol
 
 						var invsByHash = invs.ToDictionary(k => k.Hash);
 
-						this.SendMessage(new GetDataPayload(invs.ToArray()));
+						SendMessage(new GetDataPayload(invs.ToArray()));
 
-						Block[] downloadedBlocks = new Block[invs.Count];
+						var downloadedBlocks = new Block[invs.Count];
 						while(invsByHash.Count != 0)
 						{
 							var block = listener.ReceivePayload<BlockPayload>(cancellationToken).Object;
@@ -687,17 +683,17 @@ namespace ChainUtils.Protocol
 		private void AssertState(NodeState nodeState, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			if(nodeState == NodeState.HandShaked && State == NodeState.Connected)
-				this.VersionHandshake(cancellationToken);
+				VersionHandshake(cancellationToken);
 			if(nodeState != State)
 				throw new InvalidOperationException("Invalid Node state, needed=" + nodeState + ", current= " + State);
 		}
 
-		public uint256[] GetMempool(CancellationToken cancellationToken = default(CancellationToken))
+		public Uint256[] GetMempool(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			AssertState(NodeState.HandShaked);
 			using(var listener = CreateListener().OfType<InvPayload>())
 			{
-				this.SendMessage(new MempoolPayload());
+				SendMessage(new MempoolPayload());
 				return listener.ReceivePayload<InvPayload>(cancellationToken).Inventory.Select(i => i.Hash).ToArray();
 			}
 		}
@@ -707,24 +703,24 @@ namespace ChainUtils.Protocol
 			return GetMempoolTransactions(GetMempool(), cancellationToken);
 		}
 
-		public Transaction[] GetMempoolTransactions(uint256[] txIds, CancellationToken cancellationToken = default(CancellationToken))
+		public Transaction[] GetMempoolTransactions(Uint256[] txIds, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			AssertState(NodeState.HandShaked);
 			if(txIds.Length == 0)
 				return new Transaction[0];
-			List<Transaction> result = new List<Transaction>();
+			var result = new List<Transaction>();
 			using(var listener = CreateListener().OfType<TxPayload>())
 			{
-				this.SendMessage(new GetDataPayload(txIds.Select(txid => new InventoryVector()
+				SendMessage(new GetDataPayload(txIds.Select(txid => new InventoryVector()
 				{
-					Type = InventoryType.MSG_TX,
+					Type = InventoryType.MsgTx,
 					Hash = txid
 				}).ToArray()));
 				try
 				{
 					while(result.Count < txIds.Length)
 					{
-						CancellationTokenSource timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2.0));
+						var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2.0));
 						result.Add(listener.ReceivePayload<TxPayload>(
 							CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token).Token).Object);
 

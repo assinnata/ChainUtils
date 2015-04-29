@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
@@ -82,7 +81,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 		private uint Step()
 		{
-			uint j = Mod512(cnt);
+			var j = Mod512(cnt);
 			uint ret;
 			if (cnt < 512)
 			{
@@ -108,15 +107,15 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 
 			cnt = 0;
 
-			uint[] w = new uint[1280];
+			var w = new uint[1280];
 
-			for (int i = 0; i < 16; i++)
+			for (var i = 0; i < 16; i++)
 			{
 				w[i >> 2] |= ((uint)key[i] << (8 * (i & 0x3)));
 			}
 			Array.Copy(w, 0, w, 4, 4);
 
-			for (int i = 0; i < iv.Length && i < 16; i++)
+			for (var i = 0; i < iv.Length && i < 16; i++)
 			{
 				w[(i >> 2) + 8] |= ((uint)iv[i] << (8 * (i & 0x3)));
 			}
@@ -130,11 +129,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			Array.Copy(w, 256, p, 0, 512);
 			Array.Copy(w, 768, q, 0, 512);
 
-			for (int i = 0; i < 512; i++)
+			for (var i = 0; i < 512; i++)
 			{
 				p[i] = Step();
 			}
-			for (int i = 0; i < 512; i++)
+			for (var i = 0; i < 512; i++)
 			{
 				q[i] = Step();
 			}
@@ -160,7 +159,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			bool				forEncryption,
 			ICipherParameters	parameters)
 		{
-			ICipherParameters keyParam = parameters;
+			var keyParam = parameters;
 
 			if (parameters is ParametersWithIV)
 			{
@@ -196,7 +195,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			{
 				Pack.UInt32_To_LE(Step(), buf);				
 			}
-			byte ret = buf[idx];
+			var ret = buf[idx];
 			idx = idx + 1 & 0x3;
 			return ret;
 		}
@@ -215,7 +214,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
 			if ((outOff + len) > output.Length)
 				throw new DataLengthException("output buffer too short");
 
-			for (int i = 0; i < len; i++)
+			for (var i = 0; i < len; i++)
 			{
 				output[outOff + i] = (byte)(input[inOff + i] ^ GetByte());
 			}

@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.CryptoPro;
 using ChainUtils.BouncyCastle.Security;
@@ -44,7 +43,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (publicKeyParamSet == null)
 				throw new ArgumentNullException("publicKeyParamSet");
 
-			Gost3410ParamSetParameters p = Gost3410NamedParameters.GetByOid(publicKeyParamSet);
+			var p = Gost3410NamedParameters.GetByOid(publicKeyParamSet);
 
 			if (p == null)
 				throw new ArgumentException("OID is not a valid CryptoPro public key parameter set", "publicKeyParamSet");

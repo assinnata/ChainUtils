@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Utilities;
 using ChainUtils.BouncyCastle.Utilities.Collections;
@@ -104,7 +101,7 @@ namespace ChainUtils.BouncyCastle.Asn1.CryptoPro
 		public static Gost3410ParamSetParameters GetByName(
             string name)
         {
-            DerObjectIdentifier oid = (DerObjectIdentifier) objIds[name];
+            var oid = (DerObjectIdentifier) objIds[name];
 
             if (oid != null)
             {

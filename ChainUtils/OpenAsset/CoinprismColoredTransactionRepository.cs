@@ -1,14 +1,11 @@
 ﻿#if !NOHTTPCLIENT
-using ChainUtils.DataEncoders;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
+using Newtonsoft.Json.Linq;
 
 namespace ChainUtils.OpenAsset
 {
@@ -32,12 +29,12 @@ namespace ChainUtils.OpenAsset
 		{
 			#region ITransactionRepository Members
 
-			public Task<Transaction> GetAsync(uint256 txId)
+			public Task<Transaction> GetAsync(Uint256 txId)
 			{
 				return Task.FromResult<Transaction>(null);
 			}
 
-			public Task PutAsync(uint256 txId, Transaction tx)
+			public Task PutAsync(Uint256 txId, Transaction tx)
 			{
 				return Task.FromResult(true);
 			}
@@ -54,12 +51,12 @@ namespace ChainUtils.OpenAsset
 			}
 		}
 
-		public async Task<ColoredTransaction> GetAsync(uint256 txId)
+		public async Task<ColoredTransaction> GetAsync(Uint256 txId)
 		{
 			try
 			{
-				ColoredTransaction result = new ColoredTransaction();
-				using(HttpClient client = new HttpClient())
+				var result = new ColoredTransaction();
+				using(var client = new HttpClient())
 				{
 					var response = await client.GetAsync("https://api.coinprism.com/v1/transactions/" + txId).ConfigureAwait(false);
 					if(response.StatusCode != HttpStatusCode.OK)
@@ -69,7 +66,7 @@ namespace ChainUtils.OpenAsset
 					var inputs = json["inputs"] as JArray;
 					if(inputs != null)
 					{
-						for(int i = 0 ; i < inputs.Count ; i++)
+						for(var i = 0 ; i < inputs.Count ; i++)
 						{
 							if(inputs[i]["asset_id"].Value<string>() == null)
 								continue;
@@ -86,8 +83,8 @@ namespace ChainUtils.OpenAsset
 					var outputs = json["outputs"] as JArray;
 					if(outputs != null)
 					{
-						bool issuance = true;
-						for(int i = 0 ; i < outputs.Count ; i++)
+						var issuance = true;
+						for(var i = 0 ; i < outputs.Count ; i++)
 						{
 							var marker = ColorMarker.TryParse(new Script(Encoders.Hex.DecodeData(outputs[i]["script"].ToString())));
 							if(marker != null)
@@ -98,7 +95,7 @@ namespace ChainUtils.OpenAsset
 							}
 							if(outputs[i]["asset_id"].Value<string>() == null)
 								continue;
-							ColoredEntry entry = new ColoredEntry();
+							var entry = new ColoredEntry();
 							entry.Index = (uint)i;
 							entry.Asset = new Asset(
 								new BitcoinAssetId(outputs[i]["asset_id"].ToString(), null).AssetId,
@@ -134,7 +131,7 @@ namespace ChainUtils.OpenAsset
 			}
 		}
 
-		public Task PutAsync(uint256 txId, ColoredTransaction tx)
+		public Task PutAsync(Uint256 txId, ColoredTransaction tx)
 		{
 			return Task.FromResult(false);
 		}

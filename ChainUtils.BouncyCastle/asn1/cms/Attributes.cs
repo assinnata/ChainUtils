@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Asn1.Cms
 {
     public class Attributes
@@ -30,9 +28,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 
         public virtual Attribute[] GetAttributes()
         {
-            Attribute[] rv = new Attribute[attributes.Count];
+            var rv = new Attribute[attributes.Count];
 
-            for (int i = 0; i != rv.Length; i++)
+            for (var i = 0; i != rv.Length; i++)
             {
                 rv[i] = Attribute.GetInstance(attributes[i]);
             }

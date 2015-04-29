@@ -1,5 +1,4 @@
 ﻿using System;
-
 using ChainUtils.BouncyCastle.Math.EC.Custom.Sec;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -26,7 +25,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public Curve25519FieldElement()
         {
-            this.x = Nat256.Create();
+            x = Nat256.Create();
         }
 
         protected internal Curve25519FieldElement(uint[] x)
@@ -66,28 +65,28 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public override ECFieldElement Add(ECFieldElement b)
         {
-            uint[] z = Nat256.Create();
+            var z = Nat256.Create();
             Curve25519Field.Add(x, ((Curve25519FieldElement)b).x, z);
             return new Curve25519FieldElement(z);
         }
 
         public override ECFieldElement AddOne()
         {
-            uint[] z = Nat256.Create();
+            var z = Nat256.Create();
             Curve25519Field.AddOne(x, z);
             return new Curve25519FieldElement(z);
         }
 
         public override ECFieldElement Subtract(ECFieldElement b)
         {
-            uint[] z = Nat256.Create();
+            var z = Nat256.Create();
             Curve25519Field.Subtract(x, ((Curve25519FieldElement)b).x, z);
             return new Curve25519FieldElement(z);
         }
 
         public override ECFieldElement Multiply(ECFieldElement b)
         {
-            uint[] z = Nat256.Create();
+            var z = Nat256.Create();
             Curve25519Field.Multiply(x, ((Curve25519FieldElement)b).x, z);
             return new Curve25519FieldElement(z);
         }
@@ -95,7 +94,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
         public override ECFieldElement Divide(ECFieldElement b)
         {
             //return Multiply(b.Invert());
-            uint[] z = Nat256.Create();
+            var z = Nat256.Create();
             Mod.Invert(Curve25519Field.P, ((Curve25519FieldElement)b).x, z);
             Curve25519Field.Multiply(z, x, z);
             return new Curve25519FieldElement(z);
@@ -103,14 +102,14 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
 
         public override ECFieldElement Negate()
         {
-            uint[] z = Nat256.Create();
+            var z = Nat256.Create();
             Curve25519Field.Negate(x, z);
             return new Curve25519FieldElement(z);
         }
 
         public override ECFieldElement Square()
         {
-            uint[] z = Nat256.Create();
+            var z = Nat256.Create();
             Curve25519Field.Square(x, z);
             return new Curve25519FieldElement(z);
         }
@@ -118,7 +117,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
         public override ECFieldElement Invert()
         {
             //return new Curve25519FieldElement(ToBigInteger().ModInverse(Q));
-            uint[] z = Nat256.Create();
+            var z = Nat256.Create();
             Mod.Invert(Curve25519Field.P, x, z);
             return new Curve25519FieldElement(z);
         }
@@ -141,48 +140,48 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Djb
              * We use: 1, 2, 3, 4, 7, 11, 15, 30, 60, 120, 131, [251]
              */
 
-            uint[] x1 = this.x;
+            var x1 = x;
             if (Nat256.IsZero(x1) || Nat256.IsOne(x1))
                 return this;
 
-            uint[] x2 = Nat256.Create();
+            var x2 = Nat256.Create();
             Curve25519Field.Square(x1, x2);
             Curve25519Field.Multiply(x2, x1, x2);
-            uint[] x3 = x2;
+            var x3 = x2;
             Curve25519Field.Square(x2, x3);
             Curve25519Field.Multiply(x3, x1, x3);
-            uint[] x4 = Nat256.Create();
+            var x4 = Nat256.Create();
             Curve25519Field.Square(x3, x4);
             Curve25519Field.Multiply(x4, x1, x4);
-            uint[] x7 = Nat256.Create();
+            var x7 = Nat256.Create();
             Curve25519Field.SquareN(x4, 3, x7);
             Curve25519Field.Multiply(x7, x3, x7);
-            uint[] x11 = x3;
+            var x11 = x3;
             Curve25519Field.SquareN(x7, 4, x11);
             Curve25519Field.Multiply(x11, x4, x11);
-            uint[] x15 = x7;
+            var x15 = x7;
             Curve25519Field.SquareN(x11, 4, x15);
             Curve25519Field.Multiply(x15, x4, x15);
-            uint[] x30 = x4;
+            var x30 = x4;
             Curve25519Field.SquareN(x15, 15, x30);
             Curve25519Field.Multiply(x30, x15, x30);
-            uint[] x60 = x15;
+            var x60 = x15;
             Curve25519Field.SquareN(x30, 30, x60);
             Curve25519Field.Multiply(x60, x30, x60);
-            uint[] x120 = x30;
+            var x120 = x30;
             Curve25519Field.SquareN(x60, 60, x120);
             Curve25519Field.Multiply(x120, x60, x120);
-            uint[] x131 = x60;
+            var x131 = x60;
             Curve25519Field.SquareN(x120, 11, x131);
             Curve25519Field.Multiply(x131, x11, x131);
-            uint[] x251 = x11;
+            var x251 = x11;
             Curve25519Field.SquareN(x131, 120, x251);
             Curve25519Field.Multiply(x251, x120, x251);
 
-            uint[] t1 = x251;
+            var t1 = x251;
             Curve25519Field.Square(t1, t1);
 
-            uint[] t2 = x120;
+            var t2 = x120;
             Curve25519Field.Square(t1, t2);
 
             if (Nat256.Eq(x1, t2))

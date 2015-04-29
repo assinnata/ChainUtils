@@ -1,8 +1,3 @@
-using System;
-using System.Collections;
-
-using ChainUtils.BouncyCastle.Asn1;
-
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 {
     public class ContentInfo
@@ -15,7 +10,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
         {
             if (obj == null)
                 return null;
-            ContentInfo existing = obj as ContentInfo;
+            var existing = obj as ContentInfo;
             if (existing != null)
                 return existing;
             return new ContentInfo(Asn1Sequence.GetInstance(obj));
@@ -61,7 +56,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(contentType);
+            var v = new Asn1EncodableVector(contentType);
 
             if (content != null)
             {

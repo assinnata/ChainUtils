@@ -1,13 +1,9 @@
 using System;
-using System.Collections;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.CryptoPro;
-using ChainUtils.BouncyCastle.Asn1.X9;
 using ChainUtils.BouncyCastle.Crypto.Generators;
 using ChainUtils.BouncyCastle.Security;
 using ChainUtils.BouncyCastle.Utilities;
-using ChainUtils.BouncyCastle.Utilities.Collections;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
 {
@@ -47,7 +43,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
                 throw new ArgumentNullException("publicKeyParamSet");
 
             this.algorithm = VerifyAlgorithmName(algorithm);
-            this.parameters = LookupParameters(publicKeyParamSet);
+            parameters = LookupParameters(publicKeyParamSet);
             this.publicKeyParamSet = publicKeyParamSet;
         }
 
@@ -72,7 +68,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
             if (obj == this)
                 return true;
 
-            ECDomainParameters other = obj as ECDomainParameters;
+            var other = obj as ECDomainParameters;
 
             if (other == null)
                 return false;
@@ -104,7 +100,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 
         internal static string VerifyAlgorithmName(string algorithm)
         {
-            string upper = Platform.ToUpperInvariant(algorithm);
+            var upper = Platform.ToUpperInvariant(algorithm);
             if (Array.IndexOf(algorithms, algorithm, 0, algorithms.Length) < 0)
                 throw new ArgumentException("unrecognised algorithm: " + algorithm, "algorithm");
             return upper;
@@ -116,11 +112,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
             if (publicKeyParamSet == null)
                 throw new ArgumentNullException("publicKeyParamSet");
 
-            ECDomainParameters p = ECGost3410NamedCurves.GetByOid(publicKeyParamSet);
+            var p = ECGost3410NamedCurves.GetByOid(publicKeyParamSet);
 
             if (p == null)
             {
-                X9ECParameters x9 = ECKeyPairGenerator.FindECCurveByOid(publicKeyParamSet);
+                var x9 = ECKeyPairGenerator.FindECCurveByOid(publicKeyParamSet);
 
                 if (x9 == null)
                 {

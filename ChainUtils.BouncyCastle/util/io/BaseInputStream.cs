@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 
 namespace ChainUtils.BouncyCastle.Utilities.IO
@@ -27,13 +26,13 @@ namespace ChainUtils.BouncyCastle.Utilities.IO
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            int pos = offset;
+            var pos = offset;
             try
             {
-                int end = offset + count;
+                var end = offset + count;
                 while (pos < end)
                 {
-                    int b = ReadByte();
+                    var b = ReadByte();
                     if (b == -1) break;
                     buffer[pos++] = (byte) b;
                 }

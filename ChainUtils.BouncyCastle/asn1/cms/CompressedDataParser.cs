@@ -1,6 +1,3 @@
-using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -24,9 +21,9 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 		public CompressedDataParser(
 			Asn1SequenceParser seq)
 		{
-			this._version = (DerInteger)seq.ReadObject();
-			this._compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq.ReadObject().ToAsn1Object());
-			this._encapContentInfo = new ContentInfoParser((Asn1SequenceParser)seq.ReadObject());
+			_version = (DerInteger)seq.ReadObject();
+			_compressionAlgorithm = AlgorithmIdentifier.GetInstance(seq.ReadObject().ToAsn1Object());
+			_encapContentInfo = new ContentInfoParser((Asn1SequenceParser)seq.ReadObject());
 		}
 
 		public DerInteger Version

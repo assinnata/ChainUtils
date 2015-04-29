@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 
 namespace ChainUtils.BouncyCastle.Utilities.Encoders
@@ -33,7 +32,7 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
         {
             Arrays.Fill(decodingTable, (byte)0xff);
 
-            for (int i = 0; i < encodingTable.Length; i++)
+            for (var i = 0; i < encodingTable.Length; i++)
             {
                 decodingTable[encodingTable[i]] = (byte)i;
             }
@@ -55,11 +54,11 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             int		length,
             Stream	outStream)
         {
-            int modulus = length % 3;
-            int dataLength = (length - modulus);
+            var modulus = length % 3;
+            var dataLength = (length - modulus);
             int a1, a2, a3;
 
-            for (int i = off; i < off + dataLength; i += 3)
+            for (var i = off; i < off + dataLength; i += 3)
             {
                 a1 = data[i] & 0xff;
                 a2 = data[i + 1] & 0xff;
@@ -128,9 +127,9 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             Stream	outStream)
         {
             byte b1, b2, b3, b4;
-            int outLen = 0;
+            var outLen = 0;
 
-            int end = off + length;
+            var end = off + length;
 
             while (end > off)
             {
@@ -142,8 +141,8 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
                 end--;
             }
 
-            int  i = off;
-            int  finish = end - 4;
+            var  i = off;
+            var  finish = end - 4;
 
             i = nextI(data, i, finish);
 
@@ -208,9 +207,9 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
 //			return bytes.Length;
 
             byte b1, b2, b3, b4;
-            int length = 0;
+            var length = 0;
 
-            int end = data.Length;
+            var end = data.Length;
 
             while (end > 0)
             {
@@ -222,8 +221,8 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
                 end--;
             }
 
-            int  i = 0;
-            int  finish = end - 4;
+            var  i = 0;
+            var  finish = end - 4;
 
             i = nextI(data, i, finish);
 
@@ -269,8 +268,8 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
         {
             if (c3 == padding)
             {
-                byte b1 = decodingTable[c1];
-                byte b2 = decodingTable[c2];
+                var b1 = decodingTable[c1];
+                var b2 = decodingTable[c2];
 
                 if ((b1 | b2) >= 0x80)
                     throw new IOException("invalid characters encountered at end of base64 data");
@@ -282,9 +281,9 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
 
             if (c4 == padding)
             {
-                byte b1 = decodingTable[c1];
-                byte b2 = decodingTable[c2];
-                byte b3 = decodingTable[c3];
+                var b1 = decodingTable[c1];
+                var b2 = decodingTable[c2];
+                var b3 = decodingTable[c3];
 
                 if ((b1 | b2 | b3) >= 0x80)
                     throw new IOException("invalid characters encountered at end of base64 data");
@@ -296,10 +295,10 @@ namespace ChainUtils.BouncyCastle.Utilities.Encoders
             }
 
             {
-                byte b1 = decodingTable[c1];
-                byte b2 = decodingTable[c2];
-                byte b3 = decodingTable[c3];
-                byte b4 = decodingTable[c4];
+                var b1 = decodingTable[c1];
+                var b2 = decodingTable[c2];
+                var b3 = decodingTable[c3];
+                var b4 = decodingTable[c4];
 
                 if ((b1 | b2 | b3 | b4) >= 0x80)
                     throw new IOException("invalid characters encountered at end of base64 data");

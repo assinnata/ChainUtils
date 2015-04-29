@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1
@@ -41,7 +40,7 @@ namespace ChainUtils.BouncyCastle.Asn1
             Asn1TaggedObject	obj,
             bool				isExplicit)
         {
-			Asn1Object o = obj.GetObject();
+			var o = obj.GetObject();
 
 			if (isExplicit || o is DerT61String)
 			{
@@ -91,12 +90,12 @@ namespace ChainUtils.BouncyCastle.Asn1
 		protected override bool Asn1Equals(
 			Asn1Object asn1Object)
 		{
-			DerT61String other = asn1Object as DerT61String;
+			var other = asn1Object as DerT61String;
 
 			if (other == null)
 				return false;
 
-            return this.str.Equals(other.str);
+            return str.Equals(other.str);
         }
 	}
 }

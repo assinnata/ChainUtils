@@ -1,10 +1,7 @@
-﻿using ChainUtils.DataEncoders;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
 
 namespace ChainUtils.OpenAsset
 {
@@ -19,7 +16,7 @@ namespace ChainUtils.OpenAsset
 		{
 			try
 			{
-				ColorMarker result = new ColorMarker();
+				var result = new ColorMarker();
 				if(!result.ReadScript(script))
 					return null;
 				return result;
@@ -35,13 +32,13 @@ namespace ChainUtils.OpenAsset
 			var data = TxNullDataTemplate.Instance.ExtractScriptPubKeyParameters(script);
 			if(data == null)
 				return false;
-			BitcoinStream stream = new BitcoinStream(data);
+			var stream = new BitcoinStream(data);
 			ushort marker = 0;
 			stream.ReadWrite(ref marker);
 			if(marker != Tag)
 				return false;
-			stream.ReadWrite(ref _Version);
-			if(_Version != 1)
+			stream.ReadWrite(ref _version);
+			if(_version != 1)
 				return false;
 
 			ulong quantityCount = 0;
@@ -51,8 +48,8 @@ namespace ChainUtils.OpenAsset
 			{
 				for(ulong i = 0 ; i < quantityCount ; i++)
 				{
-					Quantities[i] = ReadLEB128(stream);
-					if(Quantities[i] > MAX_QUANTITY)
+					Quantities[i] = ReadLeb128(stream);
+					if(Quantities[i] > MaxQuantity)
 						throw new FormatException();
 				}
 			}
@@ -60,11 +57,11 @@ namespace ChainUtils.OpenAsset
 			{
 				return false;
 			}
-			stream.ReadWriteAsVarString(ref _Metadata);
+			stream.ReadWriteAsVarString(ref _metadata);
 			return true;
 		}
 
-		private static ulong ReadLEB128(BitcoinStream stream)
+		private static ulong ReadLeb128(BitcoinStream stream)
 		{
 			ulong value = 0;
 			value = stream.ReadWrite((byte)0);
@@ -129,11 +126,11 @@ namespace ChainUtils.OpenAsset
 			}
 			return value;
 		}
-		private void WriteLEB128(ulong value, BitcoinStream stream)
+		private void WriteLeb128(ulong value, BitcoinStream stream)
 		{
-			byte[] bytes = new byte[10];
-			int ioIndex = 0;
-			int count = 0;
+			var bytes = new byte[10];
+			var ioIndex = 0;
+			var count = 0;
 			do
 			{
 				bytes[ioIndex++] = (byte)((value & 127uL) | 128uL);
@@ -161,29 +158,29 @@ namespace ChainUtils.OpenAsset
 				throw new ArgumentNullException("quantities");
 			Quantities = quantities;
 		}
-		ushort _Version = 1;
+		ushort _version = 1;
 		public ushort Version
 		{
 			get
 			{
-				return _Version;
+				return _version;
 			}
 			set
 			{
-				_Version = value;
+				_version = value;
 			}
 		}
 
-		ulong[] _Quantities;
+		ulong[] _quantities;
 		public ulong[] Quantities
 		{
 			get
 			{
-				return _Quantities;
+				return _quantities;
 			}
 			set
 			{
-				_Quantities = value;
+				_quantities = value;
 			}
 		}
 
@@ -192,7 +189,7 @@ namespace ChainUtils.OpenAsset
 			if(Quantities == null)
 				Quantities = new ulong[0];
 			if(Quantities.Length <= index)
-				Array.Resize(ref _Quantities, (int)index + 1);
+				Array.Resize(ref _quantities, (int)index + 1);
 			Quantities[index] = quantity;
 		}
 
@@ -201,35 +198,35 @@ namespace ChainUtils.OpenAsset
 			SetQuantity((uint)index, quantity);
 		}
 
-		byte[] _Metadata = new byte[0];
+		byte[] _metadata = new byte[0];
 		public byte[] Metadata
 		{
 			get
 			{
-				return _Metadata;
+				return _metadata;
 			}
 			set
 			{
-				_Metadata = value;
+				_metadata = value;
 			}
 		}
-		private const ulong MAX_QUANTITY = ((1UL << 63) - 1);
+		private const ulong MaxQuantity = ((1UL << 63) - 1);
 
 		public Script GetScript()
 		{
-			MemoryStream ms = new MemoryStream();
-			BitcoinStream stream = new BitcoinStream(ms, true);
+			var ms = new MemoryStream();
+			var stream = new BitcoinStream(ms, true);
 			stream.ReadWrite(Tag);
-			stream.ReadWrite(ref _Version);
-			var quantityCount = (uint)this.Quantities.Length;
+			stream.ReadWrite(ref _version);
+			var quantityCount = (uint)Quantities.Length;
 			stream.ReadWriteAsVarInt(ref quantityCount);
-			for(int i = 0 ; i < quantityCount ; i++)
+			for(var i = 0 ; i < quantityCount ; i++)
 			{
-				if(Quantities[i] > MAX_QUANTITY)
+				if(Quantities[i] > MaxQuantity)
 					throw new ArgumentOutOfRangeException("Quantity should not exceed " + Quantities[i]);
-				WriteLEB128(Quantities[i], stream);
+				WriteLeb128(Quantities[i], stream);
 			}
-			stream.ReadWriteAsVarString(ref _Metadata);
+			stream.ReadWriteAsVarString(ref _metadata);
 			return TxNullDataTemplate.Instance.GenerateScriptPubKey(ms.ToArray());
 		}
 

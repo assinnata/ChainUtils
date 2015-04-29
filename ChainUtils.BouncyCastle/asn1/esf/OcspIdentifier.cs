@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.Ocsp;
 
 namespace ChainUtils.BouncyCastle.Asn1.Esf
@@ -44,8 +43,8 @@ namespace ChainUtils.BouncyCastle.Asn1.Esf
 			if (seq.Count != 2)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			this.ocspResponderID = ResponderID.GetInstance(seq[0].ToAsn1Object());
-			this.producedAt = (DerGeneralizedTime) seq[1].ToAsn1Object();
+			ocspResponderID = ResponderID.GetInstance(seq[0].ToAsn1Object());
+			producedAt = (DerGeneralizedTime) seq[1].ToAsn1Object();
 		}
 
 		public OcspIdentifier(

@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Cms
@@ -17,7 +15,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
             AlgorithmIdentifier	keyEncryptionAlgorithm,
             Asn1OctetString		encryptedKey)
         {
-            this.version = new DerInteger(0);
+            version = new DerInteger(0);
             this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
             this.encryptedKey = encryptedKey;
         }
@@ -27,7 +25,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
 			AlgorithmIdentifier	keyEncryptionAlgorithm,
 			Asn1OctetString		encryptedKey)
 		{
-			this.version = new DerInteger(0);
+			version = new DerInteger(0);
 			this.keyDerivationAlgorithm = keyDerivationAlgorithm;
 			this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
 			this.encryptedKey = encryptedKey;
@@ -118,7 +116,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Cms
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(version);
+            var v = new Asn1EncodableVector(version);
 
 			if (keyDerivationAlgorithm != null)
             {

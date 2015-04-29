@@ -1,5 +1,3 @@
-using System;
-
 namespace ChainUtils.BouncyCastle.Crypto
 {
 	public abstract class BufferedCipherBase
@@ -23,7 +21,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 			byte[]	output,
 			int		outOff)
 		{
-			byte[] outBytes = ProcessByte(input);
+			var outBytes = ProcessByte(input);
 			if (outBytes == null)
 				return 0;
 			if (outOff + outBytes.Length > output.Length)
@@ -55,7 +53,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 			byte[]	output,
 			int		outOff)
 		{
-			byte[] outBytes = ProcessBytes(input, inOff, length);
+			var outBytes = ProcessBytes(input, inOff, length);
 			if (outBytes == null)
 				return 0;
 			if (outOff + outBytes.Length > output.Length)
@@ -81,7 +79,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 			byte[]	output,
 			int		outOff)
 		{
-			byte[] outBytes = DoFinal();
+			var outBytes = DoFinal();
 			if (outOff + outBytes.Length > output.Length)
 				throw new DataLengthException("output buffer too short");
 			outBytes.CopyTo(output, outOff);
@@ -103,7 +101,7 @@ namespace ChainUtils.BouncyCastle.Crypto
 			byte[]	output,
 			int		outOff)
 		{
-			int len = ProcessBytes(input, inOff, length, output, outOff);
+			var len = ProcessBytes(input, inOff, length, output, outOff);
 			len += DoFinal(output, outOff + len);
 			return len;
 		}

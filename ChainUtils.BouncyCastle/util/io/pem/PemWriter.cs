@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities.Encoders;
 
 namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
@@ -28,7 +26,7 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 				throw new ArgumentNullException("writer");
 
 			this.writer = writer;
-			this.nlLength = Platform.NewLine.Length;
+			nlLength = Platform.NewLine.Length;
 		}
 
 		public TextWriter Writer
@@ -46,7 +44,7 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 		public int GetOutputSize(PemObject obj)
 		{
 			// BEGIN and END boundaries.
-			int size = (2 * (obj.Type.Length + 10 + nlLength)) + 6 + 4;
+			var size = (2 * (obj.Type.Length + 10 + nlLength)) + 6 + 4;
 
 			if (obj.Headers.Count > 0)
 			{
@@ -59,7 +57,7 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 			}
 
 			// base64 encoding
-			int dataLen = ((obj.Content.Length + 2) / 3) * 4;
+			var dataLen = ((obj.Content.Length + 2) / 3) * 4;
 
 			size += dataLen + (((dataLen + LineLength - 1) / LineLength) * nlLength);
 
@@ -68,7 +66,7 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 
 		public void WriteObject(PemObjectGenerator objGen)
 		{
-			PemObject obj = objGen.Generate();
+			var obj = objGen.Generate();
 
 			WritePreEncapsulationBoundary(obj.Type);
 
@@ -92,9 +90,9 @@ namespace ChainUtils.BouncyCastle.Utilities.IO.Pem
 		{
 			bytes = Base64.Encode(bytes);
 
-			for (int i = 0; i < bytes.Length; i += buf.Length)
+			for (var i = 0; i < bytes.Length; i += buf.Length)
 			{
-				int index = 0;
+				var index = 0;
 				while (index != buf.Length)
 				{
 					if ((i + index) >= bytes.Length)

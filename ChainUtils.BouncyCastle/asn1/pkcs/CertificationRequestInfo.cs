@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
@@ -52,7 +51,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             Asn1Set					attributes)
         {
             this.subject = subject;
-            this.subjectPKInfo = pkInfo;
+            subjectPKInfo = pkInfo;
             this.attributes = attributes;
 
 			if (subject == null || version == null || subjectPKInfo == null)
@@ -76,7 +75,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             //
             if (seq.Count > 3)
             {
-                DerTaggedObject tagobj = (DerTaggedObject) seq[3];
+                var tagobj = (DerTaggedObject) seq[3];
                 attributes = Asn1Set.GetInstance(tagobj, false);
             }
 
@@ -109,7 +108,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 
 		public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(
+            var v = new Asn1EncodableVector(
 				version, subject, subjectPKInfo);
 
 			if (attributes != null)

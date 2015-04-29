@@ -1,7 +1,4 @@
 using System;
-using System.Diagnostics;
-
-using ChainUtils.BouncyCastle.Crypto.Engines;
 
 namespace ChainUtils.BouncyCastle.Crypto
 {
@@ -79,8 +76,8 @@ namespace ChainUtils.BouncyCastle.Crypto
 			// we allow for an extra byte where people are using their own padding
 			// mechanisms on a raw cipher.
 			//
-			this.buffer = new byte[cipher.GetInputBlockSize() + (forEncryption ? 1 : 0)];
-			this.bufOff = 0;
+			buffer = new byte[cipher.GetInputBlockSize() + (forEncryption ? 1 : 0)];
+			bufOff = 0;
         }
 
 		public override byte[] ProcessByte(
@@ -121,7 +118,7 @@ namespace ChainUtils.BouncyCastle.Crypto
         */
         public override byte[] DoFinal()
         {
-			byte[] outBytes = bufOff > 0
+			var outBytes = bufOff > 0
 				?	cipher.ProcessBlock(buffer, 0, bufOff)
 				:	EmptyBuffer;
 

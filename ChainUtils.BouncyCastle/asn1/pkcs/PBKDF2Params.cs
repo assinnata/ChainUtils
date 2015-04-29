@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
@@ -42,7 +41,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 			byte[] salt,
 			int iterationCount)
 		{
-			this.octStr = new DerOctetString(salt);
+			octStr = new DerOctetString(salt);
 			this.iterationCount = new DerInteger(iterationCount);
 		}
 
@@ -72,7 +71,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(
+			var v = new Asn1EncodableVector(
 				octStr, iterationCount);
 
 			if (keyLength != null)

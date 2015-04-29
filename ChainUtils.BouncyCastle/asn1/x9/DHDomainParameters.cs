@@ -47,22 +47,22 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
 			if (seq.Count < 3 || seq.Count > 5)
 				throw new ArgumentException("Bad sequence size: " + seq.Count, "seq");
 
-			IEnumerator e = seq.GetEnumerator();
-			this.p = DerInteger.GetInstance(GetNext(e));
-			this.g = DerInteger.GetInstance(GetNext(e));
-			this.q = DerInteger.GetInstance(GetNext(e));
+			var e = seq.GetEnumerator();
+			p = DerInteger.GetInstance(GetNext(e));
+			g = DerInteger.GetInstance(GetNext(e));
+			q = DerInteger.GetInstance(GetNext(e));
 
-			Asn1Encodable next = GetNext(e);
+			var next = GetNext(e);
 
 			if (next != null && next is DerInteger)
 			{
-				this.j = DerInteger.GetInstance(next);
+				j = DerInteger.GetInstance(next);
 				next = GetNext(e);
 			}
 
 			if (next != null)
 			{
-				this.validationParms = DHValidationParms.GetInstance(next.ToAsn1Object());
+				validationParms = DHValidationParms.GetInstance(next.ToAsn1Object());
 			}
 		}
 
@@ -73,41 +73,41 @@ namespace ChainUtils.BouncyCastle.Asn1.X9
 
 		public DerInteger P
 		{
-			get { return this.p; }
+			get { return p; }
 		}
 
 		public DerInteger G
 		{
-			get { return this.g; }
+			get { return g; }
 		}
 
 		public DerInteger Q
 		{
-			get { return this.q; }
+			get { return q; }
 		}
 
 		public DerInteger J
 		{
-			get { return this.j; }
+			get { return j; }
 		}
 
 		public DHValidationParms ValidationParms
 		{
-			get { return this.validationParms; }
+			get { return validationParms; }
 		}
 
 		public override Asn1Object ToAsn1Object()
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(p, g, q);
+			var v = new Asn1EncodableVector(p, g, q);
 
-			if (this.j != null)
+			if (j != null)
 			{
-				v.Add(this.j);
+				v.Add(j);
 			}
 
-			if (this.validationParms != null)
+			if (validationParms != null)
 			{
-				v.Add(this.validationParms);
+				v.Add(validationParms);
 			}
 
 			return new DerSequence(v);

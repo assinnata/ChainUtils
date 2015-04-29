@@ -1,167 +1,165 @@
-﻿using ChainUtils.DataEncoders;
-using ChainUtils.Protocol;
-using ChainUtils.Stealth;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Numerics;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using ChainUtils.DataEncoders;
+using ChainUtils.OpenAsset;
+using ChainUtils.Protocol;
+using ChainUtils.Stealth;
 
 namespace ChainUtils
 {
-	public class DNSSeedData
+	public class DnsSeedData
 	{
-		string name, host;
+		string _name, _host;
 		public string Name
 		{
 			get
 			{
-				return name;
+				return _name;
 			}
 		}
 		public string Host
 		{
 			get
 			{
-				return host;
+				return _host;
 			}
 		}
-		public DNSSeedData(string name, string host)
+		public DnsSeedData(string name, string host)
 		{
-			this.name = name;
-			this.host = host;
+			this._name = name;
+			this._host = host;
 		}
 #if !PORTABLE
-		IPAddress[] _Addresses = null;
+		IPAddress[] _addresses = null;
 		public IPAddress[] GetAddressNodes()
 		{
-			if(_Addresses != null)
-				return _Addresses;
-			return Dns.GetHostAddresses(host);
+			if(_addresses != null)
+				return _addresses;
+			return Dns.GetHostAddresses(_host);
 		}
 #endif
 		public override string ToString()
 		{
-			return name + " (" + host + ")";
+			return _name + " (" + _host + ")";
 		}
 	}
 	public enum Base58Type
 	{
-		PUBKEY_ADDRESS,
-		SCRIPT_ADDRESS,
-		SECRET_KEY,
-		EXT_PUBLIC_KEY,
-		EXT_SECRET_KEY,
-		ENCRYPTED_SECRET_KEY_EC,
-		ENCRYPTED_SECRET_KEY_NO_EC,
-		PASSPHRASE_CODE,
-		CONFIRMATION_CODE,
-		STEALTH_ADDRESS,
-		ASSET_ID,
-		COLORED_ADDRESS,
-		MAX_BASE58_TYPES,
+		PubkeyAddress,
+		ScriptAddress,
+		SecretKey,
+		ExtPublicKey,
+		ExtSecretKey,
+		EncryptedSecretKeyEc,
+		EncryptedSecretKeyNoEc,
+		PassphraseCode,
+		ConfirmationCode,
+		StealthAddress,
+		AssetId,
+		ColoredAddress,
+		MaxBase58Types,
 	};
 	public class Network
 	{
-		byte[][] base58Prefixes = new byte[12][];
+		byte[][] _base58Prefixes = new byte[12][];
 
 
-		string[] pnSeed = new[] { "127.0.0.1" };
+		string[] _pnSeed = new[] { "127.0.0.1" };
 
 
-		uint magic;
-		byte[] vAlertPubKey;
-		PubKey _AlertPubKey;
+		uint _magic;
+		byte[] _vAlertPubKey;
+		PubKey _alertPubKey;
 		public PubKey AlertPubKey
 		{
 			get
 			{
-				if(_AlertPubKey == null)
+				if(_alertPubKey == null)
 				{
-					_AlertPubKey = new PubKey(vAlertPubKey);
+					_alertPubKey = new PubKey(_vAlertPubKey);
 				}
-				return _AlertPubKey;
+				return _alertPubKey;
 			}
 		}
 
 #if !PORTABLE
-		List<DNSSeedData> vSeeds = new List<DNSSeedData>();
-		List<NetworkAddress> vFixedSeeds = new List<NetworkAddress>();
+		List<DnsSeedData> _vSeeds = new List<DnsSeedData>();
+		List<NetworkAddress> _vFixedSeeds = new List<NetworkAddress>();
 #endif
-		Block genesis = new Block();
+		Block _genesis = new Block();
 
-		private int nRPCPort;
-		public int RPCPort
+		private int _nRpcPort;
+		public int RpcPort
 		{
 			get
 			{
-				return nRPCPort;
+				return _nRpcPort;
 			}
 		}
 
-		private uint256 hashGenesisBlock;
+		private Uint256 _hashGenesisBlock;
 
-		private int nDefaultPort;
+		private int _nDefaultPort;
 		public int DefaultPort
 		{
 			get
 			{
-				return nDefaultPort;
+				return _nDefaultPort;
 			}
 		}
 
 
 
-		static Network _RegTest;
+		static Network _regTest;
 		public static Network RegTest
 		{
 			get
 			{
-				if(_RegTest == null)
+				if(_regTest == null)
 				{
 					var instance = new Network();
 					instance.InitReg();
-					_RegTest = instance;
+					_regTest = instance;
 				}
-				return _RegTest;
+				return _regTest;
 			}
 		}
 
 		private void InitReg()
 		{
 			InitTest();
-			magic = 0xDAB5BFFA;
-			name = "RegTest";
-			nSubsidyHalvingInterval = 150;
-			_ProofOfLimit = new Target(~new uint256(0) >> 1);
-			genesis.Header.BlockTime = Utils.UnixTimeToDateTime(1296688602);
-			genesis.Header.Bits = 0x207fffff;
-			genesis.Header.Nonce = 2;
-			hashGenesisBlock = genesis.GetHash();
-			nDefaultPort = 18444;
+			_magic = 0xDAB5BFFA;
+			_name = "RegTest";
+			_nSubsidyHalvingInterval = 150;
+			_proofOfLimit = new Target(~new Uint256(0) >> 1);
+			_genesis.Header.BlockTime = Utils.UnixTimeToDateTime(1296688602);
+			_genesis.Header.Bits = 0x207fffff;
+			_genesis.Header.Nonce = 2;
+			_hashGenesisBlock = _genesis.GetHash();
+			_nDefaultPort = 18444;
 			//strDataDir = "regtest";
-			assert(hashGenesisBlock == new uint256("0x0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"));
+			Assert(_hashGenesisBlock == new Uint256("0x0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"));
 
 #if !PORTABLE
-			vSeeds.Clear();  // Regtest mode doesn't have any DNS seeds.
+			_vSeeds.Clear();  // Regtest mode doesn't have any DNS seeds.
 #endif
 		}
 
 
-		static Network _Main;
-		private Target _ProofOfLimit;
-		private int nSubsidyHalvingInterval;
-		private string name;
+		static Network _main;
+		private Target _proofOfLimit;
+		private int _nSubsidyHalvingInterval;
+		private string _name;
 
 		public string Name
 		{
 			get
 			{
-				return name;
+				return _name;
 			}
 		}
 
@@ -169,27 +167,27 @@ namespace ChainUtils
 		{
 			get
 			{
-				if(_Main == null)
+				if(_main == null)
 				{
 					var instance = new Network();
 					instance.InitMain();
-					_Main = instance;
+					_main = instance;
 				}
-				return _Main;
+				return _main;
 			}
 		}
 
 		private void InitMain()
 		{
 			SpendableCoinbaseDepth = 1;
-			name = "Main";
+			_name = "Main";
 			// The message start string is designed to be unlikely to occur in normal data.
 			// The characters are rarely used upper ASCII, not valid as UTF-8, and produce
 			// a large 4-byte int at any alignment.
-			magic = 0xD9B4BEF9;
-			vAlertPubKey = DataEncoders.Encoders.Hex.DecodeData("04fc9702847840aaf195de8442ebecedf5b095cdbb9bc716bda9110971b28a49e0ead8564ff0db22209e0374782c093bb899692d524e9d6a6956e7c5ecbcd68284");
-			nDefaultPort = 44001;
-			nRPCPort = 33001;
+			_magic = 0xD9B4BEF9;
+			_vAlertPubKey = Encoders.Hex.DecodeData("04fc9702847840aaf195de8442ebecedf5b095cdbb9bc716bda9110971b28a49e0ead8564ff0db22209e0374782c093bb899692d524e9d6a6956e7c5ecbcd68284");
+			_nDefaultPort = 44001;
+			_nRpcPort = 33001;
 			/*
             _ProofOfLimit = new Target(~new uint256(0) >> 32);
 			nSubsidyHalvingInterval = 210000;
@@ -216,86 +214,86 @@ namespace ChainUtils
 #if !PORTABLE
 			//vSeeds.Add(new DNSSeedData("bitcoin.sipa.be", "seed.bitcoin.sipa.be"));
 #endif
-			base58Prefixes[(int)Base58Type.PUBKEY_ADDRESS] = new byte[] { (0x41) };
-			base58Prefixes[(int)Base58Type.SCRIPT_ADDRESS] = new byte[] { (5) };
-			base58Prefixes[(int)Base58Type.SECRET_KEY] = new byte[] { (193) };
-			base58Prefixes[(int)Base58Type.ENCRYPTED_SECRET_KEY_NO_EC] = new byte[] { 0x01, 0x42 };
-			base58Prefixes[(int)Base58Type.ENCRYPTED_SECRET_KEY_EC] = new byte[] { 0x01, 0x43 };
-			base58Prefixes[(int)Base58Type.EXT_PUBLIC_KEY] = new byte[] { (0x04), (0x88), (0xB2), (0x1E) };
-			base58Prefixes[(int)Base58Type.EXT_SECRET_KEY] = new byte[] { (0x04), (0x88), (0xAD), (0xE4) };
-			base58Prefixes[(int)Base58Type.PASSPHRASE_CODE] = new byte[] { 0x2C, 0xE9, 0xB3, 0xE1, 0xFF, 0x39, 0xE2 };
-			base58Prefixes[(int)Base58Type.CONFIRMATION_CODE] = new byte[] { 0x64, 0x3B, 0xF6, 0xA8, 0x9A };
-			base58Prefixes[(int)Base58Type.STEALTH_ADDRESS] = new byte[] { 0x2a };
-			base58Prefixes[(int)Base58Type.ASSET_ID] = new byte[] { 23 };
-			base58Prefixes[(int)Base58Type.COLORED_ADDRESS] = new byte[] { 0x13 };
+			_base58Prefixes[(int)Base58Type.PubkeyAddress] = new byte[] { (0x41) };
+			_base58Prefixes[(int)Base58Type.ScriptAddress] = new byte[] { (5) };
+			_base58Prefixes[(int)Base58Type.SecretKey] = new byte[] { (193) };
+			_base58Prefixes[(int)Base58Type.EncryptedSecretKeyNoEc] = new byte[] { 0x01, 0x42 };
+			_base58Prefixes[(int)Base58Type.EncryptedSecretKeyEc] = new byte[] { 0x01, 0x43 };
+			_base58Prefixes[(int)Base58Type.ExtPublicKey] = new byte[] { (0x04), (0x88), (0xB2), (0x1E) };
+			_base58Prefixes[(int)Base58Type.ExtSecretKey] = new byte[] { (0x04), (0x88), (0xAD), (0xE4) };
+			_base58Prefixes[(int)Base58Type.PassphraseCode] = new byte[] { 0x2C, 0xE9, 0xB3, 0xE1, 0xFF, 0x39, 0xE2 };
+			_base58Prefixes[(int)Base58Type.ConfirmationCode] = new byte[] { 0x64, 0x3B, 0xF6, 0xA8, 0x9A };
+			_base58Prefixes[(int)Base58Type.StealthAddress] = new byte[] { 0x2a };
+			_base58Prefixes[(int)Base58Type.AssetId] = new byte[] { 23 };
+			_base58Prefixes[(int)Base58Type.ColoredAddress] = new byte[] { 0x13 };
 
 			// Convert the pnSeeds array into usable address objects.
-			Random rand = new Random();
-			TimeSpan nOneWeek = TimeSpan.FromDays(7);
+			var rand = new Random();
+			var nOneWeek = TimeSpan.FromDays(7);
 #if !PORTABLE
-			for(int i = 0 ; i < pnSeed.Length ; i++)
+			for(var i = 0 ; i < _pnSeed.Length ; i++)
 			{
 				// It'll only connect to one or two seed nodes because once it connects,
 				// it'll get a pile of addresses with newer timestamps.
-				IPAddress ip = IPAddress.Parse(pnSeed[i]);
-				NetworkAddress addr = new NetworkAddress();
+				var ip = IPAddress.Parse(_pnSeed[i]);
+				var addr = new NetworkAddress();
 				// Seed nodes are given a random 'last seen time' of between one and two
 				// weeks ago.
 				addr.Time = DateTime.UtcNow - (TimeSpan.FromSeconds(rand.NextDouble() * nOneWeek.TotalSeconds)) - nOneWeek;
 				addr.Endpoint = new IPEndPoint(ip, DefaultPort);
-				vFixedSeeds.Add(addr);
+				_vFixedSeeds.Add(addr);
 			}
 #endif
 		}
 
 
-		static Network _TestNet;
+		static Network _testNet;
 		public static Network TestNet
 		{
 			get
 			{
-				if(_TestNet == null)
+				if(_testNet == null)
 				{
 					var instance = new Network();
 					instance.InitTest();
-					_TestNet = instance;
+					_testNet = instance;
 				}
-				return _TestNet;
+				return _testNet;
 			}
 		}
 		private void InitTest()
 		{
 			InitMain();
-			name = "TestNet";
-			magic = 0x0709110B;
+			_name = "TestNet";
+			_magic = 0x0709110B;
 
-			vAlertPubKey = DataEncoders.Encoders.Hex.DecodeData("04302390343f91cc401d56d68b123028bf52e5fca1939df127f63c6467cdf9c8e2c14b61104cf817d0b780da337893ecc4aaff1309e536162dabbdb45200ca2b0a");
-			nDefaultPort = 18333;
-			nRPCPort = 18332;
+			_vAlertPubKey = Encoders.Hex.DecodeData("04302390343f91cc401d56d68b123028bf52e5fca1939df127f63c6467cdf9c8e2c14b61104cf817d0b780da337893ecc4aaff1309e536162dabbdb45200ca2b0a");
+			_nDefaultPort = 18333;
+			_nRpcPort = 18332;
 			//strDataDir = "testnet3";
 
 			// Modify the testnet genesis block so the timestamp is valid for a later start.
-			genesis.Header.BlockTime = Utils.UnixTimeToDateTime(1296688602);
-			genesis.Header.Nonce = 414098458;
-			hashGenesisBlock = genesis.GetHash();
-			assert(hashGenesisBlock == new uint256("0x000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"));
+			_genesis.Header.BlockTime = Utils.UnixTimeToDateTime(1296688602);
+			_genesis.Header.Nonce = 414098458;
+			_hashGenesisBlock = _genesis.GetHash();
+			Assert(_hashGenesisBlock == new Uint256("0x000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"));
 
 #if !PORTABLE
-			vFixedSeeds.Clear();
-			vSeeds.Clear();
-			vSeeds.Add(new DNSSeedData("bitcoin.petertodd.org", "testnet-seed.bitcoin.petertodd.org"));
-			vSeeds.Add(new DNSSeedData("bluematt.me", "testnet-seed.bluematt.me"));
+			_vFixedSeeds.Clear();
+			_vSeeds.Clear();
+			_vSeeds.Add(new DnsSeedData("bitcoin.petertodd.org", "testnet-seed.bitcoin.petertodd.org"));
+			_vSeeds.Add(new DnsSeedData("bluematt.me", "testnet-seed.bluematt.me"));
 #endif
-			base58Prefixes[(int)Base58Type.PUBKEY_ADDRESS] = new byte[] { (111) };
-			base58Prefixes[(int)Base58Type.SCRIPT_ADDRESS] = new byte[] { (196) };
-			base58Prefixes[(int)Base58Type.SECRET_KEY] = new byte[] { (239) };
-			base58Prefixes[(int)Base58Type.EXT_PUBLIC_KEY] = new byte[] { (0x04), (0x35), (0x87), (0xCF) };
-			base58Prefixes[(int)Base58Type.EXT_SECRET_KEY] = new byte[] { (0x04), (0x35), (0x83), (0x94) };
-			base58Prefixes[(int)Base58Type.STEALTH_ADDRESS] = new byte[] { 0x2b };
-			base58Prefixes[(int)Base58Type.ASSET_ID] = new byte[] { 115 };
+			_base58Prefixes[(int)Base58Type.PubkeyAddress] = new byte[] { (111) };
+			_base58Prefixes[(int)Base58Type.ScriptAddress] = new byte[] { (196) };
+			_base58Prefixes[(int)Base58Type.SecretKey] = new byte[] { (239) };
+			_base58Prefixes[(int)Base58Type.ExtPublicKey] = new byte[] { (0x04), (0x35), (0x87), (0xCF) };
+			_base58Prefixes[(int)Base58Type.ExtSecretKey] = new byte[] { (0x04), (0x35), (0x83), (0x94) };
+			_base58Prefixes[(int)Base58Type.StealthAddress] = new byte[] { 0x2b };
+			_base58Prefixes[(int)Base58Type.AssetId] = new byte[] { 115 };
 		}
 
-		private static void assert(bool v)
+		private static void Assert(bool v)
 		{
 			if(!v)
 				throw new InvalidOperationException("Invalid network");
@@ -317,9 +315,9 @@ namespace ChainUtils
 			var type = GetBase58Type(base58);
 			if(!type.HasValue)
 				throw new FormatException("Invalid Base58 version");
-			if(type == Base58Type.PUBKEY_ADDRESS)
+			if(type == Base58Type.PubkeyAddress)
 				return new BitcoinAddress(base58, this);
-			if(type == Base58Type.SCRIPT_ADDRESS)
+			if(type == Base58Type.ScriptAddress)
 				return new BitcoinScriptAddress(base58, this);
 			throw new FormatException("Invalid Base58 version");
 		}
@@ -332,9 +330,9 @@ namespace ChainUtils
 		private Base58Type? GetBase58Type(string base58)
 		{
 			var bytes = Encoders.Base58Check.DecodeData(base58);
-			for(int i = 0 ; i < base58Prefixes.Length ; i++)
+			for(var i = 0 ; i < _base58Prefixes.Length ; i++)
 			{
-				var prefix = base58Prefixes[i];
+				var prefix = _base58Prefixes[i];
 				if(bytes.Length < prefix.Length)
 					continue;
 				if(Utils.ArrayEqual(bytes, 0, prefix, 0, prefix.Length))
@@ -351,7 +349,7 @@ namespace ChainUtils
 				var type = network.GetBase58Type(base58);
 				if(type.HasValue)
 				{
-					if(type.Value == Base58Type.COLORED_ADDRESS)
+					if(type.Value == Base58Type.ColoredAddress)
 					{
 						var raw = Encoders.Base58Check.DecodeData(base58);
 						var version = network.GetVersionBytes(type.Value);
@@ -372,13 +370,13 @@ namespace ChainUtils
 		/// <exception cref="System.FormatException">Invalid base58 data</exception>
 		public static Base58Data CreateFromBase58Data(string base58, Network expectedNetwork = null)
 		{
-			bool invalidNetwork = false;
+			var invalidNetwork = false;
 			foreach(var network in GetNetworks())
 			{
 				var type = network.GetBase58Type(base58);
 				if(type.HasValue)
 				{
-					if(type.Value == Base58Type.COLORED_ADDRESS)
+					if(type.Value == Base58Type.ColoredAddress)
 					{
 						var inner = BitcoinAddress.Create(BitcoinColoredAddress.GetWrappedBase58(base58, network));
 						if(inner.Network != network)
@@ -420,29 +418,29 @@ namespace ChainUtils
 
 		public Base58Data CreateBase58Data(Base58Type type, string base58)
 		{
-			if(type == Base58Type.EXT_PUBLIC_KEY)
+			if(type == Base58Type.ExtPublicKey)
 				return CreateBitcoinExtPubKey(base58);
-			if(type == Base58Type.EXT_SECRET_KEY)
+			if(type == Base58Type.ExtSecretKey)
 				return CreateBitcoinExtKey(base58);
-			if(type == Base58Type.PUBKEY_ADDRESS)
+			if(type == Base58Type.PubkeyAddress)
 				return CreateBitcoinAddress(base58);
-			if(type == Base58Type.SCRIPT_ADDRESS)
+			if(type == Base58Type.ScriptAddress)
 				return CreateBitcoinScriptAddress(base58);
-			if(type == Base58Type.SECRET_KEY)
+			if(type == Base58Type.SecretKey)
 				return CreateBitcoinSecret(base58);
-			if(type == Base58Type.CONFIRMATION_CODE)
+			if(type == Base58Type.ConfirmationCode)
 				return CreateConfirmationCode(base58);
-			if(type == Base58Type.ENCRYPTED_SECRET_KEY_EC)
-				return CreateEncryptedKeyEC(base58);
-			if(type == Base58Type.ENCRYPTED_SECRET_KEY_NO_EC)
-				return CreateEncryptedKeyNoEC(base58);
-			if(type == Base58Type.PASSPHRASE_CODE)
+			if(type == Base58Type.EncryptedSecretKeyEc)
+				return CreateEncryptedKeyEc(base58);
+			if(type == Base58Type.EncryptedSecretKeyNoEc)
+				return CreateEncryptedKeyNoEc(base58);
+			if(type == Base58Type.PassphraseCode)
 				return CreatePassphraseCode(base58);
-			if(type == Base58Type.STEALTH_ADDRESS)
+			if(type == Base58Type.StealthAddress)
 				return CreateStealthAddress(base58);
-			if(type == Base58Type.ASSET_ID)
+			if(type == Base58Type.AssetId)
 				return CreateAssetId(base58);
-			if(type == Base58Type.COLORED_ADDRESS)
+			if(type == Base58Type.ColoredAddress)
 				return CreateColoredAddress(base58);
 			throw new NotSupportedException("Invalid Base58Data type : " + type.ToString());
 		}
@@ -452,9 +450,9 @@ namespace ChainUtils
 			return new BitcoinColoredAddress(base58, this);
 		}
 
-		public ChainUtils.OpenAsset.BitcoinAssetId CreateAssetId(string base58)
+		public BitcoinAssetId CreateAssetId(string base58)
 		{
-			return new ChainUtils.OpenAsset.BitcoinAssetId(base58, this);
+			return new BitcoinAssetId(base58, this);
 		}
 
 		public BitcoinStealthAddress CreateStealthAddress(string base58)
@@ -467,14 +465,14 @@ namespace ChainUtils
 			return new BitcoinPassphraseCode(base58, this);
 		}
 
-		private BitcoinEncryptedSecretNoEC CreateEncryptedKeyNoEC(string base58)
+		private BitcoinEncryptedSecretNoEc CreateEncryptedKeyNoEc(string base58)
 		{
-			return new BitcoinEncryptedSecretNoEC(base58, this);
+			return new BitcoinEncryptedSecretNoEc(base58, this);
 		}
 
-		private BitcoinEncryptedSecretEC CreateEncryptedKeyEC(string base58)
+		private BitcoinEncryptedSecretEc CreateEncryptedKeyEc(string base58)
 		{
-			return new BitcoinEncryptedSecretEC(base58, this);
+			return new BitcoinEncryptedSecretEc(base58, this);
 		}
 
 		private Base58Data CreateConfirmationCode(string base58)
@@ -505,7 +503,7 @@ namespace ChainUtils
 
 		public byte[] GetVersionBytes(Base58Type type)
 		{
-			return base58Prefixes[(int)type].ToArray();
+			return _base58Prefixes[(int)type].ToArray();
 		}
 
 		public ValidationState CreateValidationState()
@@ -515,21 +513,21 @@ namespace ChainUtils
 
 		public override string ToString()
 		{
-			return name;
+			return _name;
 		}
 
 		public Target ProofOfWorkLimit
 		{
 			get
 			{
-				return _ProofOfLimit;
+				return _proofOfLimit;
 			}
 		}
 
 		public Block GetGenesis()
 		{
 			var block = new Block();
-			block.ReadWrite(genesis.ToBytes());
+			block.ReadWrite(_genesis.ToBytes());
 			return block;
 		}
 
@@ -551,13 +549,13 @@ namespace ChainUtils
 			switch(name)
 			{
 				case "main":
-					return Network.Main;
+					return Main;
 				case "testnet":
 				case "testnet3":
-					return Network.TestNet;
+					return TestNet;
 				case "reg":
 				case "regtest":
-					return Network.RegTest;
+					return RegTest;
 				default:
 					throw new ArgumentException(String.Format("Invalid network name '{0}'", name));
 			}
@@ -586,13 +584,13 @@ namespace ChainUtils
 #if !PORTABLE
 		public Message ParseMessage(byte[] bytes, ProtocolVersion version = ProtocolVersion.PROTOCOL_VERSION)
 		{
-			BitcoinStream bstream = new BitcoinStream(bytes);
-			Message message = new Message();
+			var bstream = new BitcoinStream(bytes);
+			var message = new Message();
 			using(bstream.ProtocolVersionScope(version))
 			{
 				bstream.ReadWrite(ref message);
 			}
-			if(message.Magic != magic)
+			if(message.Magic != _magic)
 				throw new FormatException("Unexpected magic field in the message");
 			return message;
 		}
@@ -601,14 +599,14 @@ namespace ChainUtils
 		{
 			get
 			{
-				return this.vFixedSeeds;
+				return _vFixedSeeds;
 			}
 		}
-		public IEnumerable<DNSSeedData> DNSSeeds
+		public IEnumerable<DnsSeedData> DnsSeeds
 		{
 			get
 			{
-				return this.vSeeds;
+				return _vSeeds;
 			}
 		}
 #endif
@@ -619,7 +617,7 @@ namespace ChainUtils
 			{
 				if(_MagicBytes == null)
 				{
-					var bytes = new byte[] 
+					var bytes = new[] 
 					{ 
 						(byte)Magic,
 						(byte)(Magic >> 8),
@@ -635,14 +633,14 @@ namespace ChainUtils
 		{
 			get
 			{
-				return magic;
+				return _magic;
 			}
 		}
 
 		public Money GetReward(int nHeight)
 		{
-			long nSubsidy = new Money(50 * Money.COIN);
-			int halvings = nHeight / nSubsidyHalvingInterval;
+			long nSubsidy = new Money(50 * Money.Coin);
+			var halvings = nHeight / _nSubsidyHalvingInterval;
 
 			// Force block reward to zero when right shift is undefined.
 			if(halvings >= 64)
@@ -656,8 +654,8 @@ namespace ChainUtils
 
 		public bool ReadMagic(Stream stream, CancellationToken cancellation)
 		{
-			byte[] bytes = new byte[1];
-			for(int i = 0 ; i < MagicBytes.Length ; i++)
+			var bytes = new byte[1];
+			for(var i = 0 ; i < MagicBytes.Length ; i++)
 			{
 				i = Math.Max(0, i);
 				cancellation.ThrowIfCancellationRequested();

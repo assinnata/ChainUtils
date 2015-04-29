@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.ExceptionServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.ChainUtils;
 #if !NOPROTOBUF
 using System.Net.Http;
 using System.Net.Http.Headers;
 #endif
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.ChainUtils;
-using System.Runtime.ExceptionServices;
 
 namespace ChainUtils.Payment
 {
@@ -80,18 +79,18 @@ namespace ChainUtils.Payment
 				PaymentRequestUrl = new Uri(parameters["r"], UriKind.Absolute);
 				parameters.Remove("r");
 			}
-			_UnknowParameters = parameters;
+			_unknowParameters = parameters;
 			var reqParam = parameters.Keys.FirstOrDefault(k => k.StartsWith("req-", StringComparison.OrdinalIgnoreCase));
 			if(reqParam != null)
 				throw new FormatException("Non compatible required parameter " + reqParam);
 		}
 
-		private readonly Dictionary<string, string> _UnknowParameters = new Dictionary<string,string>();
+		private readonly Dictionary<string, string> _unknowParameters = new Dictionary<string,string>();
 		public Dictionary<string,string> UnknowParameters
 		{
 			get
 			{
-				return _UnknowParameters;
+				return _unknowParameters;
 			}
 		}
 #if !NOPROTOBUF
@@ -115,7 +114,7 @@ namespace ChainUtils.Payment
 			if(PaymentRequestUrl == null)
 				throw new InvalidOperationException("No PaymentRequestUrl specified");
 
-			bool own = false;
+			var own = false;
 			if(httpClient == null)
 			{
 				httpClient = new HttpClient();
@@ -123,7 +122,7 @@ namespace ChainUtils.Payment
 			}
 			try
 			{
-				HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, PaymentRequestUrl);
+				var req = new HttpRequestMessage(HttpMethod.Get, PaymentRequestUrl);
 				req.Headers.Clear();
 				req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(PaymentRequest.MediaType));
 
@@ -177,8 +176,8 @@ namespace ChainUtils.Payment
 		{
 			get
 			{
-				Dictionary<string, string> parameters = new Dictionary<string, string>();
-				StringBuilder builder = new StringBuilder();
+				var parameters = new Dictionary<string, string>();
+				var builder = new StringBuilder();
 				builder.Append("bitcoin:");
 				if(Address != null)
 				{
@@ -209,13 +208,13 @@ namespace ChainUtils.Payment
 
 				WriteParameters(parameters, builder);
 
-				return new System.Uri(builder.ToString(), UriKind.Absolute);
+				return new Uri(builder.ToString(), UriKind.Absolute);
 			}
 		}
 
 		private static void WriteParameters(Dictionary<string, string> parameters, StringBuilder builder)
 		{
-			bool first = true;
+			var first = true;
 			foreach(var parameter in parameters)
 			{
 				if(first)

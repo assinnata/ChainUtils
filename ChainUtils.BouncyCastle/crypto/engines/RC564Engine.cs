@@ -1,7 +1,4 @@
 using System;
-using System.Reflection;
-
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Engines
@@ -85,7 +82,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
                 throw new ArgumentException("invalid parameter passed to RC564 init - " + parameters.GetType().ToString());
             }
 
-            RC5Parameters       p = (RC5Parameters)parameters;
+            var       p = (RC5Parameters)parameters;
 
             this.forEncryption = forEncryption;
 
@@ -128,9 +125,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             //   of K. Any unfilled byte positions in L are zeroed. In the
             //   case that b = c = 0, set c = 1 and L[0] = 0.
             //
-            long[]   L = new long[(key.Length + (bytesPerWord - 1)) / bytesPerWord];
+            var   L = new long[(key.Length + (bytesPerWord - 1)) / bytesPerWord];
 
-            for (int i = 0; i != key.Length; i++)
+            for (var i = 0; i != key.Length; i++)
             {
                 L[i / bytesPerWord] += (long)(key[i] & 0xff) << (8 * (i % bytesPerWord));
             }
@@ -144,7 +141,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             _S            = new long[2*(_noRounds + 1)];
 
             _S[0] = P64;
-            for (int i=1; i < _S.Length; i++)
+            for (var i=1; i < _S.Length; i++)
             {
                 _S[i] = (_S[i-1] + Q64);
             }
@@ -168,7 +165,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             long A = 0, B = 0;
             int ii = 0, jj = 0;
 
-            for (int k = 0; k < iter; k++)
+            for (var k = 0; k < iter; k++)
             {
                 A = _S[ii] = RotateLeft(_S[ii] + A + B, 3);
                 B =  L[jj] = RotateLeft( L[jj] + A + B, A+B);
@@ -192,10 +189,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]  outBytes,
             int     outOff)
         {
-            long A = BytesToWord(input, inOff) + _S[0];
-            long B = BytesToWord(input, inOff + bytesPerWord) + _S[1];
+            var A = BytesToWord(input, inOff) + _S[0];
+            var B = BytesToWord(input, inOff + bytesPerWord) + _S[1];
 
-            for (int i = 1; i <= _noRounds; i++)
+            for (var i = 1; i <= _noRounds; i++)
             {
                 A = RotateLeft(A ^ B, B) + _S[2*i];
                 B = RotateLeft(B ^ A, A) + _S[2*i+1];
@@ -213,10 +210,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]  outBytes,
             int     outOff)
         {
-            long A = BytesToWord(input, inOff);
-            long B = BytesToWord(input, inOff + bytesPerWord);
+            var A = BytesToWord(input, inOff);
+            var B = BytesToWord(input, inOff + bytesPerWord);
 
-            for (int i = _noRounds; i >= 1; i--)
+            for (var i = _noRounds; i >= 1; i--)
             {
                 B = RotateRight(B - _S[2*i+1], A) ^ A;
                 A = RotateRight(A - _S[2*i],   B) ^ B;
@@ -273,7 +270,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
         {
             long    word = 0;
 
-            for (int i = bytesPerWord - 1; i >= 0; i--)
+            for (var i = bytesPerWord - 1; i >= 0; i--)
             {
                 word = (word << 8) + (src[i + srcOff] & 0xff);
             }
@@ -286,7 +283,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Engines
             byte[]  dst,
             int     dstOff)
         {
-            for (int i = 0; i < bytesPerWord; i++)
+            for (var i = 0; i < bytesPerWord; i++)
             {
                 dst[i + dstOff] = (byte)word;
                 word = (long) ((ulong) word >> 8);

@@ -1,6 +1,4 @@
 using System;
-
-using ChainUtils.BouncyCastle.Crypto;
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 
 namespace ChainUtils.BouncyCastle.Crypto.Macs
@@ -45,8 +43,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			if (userKey.Length != 32)
 				throw new ArgumentException("Key length invalid. Key needs to be 32 byte - 256 bit!!!");
 
-			int[] key = new int[8];
-			for(int i=0; i!=8; i++)
+			var key = new int[8];
+			for(var i=0; i!=8; i++)
 			{
 				key[i] = bytesToint(userKey,i*4);
 			}
@@ -61,12 +59,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			buf = new byte[blockSize];
 			if (parameters is ParametersWithSBox)
 			{
-				ParametersWithSBox param = (ParametersWithSBox)parameters;
+				var param = (ParametersWithSBox)parameters;
 
 				//
 				// Set the S-Box
 				//
-				param.GetSBox().CopyTo(this.S, 0);
+				param.GetSBox().CopyTo(S, 0);
 
 				//
 				// set key if there is one
@@ -99,11 +97,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 
 		private int gost28147_mainStep(int n1, int key)
 		{
-			int cm = (key + n1); // CM1
+			var cm = (key + n1); // CM1
 
 			// S-box replacing
 
-			int om = S[  0 + ((cm >> (0 * 4)) & 0xF)] << (0 * 4);
+			var om = S[  0 + ((cm >> (0 * 4)) & 0xF)] << (0 * 4);
 			om += S[ 16 + ((cm >> (1 * 4)) & 0xF)] << (1 * 4);
 			om += S[ 32 + ((cm >> (2 * 4)) & 0xF)] << (2 * 4);
 			om += S[ 48 + ((cm >> (3 * 4)) & 0xF)] << (3 * 4);
@@ -113,8 +111,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			om += S[112 + ((cm >> (7 * 4)) & 0xF)] << (7 * 4);
 
 //			return om << 11 | om >>> (32-11); // 11-leftshift
-			int omLeft = om << 11;
-			int omRight = (int)(((uint) om) >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
+			var omLeft = om << 11;
+			var omRight = (int)(((uint) om) >> (32 - 11)); // Note: Casts required to get unsigned bit rotation
 
 			return omLeft | omRight;
 		}
@@ -130,9 +128,9 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			N1 = bytesToint(input, inOff);
 			N2 = bytesToint(input, inOff + 4);
 
-			for (int k = 0; k < 2; k++)  // 1-16 steps
+			for (var k = 0; k < 2; k++)  // 1-16 steps
 			{
-				for (int j = 0; j < 8; j++)
+				for (var j = 0; j < 8; j++)
 				{
 					tmp = N1;
 					N1 = N2 ^ gost28147_mainStep(N1, workingKey[j]); // CM2
@@ -170,11 +168,11 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			int		bufOff,
 			byte[]	mac)
 		{
-			byte[] sum = new byte[buf.Length - bufOff];
+			var sum = new byte[buf.Length - bufOff];
 
 			Array.Copy(buf, bufOff, sum, 0, mac.Length);
 
-			for (int i = 0; i != mac.Length; i++)
+			for (var i = 0; i != mac.Length; i++)
 			{
 				sum[i] = (byte)(sum[i] ^ mac[i]);
 			}
@@ -187,7 +185,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 		{
 			if (bufOff == buf.Length)
 			{
-				byte[] sumbuf = new byte[buf.Length];
+				var sumbuf = new byte[buf.Length];
 				Array.Copy(buf, 0, sumbuf, 0, mac.Length);
 
 				if (firstStep)
@@ -214,13 +212,13 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 			if (len < 0)
 				throw new ArgumentException("Can't have a negative input length!");
 
-			int gapLen = blockSize - bufOff;
+			var gapLen = blockSize - bufOff;
 
 			if (len > gapLen)
 			{
 				Array.Copy(input, inOff, buf, bufOff, gapLen);
 
-				byte[] sumbuf = new byte[buf.Length];
+				var sumbuf = new byte[buf.Length];
 				Array.Copy(buf, 0, sumbuf, 0, mac.Length);
 
 				if (firstStep)
@@ -263,7 +261,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Macs
 				buf[bufOff++] = 0;
 			}
 
-			byte[] sumbuf = new byte[buf.Length];
+			var sumbuf = new byte[buf.Length];
 			Array.Copy(buf, 0, sumbuf, 0, mac.Length);
 
 			if (firstStep)

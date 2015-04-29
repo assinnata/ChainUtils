@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Crypto.Parameters
@@ -36,7 +35,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (obj == this)
 				return true;
 
-			DHValidationParameters other = obj as DHValidationParameters;
+			var other = obj as DHValidationParameters;
 
 			if (other == null)
 				return false;
@@ -48,7 +47,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			DHValidationParameters other)
 		{
 			return counter == other.counter
-				&& Arrays.AreEqual(this.seed, other.seed);
+				&& Arrays.AreEqual(seed, other.seed);
 		}
 
 		public override int GetHashCode()

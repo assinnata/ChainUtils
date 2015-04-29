@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Utilities;
 
 namespace ChainUtils.BouncyCastle.Asn1.X509
@@ -104,12 +103,12 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 		public void AddCrlEntry(DerInteger userCertificate, Time revocationDate, int reason,
 			DerGeneralizedTime invalidityDate)
 		{
-            IList extOids = Platform.CreateArrayList();
-            IList extValues = Platform.CreateArrayList();
+            var extOids = Platform.CreateArrayList();
+            var extValues = Platform.CreateArrayList();
 
 			if (reason != 0)
 			{
-				CrlReason crlReason = new CrlReason(reason);
+				var crlReason = new CrlReason(reason);
 
 				try
 				{
@@ -147,7 +146,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 
 		public void AddCrlEntry(DerInteger userCertificate, Time revocationDate, X509Extensions extensions)
 		{
-			Asn1EncodableVector v = new Asn1EncodableVector(
+			var v = new Asn1EncodableVector(
 				userCertificate, revocationDate);
 
 			if (extensions != null)
@@ -171,7 +170,7 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
                 throw new InvalidOperationException("Not all mandatory fields set in V2 TbsCertList generator.");
             }
 
-			Asn1EncodableVector v = new Asn1EncodableVector(
+			var v = new Asn1EncodableVector(
 				version, signature, issuer, thisUpdate);
 
 			if (nextUpdate != null)
@@ -182,8 +181,8 @@ namespace ChainUtils.BouncyCastle.Asn1.X509
 			// Add CRLEntries if they exist
             if (crlEntries != null)
             {
-                Asn1Sequence[] certs = new Asn1Sequence[crlEntries.Count];
-                for (int i = 0; i < crlEntries.Count; ++i)
+                var certs = new Asn1Sequence[crlEntries.Count];
+                for (var i = 0; i < crlEntries.Count; ++i)
                 {
                     certs[i] = (Asn1Sequence)crlEntries[i];
                 }

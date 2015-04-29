@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
 using System.IO;
-
 using ChainUtils.BouncyCastle.Asn1.X509;
-using ChainUtils.BouncyCastle.Math;
 
 namespace ChainUtils.BouncyCastle.Asn1.Pkcs
 {
@@ -40,16 +37,16 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
             Asn1Set				attributes)
         {
             this.algID = algID;
-            this.privKey = new DerOctetString(privateKey.GetEncoded(Asn1Encodable.Der));
+            privKey = new DerOctetString(privateKey.GetEncoded(Der));
             this.attributes = attributes;
         }
 
         private PrivateKeyInfo(Asn1Sequence seq)
         {
-            IEnumerator e = seq.GetEnumerator();
+            var e = seq.GetEnumerator();
 
             e.MoveNext();
-            BigInteger version = ((DerInteger)e.Current).Value;
+            var version = ((DerInteger)e.Current).Value;
             if (version.IntValue != 0)
             {
                 throw new ArgumentException("wrong version for private key info: " + version.IntValue);
@@ -122,7 +119,7 @@ namespace ChainUtils.BouncyCastle.Asn1.Pkcs
          */
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(new DerInteger(0), algID, privKey);
+            var v = new Asn1EncodableVector(new DerInteger(0), algID, privKey);
 
             if (attributes != null)
             {

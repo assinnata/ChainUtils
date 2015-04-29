@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Crypto.Parameters;
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Security;
@@ -28,8 +27,8 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 			SecureRandom    random)
 		{
 			this.size = size;
-			this.typeproc = typeProcedure;
-			this.init_random = random;
+			typeproc = typeProcedure;
+			init_random = random;
 		}
 
 		//Procedure A
@@ -46,21 +45,21 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 				c = init_random.NextInt()/32768 + 1;
 			}
 
-			BigInteger C = BigInteger.ValueOf(c);
-			BigInteger constA16 = BigInteger.ValueOf(19381);
+			var C = BigInteger.ValueOf(c);
+			var constA16 = BigInteger.ValueOf(19381);
 
 			//step1
-			BigInteger[] y = new BigInteger[1]; // begin length = 1
+			var y = new BigInteger[1]; // begin length = 1
 			y[0] = BigInteger.ValueOf(x0);
 
 			//step 2
-			int[] t = new int[1]; // t - orders; begin length = 1
+			var t = new int[1]; // t - orders; begin length = 1
 			t[0] = size;
-			int s = 0;
-			for (int i=0; t[i]>=17; i++)
+			var s = 0;
+			for (var i=0; t[i]>=17; i++)
 			{
 				// extension array t
-				int[] tmp_t = new int[t.Length + 1];             ///////////////
+				var tmp_t = new int[t.Length + 1];             ///////////////
 					Array.Copy(t,0,tmp_t,0,t.Length);          //  extension
 				t = new int[tmp_t.Length];                       //  array t
 				Array.Copy(tmp_t, 0, t, 0, tmp_t.Length);  ///////////////
@@ -70,31 +69,31 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 			}
 
 			//step3
-			BigInteger[] p = new BigInteger[s+1];
+			var p = new BigInteger[s+1];
 			p[s] = new BigInteger("8003",16); //set min prime number length 16 bit
 
-			int m = s-1;  //step4
+			var m = s-1;  //step4
 
-			for (int i=0; i<s; i++)
+			for (var i=0; i<s; i++)
 			{
-				int rm = t[m]/16;  //step5
+				var rm = t[m]/16;  //step5
 
 			step6: for(;;)
 				   {
 					   //step 6
-					   BigInteger[] tmp_y = new BigInteger[y.Length];  ////////////////
+					   var tmp_y = new BigInteger[y.Length];  ////////////////
 					   Array.Copy(y,0,tmp_y,0,y.Length);         //  extension
 					   y = new BigInteger[rm+1];                       //  array y
 					   Array.Copy(tmp_y,0,y,0,tmp_y.Length);     ////////////////
 
-					   for (int j=0; j<rm; j++)
+					   for (var j=0; j<rm; j++)
 					   {
 						   y[j+1] = (y[j].Multiply(constA16).Add(C)).Mod(BigInteger.Two.Pow(16));
 					   }
 
 					   //step 7
-					   BigInteger Ym = BigInteger.Zero;
-					   for (int j=0; j<rm; j++)
+					   var Ym = BigInteger.Zero;
+					   for (var j=0; j<rm; j++)
 					   {
 						   Ym = Ym.Add(y[j].ShiftLeft(16*j));
 					   }
@@ -102,7 +101,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 					   y[0] = y[rm]; //step 8
 
 					   //step 9
-					   BigInteger N = BigInteger.One.ShiftLeft(t[m]-1).Divide(p[m+1]).Add(
+					   var N = BigInteger.One.ShiftLeft(t[m]-1).Divide(p[m+1]).Add(
 						   Ym.ShiftLeft(t[m]-1).Divide(p[m+1].ShiftLeft(16*rm)));
 
 					   if (N.TestBit(0))
@@ -115,7 +114,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 						for(;;)
 						{
 							//step 11
-							BigInteger NByLastP = N.Multiply(p[m+1]);
+							var NByLastP = N.Multiply(p[m+1]);
 
 							if (NByLastP.BitLength > t[m])
 							{
@@ -161,21 +160,21 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 				c = init_random.NextInt()*2+1;
 			}
 
-			BigInteger C = BigInteger.ValueOf(c);
-			BigInteger constA32 = BigInteger.ValueOf(97781173);
+			var C = BigInteger.ValueOf(c);
+			var constA32 = BigInteger.ValueOf(97781173);
 
 			//step1
-			BigInteger[] y = new BigInteger[1]; // begin length = 1
+			var y = new BigInteger[1]; // begin length = 1
 			y[0] = BigInteger.ValueOf(x0);
 
 			//step 2
-			int[] t = new int[1]; // t - orders; begin length = 1
+			var t = new int[1]; // t - orders; begin length = 1
 			t[0] = size;
-			int s = 0;
-			for (int i=0; t[i]>=33; i++)
+			var s = 0;
+			for (var i=0; t[i]>=33; i++)
 			{
 				// extension array t
-				int[] tmp_t = new int[t.Length + 1];             ///////////////
+				var tmp_t = new int[t.Length + 1];             ///////////////
 					Array.Copy(t,0,tmp_t,0,t.Length);          //  extension
 				t = new int[tmp_t.Length];                       //  array t
 				Array.Copy(tmp_t, 0, t, 0, tmp_t.Length);  ///////////////
@@ -185,31 +184,31 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 			}
 
 			//step3
-			BigInteger[] p = new BigInteger[s+1];
+			var p = new BigInteger[s+1];
 			p[s] = new BigInteger("8000000B",16); //set min prime number length 32 bit
 
-			int m = s-1;  //step4
+			var m = s-1;  //step4
 
-			for (int i=0; i<s; i++)
+			for (var i=0; i<s; i++)
 			{
-				int rm = t[m]/32;  //step5
+				var rm = t[m]/32;  //step5
 
 			step6: for(;;)
 				   {
 					   //step 6
-					   BigInteger[] tmp_y = new BigInteger[y.Length];  ////////////////
+					   var tmp_y = new BigInteger[y.Length];  ////////////////
 						   Array.Copy(y,0,tmp_y,0,y.Length);         //  extension
 					   y = new BigInteger[rm+1];                       //  array y
 					   Array.Copy(tmp_y,0,y,0,tmp_y.Length);     ////////////////
 
-					   for (int j=0; j<rm; j++)
+					   for (var j=0; j<rm; j++)
 					   {
 						   y[j+1] = (y[j].Multiply(constA32).Add(C)).Mod(BigInteger.Two.Pow(32));
 					   }
 
 					   //step 7
-					   BigInteger Ym = BigInteger.Zero;
-					   for (int j=0; j<rm; j++)
+					   var Ym = BigInteger.Zero;
+					   for (var j=0; j<rm; j++)
 					   {
 						   Ym = Ym.Add(y[j].ShiftLeft(32*j));
 					   }
@@ -217,7 +216,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 					   y[0] = y[rm]; //step 8
 
 					   //step 9
-					   BigInteger N = BigInteger.One.ShiftLeft(t[m]-1).Divide(p[m+1]).Add(
+					   var N = BigInteger.One.ShiftLeft(t[m]-1).Divide(p[m+1]).Add(
 						   Ym.ShiftLeft(t[m]-1).Divide(p[m+1].ShiftLeft(32*rm)));
 
 					   if (N.TestBit(0))
@@ -230,7 +229,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 						for(;;)
 						{
 							//step 11
-							BigInteger NByLastP = N.Multiply(p[m+1]);
+							var NByLastP = N.Multiply(p[m+1]);
 
 							if (NByLastP.BitLength > t[m])
 							{
@@ -276,10 +275,10 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 				c = init_random.NextInt()/32768 + 1;
 			}
 
-			BigInteger [] qp = new BigInteger[2];
+			var qp = new BigInteger[2];
 			BigInteger q = null, Q = null, p = null;
-			BigInteger C = BigInteger.ValueOf(c);
-			BigInteger constA16 = BigInteger.ValueOf(19381);
+			var C = BigInteger.ValueOf(c);
+			var constA16 = BigInteger.ValueOf(19381);
 
 			//step1
 			x0 = procedure_A(x0, c, qp, 256);
@@ -289,26 +288,26 @@ namespace ChainUtils.BouncyCastle.Crypto.Generators
 			x0 = procedure_A(x0, c, qp, 512);
 			Q = qp[0];
 
-			BigInteger[] y = new BigInteger[65];
+			var y = new BigInteger[65];
 			y[0] = BigInteger.ValueOf(x0);
 
 			const int tp = 1024;
 
-			BigInteger qQ = q.Multiply(Q);
+			var qQ = q.Multiply(Q);
 
 step3:
 			for(;;)
 			{
 				//step 3
-				for (int j=0; j<64; j++)
+				for (var j=0; j<64; j++)
 				{
 					y[j+1] = (y[j].Multiply(constA16).Add(C)).Mod(BigInteger.Two.Pow(16));
 				}
 
 				//step 4
-				BigInteger Y = BigInteger.Zero;
+				var Y = BigInteger.Zero;
 
-				for (int j=0; j<64; j++)
+				for (var j=0; j<64; j++)
 				{
 					Y = Y.Add(y[j].ShiftLeft(16*j));
 				}
@@ -316,7 +315,7 @@ step3:
 				y[0] = y[64]; //step 5
 
 				//step 6
-				BigInteger N = BigInteger.One.ShiftLeft(tp-1).Divide(qQ).Add(
+				var N = BigInteger.One.ShiftLeft(tp-1).Divide(qQ).Add(
 					Y.ShiftLeft(tp-1).Divide(qQ.ShiftLeft(1024)));
 
 				if (N.TestBit(0))
@@ -329,7 +328,7 @@ step3:
 				for(;;)
 				{
 					//step 11
-					BigInteger qQN = qQ.Multiply(N);
+					var qQN = qQ.Multiply(N);
 
 					if (qQN.BitLength > tp)
 					{
@@ -366,10 +365,10 @@ step3:
 				c = init_random.NextInt()*2+1;
 			}
 
-			BigInteger [] qp = new BigInteger[2];
+			var qp = new BigInteger[2];
 			BigInteger q = null, Q = null, p = null;
-			BigInteger C = BigInteger.ValueOf(c);
-			BigInteger constA32 = BigInteger.ValueOf(97781173);
+			var C = BigInteger.ValueOf(c);
+			var constA32 = BigInteger.ValueOf(97781173);
 
 			//step1
 			x0 = procedure_Aa(x0, c, qp, 256);
@@ -379,25 +378,25 @@ step3:
 			x0 = procedure_Aa(x0, c, qp, 512);
 			Q = qp[0];
 
-			BigInteger[] y = new BigInteger[33];
+			var y = new BigInteger[33];
 			y[0] = BigInteger.ValueOf(x0);
 
 			const int tp = 1024;
 
-			BigInteger qQ = q.Multiply(Q);
+			var qQ = q.Multiply(Q);
 
 step3:
 			for(;;)
 			{
 				//step 3
-				for (int j=0; j<32; j++)
+				for (var j=0; j<32; j++)
 				{
 					y[j+1] = (y[j].Multiply(constA32).Add(C)).Mod(BigInteger.Two.Pow(32));
 				}
 
 				//step 4
-				BigInteger Y = BigInteger.Zero;
-				for (int j=0; j<32; j++)
+				var Y = BigInteger.Zero;
+				for (var j=0; j<32; j++)
 				{
 					Y = Y.Add(y[j].ShiftLeft(32*j));
 				}
@@ -405,7 +404,7 @@ step3:
 				y[0] = y[32]; //step 5
 
 				//step 6
-				BigInteger N = BigInteger.One.ShiftLeft(tp-1).Divide(qQ).Add(
+				var N = BigInteger.One.ShiftLeft(tp-1).Divide(qQ).Add(
 					Y.ShiftLeft(tp-1).Divide(qQ.ShiftLeft(1024)));
 
 				if (N.TestBit(0))
@@ -418,7 +417,7 @@ step3:
 				for(;;)
 				{
 					//step 11
-					BigInteger qQN = qQ.Multiply(N);
+					var qQN = qQ.Multiply(N);
 
 					if (qQN.BitLength > tp)
 					{
@@ -449,17 +448,17 @@ step3:
 		 */
 		private BigInteger procedure_C(BigInteger p, BigInteger q)
 		{
-			BigInteger pSub1 = p.Subtract(BigInteger.One);
-			BigInteger pSub1Divq = pSub1.Divide(q);
+			var pSub1 = p.Subtract(BigInteger.One);
+			var pSub1Divq = pSub1.Divide(q);
 
 			for(;;)
 			{
-				BigInteger d = new BigInteger(p.BitLength, init_random);
+				var d = new BigInteger(p.BitLength, init_random);
 
 				// 1 < d < p-1
 				if (d.CompareTo(BigInteger.One) > 0 && d.CompareTo(pSub1) < 0)
 				{
-					BigInteger a = d.ModPow(pSub1Divq, p);
+					var a = d.ModPow(pSub1Divq, p);
 
 					if (a.CompareTo(BigInteger.One) != 0)
 					{
@@ -475,7 +474,7 @@ step3:
 		 */
 		public Gost3410Parameters GenerateParameters()
 		{
-			BigInteger [] pq = new BigInteger[2];
+			var pq = new BigInteger[2];
 			BigInteger    q = null, p = null, a = null;
 
 			int  x0, c;

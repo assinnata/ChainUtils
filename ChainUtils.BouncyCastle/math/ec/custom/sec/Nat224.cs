@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-
 using ChainUtils.BouncyCastle.Crypto.Utilities;
 
 namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
@@ -228,7 +227,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static bool Diff(uint[] x, int xOff, uint[] y, int yOff, uint[] z, int zOff)
         {
-            bool pos = Gte(x, xOff, y, yOff);
+            var pos = Gte(x, xOff, y, yOff);
             if (pos)
             {
                 Sub(x, xOff, y, yOff, z, zOff);
@@ -242,7 +241,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static bool Eq(uint[] x, uint[] y)
         {
-            for (int i = 6; i >= 0; --i)
+            for (var i = 6; i >= 0; --i)
             {
                 if (x[i] != y[i])
                     return false;
@@ -255,8 +254,8 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             if (x.SignValue < 0 || x.BitLength > 224)
                 throw new ArgumentException();
 
-            uint[] z = Create();
-            int i = 0;
+            var z = Create();
+            var i = 0;
             while (x.SignValue != 0)
             {
                 z[i++] = (uint)x.IntValue;
@@ -271,18 +270,18 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             {
                 return x[0] & 1;
             }
-            int w = bit >> 5;
+            var w = bit >> 5;
             if (w < 0 || w >= 7)
             {
                 return 0;
             }
-            int b = bit & 31;
+            var b = bit & 31;
             return (x[w] >> b) & 1;
         }
 
         public static bool Gte(uint[] x, uint[] y)
         {
-            for (int i = 6; i >= 0; --i)
+            for (var i = 6; i >= 0; --i)
             {
                 uint x_i = x[i], y_i = y[i];
                 if (x_i < y_i)
@@ -295,7 +294,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static bool Gte(uint[] x, int xOff, uint[] y, int yOff)
         {
-            for (int i = 6; i >= 0; --i)
+            for (var i = 6; i >= 0; --i)
             {
                 uint x_i = x[xOff + i], y_i = y[yOff + i];
                 if (x_i < y_i)
@@ -312,7 +311,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             {
                 return false;
             }
-            for (int i = 1; i < 7; ++i)
+            for (var i = 1; i < 7; ++i)
             {
                 if (x[i] != 0)
                 {
@@ -324,7 +323,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static bool IsZero(uint[] x)
         {
-            for (int i = 0; i < 7; ++i)
+            for (var i = 0; i < 7; ++i)
             {
                 if (x[i] != 0)
                 {
@@ -370,7 +369,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 zz[7] = (uint)c;
             }
 
-            for (int i = 1; i < 7; ++i)
+            for (var i = 1; i < 7; ++i)
             {
                 ulong c = 0, x_i = x[i];
                 c += x_i * y_0 + zz[i + 0];
@@ -434,7 +433,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 zz[zzOff + 7] = (uint)c;
             }
 
-            for (int i = 1; i < 7; ++i)
+            for (var i = 1; i < 7; ++i)
             {
                 ++zzOff;
                 ulong c = 0, x_i = x[xOff + i];
@@ -474,7 +473,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             ulong y_6 = y[6];
 
             ulong zc = 0;
-            for (int i = 0; i < 7; ++i)
+            for (var i = 0; i < 7; ++i)
             {
                 ulong c = 0, x_i = x[i];
                 c += x_i * y_0 + zz[i + 0];
@@ -516,7 +515,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             ulong y_6 = y[yOff + 6];
 
             ulong zc = 0;
-            for (int i = 0; i < 7; ++i)
+            for (var i = 0; i < 7; ++i)
             {
                 ulong c = 0, x_i = x[xOff + i];
                 c += x_i * y_0 + zz[zzOff + 0];
@@ -671,11 +670,11 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
             Debug.Assert(x >> 31 == 0);
             Debug.Assert(zOff <= 3);
             ulong c = 0, xVal = x;
-            ulong y00 = y & M;
+            var y00 = y & M;
             c += xVal * y00 + z[zOff + 0];
             z[zOff + 0] = (uint)c;
             c >>= 32;
-            ulong y01 = y >> 32;
+            var y01 = y >> 32;
             c += xVal * y01 + y00 + z[zOff + 1];
             z[zOff + 1] = (uint)c;
             c >>= 32;
@@ -724,7 +723,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
         public static uint MulWord(uint x, uint[] y, uint[] z, int zOff)
         {
             ulong c = 0, xVal = x;
-            int i = 0;
+            var i = 0;
             do
             {
                 c += xVal * y[i];
@@ -746,7 +745,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 do
                 {
                     ulong xVal = x[i--];
-                    ulong p = xVal * xVal;
+                    var p = xVal * xVal;
                     zz[--j] = (c << 31) | (uint)(p >> 33);
                     zz[--j] = (uint)(p >> 1);
                     c = (uint)p;
@@ -754,7 +753,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 while (i > 0);
 
                 {
-                    ulong p = x_0 * x_0;
+                    var p = x_0 * x_0;
                     zz_1 = (ulong)(c << 31) | (p >> 33);
                     zz[0] = (uint)p;
                     c = (uint)(p >> 32) & 1;
@@ -885,7 +884,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 do
                 {
                     ulong xVal = x[xOff + i--];
-                    ulong p = xVal * xVal;
+                    var p = xVal * xVal;
                     zz[zzOff + --j] = (c << 31) | (uint)(p >> 33);
                     zz[zzOff + --j] = (uint)(p >> 1);
                     c = (uint)p;
@@ -893,7 +892,7 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
                 while (i > 0);
 
                 {
-                    ulong p = x_0 * x_0;
+                    var p = x_0 * x_0;
                     zz_1 = (ulong)(c << 31) | (p >> 33);
                     zz[zzOff + 0] = (uint)p;
                     c = (uint)(p >> 32) & 1;
@@ -1150,10 +1149,10 @@ namespace ChainUtils.BouncyCastle.Math.EC.Custom.Sec
 
         public static BigInteger ToBigInteger(uint[] x)
         {
-            byte[] bs = new byte[28];
-            for (int i = 0; i < 7; ++i)
+            var bs = new byte[28];
+            for (var i = 0; i < 7; ++i)
             {
-                uint x_i = x[i];
+                var x_i = x[i];
                 if (x_i != 0)
                 {
                     Pack.UInt32_To_BE(x_i, bs, (6 - i) << 2);

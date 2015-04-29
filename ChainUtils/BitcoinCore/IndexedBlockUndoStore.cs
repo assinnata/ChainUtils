@@ -1,9 +1,6 @@
 ﻿#if !NOFILEIO
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChainUtils.BitcoinCore
 {
@@ -12,26 +9,26 @@ namespace ChainUtils.BitcoinCore
 		public IndexedBlockUndoStore(NoSqlRepository index, BlockUndoStore store)
 			: base(index, store)
 		{
-			_Store = store;
+			_store = store;
 			IndexedLimit = "BlockUndo Index";
 		}
 
-		private readonly BlockUndoStore _Store;
+		private readonly BlockUndoStore _store;
 		public new BlockUndoStore Store
 		{
 			get
 			{
-				return _Store;
+				return _store;
 			}
 		}
 
-		public void Put(uint256 blockId, BlockUndo undo)
+		public void Put(Uint256 blockId, BlockUndo undo)
 		{
 			undo.BlockId = blockId;
 			Put(undo);
 		}
 
-		public BlockUndo Get(uint256 blockId)
+		public BlockUndo Get(Uint256 blockId)
 		{
 			if(blockId == null)
 				return null;

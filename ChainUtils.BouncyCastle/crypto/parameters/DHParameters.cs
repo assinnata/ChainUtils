@@ -1,5 +1,4 @@
 using System;
-
 using ChainUtils.BouncyCastle.Math;
 using ChainUtils.BouncyCastle.Utilities;
 
@@ -153,7 +152,7 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 			if (obj == this)
 				return true;
 
-			DHParameters other = obj as DHParameters;
+			var other = obj as DHParameters;
 
 			if (other == null)
 				return false;
@@ -166,12 +165,12 @@ namespace ChainUtils.BouncyCastle.Crypto.Parameters
 		{
 			return p.Equals(other.p)
 				&& g.Equals(other.g)
-				&& Platform.Equals(q, other.q);
+				&& Equals(q, other.q);
 		}
 
 		public override int GetHashCode()
         {
-			int hc = p.GetHashCode() ^ g.GetHashCode();
+			var hc = p.GetHashCode() ^ g.GetHashCode();
 
 			if (q != null)
 			{

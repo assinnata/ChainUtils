@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-
 using ChainUtils.BouncyCastle.Math.EC.Abc;
 using ChainUtils.BouncyCastle.Math.EC.Endo;
 using ChainUtils.BouncyCastle.Math.EC.Multiplier;
@@ -67,7 +65,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                     throw new InvalidOperationException("unsupported coordinate system");
                 }
 
-                ECCurve c = outer.CloneCurve();
+                var c = outer.CloneCurve();
                 if (c == outer)
                 {
                     throw new InvalidOperationException("implementation returned current curve");
@@ -91,7 +89,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         protected ECCurve(IFiniteField field)
         {
-            this.m_field = field;
+            m_field = field;
         }
 
         public abstract int FieldSize { get; }
@@ -99,12 +97,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public virtual Config Configure()
         {
-            return new Config(this, this.m_coord, this.m_endomorphism, this.m_multiplier);
+            return new Config(this, m_coord, m_endomorphism, m_multiplier);
         }
 
         public virtual ECPoint ValidatePoint(BigInteger x, BigInteger y)
         {
-            ECPoint p = CreatePoint(x, y);
+            var p = CreatePoint(x, y);
             if (!p.IsValid())
             {
                 throw new ArgumentException("Invalid point coordinates");
@@ -114,7 +112,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public virtual ECPoint ValidatePoint(BigInteger x, BigInteger y, bool withCompression)
         {
-            ECPoint p = CreatePoint(x, y, withCompression);
+            var p = CreatePoint(x, y, withCompression);
             if (!p.IsValid())
             {
                 throw new ArgumentException("Invalid point coordinates");
@@ -140,7 +138,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         protected virtual ECMultiplier CreateDefaultMultiplier()
         {
-            GlvEndomorphism glvEndomorphism = m_endomorphism as GlvEndomorphism;
+            var glvEndomorphism = m_endomorphism as GlvEndomorphism;
             if (glvEndomorphism != null)
             {
                 return new GlvMultiplier(this, glvEndomorphism);
@@ -159,7 +157,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             CheckPoint(point);
             lock (point)
             {
-                IDictionary table = point.m_preCompTable;
+                var table = point.m_preCompTable;
                 return table == null ? null : (PreCompInfo)table[name];
             }
         }
@@ -181,7 +179,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
             CheckPoint(point);
             lock (point)
             {
-                IDictionary table = point.m_preCompTable;
+                var table = point.m_preCompTable;
                 if (null == table)
                 {
                     point.m_preCompTable = table = Platform.CreateHashtable(4);
@@ -221,7 +219,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
         {
             CheckPoints(points);
 
-            if (this.CoordinateSystem == ECCurve.COORD_AFFINE)
+            if (CoordinateSystem == COORD_AFFINE)
             {
                 return;
             }
@@ -229,12 +227,12 @@ namespace ChainUtils.BouncyCastle.Math.EC
             /*
              * Figure out which of the points actually need to be normalized
              */
-            ECFieldElement[] zs = new ECFieldElement[points.Length];
-            int[] indices = new int[points.Length];
-            int count = 0;
-            for (int i = 0; i < points.Length; ++i)
+            var zs = new ECFieldElement[points.Length];
+            var indices = new int[points.Length];
+            var count = 0;
+            for (var i = 0; i < points.Length; ++i)
             {
-                ECPoint p = points[i];
+                var p = points[i];
                 if (null != p && !p.IsNormalized())
                 {
                     zs[count] = p.GetZCoord(0);
@@ -249,9 +247,9 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
             ECAlgorithms.MontgomeryTrick(zs, 0, count);
 
-            for (int j = 0; j < count; ++j)
+            for (var j = 0; j < count; ++j)
             {
-                int index = indices[j];
+                var index = indices[j];
                 points[index] = points[index].Normalize(zs[j]);
             }
         }
@@ -299,9 +297,9 @@ namespace ChainUtils.BouncyCastle.Math.EC
             if (points == null)
                 throw new ArgumentNullException("points");
 
-            for (int i = 0; i < points.Length; ++i)
+            for (var i = 0; i < points.Length; ++i)
             {
-                ECPoint point = points[i];
+                var point = points[i];
                 if (null != point && this != point.Curve)
                     throw new ArgumentException("entries must be null or on this curve", "points");
             }
@@ -344,11 +342,11 @@ namespace ChainUtils.BouncyCastle.Math.EC
         {
             lock (this)
             {
-                if (this.m_multiplier == null)
+                if (m_multiplier == null)
                 {
-                    this.m_multiplier = CreateDefaultMultiplier();
+                    m_multiplier = CreateDefaultMultiplier();
                 }
-                return this.m_multiplier;
+                return m_multiplier;
             }
         }
 
@@ -361,9 +359,9 @@ namespace ChainUtils.BouncyCastle.Math.EC
         public virtual ECPoint DecodePoint(byte[] encoded)
         {
             ECPoint p = null;
-            int expectedLength = (FieldSize + 7) / 8;
+            var expectedLength = (FieldSize + 7) / 8;
 
-            byte type = encoded[0];
+            var type = encoded[0];
             switch (type)
             {
                 case 0x00: // infinity
@@ -381,8 +379,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
                     if (encoded.Length != (expectedLength + 1))
                         throw new ArgumentException("Incorrect length for compressed encoding", "encoded");
 
-                    int yTilde = type & 1;
-                    BigInteger X = new BigInteger(1, encoded, 1, expectedLength);
+                    var yTilde = type & 1;
+                    var X = new BigInteger(1, encoded, 1, expectedLength);
 
                     p = DecompressPoint(yTilde, X);
                     if (!p.SatisfiesCofactor())
@@ -396,8 +394,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
                     if (encoded.Length != (2 * expectedLength + 1))
                         throw new ArgumentException("Incorrect length for uncompressed encoding", "encoded");
 
-                    BigInteger X = new BigInteger(1, encoded, 1, expectedLength);
-                    BigInteger Y = new BigInteger(1, encoded, 1 + expectedLength, expectedLength);
+                    var X = new BigInteger(1, encoded, 1, expectedLength);
+                    var Y = new BigInteger(1, encoded, 1 + expectedLength, expectedLength);
 
                     p = ValidatePoint(X, Y);
                     break;
@@ -409,8 +407,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
                     if (encoded.Length != (2 * expectedLength + 1))
                         throw new ArgumentException("Incorrect length for hybrid encoding", "encoded");
 
-                    BigInteger X = new BigInteger(1, encoded, 1, expectedLength);
-                    BigInteger Y = new BigInteger(1, encoded, 1 + expectedLength, expectedLength);
+                    var X = new BigInteger(1, encoded, 1, expectedLength);
+                    var Y = new BigInteger(1, encoded, 1 + expectedLength, expectedLength);
 
                     if (Y.TestBit(0) != (type == 0x07))
                         throw new ArgumentException("Inconsistent Y coordinate in hybrid encoding", "encoded");
@@ -440,9 +438,9 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         protected override ECPoint DecompressPoint(int yTilde, BigInteger X1)
         {
-            ECFieldElement x = FromBigInteger(X1);
-            ECFieldElement rhs = x.Square().Add(A).Multiply(x).Add(B);
-            ECFieldElement y = rhs.Sqrt();
+            var x = FromBigInteger(X1);
+            var rhs = x.Square().Add(A).Multiply(x).Add(B);
+            var y = rhs.Sqrt();
 
             /*
              * If y is not a square, then we haven't got a point on the curve
@@ -479,15 +477,15 @@ namespace ChainUtils.BouncyCastle.Math.EC
         public FpCurve(BigInteger q, BigInteger a, BigInteger b, BigInteger order, BigInteger cofactor)
             : base(q)
         {
-            this.m_q = q;
-            this.m_r = FpFieldElement.CalculateResidue(q);
-            this.m_infinity = new FpPoint(this, null, null);
+            m_q = q;
+            m_r = FpFieldElement.CalculateResidue(q);
+            m_infinity = new FpPoint(this, null, null);
 
-            this.m_a = FromBigInteger(a);
-            this.m_b = FromBigInteger(b);
-            this.m_order = order;
-            this.m_cofactor = cofactor;
-            this.m_coord = FP_DEFAULT_COORDS;
+            m_a = FromBigInteger(a);
+            m_b = FromBigInteger(b);
+            m_order = order;
+            m_cofactor = cofactor;
+            m_coord = FP_DEFAULT_COORDS;
         }
 
         protected FpCurve(BigInteger q, BigInteger r, ECFieldElement a, ECFieldElement b)
@@ -498,15 +496,15 @@ namespace ChainUtils.BouncyCastle.Math.EC
         protected FpCurve(BigInteger q, BigInteger r, ECFieldElement a, ECFieldElement b, BigInteger order, BigInteger cofactor)
             : base(q)
         {
-            this.m_q = q;
-            this.m_r = r;
-            this.m_infinity = new FpPoint(this, null, null);
+            m_q = q;
+            m_r = r;
+            m_infinity = new FpPoint(this, null, null);
 
-            this.m_a = a;
-            this.m_b = b;
-            this.m_order = order;
-            this.m_cofactor = cofactor;
-            this.m_coord = FP_DEFAULT_COORDS;
+            m_a = a;
+            m_b = b;
+            m_order = order;
+            m_cofactor = cofactor;
+            m_coord = FP_DEFAULT_COORDS;
         }
 
         protected override ECCurve CloneCurve()
@@ -545,7 +543,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public override ECFieldElement FromBigInteger(BigInteger x)
         {
-            return new FpFieldElement(this.m_q, this.m_r, x);
+            return new FpFieldElement(m_q, m_r, x);
         }
 
         protected internal override ECPoint CreateRawPoint(ECFieldElement x, ECFieldElement y, bool withCompression)
@@ -560,7 +558,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public override ECPoint ImportPoint(ECPoint p)
         {
-            if (this != p.Curve && this.CoordinateSystem == COORD_JACOBIAN && !p.IsInfinity)
+            if (this != p.Curve && CoordinateSystem == COORD_JACOBIAN && !p.IsInfinity)
             {
                 switch (p.Curve.CoordinateSystem)
                 {
@@ -798,9 +796,9 @@ namespace ChainUtils.BouncyCastle.Math.EC
             this.k1 = k1;
             this.k2 = k2;
             this.k3 = k3;
-            this.m_order = order;
-            this.m_cofactor = cofactor;
-            this.m_infinity = new F2mPoint(this, null, null);
+            m_order = order;
+            m_cofactor = cofactor;
+            m_infinity = new F2mPoint(this, null, null);
 
             if (k1 == 0)
                 throw new ArgumentException("k1 must be > 0");
@@ -819,9 +817,9 @@ namespace ChainUtils.BouncyCastle.Math.EC
                     throw new ArgumentException("k3 must be > k2");
             }
 
-            this.m_a = FromBigInteger(a);
-            this.m_b = FromBigInteger(b);
-            this.m_coord = F2M_DEFAULT_COORDS;
+            m_a = FromBigInteger(a);
+            m_b = FromBigInteger(b);
+            m_coord = F2M_DEFAULT_COORDS;
         }
 
         protected F2mCurve(int m, int k1, int k2, int k3, ECFieldElement a, ECFieldElement b, BigInteger order, BigInteger cofactor)
@@ -831,13 +829,13 @@ namespace ChainUtils.BouncyCastle.Math.EC
             this.k1 = k1;
             this.k2 = k2;
             this.k3 = k3;
-            this.m_order = order;
-            this.m_cofactor = cofactor;
+            m_order = order;
+            m_cofactor = cofactor;
 
-            this.m_infinity = new F2mPoint(this, null, null);
-            this.m_a = a;
-            this.m_b = b;
-            this.m_coord = F2M_DEFAULT_COORDS;
+            m_infinity = new F2mPoint(this, null, null);
+            m_a = a;
+            m_b = b;
+            m_coord = F2M_DEFAULT_COORDS;
         }
 
         protected override ECCurve CloneCurve()
@@ -875,14 +873,14 @@ namespace ChainUtils.BouncyCastle.Math.EC
 
         public override ECFieldElement FromBigInteger(BigInteger x)
         {
-            return new F2mFieldElement(this.m, this.k1, this.k2, this.k3, x);
+            return new F2mFieldElement(m, k1, k2, k3, x);
         }
 
         public override ECPoint CreatePoint(BigInteger x, BigInteger y, bool withCompression)
         {
             ECFieldElement X = FromBigInteger(x), Y = FromBigInteger(y);
 
-            switch (this.CoordinateSystem)
+            switch (CoordinateSystem)
             {
                 case COORD_LAMBDA_AFFINE:
                 case COORD_LAMBDA_PROJECTIVE:
@@ -986,8 +984,8 @@ namespace ChainUtils.BouncyCastle.Math.EC
             }
             else
             {
-                ECFieldElement beta = xp.Square().Invert().Multiply(B).Add(A).Add(xp);
-                ECFieldElement z = SolveQuadradicEquation(beta);
+                var beta = xp.Square().Invert().Multiply(B).Add(A).Add(xp);
+                var z = SolveQuadradicEquation(beta);
 
                 if (z != null)
                 {
@@ -996,7 +994,7 @@ namespace ChainUtils.BouncyCastle.Math.EC
                         z = z.AddOne();
                     }
 
-                    switch (this.CoordinateSystem)
+                    switch (CoordinateSystem)
                     {
                         case COORD_LAMBDA_AFFINE:
                         case COORD_LAMBDA_PROJECTIVE:
@@ -1035,20 +1033,20 @@ namespace ChainUtils.BouncyCastle.Math.EC
                 return beta;
             }
 
-            ECFieldElement zeroElement = FromBigInteger(BigInteger.Zero);
+            var zeroElement = FromBigInteger(BigInteger.Zero);
 
             ECFieldElement z = null;
             ECFieldElement gamma = null;
 
-            Random rand = new Random();
+            var rand = new Random();
             do
             {
-                ECFieldElement t = FromBigInteger(new BigInteger(m, rand));
+                var t = FromBigInteger(new BigInteger(m, rand));
                 z = zeroElement;
-                ECFieldElement w = beta;
-                for (int i = 1; i <= m - 1; i++)
+                var w = beta;
+                for (var i = 1; i <= m - 1; i++)
                 {
-                    ECFieldElement w2 = w.Square();
+                    var w2 = w.Square();
                     z = z.Square().Add(w2.Multiply(t));
                     w = w2.Add(beta);
                 }

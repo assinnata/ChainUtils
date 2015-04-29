@@ -18,10 +18,10 @@ namespace ChainUtils.Tests
 		static Dictionary<string, OpcodeType> mapOpNames = new Dictionary<string, OpcodeType>();
 		public static Script ParseScript(string s)
 		{
-			MemoryStream result = new MemoryStream();
+			var result = new MemoryStream();
 			if(mapOpNames.Count == 0)
 			{
-				for(int op = 0 ; op <= (byte)OpcodeType.OP_NOP10 ; op++)
+				for(var op = 0 ; op <= (byte)OpcodeType.OP_NOP10 ; op++)
 				{
 					// Allow OP_RESERVED to get into mapOpNames
 					if(op < (byte)OpcodeType.OP_NOP && op != (byte)OpcodeType.OP_RESERVED)
@@ -30,7 +30,7 @@ namespace ChainUtils.Tests
 					var name = Op.GetOpName((OpcodeType)op);
 					if(name == "OP_UNKNOWN")
 						continue;
-					string strName = name;
+					var strName = name;
 					mapOpNames[strName] = (OpcodeType)op;
 					// Convenience: OP_ADD and just ADD are both recognized:
 					strName = strName.Replace("OP_", "");
@@ -40,7 +40,7 @@ namespace ChainUtils.Tests
 
 			var words = s.Split(' ', '\t', '\n');
 
-			foreach(string w in words)
+			foreach(var w in words)
 			{
 				if(w == "")
 					continue;
@@ -49,7 +49,7 @@ namespace ChainUtils.Tests
 				{
 
 					// Number
-					long n = long.Parse(w);
+					var n = long.Parse(w);
 					Op.GetPushOp(new BigInteger(n)).WriteTo(result);
 				}
 				else if(w.StartsWith("0x") && HexEncoder.IsWellFormed(w.Substring(2)))
@@ -102,8 +102,8 @@ namespace ChainUtils.Tests
 			};
 			foreach(var test in tests)
 			{
-				ulong val = (ulong)test[0];
-				byte[] expectedBytes = (byte[])test[1];
+				var val = (ulong)test[0];
+				var expectedBytes = (byte[])test[1];
 
 				AssertEx.CollectionEquals(new CompactVarInt(val, sizeof(ulong)).ToBytes(), expectedBytes);
 				AssertEx.CollectionEquals(new CompactVarInt(val, sizeof(uint)).ToBytes(), expectedBytes);
@@ -295,7 +295,7 @@ namespace ChainUtils.Tests
 
 		private ScriptVerify ParseFlag(string flag)
 		{
-			ScriptVerify result = ScriptVerify.None;
+			var result = ScriptVerify.None;
 			foreach(var p in flag.Split(',', '|').Select(p => p.Trim().ToUpperInvariant()))
 			{
 				if(p == "P2SH")
@@ -343,17 +343,17 @@ namespace ChainUtils.Tests
 		[Trait("Core", "Core")]
 		public void script_standard_push()
 		{
-			for(int i = -1 ; i < 1000 ; i++)
+			for(var i = -1 ; i < 1000 ; i++)
 			{
-				Script script = new Script(Op.GetPushOp(i).ToBytes());
+				var script = new Script(Op.GetPushOp(i).ToBytes());
 				Assert.True(script.IsPushOnly, "Number " + i + " is not pure push.");
 				Assert.True(script.HasCanonicalPushes, "Number " + i + " push is not canonical.");
 			}
 
-			for(int i = 0 ; i < 1000 ; i++)
+			for(var i = 0 ; i < 1000 ; i++)
 			{
 				var data = Enumerable.Range(0, i).Select(_ => (byte)0x49).ToArray();
-				Script script = new Script(Op.GetPushOp(data).ToBytes());
+				var script = new Script(Op.GetPushOp(data).ToBytes());
 				Assert.True(script.IsPushOnly, "Length " + i + " is not pure push.");
 				Assert.True(script.HasCanonicalPushes, "Length " + i + " push is not canonical.");
 			}
@@ -362,9 +362,9 @@ namespace ChainUtils.Tests
 
 		Script sign_multisig(Script scriptPubKey, Key[] keys, Transaction transaction)
 		{
-			uint256 hash = scriptPubKey.SignatureHash(transaction, 0, SigHash.All);
+			var hash = scriptPubKey.SignatureHash(transaction, 0, SigHash.All);
 
-			List<Op> ops = new List<Op>();
+			var ops = new List<Op>();
 			//CScript result;
 			//
 			// NOTE: CHECKMULTISIG has an unfortunate bug; it requires
@@ -375,7 +375,7 @@ namespace ChainUtils.Tests
 			// and vice-versa)
 			//
 			ops.Add(OpcodeType.OP_0);
-			foreach(Key key in keys)
+			foreach(var key in keys)
 			{
 				var vchSig = key.Sign(hash).ToDER().ToList();
 				vchSig.Add((byte)SigHash.All);
@@ -393,11 +393,11 @@ namespace ChainUtils.Tests
 		[Trait("Core", "Core")]
 		public void script_CHECKMULTISIG12()
 		{
-			Key key1 = new Key(true);
-			Key key2 = new Key(false);
-			Key key3 = new Key(true);
+			var key1 = new Key(true);
+			var key2 = new Key(false);
+			var key3 = new Key(true);
 
-			Script scriptPubKey12 = new Script(
+			var scriptPubKey12 = new Script(
 					OpcodeType.OP_1,
 					Op.GetPushOp(key1.PubKey.ToBytes()),
 					Op.GetPushOp(key2.PubKey.ToBytes()),
@@ -405,27 +405,27 @@ namespace ChainUtils.Tests
 					OpcodeType.OP_CHECKMULTISIG
 				);
 
-			Transaction txFrom12 = new Transaction();
+			var txFrom12 = new Transaction();
 			txFrom12.Outputs.Add(new TxOut());
 			txFrom12.Outputs[0].ScriptPubKey = scriptPubKey12;
 
 
-			Transaction txTo12 = new Transaction();
+			var txTo12 = new Transaction();
 			txTo12.Inputs.Add(new TxIn());
 			txTo12.Outputs.Add(new TxOut());
 			txTo12.Inputs[0].PrevOut.N = 0;
 			txTo12.Inputs[0].PrevOut.Hash = txFrom12.GetHash();
 			txTo12.Outputs[0].Value = 1;
 
-			Script goodsig1 = sign_multisig(scriptPubKey12, key1, txTo12);
+			var goodsig1 = sign_multisig(scriptPubKey12, key1, txTo12);
 			Assert.True(Script.VerifyScript(goodsig1, scriptPubKey12, txTo12, 0, flags, 0));
 			txTo12.Outputs[0].Value = 2;
 			Assert.True(!Script.VerifyScript(goodsig1, scriptPubKey12, txTo12, 0, flags, 0));
 
-			Script goodsig2 = sign_multisig(scriptPubKey12, key2, txTo12);
+			var goodsig2 = sign_multisig(scriptPubKey12, key2, txTo12);
 			Assert.True(Script.VerifyScript(goodsig2, scriptPubKey12, txTo12, 0, flags, 0));
 
-			Script badsig1 = sign_multisig(scriptPubKey12, key3, txTo12);
+			var badsig1 = sign_multisig(scriptPubKey12, key3, txTo12);
 			Assert.True(!Script.VerifyScript(badsig1, scriptPubKey12, txTo12, 0, flags, 0));
 		}
 
@@ -433,12 +433,12 @@ namespace ChainUtils.Tests
 		[Trait("Core", "Core")]
 		public void script_CHECKMULTISIG23()
 		{
-			Key key1 = new Key(true);
-			Key key2 = new Key(false);
-			Key key3 = new Key(true);
-			Key key4 = new Key(false);
+			var key1 = new Key(true);
+			var key2 = new Key(false);
+			var key3 = new Key(true);
+			var key4 = new Key(false);
 
-			Script scriptPubKey23 = new Script(
+			var scriptPubKey23 = new Script(
 					OpcodeType.OP_2,
 					Op.GetPushOp(key1.PubKey.ToBytes()),
 					Op.GetPushOp(key2.PubKey.ToBytes()),
@@ -448,51 +448,51 @@ namespace ChainUtils.Tests
 				);
 
 
-			Transaction txFrom23 = new Transaction();
+			var txFrom23 = new Transaction();
 			txFrom23.Outputs.Add(new TxOut());
 			txFrom23.Outputs[0].ScriptPubKey = scriptPubKey23;
 
-			Transaction txTo23 = new Transaction();
+			var txTo23 = new Transaction();
 			txTo23.Inputs.Add(new TxIn());
 			txTo23.Outputs.Add(new TxOut());
 			txTo23.Inputs[0].PrevOut.N = 0;
 			txTo23.Inputs[0].PrevOut.Hash = txFrom23.GetHash();
 			txTo23.Outputs[0].Value = 1;
 
-			Key[] keys = new Key[] { key1, key2 };
-			Script goodsig1 = sign_multisig(scriptPubKey23, keys, txTo23);
+			var keys = new Key[] { key1, key2 };
+			var goodsig1 = sign_multisig(scriptPubKey23, keys, txTo23);
 			Assert.True(Script.VerifyScript(goodsig1, scriptPubKey23, txTo23, 0, flags, 0));
 
 			keys = new Key[] { key1, key3 };
-			Script goodsig2 = sign_multisig(scriptPubKey23, keys, txTo23);
+			var goodsig2 = sign_multisig(scriptPubKey23, keys, txTo23);
 			Assert.True(Script.VerifyScript(goodsig2, scriptPubKey23, txTo23, 0, flags, 0));
 
 			keys = new Key[] { key2, key3 };
-			Script goodsig3 = sign_multisig(scriptPubKey23, keys, txTo23);
+			var goodsig3 = sign_multisig(scriptPubKey23, keys, txTo23);
 			Assert.True(Script.VerifyScript(goodsig3, scriptPubKey23, txTo23, 0, flags, 0));
 
 			keys = new Key[] { key2, key2 }; // Can't re-use sig
-			Script badsig1 = sign_multisig(scriptPubKey23, keys, txTo23);
+			var badsig1 = sign_multisig(scriptPubKey23, keys, txTo23);
 			Assert.True(!Script.VerifyScript(badsig1, scriptPubKey23, txTo23, 0, flags, 0));
 
 			keys = new Key[] { key2, key1 }; // sigs must be in correct order
-			Script badsig2 = sign_multisig(scriptPubKey23, keys, txTo23);
+			var badsig2 = sign_multisig(scriptPubKey23, keys, txTo23);
 			Assert.True(!Script.VerifyScript(badsig2, scriptPubKey23, txTo23, 0, flags, 0));
 
 			keys = new Key[] { key3, key2 }; // sigs must be in correct order
-			Script badsig3 = sign_multisig(scriptPubKey23, keys, txTo23);
+			var badsig3 = sign_multisig(scriptPubKey23, keys, txTo23);
 			Assert.True(!Script.VerifyScript(badsig3, scriptPubKey23, txTo23, 0, flags, 0));
 
 			keys = new Key[] { key4, key2 };// sigs must match pubkeys
-			Script badsig4 = sign_multisig(scriptPubKey23, keys, txTo23);
+			var badsig4 = sign_multisig(scriptPubKey23, keys, txTo23);
 			Assert.True(!Script.VerifyScript(badsig4, scriptPubKey23, txTo23, 0, flags, 0));
 
 			keys = new Key[] { key1, key4 };// sigs must match pubkeys
-			Script badsig5 = sign_multisig(scriptPubKey23, keys, txTo23);
+			var badsig5 = sign_multisig(scriptPubKey23, keys, txTo23);
 			Assert.True(!Script.VerifyScript(badsig5, scriptPubKey23, txTo23, 0, flags, 0));
 
 			keys = new Key[0]; // Must have signatures
-			Script badsig6 = sign_multisig(scriptPubKey23, keys, txTo23);
+			var badsig6 = sign_multisig(scriptPubKey23, keys, txTo23);
 			Assert.True(!Script.VerifyScript(badsig6, scriptPubKey23, txTo23, 0, flags, 0));
 		}
 
@@ -501,15 +501,15 @@ namespace ChainUtils.Tests
 		[Trait("Core", "Core")]
 		public void script_combineSigs()
 		{
-			Key[] keys = new[] { new Key(), new Key(), new Key() };
+			var keys = new[] { new Key(), new Key(), new Key() };
 			var txFrom = CreateCreditingTransaction(keys[0].PubKey.Hash.ScriptPubKey);
 			var txTo = CreateSpendingTransaction(new Script(), txFrom);
 
-			Script scriptPubKey = txFrom.Outputs[0].ScriptPubKey;
-			Script scriptSig = txTo.Inputs[0].ScriptSig;
+			var scriptPubKey = txFrom.Outputs[0].ScriptPubKey;
+			var scriptSig = txTo.Inputs[0].ScriptSig;
 
-			Script empty = new Script();
-			Script combined = Script.CombineSignatures(scriptPubKey, txTo, 0, empty, empty);
+			var empty = new Script();
+			var combined = Script.CombineSignatures(scriptPubKey, txTo, 0, empty, empty);
 			Assert.True(combined.ToBytes().Length == 0);
 
 			// Single signature case:
@@ -519,7 +519,7 @@ namespace ChainUtils.Tests
 			Assert.True(combined == scriptSig);
 			combined = Script.CombineSignatures(scriptPubKey, txTo, 0, empty, scriptSig);
 			Assert.True(combined == scriptSig);
-			Script scriptSigCopy = scriptSig.Clone();
+			var scriptSigCopy = scriptSig.Clone();
 			// Signing again will give a different, valid signature:
 			SignSignature(keys, txFrom, txTo, 0);
 			scriptSig = txTo.Inputs[0].ScriptSig;
@@ -529,7 +529,7 @@ namespace ChainUtils.Tests
 
 
 			// P2SH, single-signature case:
-			Script pkSingle = PayToPubkeyTemplate.Instance.GenerateScriptPubKey(keys[0].PubKey);
+			var pkSingle = PayToPubkeyTemplate.Instance.GenerateScriptPubKey(keys[0].PubKey);
 			scriptPubKey = pkSingle.Hash.ScriptPubKey;
 			txFrom.Outputs[0].ScriptPubKey = scriptPubKey;
 			txTo.Inputs[0].PrevOut = new OutPoint(txFrom, 0);
@@ -571,28 +571,28 @@ namespace ChainUtils.Tests
 			Assert.True(combined == scriptSig);
 
 			// A couple of partially-signed versions:
-			uint256 hash1 = scriptPubKey.SignatureHash(txTo, 0, SigHash.All);
+			var hash1 = scriptPubKey.SignatureHash(txTo, 0, SigHash.All);
 			var sig1 = new TransactionSignature(keys[0].Sign(hash1), SigHash.All);
 
-			uint256 hash2 = scriptPubKey.SignatureHash(txTo, 0, SigHash.None);
+			var hash2 = scriptPubKey.SignatureHash(txTo, 0, SigHash.None);
 			var sig2 = new TransactionSignature(keys[1].Sign(hash2), SigHash.None);
 
 
-			uint256 hash3 = scriptPubKey.SignatureHash(txTo, 0, SigHash.Single);
+			var hash3 = scriptPubKey.SignatureHash(txTo, 0, SigHash.Single);
 			var sig3 = new TransactionSignature(keys[2].Sign(hash3), SigHash.Single);
 
 
 			// Not fussy about order (or even existence) of placeholders or signatures:
-			Script partial1a = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig1.ToBytes()) + OpcodeType.OP_0;
-			Script partial1b = new Script() + OpcodeType.OP_0 + OpcodeType.OP_0 + Op.GetPushOp(sig1.ToBytes());
-			Script partial2a = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig2.ToBytes());
-			Script partial2b = new Script() + Op.GetPushOp(sig2.ToBytes()) + OpcodeType.OP_0;
-			Script partial3a = new Script() + Op.GetPushOp(sig3.ToBytes());
-			Script partial3b = new Script() + OpcodeType.OP_0 + OpcodeType.OP_0 + Op.GetPushOp(sig3.ToBytes());
-			Script partial3c = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig3.ToBytes()) + OpcodeType.OP_0;
-			Script complete12 = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig1.ToBytes()) + Op.GetPushOp(sig2.ToBytes());
-			Script complete13 = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig1.ToBytes()) + Op.GetPushOp(sig3.ToBytes());
-			Script complete23 = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig2.ToBytes()) + Op.GetPushOp(sig3.ToBytes());
+			var partial1a = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig1.ToBytes()) + OpcodeType.OP_0;
+			var partial1b = new Script() + OpcodeType.OP_0 + OpcodeType.OP_0 + Op.GetPushOp(sig1.ToBytes());
+			var partial2a = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig2.ToBytes());
+			var partial2b = new Script() + Op.GetPushOp(sig2.ToBytes()) + OpcodeType.OP_0;
+			var partial3a = new Script() + Op.GetPushOp(sig3.ToBytes());
+			var partial3b = new Script() + OpcodeType.OP_0 + OpcodeType.OP_0 + Op.GetPushOp(sig3.ToBytes());
+			var partial3c = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig3.ToBytes()) + OpcodeType.OP_0;
+			var complete12 = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig1.ToBytes()) + Op.GetPushOp(sig2.ToBytes());
+			var complete13 = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig1.ToBytes()) + Op.GetPushOp(sig3.ToBytes());
+			var complete23 = new Script() + OpcodeType.OP_0 + Op.GetPushOp(sig2.ToBytes()) + Op.GetPushOp(sig3.ToBytes());
 
 			combined = Script.CombineSignatures(scriptPubKey, txTo, 0, partial1a, partial1b);
 			Assert.True(combined == partial1a);
@@ -683,7 +683,7 @@ namespace ChainUtils.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void CanParseAndGeneratePayToMultiSig()
 		{
-			string scriptPubKey = "1 0364bd4b02a752798342ed91c681a48793bb1c0853cbcd0b978c55e53485b8e27c 0364bd4b02a752798342ed91c681a48793bb1c0853cbcd0b978c55e53485b8e27d 2 OP_CHECKMULTISIG";
+			var scriptPubKey = "1 0364bd4b02a752798342ed91c681a48793bb1c0853cbcd0b978c55e53485b8e27c 0364bd4b02a752798342ed91c681a48793bb1c0853cbcd0b978c55e53485b8e27d 2 OP_CHECKMULTISIG";
 			var scriptPubKeyResult = PayToMultiSigTemplate.Instance.ExtractScriptPubKeyParameters(new Script(scriptPubKey));
 			Assert.Equal("0364bd4b02a752798342ed91c681a48793bb1c0853cbcd0b978c55e53485b8e27c", scriptPubKeyResult.PubKeys[0].ToString());
 			Assert.Equal("0364bd4b02a752798342ed91c681a48793bb1c0853cbcd0b978c55e53485b8e27d", scriptPubKeyResult.PubKeys[1].ToString());

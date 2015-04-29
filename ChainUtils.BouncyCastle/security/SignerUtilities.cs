@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.IO;
-
 using ChainUtils.BouncyCastle.Asn1;
 using ChainUtils.BouncyCastle.Asn1.CryptoPro;
 using ChainUtils.BouncyCastle.Asn1.Nist;
@@ -9,9 +7,8 @@ using ChainUtils.BouncyCastle.Asn1.Pkcs;
 using ChainUtils.BouncyCastle.Asn1.TeleTrust;
 using ChainUtils.BouncyCastle.Asn1.X509;
 using ChainUtils.BouncyCastle.Asn1.X9;
-using ChainUtils.BouncyCastle.Security;
-using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto;
+using ChainUtils.BouncyCastle.Crypto.Digests;
 using ChainUtils.BouncyCastle.Crypto.Engines;
 using ChainUtils.BouncyCastle.Crypto.Signers;
 using ChainUtils.BouncyCastle.Utilities;
@@ -273,7 +270,7 @@ namespace ChainUtils.BouncyCastle.Security
                 throw new ArgumentNullException("mechanism");
 
             mechanism = Platform.ToUpperInvariant(mechanism);
-            string aliased = (string) algorithms[mechanism];
+            var aliased = (string) algorithms[mechanism];
 
             if (aliased != null)
                 mechanism = aliased;
@@ -300,7 +297,7 @@ namespace ChainUtils.BouncyCastle.Security
 
             algorithm = Platform.ToUpperInvariant(algorithm);
 
-            string mechanism = (string) algorithms[algorithm];
+            var mechanism = (string) algorithms[algorithm];
 
             if (mechanism == null)
                 mechanism = algorithm;
@@ -314,7 +311,7 @@ namespace ChainUtils.BouncyCastle.Security
 
             if (mechanism.EndsWith("withRSAandMGF1"))
             {
-                string digestName = mechanism.Substring(0, mechanism.Length - "withRSAandMGF1".Length);
+                var digestName = mechanism.Substring(0, mechanism.Length - "withRSAandMGF1".Length);
                 return GetPssX509Parameters(digestName);
             }
 
@@ -324,14 +321,14 @@ namespace ChainUtils.BouncyCastle.Security
         private static Asn1Encodable GetPssX509Parameters(
             string	digestName)
         {
-            AlgorithmIdentifier hashAlgorithm = new AlgorithmIdentifier(
+            var hashAlgorithm = new AlgorithmIdentifier(
                 DigestUtilities.GetObjectIdentifier(digestName), DerNull.Instance);
 
             // TODO Is it possible for the MGF hash alg to be different from the PSS one?
-            AlgorithmIdentifier maskGenAlgorithm = new AlgorithmIdentifier(
+            var maskGenAlgorithm = new AlgorithmIdentifier(
                 PkcsObjectIdentifiers.IdMgf1, hashAlgorithm);
 
-            int saltLen = DigestUtilities.GetDigest(digestName).GetDigestSize();
+            var saltLen = DigestUtilities.GetDigest(digestName).GetDigestSize();
             return new RsassaPssParameters(hashAlgorithm, maskGenAlgorithm,
                 new DerInteger(saltLen), new DerInteger(1));
         }
@@ -350,7 +347,7 @@ namespace ChainUtils.BouncyCastle.Security
 
             algorithm = Platform.ToUpperInvariant(algorithm);
 
-            string mechanism = (string) algorithms[algorithm];
+            var mechanism = (string) algorithms[algorithm];
 
             if (mechanism == null)
                 mechanism = algorithm;
