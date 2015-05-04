@@ -10,6 +10,7 @@ namespace ChainUtils.Tests
 	{
 		public static void Main()
 		{
+
 		}
 	}
 }

@@ -46,6 +46,22 @@ namespace ChainUtils.Tests
 		private void T(uint expected, uint seed, string data)
 		{
 			Assert.Equal(Hashes.MurmurHash3(seed, Encoders.Hex.DecodeData(data)), expected);
+            string str = "0200454dd3781487f2f99b9aec4d936970ca39989c8a5947253ec16d0f9dbf1e9a1430316755jdhxuidhiuhuiwhsaz";
+            Console.Write((Hashes.Hash256(GetBytes(str), 2)).ToString());
 		}
+
+        static byte[] GetBytes(string str)
+        {
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;
+        }
+
+        static string GetString(byte[] bytes)
+        {
+            char[] chars = new char[bytes.Length / sizeof(char)];
+            System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+            return new string(chars);
+        }
 	}
 }
